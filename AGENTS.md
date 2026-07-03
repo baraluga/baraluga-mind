@@ -24,11 +24,15 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 `actions.md` is the canonical register for follow-up work.
 
 - Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
 - Do not bury active TODOs inside wiki pages.
 - Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
 - When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
 - Do not duplicate an existing open action; update it only when the new source adds material context.
-- Move completed actions to the `Done` section instead of deleting them.
+- Move completed actions to `Done` instead of deleting them.
 - Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
 
 ## File Naming

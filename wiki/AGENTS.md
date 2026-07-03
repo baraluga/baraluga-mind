@@ -22,10 +22,13 @@ The wiki is the synthesized memory layer. It should be more stable, more careful
 When wiki content produces a follow-up:
 
 - Add or update the task in root `actions.md`.
+- Add new active tasks to `Open` by default, not `Today`.
+- Move blocked tasks to `Waiting`.
+- Move completed tasks to `Done`.
 - Include `Context: [[page-name]]` linking back to the relevant wiki page.
 - Include `Source: ` with the source file path that supports the action.
 - Avoid duplicating existing open actions.
-- Move completed actions to the `Done` section of `actions.md`; do not delete them.
+- Do not delete completed actions.
 
 ## Entity Pages
 

@@ -11,6 +11,7 @@ Goals:
 - Preserve raw inputs during ingest.
 - Create or update durable wiki pages under `wiki/`.
 - Add or update captured follow-up work in root `actions.md`.
+- Put newly captured actions in `Open` by default; use `Waiting` only for blocked work and `Today` only when the user explicitly prioritizes it.
 - Prefer updating existing pages over creating duplicates.
 - Link related pages with Obsidian-style links.
 - Mark uncertainty explicitly.

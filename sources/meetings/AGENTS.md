@@ -24,6 +24,9 @@ Meeting sources can contain `Next Steps` as part of the source summary, but acti
 When a meeting contains a follow-up, owner commitment, or call to action:
 
 - Add or update the action in root `actions.md`.
+- Add newly captured meeting actions to `Open` by default.
+- Use `Waiting` when the action is clearly blocked on someone else or an external event.
+- Do not add meeting-derived actions to `Today` unless the user explicitly asks.
 - Link `Context` to the relevant wiki page when one exists.
 - Link `Source` to the meeting source file.
 - Do not create active TODOs only in meeting source files or wiki pages.
