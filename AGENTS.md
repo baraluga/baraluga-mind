@@ -16,6 +16,24 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 - Use `UNCERTAIN:` when a claim needs verification.
 - If source material is ambiguous, say so in the page.
 
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
 ## Ingest Behavior
 
 When processing files from `inbox/` or `sources/`:
