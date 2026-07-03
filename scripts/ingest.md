@@ -8,14 +8,16 @@ Process the new material in `inbox/` and update this markdown second brain.
 Follow `AGENTS.md`.
 
 Goals:
-- Preserve the raw inputs.
+- Preserve raw inputs during ingest.
 - Create or update durable wiki pages under `wiki/`.
 - Prefer updating existing pages over creating duplicates.
 - Link related pages with Obsidian-style links.
 - Mark uncertainty explicitly.
+- Move processed `inbox/` files to the appropriate `sources/` folder when they remain useful as evidence.
+- Leave files in `inbox/` when they still need follow-up, review, or clarification.
 - Give me a concise changelog when finished.
 
-Do not move or delete files unless I explicitly ask.
+Do not delete files unless I explicitly ask.
 ```
 
 ## Manual Ingest Checklist
@@ -25,7 +27,8 @@ Do not move or delete files unless I explicitly ask.
 3. Search `wiki/` for related existing pages.
 4. Create or update the smallest useful set of pages.
 5. Add source references.
-6. Report what changed.
+6. Move processed `inbox/` files worth preserving to the right `sources/` folder.
+7. Report what changed.
 
 ## Optional Capture Prompts
 

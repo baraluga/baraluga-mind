@@ -6,7 +6,10 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 
 ## Core Rules
 
-- Preserve source material. Do not delete raw inputs unless explicitly asked.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
 - Do not fabricate details, links, names, dates, or decisions.
 - Distinguish facts from inferences.
 - Prefer small updates to existing wiki pages over creating duplicate notes.
@@ -49,7 +52,12 @@ When processing files from `inbox/` or `sources/`:
 3. Update existing pages when possible.
 4. Create new pages only when the topic is likely to matter again.
 5. Add a short `Sources` section with the source filename or path.
-6. Add a short `Last Updated` date using `YYYY-MM-DD`.
+6. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+7. Add a short `Last Updated` date using `YYYY-MM-DD`.
 
 ## Wiki Page Shape
 
