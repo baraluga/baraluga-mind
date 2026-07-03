@@ -6,6 +6,7 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 
 ## Core Rules
 
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
 - Preserve source material during ingest.
 - Do not delete raw inputs unless explicitly asked.
 - After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
@@ -125,4 +126,5 @@ After an ingest pass, report:
 - pages updated
 - source files processed
 - uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
 - suggested next cleanup
