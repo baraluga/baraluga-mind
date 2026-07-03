@@ -1,2 +1,9 @@
 # Keep local Obsidian UI state out of the repo.
 .obsidian/
+
+# Keep macOS metadata out of the repo.
+.DS_Store
+
+# Keep transient inbox captures local until they are processed into sources/wiki.
+inbox/*
+!inbox/.gitkeep
