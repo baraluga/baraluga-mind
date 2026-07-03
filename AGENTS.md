@@ -16,9 +16,20 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 - Prefer small updates to existing wiki pages over creating duplicate notes.
 - Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
 - Keep prose direct, dense, and useful.
-- Use `TODO:` only for concrete follow-up work.
 - Use `UNCERTAIN:` when a claim needs verification.
 - If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to the `Done` section instead of deleting them.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
 
 ## File Naming
 
@@ -52,13 +63,14 @@ When processing files from `inbox/` or `sources/`:
    - action items
 3. Update existing pages when possible.
 4. Create new pages only when the topic is likely to matter again.
-5. Add a short `Sources` section with the source filename or path.
-6. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
    - `sources/articles/` for articles, links, and reading notes
    - `sources/meetings/` for meeting transcripts, agendas, and summaries
    - `sources/voice/` for voice-note transcripts and dictated thoughts
    - `sources/pdfs/` for PDFs and extracted PDF notes
-7. Add a short `Last Updated` date using `YYYY-MM-DD`.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
 
 ## Wiki Page Shape
 
@@ -124,6 +136,7 @@ After an ingest pass, report:
 
 - pages created
 - pages updated
+- actions added or updated in `actions.md`
 - source files processed
 - uncertain claims
 - new or suspicious names, acronyms, systems, projects, or jargon needing confirmation

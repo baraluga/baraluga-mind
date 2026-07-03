@@ -17,6 +17,18 @@ When processing meeting sources:
 - If a term affects a decision, action item, owner, or durable project context, flag it in the ingest review output for confirmation.
 - Prefer quoting a short source phrase around an uncertain term over replacing it with a guess.
 
+## Action Capture
+
+Meeting sources can contain `Next Steps` as part of the source summary, but active task tracking belongs in root `actions.md`.
+
+When a meeting contains a follow-up, owner commitment, or call to action:
+
+- Add or update the action in root `actions.md`.
+- Link `Context` to the relevant wiki page when one exists.
+- Link `Source` to the meeting source file.
+- Do not create active TODOs only in meeting source files or wiki pages.
+- If the owner, term, or task wording is uncertain because of transcript quality, flag it for confirmation in the ingest review output before creating a high-confidence action.
+
 ## First-Time Term Review
 
 Flag first-time terms when they look like:

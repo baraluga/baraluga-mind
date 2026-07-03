@@ -12,8 +12,20 @@ The wiki is the synthesized memory layer. It should be more stable, more careful
 - Keep transcript-derived claims traceable to source files.
 - Keep uncertain names, acronyms, and jargon out of page titles unless confirmed.
 - Use `UNCERTAIN:` for important claims that depend on unclear transcript text.
-- Do not turn every action item into a durable TODO. Only keep TODOs that still matter outside the meeting.
+- Do not create active TODO checkboxes or `TODO:` items in wiki pages.
+- Put every active follow-up, task, owner commitment, or call to action in root `actions.md`.
+- If a wiki page needs to mention active work, reference `[[actions]]` or describe the context without creating a separate TODO.
 - If a page is mostly a bucket for unclear material, name it plainly, such as `unclear-captures.md`.
+
+## Action References
+
+When wiki content produces a follow-up:
+
+- Add or update the task in root `actions.md`.
+- Include `Context: [[page-name]]` linking back to the relevant wiki page.
+- Include `Source: ` with the source file path that supports the action.
+- Avoid duplicating existing open actions.
+- Move completed actions to the `Done` section of `actions.md`; do not delete them.
 
 ## Entity Pages
 

@@ -10,6 +10,7 @@ Follow `AGENTS.md`.
 Goals:
 - Preserve raw inputs during ingest.
 - Create or update durable wiki pages under `wiki/`.
+- Add or update captured follow-up work in root `actions.md`.
 - Prefer updating existing pages over creating duplicates.
 - Link related pages with Obsidian-style links.
 - Mark uncertainty explicitly.
@@ -26,9 +27,10 @@ Do not delete files unless I explicitly ask.
 2. List files in `inbox/`.
 3. Search `wiki/` for related existing pages.
 4. Create or update the smallest useful set of pages.
-5. Add source references.
-6. Move processed `inbox/` files worth preserving to the right `sources/` folder.
-7. Report what changed.
+5. Add or update active follow-up work in `actions.md`.
+6. Add source references.
+7. Move processed `inbox/` files worth preserving to the right `sources/` folder.
+8. Report what changed.
 
 ## Optional Capture Prompts
 
