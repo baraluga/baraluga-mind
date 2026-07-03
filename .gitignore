@@ -1,0 +1,2 @@
+# Keep local Obsidian UI state out of the repo.
+.obsidian/
