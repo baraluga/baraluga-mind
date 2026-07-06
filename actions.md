@@ -6,12 +6,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Open
 
-### Baraluga Mind
-
-- [ ] Decide whether to automate the daily Codex conversation dump into `inbox/`.
-  - Context: [[baraluga-mind]]
-  - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
-
 ### Jira / SMP
 
 - [ ] Verify and finish the parent-ticket transition for `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137`.
@@ -21,6 +15,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 ## Waiting
 
 ## Done
+
+### Baraluga Mind
+
+- [x] Decide whether to automate the daily Codex conversation dump into `inbox/`.
+  - Context: [[baraluga-mind]]
+  - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
 
 ### SMP Platform
 
