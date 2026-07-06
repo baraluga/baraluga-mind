@@ -6,6 +6,18 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Open
 
+### Baraluga Mind
+
+- [ ] Decide whether to automate the daily Codex conversation dump into `inbox/`.
+  - Context: [[baraluga-mind]]
+  - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
+
+### Jira / SMP
+
+- [ ] Verify and finish the parent-ticket transition for `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137`.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
+
 ## Waiting
 
 ## Done
@@ -119,4 +131,3 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [x] Francois to submit the resource planning form by end of week from the June 30 note.
   - Context: [[francois]]
   - Source: `sources/meetings/2026-06-30-1504-granola-feedback-from-francois.md`
-
