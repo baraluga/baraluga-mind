@@ -19,10 +19,16 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - Carlos requested interconnector data also be pushed to TSDB.
 - Japan interconnector production dashboard updates on July 6 added daily-average JEPX spread, interconnector-specific spread labels, and compact `Last`, `WTD avg`, and `MTD avg` spread stat boxes.
 - The final Japan interconnector stat layout uses three right-aligned metric boxes per interconnector, with WTD/MTD based on the latest available spread date in the selected range.
+- July 7 Francois-help notes describe the expected self-service dashboard flow: register dataset/schema in CDH, assign the dataset to the CDH project for dev/QA/prod, add the data source to the CDH project in Grafana, then edit the visible dashboard.
+- The same notes say the contributor had edit rights in QA but not dev, and that the SMP Dashboard README has the full guide.
+- Carlos previously handled CDH setup himself; Brian only added the data source to the CDH project.
+- July 7 Codex work added a targeted CDH dataset-manager path for Japan interconnector effective-capacity historical stage registration and improved schema/crawler refresh behavior for existing datasets and stages.
+- CDH crawler lag made the historical stage appear broken at first; once it caught up, the cleaner same-dataset/two-stage model was restored.
 
 ## Open Questions
 
 - UNCERTAIN: Grafana backup implementation path remains blocked by network/VPN access in the captured notes.
+- UNCERTAIN: CDH crawler delay duration and operator-facing status behavior are not fully characterized.
 
 ## Sources
 
@@ -30,5 +36,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-07-01-1630-granola-smp-revie.md`
 - `sources/meetings/2026-07-02-1100-granola-sprint-planning.md`
 - `sources/codex-conversations/2026-07-06-codex-conversations.md`
+- `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+- `sources/codex-conversations/2026-07-07-codex-conversations.md`
 
-Last Updated: 2026-07-06
+Last Updated: 2026-07-08

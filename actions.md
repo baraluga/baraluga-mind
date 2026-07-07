@@ -6,6 +6,76 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Open
 
+### Team Operations
+
+- [ ] Complete the 40-minute training video.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
+
+- [ ] Submit the engagement meter survey and midyear GitHub feedback.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
+
+- [ ] Finalize GitHub organization members, targets, and git rules before end of July.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
+
+- [ ] Post a short team-chat note documenting the GitHub CLI remote-transfer approach for existing repos.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
+
+- [ ] Update PR rules to prevent contributors from self-merging.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+
+### Job Search
+
+- [ ] Enable Chrome local file access for Codex, then submit the queued ECLARO and JTI LinkedIn applications.
+  - Context: [[job-search-2026]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
+
+### Japan Interconnector
+
+- [ ] Try the interconnector historical backfill as a month-by-month run.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `inbox/2026-07-07.md`
+
+- [ ] Reimport the updated `SCR-1197` look-back dashboard JSON after the date-only `as_of` fix.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
+
+- [ ] Capture successful reconciliation input manifests and latest daily capacity output keys before implementing reconciliation source-selection hardening.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
+
+- [ ] Share the proxy address needed for ticket 1186.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
+
+- [ ] Pair with Francois on ticket 1100 dependency setup.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
+
+- [ ] Clarify look-back dashboard point-in-time requirements with Hermine.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
+
+### SMP Dashboards
+
+- [ ] Complete a Grafana dashboard end-to-end as a solo exercise.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+
+- [ ] Use the solo Grafana exercise to demonstrate self-service capability to Material and Adrian, then replicate with Carlos.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+
+### AI Assisted Engineering
+
+- [ ] Confirm Copilot token billing model with Irun.
+  - Context: [[ai-assisted-engineering]]
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+
 ## Waiting
 
 ## Done
@@ -45,6 +115,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### Japan Interconnector
+
+- [x] Investigate why `reconcile_capacity_task` started failing after the 13:00 successful run.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
 
 - [x] Verify and finish the parent-ticket transition for `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137`.
   - Context: [[japan-interconnector-dashboard]]

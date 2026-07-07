@@ -10,6 +10,7 @@ SMP operational discussions in late June and early July focused on production in
 - June 29 notes say NPRM68 without `.sem-em` worked for users but not the Teams channel.
 - July 2 planning proposed catching Graph API email failures and sending SMTP/direct email fallback alerts.
 - Proposed noise control: suppress repeated alerts for about 5 days and cap alerts around 3 per day.
+- July 7 standup notes say ticket 1181 added an alert-on-alert mechanism: if MS Teams alerting fails, send fallback email. A dedicated forced-failure test was set up in Japan QA for Francois to verify.
 - Francois wanted the MS Teams email issue resolved quickly or escalated through a vendor meeting.
 - ServiceNow incident fields discussed: affected service, symptom, and dropdown incident link.
 - Proxy errors were reported as 403s in FMP Japan prod and FMP India prod while QA was consistently successful.
@@ -28,5 +29,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-07-02-1100-granola-sprint-planning.md`
 - `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
 - `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
+- `sources/meetings/2026-07-07-1415-granola-standup.md`
 
-Last Updated: 2026-07-04
+Last Updated: 2026-07-08
