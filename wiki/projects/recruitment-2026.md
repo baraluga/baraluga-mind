@@ -25,11 +25,17 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - A July 8 pasted note preserved candidate interview prompts about Day 0 technical-lead priorities, Gitflow versus trunk-based development, delayed projects, good and bad git commits, and test culture.
 - Panel interview checks communication with EU counterparts and hypothetical problem-solving.
 - Remote cheating risk in technical assessments was discussed; in-person attendance was recommended for problem-solving/coding.
+- July 9 Angelica Lapastora interview notes describe a Python-heavy candidate with AngularJS, Node.js, Laravel-to-Django migration experience, and a React/Flask/Ollama/RAG dashboard demo built with Claude/Cursor assistance.
+- Angelica's demo used manual Open-Meteo pulls, IQR anomaly detection, SQLite, and a terminal-only local chatbot. Flask was justified over Django because the project had one endpoint and did not need Django's MVC/model structure.
+- In the AWS serverless design review, Angelica suggested ELB, SNS, SQS, and Secrets Manager improvements, but did not independently spot the DynamoDB stream/S3/Lambda infinite-loop risk.
+- Interviewer assessment in the note: medium-low, not clearly senior compared with Matt, with communication often staying at obvious statements. If passing, the next step would be a panel interview with European colleagues.
+- Future technical interviews should be at least 1.5 hours to leave enough time for demo and code review.
 
 ## Open Questions
 
 - UNCERTAIN: The count moved from 33 candidates on June 30 to 41 candidates on July 2; this likely reflects pipeline growth, but the notes do not reconcile the numbers.
 - UNCERTAIN: The Granola title says "Matt Mendez" but the candidate overview says "Matt Mendeswell"; this may be a transcription/name artifact.
+- UNCERTAIN: Angelica's exact seniority signal may need calibration against Alfred's assessment and any panel feedback if the process continues.
 
 ## Sources
 
@@ -38,5 +44,7 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-07-08-1100-granola-matt-mendez.md`
 - `sources/notes/2026-07-08.md`
+- `sources/meetings/2026-07-09-1000-granola-tech-interview-angelica-lapastora.md`
+- `sources/codex-conversations/2026-07-09-codex-conversations.md`
 
 Last Updated: 2026-07-09

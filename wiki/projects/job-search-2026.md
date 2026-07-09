@@ -18,15 +18,19 @@ The July 7 Codex capture shows the workflow can screen LinkedIn recommendations,
 - Blocker: Chrome extension local-file access needs enabling before Codex can upload tailored DOCX resumes through LinkedIn.
 - Main fit gaps noted: ECLARO asks for TensorFlow/PyTorch-style ML tooling; JTI asks for Azure OpenAI, AI Search, Databricks, Terraform/Bicep, and RAG platform depth.
 - Additional July 8 fit gaps: Agile & Co. asks for formal line management, WTW leans Azure/Power Platform, RealPage leans invoice-processing plus production RAG/vector DB depth, and CoDev has React/current Java/LangChain gaps.
+- July 9 run evaluated about 25 of 40 LinkedIn listings and submitted no applications because Chrome/LinkedIn inspection and upload probes timed out before resume upload.
+- July 9 artifacts were created for DevRev Software Engineer - Applied AI, Zero Hiring Senior Software Engineer, and Stratpoint Technologies Cloud Solutions Architect. All three remained manual follow-up or portal apply items.
+- July 9 fit gaps: DevRev asks for Go/serverless edge and travel up to 30%; Zero may require US Eastern overlap; Stratpoint is weaker on AI/agentic fit and stronger on cloud architecture/stakeholder delivery.
 
 ## Open Questions
 
 - UNCERTAIN: Whether the Chrome file-upload permission has since been enabled.
-- UNCERTAIN: Whether ECLARO, JTI, Agile & Co., WTW, or RealPage were manually submitted after being queued.
+- UNCERTAIN: Whether ECLARO, JTI, Agile & Co., WTW, RealPage, DevRev, Zero Hiring, or Stratpoint were manually submitted after being queued.
 
 ## Sources
 
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
 - `sources/codex-conversations/2026-07-08-codex-conversations.md`
+- `sources/codex-conversations/2026-07-09-codex-conversations.md`
 
 Last Updated: 2026-07-09

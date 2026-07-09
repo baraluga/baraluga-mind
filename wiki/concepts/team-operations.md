@@ -17,6 +17,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 8 Walnut migration planning split repo migration into ADO-direct and non-GitHub-source paths. The proposed sequence was read-only repo migration, recreate GitHub pipelines, add users after pipelines stabilize, then turn off ADO access after a few days.
 - July 8 notes say most migration effort is pipeline recreation rather than repo transfer. Michael was execution lead, Brian handled support/automation/governance oversight, and Alexander owned governance pipeline and master branch protection settings.
 - [[ado-ios]] is a small Python CLI for one-repo-at-a-time Azure DevOps to GitHub migration through `gh ado2gh migrate-repo`, with dry-run defaults and source-lock support.
+- July 9 AM standup clarified that the migrator role does not cover repository migration by default, bulk pipeline migration may be an option, and the team principle is to understand the manual UI process before automating.
+- July 9 technical standup decided not to pursue migrator role for PR history. See [[2026-07-09-skip-pr-history-for-walnut-migration]].
+- July 9 technical standup said ABT dashboard was migrated as a test case using GitHub CLI and Azure CLI without migrator role. Click migration should wait until JB's security remediation work is complete because commits during migration can leave leftovers.
 - Artifact migration was still unsettled. SFF components may need dedicated repos for common artifacts, SMP Common may become a shared artifact source, and ADO artifacts remain in use until cutover.
 - July 8 AWS migration notes introduced a centralized technical-activities board with separate epics for AWS migration, Walnut migration, and security remediation, charged per project instead of one blanket bucket.
 - Pyrine/GMR migration notes mention default EFS backup in the new DMS account, 35-day warm backup, daily incremental backup, and Pyrine storage cost estimated around USD 600-700/month for about 13 TB.
@@ -33,6 +36,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether GitHub CLI transfer is officially preferred for all existing repos or only the observed repo migration case.
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
 - UNCERTAIN: Whether Pyrine UAT/pre-prod should be always-on or on-demand.
+- UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
 
 ## Sources
 
@@ -44,5 +48,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
+- `sources/meetings/2026-07-09-0945-granola-am-standup.md`
+- `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 
 Last Updated: 2026-07-09

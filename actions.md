@@ -40,11 +40,23 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 
+- [ ] Request Maintainer access in Auto for Brian.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-09-0945-granola-am-standup.md`
+
+- [ ] Document the manual ADO-to-GitHub migrator UI process before automating it.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-09-0945-granola-am-standup.md`
+
+- [ ] Coordinate Click migration with JB after security remediation is complete.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
 ### Job Search
 
 - [ ] Enable Chrome local file access for Codex, then submit the queued LinkedIn/manual applications.
   - Context: [[job-search-2026]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`
 
 ### Japan Interconnector
 
@@ -60,21 +72,29 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
 
-- [ ] Share the proxy address needed for ticket 1186.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
-
-- [ ] Pair with Francois on ticket 1100 dependency setup.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
-
 - [ ] Clarify look-back dashboard point-in-time requirements with Hermine.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`
 
 - [ ] Confirm whether the existing dashboard data export feature is sufficient once the current interconnector dashboard is finalized.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
+  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+
+- [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+
+- [ ] Raise PR for `SCR-11102`.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+
+- [ ] Check Prometheus for Japan QA cluster memory pressure and namespace memory reservation after parallel backfill failures.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+
+- [ ] Confirm actual-flow source path for FY2019-FY2024 with Hiromi.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
 
 ### SMP Dashboards
 
@@ -112,11 +132,43 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 
+- [ ] Rebuild and redeploy the QA Airflow image so `smp-common 0.4.3` is available at runtime.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
+
+- [ ] Fix the CDK compute-environment role bug caused by the removed `dash-infra` suffix and redeploy.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Publish an unofficial artifact to test the `dash-infra` suffix correction before creating a PR.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Resume Pyrene EFS S3 sync with a detachable session or Kubernetes job, considering 16-20 threads.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Handle the Pyrene UAT SSL certificate request.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Schedule a focused user-microservice security discussion with a subset of the team.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Message Lloyd about AWS ADO access.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
   - Context: [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+
+- [ ] Set up an encrypted common-stack SNS topic for Grafana APM alerts and coordinate the Teams channel subscriber with Nilo.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 
 ## Waiting
 
@@ -177,6 +229,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### Japan Interconnector
+
+- [x] Share the proxy address needed for ticket 1186.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`; `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+
+- [x] Pair with Francois on ticket 1100 dependency setup.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-07-1415-granola-standup.md`; `sources/notes/2026-07-09.md`
 
 - [x] Investigate why `reconcile_capacity_task` started failing after the 13:00 successful run.
   - Context: [[japan-interconnector-dashboard]]

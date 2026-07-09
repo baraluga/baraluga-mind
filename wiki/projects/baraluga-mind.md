@@ -17,11 +17,11 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The capture should preserve user/assistant transcript evidence while filtering out tool calls, tool outputs, system prompts, developer prompts, and reasoning records.
 - The July 6 capture showed that full daily transcripts can be large, so the durable wiki should summarize only decisions, implementation outcomes, risks, and follow-ups.
 - The corrected July 7 capture found five local Codex sessions and was ingested as source evidence. The July 8 capture found zero sessions and is preserved separately.
-- GitHub Copilot conversations can also be exported from local Copilot CLI state under `/Users/qn5792/.copilot/session-state` and VS Code Copilot Chat workspace storage. The July 9 capture found five local Copilot sessions and followed the same inbox-first ingest path.
+- The daily Codex conversation capture automation was confirmed active on July 9. It runs daily at 23:00, writes to `inbox/YYYY-MM-DD-codex-conversations.md`, and explicitly stays export-only until a separate ingest pass.
+- GitHub Copilot conversations can also be exported from local Copilot CLI state under `/Users/qn5792/.copilot/session-state` and VS Code Copilot Chat workspace storage. The July 9 capture found ten local Copilot sessions and followed the same inbox-first ingest path.
 
 ## Open Questions
 
-- UNCERTAIN: Whether the daily Codex conversation dump should be automated on a schedule or kept as an explicit manual capture step.
 - UNCERTAIN: The July 7 automation initially produced an empty capture before the corrected export was created.
 - UNCERTAIN: Whether Copilot conversation capture should stay manual or become a scheduled export like the Codex and Granola captures.
 
@@ -30,6 +30,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/codex-conversations/2026-07-06-codex-conversations.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
 - `sources/codex-conversations/2026-07-08-codex-conversations.md`
+- `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 
 Last Updated: 2026-07-09

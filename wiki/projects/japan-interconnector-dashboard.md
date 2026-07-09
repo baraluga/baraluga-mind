@@ -37,6 +37,12 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - Durable design direction after recovery: capacity source storage may be append-only/history-bearing, but current effective reconciliation must use a bounded or manifest-based source selection instead of scanning every object in `japan_occto_interconnector_capacity/all`.
 - July 8 AWS migration standup said the interconnector dashboard was nearly complete, with remaining detail tickets including ticket 97 for time series view and accepted data exports.
 - The same note says the adaptable Y-axis ticket was closed because the user accepted auto-adjusted scale as-is.
+- July 9 SMP standup says historical backfill was complete for JPX and capacity from 2019, while actual flow was available only for 2025. Hiromi was investigating the actual-flow download path for FY2019-FY2024.
+- July 9 notes say the historical look-back path takes the latest snapshot at 23:30 JST and copies reconciled capacity to a new CDH dataset. It was working in Grafana and waiting for Japan team feedback.
+- `SCR-1198` export remained open on July 9. The best case was using existing Grafana export; Excel template complexity was still TBD.
+- July 9 proxy notes say Oliver deployed a proxy handler fix around 17:00, no proxy errors appeared after the fix, root cause was an access-control filter using the wrong network mask and destination IP filtering, and the ticket was validated and moved done.
+- Some Japan QA DAGs still failed with clean-looking logs. The working theory was memory pressure from parallel backfill runs, requiring Prometheus and namespace memory reservation checks.
+- Interconnector TSDB direction on July 9: send reconciled interconnector capacity view to TSDB, four time-series inserts per interconnector, with Carlos consolidating the catalog and IDs expected next sprint.
 
 ## Open Questions
 
@@ -47,6 +53,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the local date-only `as_of` dashboard JSON update was later committed/pushed after the reimport guidance.
 - UNCERTAIN: Exact current reconciliation source-selection rules still need design against successful Airflow manifests and daily capacity output keys.
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
+- UNCERTAIN: Whether Hiromi can identify reliable FY2019-FY2024 actual-flow source paths.
+- UNCERTAIN: Whether the clean-log Japan QA failures are truly caused by memory pressure.
 
 ## Sources
 
@@ -59,5 +67,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-07-07.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
+- `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+- `sources/notes/2026-07-09.md`
+- `sources/codex-conversations/2026-07-09-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 
 Last Updated: 2026-07-09

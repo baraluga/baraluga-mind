@@ -24,10 +24,15 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - July 8 Codex work added README instructions to install local `pre-commit` and `pre-push` hooks in `smp-india` and `smp-japan`, including Windows PowerShell coverage. The durable policy point was that local hooks can be automated for convenience, but real enforcement is CI plus required branch protection.
 - Pipeline tests were still skipped because of Zscaler proxy dependency and Walnut/GEMS Artifactory auth. The captured workaround was local reviewer testing until the GitHub migration team/Ilo sorts out the Walnut runner.
 - July 8 AWS migration notes say the Walnut runner in the new GitHub org was still blocking automated Docker image builds because TLS trust for the GEMS artifact registry was not set up correctly.
+- July 9 notes say `smp-common 0.4.3` introduced `send_debug_dag_email`, `smp-japan` wired it into the manual interconnector backfill DAG, and `smp-tool` was later bumped to `smp-common>=0.4.3`. The runtime still requires a QA Airflow image rebuild/redeploy before deployed DAGs can import the new callback.
+- July 9 Copilot dependency audit removed dead `smp-tool` extras and flagged that `smp-india` uses `plotly` without declaring it directly, relying on `smp-tool` base dependencies.
 - User account management was moving through `SCR-1172`, with a meeting planned with Jim to configure access rights. The next-sprint target was India user access plus detailed training, with Matteo to be invited.
 - Synapse integration was not yet accepted; a demo was requested to evaluate fit before committing.
 - PR review should stay in the loop initially, with rules preventing contributors from self-approving or self-merging.
 - July 9 Copilot walkthrough summarized the SMP collection as separate region DAG repos (`smp-india`, `smp-japan`), runtime/deployment in `smp-tool`, and CDH/Grafana work in `smp-dashboard`. It reinforced the contract that DAG outputs intended for dashboards land as `dashboard_data/<dataset>/<stage>/<file>.parquet` before CDH/Athena/Grafana wiring.
+- July 9 technical standup notes say CDK `6.5.1` was released to MS prod, NOP prod, Pyrene, and GMR, but compute-environment creation failed because some roles still expected the removed `dash-infra` project-name suffix.
+- Pyrene migration status on July 9: compute environment migration was done, 13 TB EFS recovery was running via S3 sync, UAT setup was pending SSL certificate, and the rough target was Wednesday with worst case end of next week.
+- Prosumer security remediation on July 9 centered on backend authorization for user lookup/sharing flows. The current frontend-controlled permission model was called out as insufficient, and the user microservice needed broader fix work across systems.
 - [[smp-alerting-and-ops]] covers MS Teams email failures, fallback alerting, incident reporting, Grafana backup, and runbook automation.
 - [[japan-interconnector-dashboard]] covers Japan interconnector data retrieval and dashboard work.
 - [[copilot-dag-agent]] covers the DAG creation helper and branch workflow implications.
@@ -37,6 +42,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether SMP prod database should be a cluster or a separate database still needed confirmation in the June 22 notes.
 - UNCERTAIN: Exact root cause of the Japan/India production proxy 403s was not established in the captured notes.
 - UNCERTAIN: Whether the GEMS artifact registry TLS certificate is owned by the SMP team, Nilo/Guido, or another platform group.
+- UNCERTAIN: Whether Pyrene UAT should be always-on or on-demand remains unresolved in migration notes.
+- UNCERTAIN: The exact final remediation shape for user lookup permissions belongs to a follow-up technical discussion.
 
 ## Sources
 
@@ -54,5 +61,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 - `sources/codex-conversations/2026-07-08-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
+- `sources/codex-conversations/2026-07-09-codex-conversations.md`
+- `sources/meetings/2026-07-09-0945-granola-am-standup.md`
+- `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 
 Last Updated: 2026-07-09
