@@ -24,11 +24,13 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - Carlos previously handled CDH setup himself; Brian only added the data source to the CDH project.
 - July 7 Codex work added a targeted CDH dataset-manager path for Japan interconnector effective-capacity historical stage registration and improved schema/crawler refresh behavior for existing datasets and stages.
 - CDH crawler lag made the historical stage appear broken at first; once it caught up, the cleaner same-dataset/two-stage model was restored.
+- July 8 AWS migration standup favored backing up the full Grafana database instead of only dashboard JSON exports. Grafana was thought to use MySQL or Postgres, with an option to connect to existing RDS using the same pattern as Airflow.
 
 ## Open Questions
 
 - UNCERTAIN: Grafana backup implementation path remains blocked by network/VPN access in the captured notes.
 - UNCERTAIN: CDH crawler delay duration and operator-facing status behavior are not fully characterized.
+- UNCERTAIN: Grafana database engine and RDS backup path still need confirmation.
 
 ## Sources
 
@@ -38,5 +40,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-07-06-codex-conversations.md`
 - `sources/meetings/2026-07-07-1530-granola-francois-help.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
+- `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 
-Last Updated: 2026-07-08
+Last Updated: 2026-07-09

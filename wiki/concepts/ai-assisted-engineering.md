@@ -17,6 +17,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - One team meeting noted Scalar defaulting to a Hong Kong IP, causing Claude/Anthropic access issues; GPT/Gemini alternatives were mentioned.
 - July 7 weekly team notes say one hour of IT troubleshooting restored Claude/Anthropic access through web or IDE, though Hong Kong routing remained a concern and IT would report the network tool block.
 - July 7 Francois-help notes say GitHub Copilot can fix PR pipeline errors directly in GitHub and commit to the existing PR, making simple PR fixes more accessible to non-Python contributors.
+- July 9 Copilot CLI sessions show the same repo-grounded workflow being used outside Codex: project walkthroughs for the SMP collection and `ado-ios`, then a TDD refactor with Ruff, pytest, coverage, smoke validation, commit, PR creation, approval, and merge.
 
 ## Open Questions
 
@@ -31,5 +32,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+- `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 
-Last Updated: 2026-07-08
+Last Updated: 2026-07-09

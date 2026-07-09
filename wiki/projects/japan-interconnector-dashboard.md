@@ -35,6 +35,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - Two temporary operational DAGs were added and promoted to QA: `z_japan_occto_capacity_reconciliation_probe_dag` for read-only inventory/metadata diagnostics and `z_japan_occto_capacity_source_quarantine_dag` for dry-run-first copy-verify-delete quarantine.
 - Quarantining the 44 suspect daily files reduced daily source files from 482 to 438 and restored `japan_occto_capacity_reconciliation_dag` in QA.
 - Durable design direction after recovery: capacity source storage may be append-only/history-bearing, but current effective reconciliation must use a bounded or manifest-based source selection instead of scanning every object in `japan_occto_interconnector_capacity/all`.
+- July 8 AWS migration standup said the interconnector dashboard was nearly complete, with remaining detail tickets including ticket 97 for time series view and accepted data exports.
+- The same note says the adaptable Y-axis ticket was closed because the user accepted auto-adjusted scale as-is.
 
 ## Open Questions
 
@@ -44,6 +46,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: The parent Jira tickets `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137` may still need workflow cleanup after an interrupted transition attempt.
 - UNCERTAIN: Whether the local date-only `as_of` dashboard JSON update was later committed/pushed after the reimport guidance.
 - UNCERTAIN: Exact current reconciliation source-selection rules still need design against successful Airflow manifests and daily capacity output keys.
+- UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
 
 ## Sources
 
@@ -53,7 +56,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
 - `sources/codex-conversations/2026-07-06-codex-conversations.md`
 - `sources/meetings/2026-07-07-1415-granola-standup.md`
-- `inbox/2026-07-07.md`
+- `sources/notes/2026-07-07.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
+- `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 
-Last Updated: 2026-07-08
+Last Updated: 2026-07-09
