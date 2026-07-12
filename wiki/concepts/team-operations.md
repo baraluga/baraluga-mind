@@ -28,12 +28,13 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Sentry will be recreated from scratch in Europe, with previous logs accepted as lost.
 - Portfolio topics mentioned: JMR v2, AVST index builder, Onset, Platform, Sign Ups, SMP, carbon emissions platform, Delphi CLI, APM, and Click.
 - Sign Ups AKS migration covered Azure resource groups, naming conventions, storage accounts, Key Vault, workload identity, Bicep, and IT dependencies.
+- A July 12 `smp-japan` migration attempt showed that native GitHub transfers can create an approval window where neither organization URL is accessible. For migrations that only need branches, tags, and commit history, the preferred operational method is now a staged private mirror with the source left available until the target is verified.
 
 ## Open Questions
 
 - UNCERTAIN: Extraordinary/additional bonus question was raised with no answer captured.
 - UNCERTAIN: Whether GitHub/Walnut should reuse and rename the existing SMP organization or create a new one.
-- UNCERTAIN: Whether GitHub CLI transfer is officially preferred for all existing repos or only the observed repo migration case.
+- UNCERTAIN: Whether a native transfer is still required for any repository whose GitHub metadata must be preserved; it is no longer the default for Git-only migrations.
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
 - UNCERTAIN: Whether Pyrine UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
@@ -50,5 +51,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 - `sources/meetings/2026-07-09-0945-granola-am-standup.md`
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+- `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-13

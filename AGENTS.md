@@ -33,6 +33,7 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 - When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
 - Do not duplicate an existing open action; update it only when the new source adds material context.
 - Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
 - Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
 
 ## File Naming
@@ -93,6 +94,7 @@ When processing files from `inbox/` or `sources/`:
    - `sources/voice/` for voice-note transcripts and dictated thoughts
    - `sources/pdfs/` for PDFs and extracted PDF notes
 8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
 
 ## Wiki Page Shape
 

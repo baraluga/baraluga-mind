@@ -48,6 +48,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-09-0945-granola-am-standup.md`
 
+- [ ] After the Japan transfer is resolved, migrate remaining repositories with staged private mirrors and keep each source available until the target is verified.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
+
 - [ ] Coordinate Click migration with JB after security remediation is complete.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
@@ -65,10 +69,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/notes/2026-07-07.md`
 
 - [ ] Reimport the updated `SCR-1197` look-back dashboard JSON after the date-only `as_of` fix.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
-
-- [ ] Capture successful reconciliation input manifests and latest daily capacity output keys before implementing reconciliation source-selection hardening.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
 
@@ -160,6 +160,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 
+- [ ] Fix the `smp-tool` Docker workflow so its temporary `netrc` exists before the Docker build consumes it.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
@@ -179,6 +183,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/meetings/2026-07-08-1100-granola-matt-mendez.md`
 
 ### Team Operations
+
+- [ ] Wait for a `qrm-dms` owner to accept or decline the pending private `smp-japan` transfer, then verify remote access, update Japan Airflow git-sync URLs, adopt `qrm-dms/install-engie-ca@v1`, and confirm CI is green.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
 - [ ] Wait for Alexander to define GitHub governance pipeline and master branch protection rules.
   - Context: [[team-operations]]
@@ -229,6 +237,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### Japan Interconnector
+
+- [x] Capture successful reconciliation input manifests and latest daily capacity output keys before implementing reconciliation source-selection hardening.
+  - Closure: Superseded by the implemented and QA-validated immutable-baseline reconciliation contract; the pre-implementation capture is no longer actionable.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
 - [x] Share the proxy address needed for ticket 1186.
   - Context: [[japan-interconnector-dashboard]]

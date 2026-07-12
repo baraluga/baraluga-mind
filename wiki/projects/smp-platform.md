@@ -36,12 +36,19 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - [[smp-alerting-and-ops]] covers MS Teams email failures, fallback alerting, incident reporting, Grafana backup, and runbook automation.
 - [[japan-interconnector-dashboard]] covers Japan interconnector data retrieval and dashboard work.
 - [[copilot-dag-agent]] covers the DAG creation helper and branch workflow implications.
+- July 12 Walnut diagnostics proved that `IS_INFRA_ROOT_CRT.crt` is the CA required for GEMS Artifactory: default trust failed with certificate verification code 19, while an explicit request using that CA returned HTTP 200 with verification code 0.
+- Walnut can access the GEMS Python indexes anonymously. The initial India/Japan authorization failures came from sending usernames with empty passwords; removing those incomplete GEMS credentials allowed full dependency synchronization. Tools Artifactory still uses its separate credentials.
+- India and Japan CI were consolidated into one workflow per repository with parallel docs, lint, and test jobs. Tests run on Walnut with frozen dependency sync, fork-PR isolation, timeouts, least-privilege permissions, and current action versions; both full pipelines were verified green.
+- A private, narrowly scoped `qrm-dms/install-engie-ca` composite-action repository was created and released as `v1`. It installs and fingerprints the ENGIE CA without coupling certificate setup to Python or `uv`.
+- The attempted native transfer of `smp-japan` to `qrm-dms` was pending owner acceptance at the end of the capture. The repository was changed to private before transfer, but neither old nor new remote was reachable while approval was pending; existing Airflow DAG checkouts could continue, while git-sync, restarts, or new pods were at risk.
+- Durable migration preference after this incident: use a staged private mirror when only Git refs and history need preservation, keep the source operational through verification, and avoid approval-dependent organization operations unless explicitly authorized with the downtime boundary understood.
 
 ## Open Questions
 
 - UNCERTAIN: Whether SMP prod database should be a cluster or a separate database still needed confirmation in the June 22 notes.
 - UNCERTAIN: Exact root cause of the Japan/India production proxy 403s was not established in the captured notes.
-- UNCERTAIN: Whether the GEMS artifact registry TLS certificate is owned by the SMP team, Nilo/Guido, or another platform group.
+- UNCERTAIN: Who owns approval and rotation of the ENGIE root certificate despite its technical validation for GEMS access.
+- UNCERTAIN: Whether the pending `smp-japan` native transfer was accepted after the July 12 capture.
 - UNCERTAIN: Whether Pyrene UAT should be always-on or on-demand remains unresolved in migration notes.
 - UNCERTAIN: The exact final remediation shape for user lookup permissions belongs to a follow-up technical discussion.
 
@@ -64,5 +71,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/meetings/2026-07-09-0945-granola-am-standup.md`
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+- `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-13

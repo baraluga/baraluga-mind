@@ -43,6 +43,11 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - July 9 proxy notes say Oliver deployed a proxy handler fix around 17:00, no proxy errors appeared after the fix, root cause was an access-control filter using the wrong network mask and destination IP filtering, and the ticket was validated and moved done.
 - Some Japan QA DAGs still failed with clean-looking logs. The working theory was memory pressure from parallel backfill runs, requiring Prometheus and namespace memory reservation checks.
 - Interconnector TSDB direction on July 9: send reconciled interconnector capacity view to TSDB, four time-series inserts per interconnector, with Carlos consolidating the catalog and IDs expected next sprint.
+- July 12 investigation confirmed that scheduled reconciliation could overwrite granular manual-backfill results: the manual raw files were isolated under `backfill/manual`, but the scheduled rebuild omitted that prefix and replaced the stable yearly effective-capacity files.
+- The reconciliation contract was hardened in `smp-japan`: manual-backfill files are permanent inputs, live daily data is a bounded overlay, partial runs rebuild affected years from the persisted baseline, and completed-year publication fails closed if daily granularity would regress.
+- A full-history QA run exposed memory pressure across reconciliation, validation, and publication. All three paths were changed test-first to stream Parquet data in 32,768-row batches and process one calendar year at a time; the fresh QA reconciliation then completed successfully.
+- Effective output is partitioned by the calendar year of `interval_start_jst`, not the source `target_year`, because fiscal-year source files can contain January-March intervals from the following calendar year.
+- A July 12 read-only audit found no comparable urgent memory defect in normal scheduled interconnector DAGs. Remaining medium risks were unbounded multi-year JEPX extraction, concurrent branches in the unified history backfill, and four Celery task subprocesses sharing a 4 GiB QA worker pod.
 
 ## Open Questions
 
@@ -51,10 +56,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether capacity yearly/monthly/weekly historical rows with missing max values should ever be supported, or whether daily-only historical capacity is sufficient.
 - UNCERTAIN: The parent Jira tickets `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137` may still need workflow cleanup after an interrupted transition attempt.
 - UNCERTAIN: Whether the local date-only `as_of` dashboard JSON update was later committed/pushed after the reimport guidance.
-- UNCERTAIN: Exact current reconciliation source-selection rules still need design against successful Airflow manifests and daily capacity output keys.
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
 - UNCERTAIN: Whether Hiromi can identify reliable FY2019-FY2024 actual-flow source paths.
-- UNCERTAIN: Whether the clean-log Japan QA failures are truly caused by memory pressure.
+- UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
 
 ## Sources
 
@@ -71,5 +75,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-07-09.md`
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
+- `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-13
