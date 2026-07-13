@@ -22,11 +22,11 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 9 technical standup said ABT dashboard was migrated as a test case using GitHub CLI and Azure CLI without migrator role. Click migration should wait until JB's security remediation work is complete because commits during migration can leave leftovers.
 - Artifact migration was still unsettled. SFF components may need dedicated repos for common artifacts, SMP Common may become a shared artifact source, and ADO artifacts remain in use until cutover.
 - July 8 AWS migration notes introduced a centralized technical-activities board with separate epics for AWS migration, Walnut migration, and security remediation, charged per project instead of one blanket bucket.
-- Pyrine/GMR migration notes mention default EFS backup in the new DMS account, 35-day warm backup, daily incremental backup, and Pyrine storage cost estimated around USD 600-700/month for about 13 TB.
-- Pyrine environment scope was unresolved because a resource-heavy always-on machine was estimated around USD 2,000/month.
+- Pyrene/GMR migration notes mention default EFS backup in the new DMS account, 35-day warm backup, daily incremental backup, and Pyrene storage cost estimated around USD 600-700/month for about 13 TB.
+- Pyrene environment scope was unresolved because a resource-heavy always-on machine was estimated around USD 2,000/month.
 - Atlassian migration was virtually moved around July 1, with actual migration still coming.
 - Sentry will be recreated from scratch in Europe, with previous logs accepted as lost.
-- Portfolio topics mentioned: JMR v2, AVST index builder, Onset, Platform, Sign Ups, SMP, carbon emissions platform, Delphi CLI, APM, and Click.
+- Portfolio topics mentioned: GMR / Model Runner v2, AVST index builder, Onset, Platform, Sign Ups, SMP, carbon emissions platform, Delphi CLI, APM, and Click.
 - Sign Ups AKS migration covered Azure resource groups, naming conventions, storage accounts, Key Vault, workload identity, Bicep, and IT dependencies.
 - A July 12 `smp-japan` migration attempt showed that native GitHub transfers can create an approval window where neither organization URL is accessible. For migrations that only need branches, tags, and commit history, the preferred operational method is now a staged private mirror with the source left available until the target is verified.
 - The July 13 migration presentation settled the current comparison: plain mirror push and GitHub Importer preserve Git source/history without a Migrator role; `ado2gh` uses GitHub Enterprise Importer and requires an organization owner or Migrator role. GitHub Importer does not preserve ADO PRs, while `ado2gh` can preserve PRs and branch policies.
@@ -39,7 +39,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether GitHub/Walnut should reuse and rename the existing SMP organization or create a new one.
 - UNCERTAIN: Whether a native transfer is still required for any repository whose GitHub metadata must be preserved; it is no longer the default for Git-only migrations.
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
-- UNCERTAIN: Whether Pyrine UAT/pre-prod should be always-on or on-demand.
+- UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
 
 ## Sources

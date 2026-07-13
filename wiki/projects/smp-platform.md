@@ -42,11 +42,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - A private, narrowly scoped `qrm-dms/install-engie-ca` composite-action repository was created and released as `v1`. It installs and fingerprints the ENGIE CA without coupling certificate setup to Python or `uv`.
 - The attempted native transfer of `smp-japan` to `qrm-dms` was pending owner acceptance at the end of the capture. The repository was changed to private before transfer, but neither old nor new remote was reachable while approval was pending; existing Airflow DAG checkouts could continue, while git-sync, restarts, or new pods were at risk.
 - Durable migration preference after this incident: use a staged private mirror when only Git refs and history need preservation, keep the source operational through verification, and avoid approval-dependent organization operations unless explicitly authorized with the downtime boundary understood.
-- July 13 standup reported Pyrin UAT deployed and JMR's high-worker configuration removed because only default and low workers were needed. The model-runner Kubic web image was updated to `v3.8.5`, and Alfred recreated production compute environments. `Pyrin`, `JMR`, and `Kubic` reflect the source wording and may need name confirmation.
+- July 13 standup reported Pyrene UAT deployed and the high-worker configuration for GMR / Model Runner removed because only default and low workers were needed. Alfred recreated production compute environments. The source also says a model-runner web image called `Kubic` was updated to `v3.8.5`; that name remains unconfirmed.
 - A scoped replacement is planned for an overly permissive AWS role used by the model-runner pipeline. The intended rollout is to validate trust and permissions in dev, then reproduce the working policy in production.
 - Updated high-worker and Phoenix-worker requirements created dev/UAT allocation conflicts. The notes cite Phoenix at 100 GB minimum and 220 GB memory, and call for exact machine counts plus per-environment memory before adding node groups.
 - Prosumer remediation remains incomplete. Public-domain security headers were applied, internal project-specific headers need a working session, and the user-microservice endpoint change exists but still needs testing and discussion with Nico. The training section will remain authenticated while the rest of the homepage stays available as an unauthenticated landing page.
-- APM migration to Walnut was reported done. The shared certificate action was reused successfully by SMP Japan; SMP India remains on hold for Francois's prerequisites. SMP Japan is blocked on approval of functional user `nprm68` into the `qrmvms` organization.
+- APM migration to Walnut was reported done. The shared certificate action was reused successfully by SMP Japan; SMP India remains on hold for Francois's prerequisites. SMP Japan is blocked on approval of confirmed SMP functional user `nprm68` into an organization transcribed as `qrmvms`.
 
 ## Open Questions
 
@@ -56,8 +56,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the pending `smp-japan` native transfer was accepted after the July 12 capture.
 - UNCERTAIN: Whether Pyrene UAT should be always-on or on-demand remains unresolved in migration notes.
 - UNCERTAIN: The exact final remediation shape for user lookup permissions belongs to a follow-up technical discussion.
-- UNCERTAIN: Whether `Pyrin`, `JMR`, `Kubic`, `Phoenix worker`, and `qrmvms` are the exact system/project names; the meeting source may contain transcription artifacts.
-- UNCERTAIN: The source alternates between `npm/nprm68` and `nprm68` for the functional user; the action register uses `nprm68` from the explicit next-step wording.
+- UNCERTAIN: Whether `Kubic`, `Phoenix Worker`, and `qrmvms` are the exact names; the meeting source may contain transcription artifacts.
 
 ## Sources
 

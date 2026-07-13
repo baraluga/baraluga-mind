@@ -36,7 +36,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
-- [ ] Sync Pyrine and GMR tickets to Dale's board.
+- [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 
@@ -192,7 +192,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[ado-ios]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
-- [ ] Wait for a `qrmvms` organization owner to approve functional user `nprm68` and unblock SMP Japan.
+- [ ] Wait for an owner of the organization transcribed as `qrmvms` to approve SMP functional user `nprm68` and unblock SMP Japan.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
@@ -208,7 +208,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
 
-- [ ] Clarify with Nikola whether Pyrine dev and UAT need the same worker specifications and whether UAT should be scaled down before node groups are added.
+- [ ] Clarify with Nikola whether Pyrene dev and UAT need the same worker specifications and whether UAT should be scaled down before node groups are added.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
