@@ -29,6 +29,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Portfolio topics mentioned: JMR v2, AVST index builder, Onset, Platform, Sign Ups, SMP, carbon emissions platform, Delphi CLI, APM, and Click.
 - Sign Ups AKS migration covered Azure resource groups, naming conventions, storage accounts, Key Vault, workload identity, Bicep, and IT dependencies.
 - A July 12 `smp-japan` migration attempt showed that native GitHub transfers can create an approval window where neither organization URL is accessible. For migrations that only need branches, tags, and commit history, the preferred operational method is now a staged private mirror with the source left available until the target is verified.
+- The July 13 migration presentation settled the current comparison: plain mirror push and GitHub Importer preserve Git source/history without a Migrator role; `ado2gh` uses GitHub Enterprise Importer and requires an organization owner or Migrator role. GitHub Importer does not preserve ADO PRs, while `ado2gh` can preserve PRs and branch policies.
+- The current package path is transitional: migrated repositories may publish to and install from Walnut Artifactory, GitHub Packages remains a secondary option to assess by package type, and some consumers still use ADO Artifacts through a technical-account PAT. The final standard is not yet fixed.
+- Migration is considered done when the repository is usable in Walnut and every existing ADO pipeline, including deployment, has been recreated and proven. PRs, Issues, and other ADO metadata are explicitly out of scope for the current program.
 
 ## Open Questions
 
@@ -52,5 +55,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-09-0945-granola-am-standup.md`
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 - `sources/codex-conversations/2026-07-12-codex-conversations.md`
+- `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 Last Updated: 2026-07-13

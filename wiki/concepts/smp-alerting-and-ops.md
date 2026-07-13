@@ -20,6 +20,7 @@ SMP operational discussions in late June and early July focused on production in
 - Application team meeting notes describe AI-assisted runbook automation for recurring APM issues, with diagnosis time reduced from about 10-20 minutes to about 2 minutes.
 - Runbooks were stored in `docs/runbooks`; Confluence discoverability was discussed because of Microsoft 365 AI and searchability.
 - July 9 technical standup says Grafana APM alerts were created and tested by lowering the threshold. SMTP was not configured; the proposed path was an encrypted common-stack SNS topic with a Teams channel subscriber.
+- July 13 standup says the Grafana-alert SNS stack was created and testing was in progress; Sentry for APL was next.
 
 ## Open Questions
 
@@ -39,5 +40,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+- `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-13

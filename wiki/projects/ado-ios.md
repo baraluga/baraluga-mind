@@ -6,6 +6,8 @@
 
 The v1 cleanup work added Ruff and pytest, characterized existing behavior first, split the monolithic CLI into focused modules, and merged the resulting PR.
 
+On July 13, the repository itself was moved from `qrm-dms` to Brian's enterprise account at `QN5792_engieco/ado-ios`. The transfer stayed private, preserved both branches and PR #1, removed inherited collaborators, and repointed the local clone.
+
 ## Details
 
 - The tool defaults to ADO org `AA-SSO-EMEAI` and GitHub org `qrm-dms`.
@@ -15,13 +17,16 @@ The v1 cleanup work added Ruff and pytest, characterized existing behavior first
 - The refactor split a roughly 939-line `cli.py` into focused modules: `models`, `formatting`, `commands`, `az_client`, `process`, `prompts`, `args`, `reporting`, and `migration`, leaving `cli.py` as a thin dispatcher.
 - Validation captured in the Copilot source: 115 tests, 93% coverage, Ruff clean, and a dry-run CLI smoke test.
 - The PR was created, approved, and merged on July 9.
+- An initial misunderstanding created an accidental private mirror at `baraluga/ado-ios`. It remains pending deletion because the `baraluga` CLI authorization did not yet include `delete_repo`; the correct enterprise repository is already verified and intact.
 
 ## Open Questions
 
 - UNCERTAIN: Whether v2 should add CI wiring for Ruff/pytest, more migration commands, or deeper pipeline inventory behavior.
+- UNCERTAIN: Whether the accidental `baraluga/ado-ios` mirror has been deleted after the required GitHub device authorization.
 
 ## Sources
 
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
+- `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-13

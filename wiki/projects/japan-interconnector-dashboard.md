@@ -48,6 +48,11 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - A full-history QA run exposed memory pressure across reconciliation, validation, and publication. All three paths were changed test-first to stream Parquet data in 32,768-row batches and process one calendar year at a time; the fresh QA reconciliation then completed successfully.
 - Effective output is partitioned by the calendar year of `interval_start_jst`, not the source `target_year`, because fiscal-year source files can contain January-March intervals from the following calendar year.
 - A July 12 read-only audit found no comparable urgent memory defect in normal scheduled interconnector DAGs. Remaining medium risks were unbounded multi-year JEPX extraction, concurrent branches in the unified history backfill, and four Celery task subprocesses sharing a 4 GiB QA worker pod.
+- Hiromi supplied a Bloomberg workbook covering FY2019-FY2024 actual flow for all seven interconnectors. Validation found 729,078 populated half-hour observations, no duplicate timestamps, and missing periods represented by omitted timestamps rather than blank values.
+- The approved historical-source design is captured in [[2026-07-13-use-separate-bloomberg-actual-flow-dataset]]: a manual Airflow import reads the unchanged workbook from private S3, publishes a separate Bloomberg CDH dataset, and leaves missing periods blank.
+- The main dashboard now combines OCCTO 30-minute averages with Bloomberg 30-minute snapshots under neutral `Actual Flow` labeling. OCCTO wins at overlapping interconnector timestamps; Bloomberg fills older gaps.
+- CDH registration for `japan_bloomberg_interconnector_actual_flow/all` succeeded in dev, QA, and production. The `smp-dashboard` changes were pushed to `dev`, and the `smp-japan` importer/DAG was committed, pushed to `dev`, and promoted to QA as `japan_bloomberg_actual_flow_backfill_manual_dag` after Michael uploaded the workbook to all three environment buckets.
+- `SCR-1197` was simplified to one visible `As of` dropdown. `Latest` selects the current `_all` table; a date selects `_historical` and resolves the newest snapshot on or before that date. The tested change was committed and pushed to `smp-dashboard` `dev`.
 
 ## Open Questions
 
@@ -55,10 +60,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Japan team's final Y-axis requirement still needed confirmation in the July 2 planning notes.
 - UNCERTAIN: Whether capacity yearly/monthly/weekly historical rows with missing max values should ever be supported, or whether daily-only historical capacity is sufficient.
 - UNCERTAIN: The parent Jira tickets `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137` may still need workflow cleanup after an interrupted transition attempt.
-- UNCERTAIN: Whether the local date-only `as_of` dashboard JSON update was later committed/pushed after the reimport guidance.
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
-- UNCERTAIN: Whether Hiromi can identify reliable FY2019-FY2024 actual-flow source paths.
 - UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
+- UNCERTAIN: Whether the Bloomberg manual backfill has completed successfully in QA after promotion and workbook upload.
 
 ## Sources
 
@@ -76,5 +80,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 - `sources/codex-conversations/2026-07-12-codex-conversations.md`
+- `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 Last Updated: 2026-07-13

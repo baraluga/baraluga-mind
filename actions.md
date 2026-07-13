@@ -32,9 +32,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-0945-granola-am-standup.md`
 
-- [ ] Confirm Artifactory status and artifact publishing plan for the GitHub/Walnut migration.
+- [ ] Confirm the final package-hosting standard for the GitHub/Walnut migration; Walnut Artifactory is the emerging primary path, GitHub Packages is a secondary option, and ADO Artifacts via technical-account PAT is the current bridge.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 - [ ] Sync Pyrine and GMR tickets to Dale's board.
   - Context: [[team-operations]]
@@ -60,17 +60,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Enable Chrome local file access for Codex, then submit the queued LinkedIn/manual applications.
   - Context: [[job-search-2026]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 ### Japan Interconnector
 
 - [ ] Try the interconnector historical backfill as a month-by-month run.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/notes/2026-07-07.md`
-
-- [ ] Reimport the updated `SCR-1197` look-back dashboard JSON after the date-only `as_of` fix.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`
 
 - [ ] Clarify look-back dashboard point-in-time requirements with Hermine.
   - Context: [[japan-interconnector-dashboard]]
@@ -92,9 +88,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
 
-- [ ] Confirm actual-flow source path for FY2019-FY2024 with Hiromi.
+- [ ] Run and validate `japan_bloomberg_actual_flow_backfill_manual_dag` in QA now that the workbook is uploaded and the implementation is promoted.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+  - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 ### SMP Dashboards
 
@@ -124,10 +120,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-08-0945-granola-am-standup.md`
 
-- [ ] Check whether the GEMS artifact registry TLS certificate issue is in team scope.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
-
 - [ ] Evaluate Synapse integration fit after the requested demo.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
@@ -154,7 +146,19 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Schedule a focused user-microservice security discussion with a subset of the team.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+
+- [ ] Schedule a Prosumer working session to resolve project-specific security headers for the internal domain.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+
+- [ ] Test the Prosumer user-microservice endpoint update and discuss the result with Nico.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+
+- [ ] Create and validate a scoped AWS role for the model-runner pipeline in dev, then replicate the confirmed permissions to production.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
 - [ ] Message Lloyd about AWS ADO access.
   - Context: [[smp-platform]]
@@ -170,9 +174,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
 
-- [ ] Set up an encrypted common-stack SNS topic for Grafana APM alerts and coordinate the Teams channel subscriber with Nilo.
+- [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
 ## Waiting
 
@@ -183,6 +187,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/meetings/2026-07-08-1100-granola-matt-mendez.md`
 
 ### Team Operations
+
+- [ ] Wait for `baraluga` GitHub authorization with `delete_repo` scope, then delete only the accidental private `baraluga/ado-ios` mirror and reverify `QN5792_engieco/ado-ios`.
+  - Context: [[ado-ios]]
+  - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
+
+- [ ] Wait for a `qrmvms` organization owner to approve functional user `nprm68` and unblock SMP Japan.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
 - [ ] Wait for a `qrm-dms` owner to accept or decline the pending private `smp-japan` transfer, then verify remote access, update Japan Airflow git-sync URLs, adopt `qrm-dms/install-engie-ca@v1`, and confirm CI is green.
   - Context: [[smp-platform]]
@@ -196,9 +208,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
 
-- [ ] Clarify Pyrine UAT environment scope with Nicola.
+- [ ] Clarify with Nikola whether Pyrine dev and UAT need the same worker specifications and whether UAT should be scaled down before node groups are added.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
+  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
 ## Done
 
@@ -209,6 +221,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
 
 ### SMP Platform
+
+- [x] Validate the GEMS artifact-registry TLS path and provide a reusable Walnut CI certificate action.
+  - Closure: `IS_INFRA_ROOT_CRT.crt` was proven against GEMS, India and Japan CI passed, and `qrm-dms/install-engie-ca@v1` was published with a green self-test.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
 - [x] Document user secrets and Python dependency addition process.
   - Context: [[smp-platform]]
@@ -237,6 +254,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### Japan Interconnector
+
+- [x] Confirm and implement the FY2019-FY2024 actual-flow source path with Hiromi's Bloomberg workbook.
+  - Closure: The workbook was validated, registered as a separate CDH dataset, uploaded to all environments, and the manual Airflow implementation was promoted to QA.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
+
+- [x] Replace the `SCR-1197` look-back mode controls with one `As of` selector and push the dashboard update.
+  - Closure: `Latest` now selects the live table and dated options select the historical snapshot table; the focused tests and JSON validation passed before push.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
 - [x] Capture successful reconciliation input manifests and latest daily capacity output keys before implementing reconciliation source-selection hardening.
   - Closure: Superseded by the implemented and QA-validated immutable-baseline reconciliation contract; the pre-implementation capture is no longer actionable.
