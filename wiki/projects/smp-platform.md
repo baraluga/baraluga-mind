@@ -47,6 +47,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Updated high-worker and Phoenix-worker requirements created dev/UAT allocation conflicts. The notes cite Phoenix at 100 GB minimum and 220 GB memory, and call for exact machine counts plus per-environment memory before adding node groups.
 - Prosumer remediation remains incomplete. Public-domain security headers were applied, internal project-specific headers need a working session, and the user-microservice endpoint change exists but still needs testing and discussion with Nico. The training section will remain authenticated while the rest of the homepage stays available as an unauthenticated landing page.
 - APM migration to Walnut was reported done. The shared certificate action was reused successfully by SMP Japan; SMP India remains on hold for Francois's prerequisites. SMP Japan is blocked on approval of confirmed SMP functional user `nprm68` into an organization transcribed as `qrmvms`.
+- July 14 team notes reported a file browser plugin authentication issue after an upgrade to a new non-Airflow version, with `3.3.0` and `3.2.2` mentioned as version context.
+- SAP / QRMS migration planning was still waiting on final solution architecture with Nilo and a go-live date confirmation. The notes say feasibility was confirmed to Luke, but QRMS access-token authorization was still blocking safe SMP India to QRMS migration.
+- APM migration itself was reported complete on July 14, but Grafana still needed an AWS admin to create or confirm a role for CloudWatch or publish access.
+- Clickstart pre-migration work needs custom node-group labels so deployments can target nodes with very different memory profiles, plus role cleanup for deploying resources per node group.
+- Extruder remediation had remaining critical issues to investigate before deciding whether other remediation tasks can wait until after go-live.
 
 ## Open Questions
 
@@ -57,6 +62,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether Pyrene UAT should be always-on or on-demand remains unresolved in migration notes.
 - UNCERTAIN: The exact final remediation shape for user lookup permissions belongs to a follow-up technical discussion.
 - UNCERTAIN: Whether `Kubic`, `Phoenix Worker`, and `qrmvms` are the exact names; the meeting source may contain transcription artifacts.
+- UNCERTAIN: Whether `Clickstart`, `Extruder`, `EPM`, `QRMS`, and `Peer` are exact names from the July 14 meeting captures.
+- UNCERTAIN: Whether the file browser plugin auth issue is in SMP, a related project, or another application stack.
 
 ## Sources
 
@@ -79,5 +86,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 - `sources/codex-conversations/2026-07-12-codex-conversations.md`
 - `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+- `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 
-Last Updated: 2026-07-13
+Last Updated: 2026-07-14

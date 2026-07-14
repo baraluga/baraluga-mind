@@ -32,6 +32,11 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The July 13 migration presentation settled the current comparison: plain mirror push and GitHub Importer preserve Git source/history without a Migrator role; `ado2gh` uses GitHub Enterprise Importer and requires an organization owner or Migrator role. GitHub Importer does not preserve ADO PRs, while `ado2gh` can preserve PRs and branch policies.
 - The current package path is transitional: migrated repositories may publish to and install from Walnut Artifactory, GitHub Packages remains a secondary option to assess by package type, and some consumers still use ADO Artifacts through a technical-account PAT. The final standard is not yet fixed.
 - Migration is considered done when the repository is usable in Walnut and every existing ADO pipeline, including deployment, has been recreated and proven. PRs, Issues, and other ADO metadata are explicitly out of scope for the current program.
+- The July 14 QRM BE chapter meeting chose one QRM/DMS GitHub Cloud organization by default. See [[2026-07-14-use-single-qrm-github-organization]].
+- Repositories in the QRM org should be private by default, with org-wide default repository access disabled. GitHub teams provide read/write access, including a planned department-wide QRM-all team and sub-teams per QRM group.
+- The migration approach remains pragmatic: Git mirror push is the simplest scriptable path when Git history is enough; GitHub UI import is simpler but limited; `ado2gh` can preserve richer ADO metadata but needs elevated roles. Pipelines must be recreated regardless of migration method.
+- Runner selection guidance from the July 14 chapter: use GitHub-hosted runners when no NG network access is needed; use Walnut runners for workflows that need private Artifactory or internal endpoints.
+- The package-hosting discussion expanded to include Harbor as an alternative to JFrog/Artifactory for shared Python/npm packages, especially where project-level access or robot users may be easier than per-developer/per-component access.
 
 ## Open Questions
 
@@ -41,6 +46,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
 - UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
+- UNCERTAIN: Whether Walnut team will pre-install NG certificates in runner images or keep certificate setup in reusable workflow actions.
+- UNCERTAIN: Whether Harbor will become an approved shared-package path for QRM teams.
 
 ## Sources
 
@@ -56,5 +63,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 - `sources/codex-conversations/2026-07-12-codex-conversations.md`
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
+- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+- `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 
-Last Updated: 2026-07-13
+Last Updated: 2026-07-14

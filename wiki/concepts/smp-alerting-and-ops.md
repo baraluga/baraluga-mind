@@ -21,12 +21,16 @@ SMP operational discussions in late June and early July focused on production in
 - Runbooks were stored in `docs/runbooks`; Confluence discoverability was discussed because of Microsoft 365 AI and searchability.
 - July 9 technical standup says Grafana APM alerts were created and tested by lowering the threshold. SMTP was not configured; the proposed path was an encrypted common-stack SNS topic with a Teams channel subscriber.
 - July 13 standup says the Grafana-alert SNS stack was created and testing was in progress; Sentry for APL was next.
+- July 14 team notes reported EPM notification setup blocked because email notifications were not working due to SMTP configuration. The recommended resolution path was IAM or identity-provider based, with console checking as a workaround.
+- July 14 technical standup said APM migration was complete and SNS infrastructure was done, but Grafana still needed AWS-admin help to create or confirm a role for CloudWatch/publish access.
 
 ## Open Questions
 
 - UNCERTAIN: Exact permissions or routing cause of MS Teams channel email 403s was not confirmed in the notes.
 - UNCERTAIN: Exact root cause of production proxy 403s was not confirmed in the notes.
 - UNCERTAIN: Whether the Grafana alert destination should be one shared Teams channel or separate per system still needs confirmation.
+- UNCERTAIN: Whether `EPM` is the exact system name from the July 14 team meeting capture.
+- UNCERTAIN: Which AWS account owns the Grafana role needed for CloudWatch/publish access.
 
 ## Sources
 
@@ -41,5 +45,7 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 - `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
 - `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+- `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 
-Last Updated: 2026-07-13
+Last Updated: 2026-07-14

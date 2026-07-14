@@ -8,9 +8,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Team Operations
 
-- [ ] Complete the 40-minute training video.
+- [ ] Complete the overdue "5 Keys to Sustainable Performance" training module.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 
 - [ ] Submit the engagement meter survey and midyear GitHub feedback.
   - Context: [[team-operations]]
@@ -18,7 +18,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Finalize GitHub organization members, targets, and git rules before end of July.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 
 - [ ] Post a short team-chat note documenting the GitHub CLI remote-transfer approach for existing repos.
   - Context: [[team-operations]]
@@ -34,7 +34,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm the final package-hosting standard for the GitHub/Walnut migration; Walnut Artifactory is the emerging primary path, GitHub Packages is a secondary option, and ADO Artifacts via technical-account PAT is the current bridge.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 
 - [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
@@ -55,6 +55,18 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Coordinate Click migration with JB after security remediation is complete.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
+
+- [ ] Share the Viva Engage Walnut community link with the QRM migration group.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+
+- [ ] Raise the request for Walnut runners to ship with NG certificates pre-installed.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+
+- [ ] Bring Artifactory versus Harbor package-governance tradeoffs to the VE chapter discussion.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 
 ### Job Search
 
@@ -91,6 +103,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Run and validate `japan_bloomberg_actual_flow_backfill_manual_dag` in QA now that the workbook is uploaded and the implementation is promoted.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
+
+- [ ] Verify the promoted manual interconnector backfill DAG parameter change in the Airflow UI, especially nullable `end_date` behavior.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`
 
 ### SMP Dashboards
 
@@ -168,6 +184,22 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
+- [ ] Address the file browser plugin authentication issue after the 3.3.0 non-Airflow upgrade.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+
+- [ ] Confirm the SAP/QRMS migration go-live date with Nilo and Luke.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+
+- [ ] Continue Clickstart pre-migration by adding custom node-group labels and cleaning up deployment roles per node group.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+
+- [ ] Investigate critical Extruder remediation issues before deciding whether to defer the remaining remediation until after go-live.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
@@ -176,7 +208,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+  - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`; `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+
+- [ ] Identify an AWS admin who can create the Grafana role needed for CloudWatch or publish access.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+
+- [ ] Resolve EPM notification setup by fixing SMTP or moving to the recommended IAM/identity-provider path.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 
 ## Waiting
 
@@ -199,6 +239,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for a `qrm-dms` owner to accept or decline the pending private `smp-japan` transfer, then verify remote access, update Japan Airflow git-sync URLs, adopt `qrm-dms/install-engie-ca@v1`, and confirm CI is green.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
+
+- [ ] Wait for Peer to resolve QRMS access-token authorization before SMP India to QRMS migration proceeds.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 
 - [ ] Wait for Alexander to define GitHub governance pipeline and master branch protection rules.
   - Context: [[team-operations]]

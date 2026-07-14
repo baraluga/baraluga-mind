@@ -21,6 +21,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - GitHub Copilot conversations can also be exported from local Copilot CLI state under `/Users/qn5792/.copilot/session-state` and VS Code Copilot Chat workspace storage. The July 9 capture found ten local Copilot sessions and followed the same inbox-first ingest path.
 - By July 12, Codex, GitHub Copilot, and Granola capture automations were all operating as inbox-only exporters. The July 12 captures contained six Codex sessions, two Copilot sessions, and a Granola status recording that the connector returned no meetings.
 - The July 13 captures contained twelve Codex sessions, zero Copilot sessions, and one Granola standup. A trial morning brief grouped the previous day's evidence into `DONE`, `TODO`, and `BLOCKERS` and stayed in chat while the format is evaluated.
+- The July 14 capture set contained four Codex sessions, zero Copilot sessions, three Granola meeting notes, and an empty manual daily note file. The Codex sessions included SMP Japan promotion and manual interconnector backfill follow-up work plus the export-only capture automations.
 
 ## Open Questions
 
@@ -39,5 +40,11 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-13-copilot-conversations.md`
 - `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+- `sources/codex-conversations/2026-07-14-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-14-copilot-conversations.md`
+- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+- `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+- `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+- `sources/notes/2026-07-14.md`
 
-Last Updated: 2026-07-13
+Last Updated: 2026-07-14
