@@ -54,6 +54,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - CDH registration for `japan_bloomberg_interconnector_actual_flow/all` succeeded in dev, QA, and production. The `smp-dashboard` changes were pushed to `dev`, and the `smp-japan` importer/DAG was committed, pushed to `dev`, and promoted to QA as `japan_bloomberg_actual_flow_backfill_manual_dag` after Michael uploaded the workbook to all three environment buckets.
 - `SCR-1197` was simplified to one visible `As of` dropdown. `Latest` selects the current `_all` table; a date selects `_historical` and resolves the newest snapshot on or before that date. The tested change was committed and pushed to `smp-dashboard` `dev`.
 - July 14 Codex work normalized the manual interconnector backfill DAG date parameters: `start_date` and `end_date` now use date-formatted schema values, `end_date` is nullable, and `null` preserves runtime "today in Asia/Tokyo" behavior. The change was committed to `smp-japan` `dev` and promoted through `qa` and `prod`.
+- A July 15 clarification says the normalized manual DAG parameter behavior is already up and running.
 
 ## Open Questions
 
@@ -64,7 +65,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
 - UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
 - UNCERTAIN: Whether the Bloomberg manual backfill has completed successfully in QA after promotion and workbook upload.
-- UNCERTAIN: Whether the normalized Airflow UI parameter behavior has been verified by running the promoted manual DAG.
 
 ## Sources
 
@@ -84,5 +84,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-12-codex-conversations.md`
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/codex-conversations/2026-07-14-codex-conversations.md`
+- `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15

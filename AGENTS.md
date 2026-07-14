@@ -165,3 +165,21 @@ After an ingest pass, report:
 - uncertain claims
 - new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
 - suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.

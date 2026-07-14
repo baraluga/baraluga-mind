@@ -18,6 +18,8 @@ Goals:
 - Move processed `inbox/` files to the appropriate `sources/` folder when they remain useful as evidence.
 - Leave files in `inbox/` when they still need follow-up, review, or clarification.
 - Give me a concise changelog when finished.
+- End with a `Needs Confirmation` handover that lists only suspicious terms, ambiguous owners, uncertain claims, and other clarification items worth asking me about.
+- Do not surface the full `Open` action register as my assignment unless I explicitly ask for it.
 
 Do not delete files unless I explicitly ask.
 ```
@@ -31,7 +33,13 @@ Do not delete files unless I explicitly ask.
 5. Add or update active follow-up work in `actions.md`.
 6. Add source references.
 7. Move processed `inbox/` files worth preserving to the right `sources/` folder.
-8. Report what changed.
+8. Validate source references, wiki links, action sections, duplicate actions, current `Last Updated` dates, and synthesized-file whitespace.
+9. Report what changed.
+10. Include a `Needs Confirmation` handover:
+    - group suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims by durable area;
+    - include why each item needs confirmation;
+    - include the source path or related wiki page;
+    - omit routine TODOs, low-priority maybe-later topics, `Open`, `Waiting`, and `Done` action lists unless explicitly requested.
 
 ## Optional Capture Prompts
 

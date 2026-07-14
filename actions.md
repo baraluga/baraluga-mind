@@ -104,10 +104,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
-- [ ] Verify the promoted manual interconnector backfill DAG parameter change in the Airflow UI, especially nullable `end_date` behavior.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`
-
 ### SMP Dashboards
 
 - [ ] Complete a Grafana dashboard end-to-end as a solo exercise.
@@ -188,13 +184,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 
-- [ ] Confirm the SAP/QRMS migration go-live date with Nilo and Luke.
+- [ ] Confirm the SAP/qrm-dms migration go-live date with Nilo and Luke.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
-- [ ] Continue Clickstart pre-migration by adding custom node-group labels and cleaning up deployment roles per node group.
+- [ ] Clarify the Clickstart pre-migration context before tracking concrete node-group label or deployment-role cleanup.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 - [ ] Investigate critical Extruder remediation issues before deciding whether to defer the remaining remediation until after go-live.
   - Context: [[smp-platform]]
@@ -210,13 +206,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`; `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 
-- [ ] Identify an AWS admin who can create the Grafana role needed for CloudWatch or publish access.
+- [ ] Identify an AWS admin who can create the APM Grafana role needed for CloudWatch or publish access.
   - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
-
-- [ ] Resolve EPM notification setup by fixing SMTP or moving to the recommended IAM/identity-provider path.
-  - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 ## Waiting
 
@@ -240,9 +232,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
 
-- [ ] Wait for Peer to resolve QRMS access-token authorization before SMP India to QRMS migration proceeds.
+- [ ] Wait for the person transcribed as `Peer` to resolve `qrm-dms` access-token authorization before SMP India to qrm-dms migration proceeds.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
+  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+
+- [ ] Wait for Huk to continue the APM notification setup work.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 - [ ] Wait for Alexander to define GitHub governance pipeline and master branch protection rules.
   - Context: [[team-operations]]
@@ -263,6 +259,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [x] Decide whether to automate the daily Codex conversation dump into `inbox/`.
   - Context: [[baraluga-mind]]
   - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
+
+### Japan Interconnector
+
+- [x] Verify the promoted manual interconnector backfill DAG parameter change in the Airflow UI, especially nullable `end_date` behavior.
+  - Closure: Confirmed on 2026-07-15 that the normalized manual DAG parameter behavior is already up and running.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 ### SMP Platform
 

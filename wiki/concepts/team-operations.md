@@ -37,6 +37,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The migration approach remains pragmatic: Git mirror push is the simplest scriptable path when Git history is enough; GitHub UI import is simpler but limited; `ado2gh` can preserve richer ADO metadata but needs elevated roles. Pipelines must be recreated regardless of migration method.
 - Runner selection guidance from the July 14 chapter: use GitHub-hosted runners when no NG network access is needed; use Walnut runners for workflows that need private Artifactory or internal endpoints.
 - The package-hosting discussion expanded to include Harbor as an alternative to JFrog/Artifactory for shared Python/npm packages, especially where project-level access or robot users may be easier than per-developer/per-component access.
+- A July 15 clarification says Walnut runner certificate pre-installation and Harbor package governance are real topics, but not current confirmation priorities.
 
 ## Open Questions
 
@@ -46,8 +47,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
 - UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
-- UNCERTAIN: Whether Walnut team will pre-install NG certificates in runner images or keep certificate setup in reusable workflow actions.
-- UNCERTAIN: Whether Harbor will become an approved shared-package path for QRM teams.
 
 ## Sources
 
@@ -65,5 +64,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 - `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+- `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15
