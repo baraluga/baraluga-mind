@@ -22,6 +22,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - By July 12, Codex, GitHub Copilot, and Granola capture automations were all operating as inbox-only exporters. The July 12 captures contained six Codex sessions, two Copilot sessions, and a Granola status recording that the connector returned no meetings.
 - The July 13 captures contained twelve Codex sessions, zero Copilot sessions, and one Granola standup. A trial morning brief grouped the previous day's evidence into `DONE`, `TODO`, and `BLOCKERS` and stayed in chat while the format is evaluated.
 - The July 14 capture set contained four Codex sessions, zero Copilot sessions, three Granola meeting notes, and an empty manual daily note file. The Codex sessions included SMP Japan promotion and manual interconnector backfill follow-up work plus the export-only capture automations.
+- The July 15 capture set contained thirteen Codex sessions, zero Copilot sessions, two Granola meeting notes, and a manual migration checklist. The Codex sessions were heavy on QRM/SFF migration coordination, Copilot custom agents, Aurora XLSX parser hardening, and a File Browser health monitor.
 
 ## Open Questions
 
@@ -46,5 +47,10 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 - `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 - `sources/notes/2026-07-14.md`
+- `sources/codex-conversations/2026-07-15-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-15-copilot-conversations.md`
+- `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+- `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
+- `sources/notes/2026-07-15.md`
 
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15

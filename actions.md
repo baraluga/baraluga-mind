@@ -34,7 +34,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm the final package-hosting standard for the GitHub/Walnut migration; Walnut Artifactory is the emerging primary path, GitHub Packages is a secondary option, and ADO Artifacts via technical-account PAT is the current bridge.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`
 
 - [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
@@ -67,6 +67,26 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Bring Artifactory versus Harbor package-governance tradeoffs to the VE chapter discussion.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+
+- [ ] Set up the shared Azure Artifacts variables/secrets model for migrated GitHub repositories.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
+
+- [ ] Finish the `common_data_model` and `tdb_client` pipeline migrations before starting additional pipeline transfers.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
+
+- [ ] Resolve the inherited GitHub Actions / Dependency Graph validation issue for `sff-tool-tdb-cliennt`, then lock the ADO source branches.
+  - Context: [[ado-ios]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
+
+- [ ] Confirm the budget code for potential Iberia and UK expansion work.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+
+- [ ] Schedule the support process refresher session.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 
 ### Job Search
 
@@ -103,6 +123,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Run and validate `japan_bloomberg_actual_flow_backfill_manual_dag` in QA now that the workbook is uploaded and the implementation is promoted.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
+
+- [ ] Push interconnector dashboard data to TSDB after the catalog IDs and provider metadata are confirmed.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
+
+- [ ] Decide whether interconnector TSDB submission should use 5-minute or 30-minute average curves.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 
 ### SMP Dashboards
 
@@ -182,7 +210,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Address the file browser plugin authentication issue after the 3.3.0 non-Airflow upgrade.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
+  - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`
 
 - [ ] Confirm the SAP/qrm-dms migration go-live date with Nilo and Luke.
   - Context: [[smp-platform]]
@@ -200,7 +228,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm Copilot token billing model with Irun.
   - Context: [[ai-assisted-engineering]]
-  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+
+- [ ] Pilot the `qrm-dms/.github` ADO Pipeline Modernizer agent on a real migrated repository pipeline and fold lessons into the agent.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
 
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
@@ -228,13 +260,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
-- [ ] Wait for a `qrm-dms` owner to accept or decline the pending private `smp-japan` transfer, then verify remote access, update Japan Airflow git-sync URLs, adopt `qrm-dms/install-engie-ca@v1`, and confirm CI is green.
+- [ ] Wait for AWS IAM trust updates so `qrm-dms/smp-tool` can assume the India noprod/prod deployment roles from `dev-india`, `qa-india`, and `prod-india`.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
-
-- [ ] Wait for the person transcribed as `Peer` to resolve `qrm-dms` access-token authorization before SMP India to qrm-dms migration proceeds.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
 
 - [ ] Wait for Huk to continue the APM notification setup work.
   - Context: [[smp-alerting-and-ops]]
@@ -268,6 +296,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 ### SMP Platform
+
+- [x] Resolve the pending `smp-japan` move into `qrm-dms` and remove tracked old-organization references.
+  - Closure: July 15 evidence shows `qrm-dms/smp-japan` active, stale old-org references cleaned from canonical repos, and CI green.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`
+
+- [x] Migrate `smp-india` Git refs to `qrm-dms` and archive the old source repository as read-only.
+  - Closure: `qrm-dms/smp-india` was created with `dev`, `qa`, and `prod`; branch SHAs matched the source, CI was made green after adding Artifactory secrets, and the old GitHub source repository was archived read-only.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
+
+- [x] Replace the SMP India `qrm-dms` access-token blocker with the current AWS OIDC trust blocker.
+  - Closure: The India migration proceeded; runtime promotion is now blocked by AWS rejecting the new `qrm-dms/smp-tool` OIDC subjects, not by the earlier access-token authorization issue.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
 
 - [x] Validate the GEMS artifact-registry TLS path and provide a reusable Walnut CI certificate action.
   - Closure: `IS_INFRA_ROOT_CRT.crt` was proven against GEMS, India and Japan CI passed, and `qrm-dms/install-engie-ca@v1` was published with a green self-test.

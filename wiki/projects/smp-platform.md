@@ -52,6 +52,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - APM migration itself was reported complete on July 14, but Grafana still needed an AWS admin to create or confirm a role for CloudWatch or publish access in the APM context.
 - Clickstart pre-migration work was mentioned with custom node-group labels and deployment-role cleanup, but a July 15 clarification says the term still needs more context before treating the details as settled.
 - Extruder remediation had remaining critical issues to investigate before deciding whether other remediation tasks can wait until after go-live.
+- July 15 Codex work migrated `smp-india` into `qrm-dms/smp-india` as a private Git mirror with only `dev`, `qa`, and `prod`; the three branch SHAs matched the source and no tags existed. The old source repository was later archived read-only rather than deleted.
+- `smp-tool` India git-sync references were updated to `qrm-dms/smp-india` and promoted to `dev-india`, but runtime promotion stopped there because AWS rejected GitHub OIDC for the new `qrm-dms/smp-tool` repository subjects. `qa-india` and `prod-india` were intentionally not advanced.
+- The current AWS trust update needed for India runtime promotion is to allow `repo:qrm-dms/smp-tool:ref:refs/heads/dev-india` and `repo:qrm-dms/smp-tool:ref:refs/heads/qa-india` on the noprod role, and `repo:qrm-dms/smp-tool:ref:refs/heads/prod-india` on the prod role.
+- A bare-minimum File Browser monitor was added to `smp-tool`: a scheduled/manual GitHub Actions workflow probes the Japan dev, QA, and prod `/filebrowser/` URLs on the internal `ubuntu` runner and checks for the unauthenticated `Login with Okta` page. It was first proven green, then reduced to a daily 09:00 Manila schedule.
+- The File Browser monitor proves DNS, TLS, ingress, Airflow API-server reachability, and plugin login-page availability. It does not prove Okta login, authenticated browsing, mount readability, or downloads.
 
 ## Open Questions
 
@@ -65,6 +70,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: `Clickstart` still needs more context before the migration work can be interpreted confidently.
 - UNCERTAIN: `Peer` may be a mistranscribed person name and needs more context.
 - UNCERTAIN: Whether `Extruder` is the exact project/system name from the July 14 meeting capture.
+- UNCERTAIN: Whether an unauthenticated `/filebrowser/health` endpoint or authenticated synthetic browse check is needed after the daily monitor has run for a while.
+- UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 
 ## Sources
 
@@ -90,5 +97,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 - `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-15-codex-conversations.md`
+- `sources/notes/2026-07-15.md`
 
 Last Updated: 2026-07-15

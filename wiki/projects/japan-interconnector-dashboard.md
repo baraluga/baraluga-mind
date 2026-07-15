@@ -55,6 +55,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `SCR-1197` was simplified to one visible `As of` dropdown. `Latest` selects the current `_all` table; a date selects `_historical` and resolves the newest snapshot on or before that date. The tested change was committed and pushed to `smp-dashboard` `dev`.
 - July 14 Codex work normalized the manual interconnector backfill DAG date parameters: `start_date` and `end_date` now use date-formatted schema values, `end_date` is nullable, and `null` preserves runtime "today in Asia/Tokyo" behavior. The change was committed to `smp-japan` `dev` and promoted through `qa` and `prod`.
 - A July 15 clarification says the normalized manual DAG parameter behavior is already up and running.
+- Sprint 24 review notes say the dashboard now shows region-specific panels, `Latest` and look-back `As Of` behavior, data backfilled to fiscal year 2019, actual power flow, capacity, minimum capacity, and day-ahead price-difference lines. A stakeholder expected to use the dashboard in an auction early the following week and provide feedback afterward.
+- Sprint 25 goals include pushing interconnector data to TSDB. The sprint retro notes say roughly 28 time series are expected, IDs need to be created through GSBK, Carlos and the OCCTO provider owner team should validate metadata changes, and the open design question is whether to submit 5-minute or 30-minute average curves.
 
 ## Open Questions
 
@@ -65,6 +67,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
 - UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
 - UNCERTAIN: Whether the Bloomberg manual backfill has completed successfully in QA after promotion and workbook upload.
+- UNCERTAIN: Whether TSDB should receive 5-minute or 30-minute average interconnector curves.
+- UNCERTAIN: Whether dashboard feedback after the early-week auction requires immediate Grafana changes.
 
 ## Sources
 
@@ -85,5 +89,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/codex-conversations/2026-07-14-codex-conversations.md`
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+- `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
 
 Last Updated: 2026-07-15

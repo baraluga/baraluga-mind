@@ -38,6 +38,11 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Runner selection guidance from the July 14 chapter: use GitHub-hosted runners when no NG network access is needed; use Walnut runners for workflows that need private Artifactory or internal endpoints.
 - The package-hosting discussion expanded to include Harbor as an alternative to JFrog/Artifactory for shared Python/npm packages, especially where project-level access or robot users may be easier than per-developer/per-component access.
 - A July 15 clarification says Walnut runner certificate pre-installation and Harbor package governance are real topics, but not current confirmation priorities.
+- July 15 SFF migration work moved from ad hoc repo selection toward a tracker-driven process. A local tracker was created from the SharePoint workbook, grouped by workbook priority, owner, owner confirmation, commit activity, and pipeline complexity.
+- The first high-priority trivial migrations were grouped by low red tape and owner coordination. The completed local set included IAM federation, Cubicweb infrastructure, Pydantic tools, Certificate, Kubestat, Cmdutil, and File Manager. `common_data_model` and `tdb_client` became the capped active pipeline-transfer pair.
+- The workbook `Action` column became a required gate after `quality_tools` was initially treated as an easy migration candidate even though the workbook action was `Archive`. Later audit separated `Migrate` rows from archive/done rows.
+- A full workbook pipeline audit found 172 rows marked `Migrate`: 50 `TRIVIAL`, 2 `EASY`, and 120 `HARD` under the strict rule that no pipeline is trivial, a pipeline with no variables/secrets is easy, and anything credentialed, variable-driven, broken, unreadable, or unproven is hard.
+- For migrated GitHub pipelines that need the shared Azure Artifacts feed, the preferred model is organization-level variables for non-secret coordinates and organization-level secrets for Azure Artifacts PATs. `qrm-dms/.github` remains the organization-facing configuration/profile/agent repository, while `qrm-dms/sff-actions` remains the versioned executable automation library.
 
 ## Open Questions
 
@@ -47,6 +52,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
 - UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
+- UNCERTAIN: Whether `sff-tool-tdb-cliennt`, `sff-tool-federatioam-federation`, and `sff-tool-certificatte` are intentionally misspelled destination names or workbook artifacts that should be corrected later.
 
 ## Sources
 
@@ -65,5 +71,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 - `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-15-codex-conversations.md`
+- `sources/notes/2026-07-15.md`
 
 Last Updated: 2026-07-15
