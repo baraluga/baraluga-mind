@@ -72,13 +72,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
 
-- [ ] Finish the `common_data_model` and `tdb_client` pipeline migrations before starting additional pipeline transfers.
+- [ ] Finish the `common_data_model` pipeline migration before starting additional pipeline transfers.
   - Context: [[team-operations]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`; `sources/notes/2026-07-16.md`
 
 - [ ] Resolve the inherited GitHub Actions / Dependency Graph validation issue for `sff-tool-tdb-cliennt`, then lock the ADO source branches.
   - Context: [[ado-ios]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`; `sources/notes/2026-07-16.md`
 
 - [ ] Confirm the budget code for potential Iberia and UK expansion work.
   - Context: [[team-operations]]
@@ -106,7 +106,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm whether the existing dashboard data export feature is sufficient once the current interconnector dashboard is finalized.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
+  - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-09-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
+
+- [ ] Validate the HJKS shadow evaluation DAG in QA before retiring the current mega-orchestrator.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
 
 - [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
   - Context: [[japan-interconnector-dashboard]]
@@ -124,13 +128,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
 
-- [ ] Push interconnector dashboard data to TSDB after the catalog IDs and provider metadata are confirmed.
+- [ ] Ask `zs5929` to approve `smp_interconnector_recon` and the five OCCTO UAT `TimeseriesChange` records for the `SCR-1171` TSDB POC.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`
 
-- [ ] Decide whether interconnector TSDB submission should use 5-minute or 30-minute average curves.
+- [ ] Send the CDH support request for the stuck production Bloomberg crawler and timebox the response to 2026-07-17 EOD Manila.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
+
+- [ ] Promote and unpause `japan_occto_capacity_completed_day_dag` after QA validation confirms daily capacity wins over weekly fallback.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
 
 ### SMP Dashboards
 
@@ -250,6 +258,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[recruitment-2026]]
   - Source: `sources/meetings/2026-07-08-1100-granola-matt-mendez.md`
 
+### Japan Interconnector
+
+- [ ] Wait for TSDB UAT approvals before running the `SCR-1171` five-series write/read-back proof.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`
+
 ### Team Operations
 
 - [ ] Wait for `baraluga` GitHub authorization with `delete_repo` scope, then delete only the accidental private `baraluga/ado-ios` mirror and reverify `QN5792_engieco/ado-ios`.
@@ -289,6 +303,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
 
 ### Japan Interconnector
+
+- [x] Decide the initial TSDB cadence and value semantics for `SCR-1171`.
+  - Closure: Capacity uses 30-minute reconciled values with positive directional conversion at the TSDB boundary; actual flow keeps signed five-minute values.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 
 - [x] Verify the promoted manual interconnector backfill DAG parameter change in the Airflow UI, especially nullable `end_date` behavior.
   - Closure: Confirmed on 2026-07-15 that the normalized manual DAG parameter behavior is already up and running.
@@ -427,6 +446,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### Team Operations
+
+- [x] Migrate the `tdb_client` pipeline.
+  - Closure: July 16 note marks the `tdb_client` pipeline migration complete; remaining work is post-migration validation and source locking for `sff-tool-tdb-cliennt`.
+  - Context: [[team-operations]]
+  - Source: `sources/notes/2026-07-16.md`
+
+- [x] Set up the ADO backwards-compatibility action in `sff-actions`.
+  - Context: [[team-operations]]
+  - Source: `sources/notes/2026-07-16.md`
 
 - [x] Send anniversary date survey.
   - Context: [[team-operations]]

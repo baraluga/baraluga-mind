@@ -57,6 +57,12 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - A July 15 clarification says the normalized manual DAG parameter behavior is already up and running.
 - Sprint 24 review notes say the dashboard now shows region-specific panels, `Latest` and look-back `As Of` behavior, data backfilled to fiscal year 2019, actual power flow, capacity, minimum capacity, and day-ahead price-difference lines. A stakeholder expected to use the dashboard in an auction early the following week and provide feedback afterward.
 - Sprint 25 goals include pushing interconnector data to TSDB. The sprint retro notes say roughly 28 time series are expected, IDs need to be created through GSBK, Carlos and the OCCTO provider owner team should validate metadata changes, and the open design question is whether to submit 5-minute or 30-minute average curves.
+- July 16 notes confirmed Grafana has a native CSV export path for displayed dashboard data. Brian drafted a short message to Hiromi asking whether that satisfies the current export need or whether a formatted Excel workbook is still required.
+- July 16 HJKS investigation found intermittent `japan_get_hjks_final_dag` failures around CSRF refresh after Selenium search submission. A scheduled `japan_get_hjks_final_shadow_dag` was created and pushed to test 26 serialized retryable windows before retiring the current mega-orchestrator.
+- July 16 actual-flow/capacity investigation clarified that the dashboard's blue/orange `Available` series is OCCTO residual available capacity, not the physical operating capacity. Actual flow can exceed residual available capacity without proving a physical capacity breach. The dashboard label should be clarified, and a true breach check requires comparing actual flow with directional operating capacity.
+- July 16 QA investigation found `SCR-1197` capacity provenance was stale because the effective curve selected weekly capacity after the daily source fell out of the live window. A completed-day capacity DAG was added at 00:30 JST to persist yesterday's revised `D` capacity into the immutable prefix, trigger reconciliation, and prevent daily-to-weekly regression.
+- July 16 production Bloomberg actual-flow registration exposed a CDH false positive: the workflow accepted schema detection but did not prove Athena table creation. The production Glue crawler `cdh_smpdatasourceprd_japan_bloomberg_interconnector_actual_flow_49` remained stuck in `RUNNING`, so `japan_bloomberg_interconnector_actual_flow_all` was still missing from Athena. A temporary OCCTO-only dashboard JSON was prepared but intentionally not imported because production users were still on QA.
+- July 16 TSDB POC work for `SCR-1171` split the target into 35 series: 14 directional available-capacity series, 14 directional minimum-capacity series, and 7 signed actual-flow series. Capacity publication should use positive directional values at the TSDB boundary, while actual flow keeps signed five-minute values. The first UAT POC created five Hokkaido/Tohoku `TimeseriesChange` records and identified `zs5929` as the best single approver for both `smp_interconnector_recon` model metadata and the OCCTO time-series changes.
 
 ## Open Questions
 
@@ -67,7 +73,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
 - UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
 - UNCERTAIN: Whether the Bloomberg manual backfill has completed successfully in QA after promotion and workbook upload.
-- UNCERTAIN: Whether TSDB should receive 5-minute or 30-minute average interconnector curves.
+- UNCERTAIN: Whether CDH support can reset the stuck production Bloomberg crawler before the July 17 EOD Manila timebox.
+- UNCERTAIN: Whether the temporary OCCTO-only dashboard, manual Athena table, or recovery-dataset fallback will be needed if CDH support is silent.
+- UNCERTAIN: Whether `zs5929` can approve both the `smp_interconnector_recon` model metadata and the five OCCTO UAT `TimeseriesChange` records without additional TSDB administrators.
 - UNCERTAIN: Whether dashboard feedback after the early-week auction requires immediate Grafana changes.
 
 ## Sources
@@ -91,5 +99,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 - `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 - `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
+- `sources/codex-conversations/2026-07-16-codex-conversations.md`
+- `sources/notes/2026-07-16.md`
 
-Last Updated: 2026-07-15
+Last Updated: 2026-07-16

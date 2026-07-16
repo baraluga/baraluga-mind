@@ -57,6 +57,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The current AWS trust update needed for India runtime promotion is to allow `repo:qrm-dms/smp-tool:ref:refs/heads/dev-india` and `repo:qrm-dms/smp-tool:ref:refs/heads/qa-india` on the noprod role, and `repo:qrm-dms/smp-tool:ref:refs/heads/prod-india` on the prod role.
 - A bare-minimum File Browser monitor was added to `smp-tool`: a scheduled/manual GitHub Actions workflow probes the Japan dev, QA, and prod `/filebrowser/` URLs on the internal `ubuntu` runner and checks for the unauthenticated `Login with Okta` page. It was first proven green, then reduced to a daily 09:00 Manila schedule.
 - The File Browser monitor proves DNS, TLS, ingress, Airflow API-server reachability, and plugin login-page availability. It does not prove Okta login, authenticated browsing, mount readability, or downloads.
+- July 16 `smp-dashboard` work added and promoted a manual CDH registration GitHub Actions workflow. It uses branch-to-environment mapping, explicit Japan/India region selection, environment approval for short-lived `CDH_TOKEN_ONESHOT`, and long-lived GitHub Tools credentials for installing `cdh-sdk`.
+- The same CDH registration work later exposed a false-positive risk: `cdh-sdk 1.1.81` could submit schema detection while crawler-status refresh failed, so the workflow reported success even though Athena did not have the expected table. The local hardening made schema upload and crawler status terminal checks fail loudly, but production crawler reset still required CDH/platform support.
 
 ## Open Questions
 
@@ -72,6 +74,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Extruder` is the exact project/system name from the July 14 meeting capture.
 - UNCERTAIN: Whether an unauthenticated `/filebrowser/health` endpoint or authenticated synthetic browse check is needed after the daily monitor has run for a while.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
+- UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 
 ## Sources
 
@@ -99,5 +102,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/notes/2026-07-15.md`
+- `sources/codex-conversations/2026-07-16-codex-conversations.md`
 
-Last Updated: 2026-07-15
+Last Updated: 2026-07-16
