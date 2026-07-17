@@ -44,6 +44,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - A full workbook pipeline audit found 172 rows marked `Migrate`: 50 `TRIVIAL`, 2 `EASY`, and 120 `HARD` under the strict rule that no pipeline is trivial, a pipeline with no variables/secrets is easy, and anything credentialed, variable-driven, broken, unreadable, or unproven is hard.
 - For migrated GitHub pipelines that need the shared Azure Artifacts feed, the preferred model is organization-level variables for non-secret coordinates and organization-level secrets for Azure Artifacts PATs. `qrm-dms/.github` remains the organization-facing configuration/profile/agent repository, while `qrm-dms/sff-actions` remains the versioned executable automation library.
 - A July 16 note says the `tdb_client` pipeline migration was completed. The same note says the ADO backwards-compatibility action was set up in `sff-actions`.
+- July 17 SFF migration work hardened the standard migrated Python package shape. Meteomatics was fixed to mount Azure Artifacts `.netrc` into its Lambda Docker compatibility test, split CI from manual publishing, remove duplicate push/PR runs, use the shared tested-artifact publisher, and pass a dry-run publish. TDB kept the split release model, removed duplicate CI triggers, pinned public bootstrap tools, and passed CI plus dry-run publishing.
+- The organization-level modernizer and `sff-actions` now treat migration correctness as an executable contract: generated repositories should run `validate-python-migration@v1` locally and in CI, rather than relying only on Copilot prompt adherence.
+- Repository ruleset cleanup on July 17 found automatic Copilot review only on active `smp-japan`, plus a stranded ruleset on archived legacy `DMS-Scraper-and-Models-Platform/smp-india`. The legacy ruleset was removed after temporary unarchive, and `smp-japan` kept its branch protections while removing the `copilot_code_review` rule.
 
 ## Open Questions
 
@@ -54,6 +57,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
 - UNCERTAIN: Whether `sff-tool-tdb-cliennt`, `sff-tool-federatioam-federation`, and `sff-tool-certificatte` are intentionally misspelled destination names or workbook artifacts that should be corrected later.
+- UNCERTAIN: Whether the next untouched Python migration will pass the modernizer validator loop without manual workflow corrections.
 
 ## Sources
 
@@ -75,5 +79,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/notes/2026-07-15.md`
 - `sources/notes/2026-07-16.md`
+- `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
-Last Updated: 2026-07-16
+Last Updated: 2026-07-17

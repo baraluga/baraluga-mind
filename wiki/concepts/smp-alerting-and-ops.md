@@ -23,6 +23,8 @@ SMP operational discussions in late June and early July focused on production in
 - July 13 standup says the Grafana-alert SNS stack was created and testing was in progress; Sentry for APL was next.
 - July 14 team notes reported APM notification setup blocked because email notifications were not working due to SMTP configuration. The recommended resolution path was IAM or identity-provider based, with console checking as a workaround. A July 15 clarification says this was APM, not EPM, and Huk is working on it.
 - July 14 technical standup said APM migration was complete and SNS infrastructure was done, but Grafana still needed AWS-admin help to create or confirm a role for CloudWatch/publish access in the APM context.
+- July 17 technical-activities notes say an SNS publisher role had been created and attached to the Grafana service account, but a web-identity/STSS error still persisted and Jeka was asked for namespace access. The SNS ticket was not expected to close that day because of a later demo.
+- The same meeting introduced a broader alerting idea from the Prosumer simulation blockage: restore Prosumer-specific alarms if needed, but also consider account-level global alarms because the immediate root cause was shared AWS infrastructure capacity rather than a Prosumer application failure.
 
 ## Open Questions
 
@@ -30,6 +32,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Exact root cause of production proxy 403s was not confirmed in the notes.
 - UNCERTAIN: Whether the Grafana alert destination should be one shared Teams channel or separate per system still needs confirmation.
 - UNCERTAIN: Which AWS admin can create the Grafana role needed for APM CloudWatch/publish access.
+- UNCERTAIN: Whether `STSS` and `Jeka` are exact names from the July 17 technical-activities source.
 
 ## Sources
 
@@ -47,5 +50,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 - `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
-Last Updated: 2026-07-15
+Last Updated: 2026-07-17

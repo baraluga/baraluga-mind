@@ -25,12 +25,15 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - July 7 Codex work added a targeted CDH dataset-manager path for Japan interconnector effective-capacity historical stage registration and improved schema/crawler refresh behavior for existing datasets and stages.
 - CDH crawler lag made the historical stage appear broken at first; once it caught up, the cleaner same-dataset/two-stage model was restored.
 - July 8 AWS migration standup favored backing up the full Grafana database instead of only dashboard JSON exports. Grafana was thought to use MySQL or Postgres, with an option to connect to existing RDS using the same pattern as Airflow.
+- July 17 Codex notes requested hardening the manual `cdh-register.yml` workflow so the target environment is inferred from the branch and the one-hour CDH token can be pasted as an explicit workflow input. The motivation was to avoid a dev branch run accidentally targeting production.
+- July 17 `SCR-1202` dashboard work added an opt-in HJKS 2Y `As of` selector pattern with immediate visibility for complete scheduled snapshots, exact snapshot filtering across all 12 panels, and a reusable look-back playbook for future dashboards.
 
 ## Open Questions
 
 - UNCERTAIN: Grafana backup implementation path remains blocked by network/VPN access in the captured notes.
 - UNCERTAIN: CDH crawler delay duration and operator-facing status behavior are not fully characterized.
 - UNCERTAIN: Grafana database engine and RDS backup path still need confirmation.
+- UNCERTAIN: Whether the `cdh-register.yml` input-token redesign has been implemented after the July 17 request.
 
 ## Sources
 
@@ -41,5 +44,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-07-07-1530-granola-francois-help.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
+- `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-07-17

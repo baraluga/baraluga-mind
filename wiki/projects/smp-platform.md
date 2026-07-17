@@ -59,6 +59,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The File Browser monitor proves DNS, TLS, ingress, Airflow API-server reachability, and plugin login-page availability. It does not prove Okta login, authenticated browsing, mount readability, or downloads.
 - July 16 `smp-dashboard` work added and promoted a manual CDH registration GitHub Actions workflow. It uses branch-to-environment mapping, explicit Japan/India region selection, environment approval for short-lived `CDH_TOKEN_ONESHOT`, and long-lived GitHub Tools credentials for installing `cdh-sdk`.
 - The same CDH registration work later exposed a false-positive risk: `cdh-sdk 1.1.81` could submit schema detection while crawler-status refresh failed, so the workflow reported success even though Athena did not have the expected table. The local hardening made schema upload and crawler status terminal checks fail loudly, but production crawler reset still required CDH/platform support.
+- July 17 notes requested a follow-up to improve `smp-dashboard` CDH registration: infer the target environment from the workflow branch instead of accepting a user-supplied branch, and pass the one-hour CDH token directly as a workflow input instead of storing it as an environment secret.
+- July 17 technical-activities notes described a Grafana/Loki signups deployment blocked on IP registration before DNS and certificate requests. The notes also mention service-account work for SNS publishing, but a web-identity/STSS error persisted after the role was attached.
+- The same meeting identified a runaway AWS Batch configuration: GMR compute environments had minimum CPU set to 1,200, causing more than 1,200 M3 medium EC2 instances to run continuously without CrowdStrike coverage. The minimum was reduced to zero during the meeting, and maximum vCPU limits still needed review across compute environments.
+- The Prosumer simulation blockage was attributed to saturated shared AWS infrastructure capacity rather than an application-specific Prosumer failure. Reducing the AWS Batch minimum CPU was expected to relieve the capacity issue, but simulation recovery still needed verification.
 
 ## Open Questions
 
@@ -75,6 +79,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether an unauthenticated `/filebrowser/health` endpoint or authenticated synthetic browse check is needed after the daily monitor has run for a while.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
+- UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
+- UNCERTAIN: Whether `ngloud` is the exact AMI/image family name behind the GMR CrowdStrike coverage issue.
+- UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
 
 ## Sources
 
@@ -103,5 +110,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/notes/2026-07-15.md`
 - `sources/codex-conversations/2026-07-16-codex-conversations.md`
+- `sources/codex-conversations/2026-07-17-codex-conversations.md`
+- `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
-Last Updated: 2026-07-16
+Last Updated: 2026-07-17

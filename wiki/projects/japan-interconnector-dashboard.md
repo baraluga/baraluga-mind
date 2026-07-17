@@ -63,6 +63,10 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - July 16 QA investigation found `SCR-1197` capacity provenance was stale because the effective curve selected weekly capacity after the daily source fell out of the live window. A completed-day capacity DAG was added at 00:30 JST to persist yesterday's revised `D` capacity into the immutable prefix, trigger reconciliation, and prevent daily-to-weekly regression.
 - July 16 production Bloomberg actual-flow registration exposed a CDH false positive: the workflow accepted schema detection but did not prove Athena table creation. The production Glue crawler `cdh_smpdatasourceprd_japan_bloomberg_interconnector_actual_flow_49` remained stuck in `RUNNING`, so `japan_bloomberg_interconnector_actual_flow_all` was still missing from Athena. A temporary OCCTO-only dashboard JSON was prepared but intentionally not imported because production users were still on QA.
 - July 16 TSDB POC work for `SCR-1171` split the target into 35 series: 14 directional available-capacity series, 14 directional minimum-capacity series, and 7 signed actual-flow series. Capacity publication should use positive directional values at the TSDB boundary, while actual flow keeps signed five-minute values. The first UAT POC created five Hokkaido/Tohoku `TimeseriesChange` records and identified `zs5929` as the best single approver for both `smp_interconnector_recon` model metadata and the OCCTO time-series changes.
+- July 17 standup notes say the production Bloomberg actual-flow backfill table was still missing from Grafana even though row-level preview was visible in CDH prod. A CDH support ticket had been raised and a support call was pending; the remaining work is to understand the CDH-to-Grafana/Athena gap and document findings for the team and future DAG users.
+- `SCR-1202` added an opt-in HJKS 2Y dashboard look-back pattern. The implemented design records scheduled snapshots with explicit metadata, publishes a snapshot manifest only when all nine dashboard regions complete, and exposes complete scheduled snapshots in the `As of` selector as soon as their manifest is queryable. Manual and incomplete runs remain excluded, `Latest` remains default, and no pre-deployment backfill is required.
+- `SCR-1202` was implemented across `smp-common`, `smp-tool`, `smp-japan`, and `smp-dashboard`: `smp-common 0.4.4` was published, `smp-tool` was pushed to `dev`, Japan changes were merged and promoted through QA, and dashboard changes were pushed directly to `dev` then promoted to QA. The remaining source-backed validation item is a real scheduled Airflow snapshot before production rollout.
+- July 17 standup notes also say the TSDB catalog approval for `SCR-1171` was waiting on Carlos, with Laurent identified as fallback if Carlos did not respond by end of day. This appears related to the existing TSDB UAT approval wait rather than a separate design decision.
 
 ## Open Questions
 
@@ -77,6 +81,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the temporary OCCTO-only dashboard, manual Athena table, or recovery-dataset fallback will be needed if CDH support is silent.
 - UNCERTAIN: Whether `zs5929` can approve both the `smp_interconnector_recon` model metadata and the five OCCTO UAT `TimeseriesChange` records without additional TSDB administrators.
 - UNCERTAIN: Whether dashboard feedback after the early-week auction requires immediate Grafana changes.
+- UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
+- UNCERTAIN: Whether `SCR-1202` has been validated with a real scheduled QA Airflow run after the QA promotion.
 
 ## Sources
 
@@ -101,5 +107,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-07-15-1630-granola-sprint-review.md`
 - `sources/codex-conversations/2026-07-16-codex-conversations.md`
 - `sources/notes/2026-07-16.md`
+- `sources/codex-conversations/2026-07-17-codex-conversations.md`
+- `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+- `sources/notes/2026-07-17.md`
 
-Last Updated: 2026-07-16
+Last Updated: 2026-07-17

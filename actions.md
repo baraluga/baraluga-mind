@@ -88,6 +88,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 
+- [ ] Complete review of Joyce's PR on the SFF idiomatics client repository.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Work through Bong's ADO-to-new-repo migration list from the Abstract meeting.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
 ### Job Search
 
 - [ ] Enable Chrome local file access for Codex, then submit the queued LinkedIn/manual applications.
@@ -112,6 +120,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
 
+- [ ] Validate a real scheduled HJKS 2Y look-back snapshot in Airflow before production rollout.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
 - [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-09-1415-granola-smp-standup.md`
@@ -132,13 +144,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`
 
-- [ ] Send the CDH support request for the stuck production Bloomberg crawler and timebox the response to 2026-07-17 EOD Manila.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
-
 - [ ] Promote and unpause `japan_occto_capacity_completed_day_dag` after QA validation confirms daily capacity wins over weekly fallback.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
+
+- [ ] Document the Bloomberg actual-flow backfill investigation outcome for the team and end users once CDH support resolves the production visibility issue.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
+- [ ] Confirm which environment the recent interconnector dashboard fix was deployed to.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
 
 ### SMP Dashboards
 
@@ -153,6 +169,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Investigate Grafana database type and backup strategy.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
+
+- [ ] Improve `smp-dashboard` `cdh-register.yml` so environment comes from the branch and the short-lived CDH token is supplied as a workflow input.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 ### SMP Platform
 
@@ -232,6 +252,26 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 
+- [ ] Register the TA-91 IP address, then request DNS and certificate setup for the Grafana/Loki signups deployment.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Verify CrowdStrike agent coverage on the GMR compute instances provisioned from ngloud images.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Review and reduce max vCPU limits across GMR compute environments to prevent runaway AWS Batch capacity.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Submit an AWS support request for a VPC CPU limit increase.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Validate Prosumer simulations after the shared AWS Batch minimum CPU fix.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
@@ -240,7 +280,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Pilot the `qrm-dms/.github` ADO Pipeline Modernizer agent on a real migrated repository pipeline and fold lessons into the agent.
   - Context: [[github-copilot-custom-agents]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+- [ ] Test the modernizer and migration validator on a fresh untouched Python repository and record first-pass findings.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+- [ ] Decide whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
@@ -249,6 +297,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Identify an AWS admin who can create the APM Grafana role needed for CloudWatch or publish access.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-07-14-1515-granola-technical-standup.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+
+- [ ] Evaluate account-level global alarms for shared AWS Batch capacity saturation.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Ask IT for an approved Zscaler bypass or split-routing policy for ChatGPT/Codex traffic while private-site access remains on Zscaler.
+  - Context: [[zscaler-codex-access]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 ## Waiting
 
@@ -262,7 +318,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Wait for TSDB UAT approvals before running the `SCR-1171` five-series write/read-back proof.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
+- [ ] Wait for CDH support to resolve or explain the missing production Bloomberg actual-flow table between CDH and Grafana.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
 
 ### Team Operations
 
@@ -294,6 +354,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
 
+- [ ] Wait for Jeka to provide namespace access needed to debug the Grafana SNS service-account web identity error.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
 ## Done
 
 ### Baraluga Mind
@@ -308,6 +372,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Capacity uses 30-minute reconciled values with positive directional conversion at the TSDB boundary; actual flow keeps signed five-minute values.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
+
+- [x] Add and promote the `SCR-1202` HJKS 2Y snapshot look-back implementation through QA.
+  - Closure: `smp-common 0.4.4`, `smp-tool`, `smp-japan`, and `smp-dashboard` were updated; Japan and dashboard changes were promoted through QA, with immediate scheduled-snapshot visibility replacing the initial completed-day restriction.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/notes/2026-07-17.md`
+
+- [x] Send the CDH support request for the stuck production Bloomberg crawler.
+  - Closure: July 17 standup evidence says the CDH support ticket was raised and a call was pending; the remaining issue is tracked as waiting on CDH support.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
 
 - [x] Verify the promoted manual interconnector backfill DAG parameter change in the Airflow UI, especially nullable `end_date` behavior.
   - Closure: Confirmed on 2026-07-15 that the normalized manual DAG parameter behavior is already up and running.
@@ -335,6 +409,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: `IS_INFRA_ROOT_CRT.crt` was proven against GEMS, India and Japan CI passed, and `qrm-dms/install-engie-ca@v1` was published with a green self-test.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
+
+- [x] Remove stranded or unwanted automatic Copilot review rules from SMP repositories.
+  - Closure: The archived legacy `DMS-Scraper-and-Models-Platform/smp-india` ruleset was removed after temporary unarchive, and the active `qrm-dms/smp-japan` ruleset kept branch protections while removing `copilot_code_review`.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+- [x] Harden SFF pipeline migration tooling with a reusable migration validator and consumer CI enforcement.
+  - Closure: `qrm-dms/sff-actions` exposes `validate-python-migration@v1`; the modernizer requires the validator feedback loop; Common Data Model, Meteomatics, and TDB enforce the contract in CI; all referenced CI and dry-run publish checks were green.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 - [x] Document user secrets and Python dependency addition process.
   - Context: [[smp-platform]]
