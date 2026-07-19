@@ -25,6 +25,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The July 15 capture set contained thirteen Codex sessions, zero Copilot sessions, two Granola meeting notes, and a manual migration checklist. The Codex sessions were heavy on QRM/SFF migration coordination, Copilot custom agents, Aurora XLSX parser hardening, and a File Browser health monitor.
 - The July 17 capture set contained eleven Codex sessions, zero Copilot sessions, two Granola meeting notes, and a manual daily checklist. The Codex sessions were heavy on `SCR-1202` HJKS 2Y look-back implementation, SMP ruleset cleanup, SFF pipeline migration guardrails, Meteomatics/TDB CI publishing, and Zscaler/Codex private-site access diagnostics.
 - The July 18 capture set contained one Codex session, zero Copilot sessions, and a Granola status note saying no meetings dated 2026-07-18 Asia/Manila were returned by the connector. The Codex session only captured the export-only daily Codex conversation capture run.
+- The July 19 capture set contained three Codex sessions, zero Copilot sessions, and a Granola status note saying no meetings matched the 2026-07-19 Asia/Manila date filter. The Codex sessions only captured the export-only daily Copilot, Granola, and Codex capture runs.
 
 ## Open Questions
 
@@ -62,5 +63,8 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/codex-conversations/2026-07-18-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-18-copilot-conversations.md`
 - `sources/meetings/2026-07-18-granola-meeting-notes-status.md`
+- `sources/codex-conversations/2026-07-19-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-19-copilot-conversations.md`
+- `sources/meetings/2026-07-19-granola-meeting-notes-status.md`
 
-Last Updated: 2026-07-18
+Last Updated: 2026-07-19
