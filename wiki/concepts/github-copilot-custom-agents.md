@@ -19,10 +19,15 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 - `qrm-dms/sff-actions` now exposes `validate-python-migration@v1`, a Ruby-based dependency-free validator with a machine-readable Python migration contract. It checks split CI/publish workflows, non-overlapping triggers, tested artifact publishing, dry-run defaults, Docker credential and CA mounts, non-mutating checks, pinned bootstrap tools, approved action versions, job timeouts, and least-privilege permissions.
 - The modernizer now requires a local validator pass and a dedicated migration-contract CI job before handoff. Common Data Model, Meteomatics, and TDB enforce the released validator action in CI and passed with zero warnings in the July 17 evidence.
 - Ruby was chosen for the validator because GitHub-hosted runners include Ruby and its standard library provides YAML parsing without installing packages. The portability risk is explicit: if Ruby availability becomes a real problem for local or Copilot environments, a bundled Node action may be justified.
+- July 20 work tested the Modernizer on three real SFF migrations. The generated attempts for `sff-lib-user-ms-client` and `sff-lib-web-common` were insufficient without takeover: one made no change, while another missed pinned tools, artifact retention, the shared publisher, and non-mutating checks. The repaired workflows later passed CI and dry-run publishing.
+- The `sff-ms-user` Modernizer attempt was stronger but still needed manual repair: source formatting failed, the Lambda image was mutable, corporate CA forwarding into Docker was incomplete, and version metadata generation could fail silently. After focused fixes, PR #1 became green with 72 tests, 85.54% coverage, Lambda parity, `dist` artifacts, and coverage artifacts.
+- Those misses were converted into stronger `sff-actions` validation rather than only prompt changes. The live `validate-python-migration@v1` contract was advanced to `0f9cdc8` after `sff-actions`, the organization Modernizer fixture, and representative consumers were green.
+- The hardened validator now enforces authenticated read-feed setup, ENGIE CA setup, `AZURE_ARTIFACTS_READ_PAT` read mode, Docker private-feed environment propagation, matching read-only `.netrc` and CA mount paths, `UV_SYSTEM_CERTS=true`, SHA-256-pinned Lambda images, and a clear boundary between structural validation and runtime CI evidence.
+- The stronger validator exposed existing debt in repositories then named `sff-common-data-model` and `sff-microservice-meteomatics-client`: mutable Lambda images and pre-existing mutating tox environments. These were left untouched in the source conversation and are tracked in [[actions]].
 
 ## Open Questions
 
-- UNCERTAIN: Whether the ADO Pipeline Modernizer plus validator can one-shot a genuinely untouched Python repository migration; the July 17 work proved the guardrail on known repositories, not a fresh migration.
+- UNCERTAIN: Whether prompt-only Modernizer guidance can consistently prevent misses such as omitted CA forwarding or mutable Lambda images; July 20 evidence suggests executable validation is the reliable control.
 - UNCERTAIN: Which additional organization-level Copilot agents are worth contributing to `qrm-dms/.github`.
 - UNCERTAIN: Whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
 
@@ -30,5 +35,6 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
+- `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-07-20

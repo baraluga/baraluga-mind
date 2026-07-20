@@ -44,10 +44,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-09-0945-granola-am-standup.md`
 
-- [ ] Document the manual ADO-to-GitHub migrator UI process before automating it.
-  - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-09-0945-granola-am-standup.md`
-
 - [ ] After the Japan transfer is resolved, migrate remaining repositories with staged private mirrors and keep each source available until the target is verified.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-12-codex-conversations.md`
@@ -96,6 +92,18 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
+- [ ] Decide whether to enable `master` branch protection for `sff-lib-user-ms-client` and `sff-lib-web-common`.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
+
+- [ ] Align with Fred on the SMP support model for teams such as UK data governance: platform-only maintenance versus active development support.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`
+
+- [ ] Fix the Jira email issue from the July 20 note.
+  - Context: [[team-operations]]
+  - Source: `sources/notes/2026-07-20.md`
+
 ### Job Search
 
 - [ ] Enable Chrome local file access for Codex, then submit the queued LinkedIn/manual applications.
@@ -123,6 +131,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Validate a real scheduled HJKS 2Y look-back snapshot in Airflow before production rollout.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
+- [ ] Follow up with Carlos on `SCR-1171` spreadsheet approval, then have Laurent execute the TSDB catalog changes once approved.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`
 
 - [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
   - Context: [[japan-interconnector-dashboard]]
@@ -272,23 +284,39 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
+- [ ] Onboard Mateo to SMP India by confirming GitHub corporate license, granting `qrm-dms` / SMP India access, and granting dev dashboard rights.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`
+
+- [ ] Follow up on the billing ticket with the corrected explanation that the 1,000-instance run was manual error, not a billing-system bug.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+
+- [ ] Integrate File Manager into the Pyrene deployment and confirm end-to-end runs with Abraham.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+
+- [ ] Add the old Prosumer prod and DMS prod S3 buckets to the Azure admin role and enable cost-center ABAC tags before the data migration.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+
+- [ ] Confirm the Model Runner migration cutover date with Nick, then plan database/file migration and cluster scale-up.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
   - Context: [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 
-- [ ] Pilot the `qrm-dms/.github` ADO Pipeline Modernizer agent on a real migrated repository pipeline and fold lessons into the agent.
-  - Context: [[github-copilot-custom-agents]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-17-codex-conversations.md`
-
-- [ ] Test the modernizer and migration validator on a fresh untouched Python repository and record first-pass findings.
-  - Context: [[github-copilot-custom-agents]]
-  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
-
 - [ ] Decide whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
   - Context: [[github-copilot-custom-agents]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+- [ ] Clean up mutable Lambda images and mutating tox environments in `sff-data-common-models` and `sff-lib-meteomatics-client`.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
@@ -318,7 +346,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Wait for TSDB UAT approvals before running the `SCR-1171` five-series write/read-back proof.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+  - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/meetings/2026-07-20-1415-granola-standup.md`
 
 - [ ] Wait for CDH support to resolve or explain the missing production Bloomberg actual-flow table between CDH and Grafana.
   - Context: [[japan-interconnector-dashboard]]
@@ -358,6 +386,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
+- [ ] Wait for the temporary `All-repository admin` role to be revoked at the end of July.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
+
 ## Done
 
 ### Baraluga Mind
@@ -378,6 +410,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/notes/2026-07-17.md`
 
+- [x] Send Japan team the `SCR-1202` HJKS 2Y look-back dashboard for validation.
+  - Closure: The July 20 note marks the Japan check request as done; the separate scheduled-Airflow validation item remains open.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`
+
 - [x] Send the CDH support request for the stuck production Bloomberg crawler.
   - Closure: July 17 standup evidence says the CDH support ticket was raised and a call was pending; the remaining issue is tracked as waiting on CDH support.
   - Context: [[japan-interconnector-dashboard]]
@@ -389,6 +426,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 
 ### SMP Platform
+
+- [x] Document the public-facing repository and pipeline migration process before further automation.
+  - Closure: Three Confluence child pages were published: repository migration, pipeline migration, and an explicitly WIP/TBD artifact migration page; the finished guides avoid mentioning the internal migration helper.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
 - [x] Resolve the pending `smp-japan` move into `qrm-dms` and remove tracked old-organization references.
   - Closure: July 15 evidence shows `qrm-dms/smp-japan` active, stale old-org references cleaned from canonical repos, and CI green.
@@ -416,9 +458,19 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 - [x] Harden SFF pipeline migration tooling with a reusable migration validator and consumer CI enforcement.
-  - Closure: `qrm-dms/sff-actions` exposes `validate-python-migration@v1`; the modernizer requires the validator feedback loop; Common Data Model, Meteomatics, and TDB enforce the contract in CI; all referenced CI and dry-run publish checks were green.
+  - Closure: `qrm-dms/sff-actions` exposes `validate-python-migration@v1`; the modernizer requires the validator feedback loop; Common Data Model, Meteomatics, TDB, `sff-lib-user-ms-client`, `sff-lib-web-common`, and `sff-ms-user` enforce the contract in CI; the July 20 validator hardening advanced live `v1` to `0f9cdc8` after representative consumer runs were green.
   - Context: [[github-copilot-custom-agents]]
-  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/codex-conversations/2026-07-20-codex-conversations.md`
+
+- [x] Migrate `user_ms_client`, `web_common`, and `user_microservice` SFF repositories into `qrm-dms`, lock their ADO source branches, and prove migrated GitHub CI.
+  - Closure: `user_ms_client` became `sff-lib-user-ms-client`, `web_common` became `sff-lib-web-common`, and `user_microservice` became `sff-ms-user`; all Git refs matched, ADO source branches were locked, migrated CI was green, and manual publisher dry-runs passed without uploading packages.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`; `sources/notes/2026-07-20.md`
+
+- [x] Review and apply the confirmed red-font SFF repository rename batch from the migration workbook.
+  - Closure: Twenty workbook-confirmed repositories were renamed while preserving repository IDs, private visibility, and unarchived state; `sff-actions` and the no-op `sff-tool-tdb-client` were intentionally left unchanged.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`; `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
 
 - [x] Document user secrets and Python dependency addition process.
   - Context: [[smp-platform]]
@@ -522,6 +574,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### AI Assisted Engineering
+
+- [x] Pilot the `qrm-dms/.github` ADO Pipeline Modernizer agent on a real migrated repository pipeline and fold lessons into the agent.
+  - Closure: Copilot's generated attempts for `sff-lib-user-ms-client`, `sff-lib-web-common`, and `sff-ms-user` were reviewed, repaired where needed, and used to harden the live Modernizer profile and `sff-actions` validator.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/codex-conversations/2026-07-20-codex-conversations.md`
+
+- [x] Test the modernizer and migration validator on a fresh untouched Python repository and record first-pass findings.
+  - Closure: The `sff-ms-user` migration PR exposed formatting drift, mutable Lambda images, missing container CA forwarding, and silent version-generation risk; the PR was fixed to green and those misses were converted into stronger validator rules.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
 - [x] Fred to bring team-level AI implementation planning to the tech meeting.
   - Context: [[ai-assisted-engineering]]

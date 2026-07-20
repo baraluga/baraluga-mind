@@ -24,12 +24,14 @@ On July 15, `ado-ios` became the working helper for the broader SFF/QRM reposito
 - The migration prompts now require a meaningful GitHub repository description based on source README/project metadata rather than carrying over generic workbook text.
 - July 15 migrations and delegations used `ado-ios` for SFF repositories including `sff-ado-aws-iam-federation`, `cubicweb-infrastructure`, `pydanticai_tools`, `file-manager`, `common_data_model`, and `tdb_client`. Several repo-only migrations finished, but `common_data_model` and `tdb_client` pipeline transfers were still active.
 - `tdb_client` was migrated to the workbook-provided destination `qrm-dms/sff-tool-tdb-cliennt`; validation found matching refs/history but source locking was left outstanding because GitHub automatically activated an inherited Dependency Graph workflow/run.
+- July 20 repo-only SFF migrations used the current staged mirror flow for `user_ms_client`, `web_common`, and `user_microservice`. `user_ms_client` became `qrm-dms/sff-lib-user-ms-client` with 9 branches and 3 tags; `web_common` became `qrm-dms/sff-lib-web-common` with 8 branches and 1 tag; `user_microservice` became `qrm-dms/sff-ms-user` with 44 branches and 17 tags.
+- After the July 20 migrations, the corresponding ADO source branches were locked read-only: 9/9 for `user_ms_client`, 8/8 for `web_common`, and 44/44 for `user_microservice`. Pipeline definitions were intentionally left for separate migration work.
 
 ## Open Questions
 
 - UNCERTAIN: Whether v2 should add CI wiring for Ruff/pytest, more migration commands, or deeper pipeline inventory behavior.
 - UNCERTAIN: Whether the accidental `baraluga/ado-ios` mirror has been deleted after the required GitHub device authorization.
-- UNCERTAIN: Whether every successful July 15 SFF migration has already had all ADO source branches locked read-only.
+- UNCERTAIN: Whether every successful July 15 SFF migration has already had all ADO source branches locked read-only; the July 20 SFF migrations listed above were source-locked.
 
 ## Sources
 
@@ -37,5 +39,6 @@ On July 15, `ado-ios` became the working helper for the broader SFF/QRM reposito
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/notes/2026-07-15.md`
+- `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
-Last Updated: 2026-07-15
+Last Updated: 2026-07-20

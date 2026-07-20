@@ -63,6 +63,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - July 17 technical-activities notes described a Grafana/Loki signups deployment blocked on IP registration before DNS and certificate requests. The notes also mention service-account work for SNS publishing, but a web-identity/STSS error persisted after the role was attached.
 - The same meeting identified a runaway AWS Batch configuration: GMR compute environments had minimum CPU set to 1,200, causing more than 1,200 M3 medium EC2 instances to run continuously without CrowdStrike coverage. The minimum was reduced to zero during the meeting, and maximum vCPU limits still needed review across compute environments.
 - The Prosumer simulation blockage was attributed to saturated shared AWS infrastructure capacity rather than an application-specific Prosumer failure. Reducing the AWS Batch minimum CPU was expected to relieve the capacity issue, but simulation recovery still needed verification.
+- July 20 standup introduced Mateo as a beta tester for SMP India onboarding. The plan is to confirm his GitHub corporate license, grant `qrm-dms` and SMP India access, grant dashboard creation rights in dev, and use his friction to improve README/CONTRIBUTING and onboarding permissions.
+- July 20 TA standup says the billing-ticket issue was not a billing-system defect: the customer's unexpected cost came from an accidental run of 1,000 instances for six days. The follow-up should clarify the manual-error explanation while the customer switches from hourly to fixed monthly/yearly billing display.
+- The same TA standup says Pyrene work resumed after Nicola's issues from the prior week. Most issues were tied to File Manager, which was deployed separately from Pyrene and still needed integration. Abraham provided integration information, but end-to-end run status still needed confirmation.
+- Model Runner migration status on July 20: Alfred had migrated EFS and images; database and file migration should occur when users cut over to production. The cutover plan is to scale up cluster instances rather than redeploy, and a new ADO pipeline pushes images to MS accounts with a separate promotion pipeline across accounts.
+- Prosumer data migration was planned for 2026-07-21. Preparation required adding old Prosumer prod and DMS prod S3 buckets to an Azure admin role with `s3:GetObject` and `s3:ListBucket`, plus enabling cost-center tags for ABAC. A reset/delete-then-restore script using `s3 sync --delete` was created for the prod account.
+- July 20 "Wallet Migration" notes say three SFF repositories had been migrated. Brian clarified on 2026-07-21 that the source phrase transcribed as `web-colon` means `web_common`, matching the broader Codex evidence for `user_ms_client`, `web_common`, and `user_microservice`.
 
 ## Open Questions
 
@@ -82,6 +88,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
 - UNCERTAIN: Whether `ngloud` is the exact AMI/image family name behind the GMR CrowdStrike coverage issue.
 - UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
+- UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
 
 ## Sources
 
@@ -112,5 +119,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-16-codex-conversations.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+- `sources/meetings/2026-07-20-1415-granola-standup.md`
+- `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+- `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-07-21

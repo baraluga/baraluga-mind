@@ -67,6 +67,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `SCR-1202` added an opt-in HJKS 2Y dashboard look-back pattern. The implemented design records scheduled snapshots with explicit metadata, publishes a snapshot manifest only when all nine dashboard regions complete, and exposes complete scheduled snapshots in the `As of` selector as soon as their manifest is queryable. Manual and incomplete runs remain excluded, `Latest` remains default, and no pre-deployment backfill is required.
 - `SCR-1202` was implemented across `smp-common`, `smp-tool`, `smp-japan`, and `smp-dashboard`: `smp-common 0.4.4` was published, `smp-tool` was pushed to `dev`, Japan changes were merged and promoted through QA, and dashboard changes were pushed directly to `dev` then promoted to QA. The remaining source-backed validation item is a real scheduled Airflow snapshot before production rollout.
 - July 17 standup notes also say the TSDB catalog approval for `SCR-1171` was waiting on Carlos, with Laurent identified as fallback if Carlos did not respond by end of day. This appears related to the existing TSDB UAT approval wait rather than a separate design decision.
+- July 20 standup says `SCR-1171` was still waiting on Carlos's approval of the spreadsheet listing expected TSDB catalog changes and time-series IDs. The proposed path was for Carlos to approve and contact Laurent to execute the TSDB changes; Brian planned email/DM follow-up if there was no response by end of day.
+- July 20 standup says `SCR-1197` was set to validation, production was confirmed stable, all interconnector docs were enabled, and 2019-2025 fiscal-year data had been backfilled for capacity, JPX prices, and actual flow from Bloomberg and OCCTO.
+- July 20 standup says `SCR-1202` HJKS 2Y look-back was in review. It was functionally done the prior Friday but needed enough weekend data to display. The same day's manual note marks the action to ask Japan to check the 2Y look-back feature as done.
 
 ## Open Questions
 
@@ -83,6 +86,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether dashboard feedback after the early-week auction requires immediate Grafana changes.
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
 - UNCERTAIN: Whether `SCR-1202` has been validated with a real scheduled QA Airflow run after the QA promotion.
+- UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 
 ## Sources
 
@@ -110,5 +114,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-17.md`
+- `sources/meetings/2026-07-20-1415-granola-standup.md`
+- `sources/notes/2026-07-20.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-07-20

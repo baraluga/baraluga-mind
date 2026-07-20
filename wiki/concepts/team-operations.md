@@ -47,6 +47,11 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 17 SFF migration work hardened the standard migrated Python package shape. Meteomatics was fixed to mount Azure Artifacts `.netrc` into its Lambda Docker compatibility test, split CI from manual publishing, remove duplicate push/PR runs, use the shared tested-artifact publisher, and pass a dry-run publish. TDB kept the split release model, removed duplicate CI triggers, pinned public bootstrap tools, and passed CI plus dry-run publishing.
 - The organization-level modernizer and `sff-actions` now treat migration correctness as an executable contract: generated repositories should run `validate-python-migration@v1` locally and in CI, rather than relying only on Copilot prompt adherence.
 - Repository ruleset cleanup on July 17 found automatic Copilot review only on active `smp-japan`, plus a stranded ruleset on archived legacy `DMS-Scraper-and-Models-Platform/smp-india`. The legacy ruleset was removed after temporary unarchive, and `smp-japan` kept its branch protections while removing the `copilot_code_review` rule.
+- July 20 SFF work migrated `user_ms_client` to `qrm-dms/sff-lib-user-ms-client`, `web_common` to `qrm-dms/sff-lib-web-common`, and `user_microservice` to `qrm-dms/sff-ms-user`. Git refs matched source branches/tags, ADO source branches were locked, migrated GitHub CI went green, and manual publisher dry-runs passed without package upload.
+- The SFF naming convention was clarified with Bong's rule: deployed microservices use `sff-ms-*`, while importable clients use `sff-lib-*-client`. The SharePoint workbook's red-font repository names appear to indicate naming corrections, not visibility issues.
+- A temporary org-wide `All-repository admin` role enabled a confirmed batch rename of 20 SFF repositories. `sff-actions` and stale/no-op `sff-tool-tdb-client` were intentionally left unchanged. Brian clarified on 2026-07-21 that all repo admin will be revoked at the end of July.
+- Public-facing Confluence migration guidance was published as three child pages: repository migration, pipeline migration, and `Artifact migration (WIP)`. The artifact page is explicitly WIP/TBD because package hosting, historical artifact migration, retention, permissions, and consumer cutover are not final.
+- A July 20 standup said Chantal Lee leads a UK data-governance project, "Empowering Users with Data", with possible SMP overlap. The key unresolved operating question is whether SMP provides platform-only support or active delivery support for teams such as UK data governance and Iberia.
 
 ## Open Questions
 
@@ -57,7 +62,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
 - UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
 - UNCERTAIN: Whether `sff-tool-tdb-cliennt`, `sff-tool-federatioam-federation`, and `sff-tool-certificatte` are intentionally misspelled destination names or workbook artifacts that should be corrected later.
-- UNCERTAIN: Whether the next untouched Python migration will pass the modernizer validator loop without manual workflow corrections.
+- UNCERTAIN: Whether the newly migrated SFF `master` branches should receive branch protection immediately or wait for the broader GitHub governance rules.
+- UNCERTAIN: `Dexter` remains unidentified; Brian did not recognize what this referred to in the July 20 standup.
+- UNCERTAIN: Whether `Chantal Lee` is the exact spelling from the July 20 standup.
 
 ## Sources
 
@@ -80,5 +87,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/notes/2026-07-15.md`
 - `sources/notes/2026-07-16.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
+- `sources/meetings/2026-07-20-1415-granola-standup.md`
+- `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+- `sources/codex-conversations/2026-07-20-codex-conversations.md`
+- `sources/notes/2026-07-20.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-07-21
