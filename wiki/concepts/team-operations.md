@@ -52,6 +52,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - A temporary org-wide `All-repository admin` role enabled a confirmed batch rename of 20 SFF repositories. `sff-actions` and stale/no-op `sff-tool-tdb-client` were intentionally left unchanged. Brian clarified on 2026-07-21 that all repo admin will be revoked at the end of July.
 - Public-facing Confluence migration guidance was published as three child pages: repository migration, pipeline migration, and `Artifact migration (WIP)`. The artifact page is explicitly WIP/TBD because package hosting, historical artifact migration, retention, permissions, and consumer cutover are not final.
 - A July 20 standup said Chantal Lee leads a UK data-governance project, "Empowering Users with Data", with possible SMP overlap. The key unresolved operating question is whether SMP provides platform-only support or active delivery support for teams such as UK data governance and Iberia.
+- July 21 migration planning created a separate Markdown audit and polished spreadsheet from the master workbook's unmigrated rows. The audit found 126 unmigrated records, with 124 verified latest commits, one empty repository (`NEMO / NEMO`), and one Azure DevOps URL that returned missing or inaccessible (`Prosumer / prosumer-shared-tools`). A later scope cut removed 16 PLEXOS and pegase repositories from the workbook, leaving 110 in-scope records sorted oldest activity first.
+- The migration-age workbook was kept as a companion artifact rather than merged into the live shared SharePoint master workbook. The rationale was to avoid disrupting an actively edited master while preserving a timestamped, replaceable audit snapshot. A future integration could add namespaced audit sheets directly to the SharePoint workbook if stakeholders prefer one file.
+- July 21 Git-only migration moved `wss_client` to private `qrm-dms/sff-lib-wss-client`, preserved 9 branches and 12 tags, set default branch `master`, and locked all 9 ADO source branches. `strategy-common-infra` was briefly migrated to `qrm-dms/sff-infra-strategy`, but the migration was rolled back the same day: the GitHub repository was deleted, and the ADO `main` branch was unlocked after pipeline modernization evidence showed the repo was not ready.
 
 ## Open Questions
 
@@ -65,6 +68,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the newly migrated SFF `master` branches should receive branch protection immediately or wait for the broader GitHub governance rules.
 - UNCERTAIN: `Dexter` remains unidentified; Brian did not recognize what this referred to in the July 20 standup.
 - UNCERTAIN: Whether `Chantal Lee` is the exact spelling from the July 20 standup.
+- UNCERTAIN: Whether the July 21 migration-age audit should stay as a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
+- UNCERTAIN: Whether `strategy-common-infra` should be migrated only after its stale ADO deploy path and GitHub OIDC deployment model are fixed, or whether it should remain out of the current batch.
 
 ## Sources
 
@@ -91,5 +96,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
 - `sources/codex-conversations/2026-07-20-codex-conversations.md`
 - `sources/notes/2026-07-20.md`
+- `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
 Last Updated: 2026-07-21

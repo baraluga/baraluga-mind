@@ -20,6 +20,8 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - July 9 Copilot CLI sessions show the same repo-grounded workflow being used outside Codex: project walkthroughs for the SMP collection and `ado-ios`, then a TDD refactor with Ruff, pytest, coverage, smoke validation, commit, PR creation, approval, and merge.
 - July 15 work created [[github-copilot-custom-agents]] for `qrm-dms`, replacing an initial smoke-test agent with an ADO Pipeline Modernizer agent intended to help convert and redesign Azure DevOps YAML pipelines as GitHub Actions workflows.
 - July 17 diagnostics for [[zscaler-codex-access]] showed that Codex can sometimes keep an existing response stream alive during Zscaler handoff, but fresh Codex/OpenAI requests can fail with 403 through the Zscaler path. Private-site browser testing may still work once Zscaler settles, but durable agentic access needs an approved networking policy rather than local protocol workarounds.
+- July 21 work created a global `consult-mind-palace` Codex skill that can use this repository as a source-backed memory layer from any working directory. A forward test produced a Japan Interconnector briefing with facts, decisions, actions, uncertainty, and stale-status caveats separated.
+- July 21 also showed a practical limit of GitHub-side custom agents: a Modernizer run may finish without changes when the runner cannot reach internal registry evidence. In that case, Codex can reconstruct and supply a grounded handoff, but authentication and repo readiness still control whether relaunching is appropriate.
 
 ## Open Questions
 
@@ -27,6 +29,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Copilot token usage for GitHub-side PR fixes was believed to be org-budgeted rather than personal-tokened, but this needed confirmation with IT/Irun.
 - UNCERTAIN: The ADO Pipeline Modernizer agent had only been lightly tried by July 15; it still needs real-pipeline pilots before being treated as a proven migration path.
 - UNCERTAIN: Whether IT will approve a ChatGPT/Codex Zscaler bypass or split-routing policy for private-site agentic testing.
+- UNCERTAIN: Whether internal registry access for GitHub-side agent runners will be solved centrally or handled with per-run evidence handoffs.
 
 ## Sources
 
@@ -40,5 +43,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
+- `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-07-21

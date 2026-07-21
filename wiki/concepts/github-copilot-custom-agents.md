@@ -24,17 +24,22 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 - Those misses were converted into stronger `sff-actions` validation rather than only prompt changes. The live `validate-python-migration@v1` contract was advanced to `0f9cdc8` after `sff-actions`, the organization Modernizer fixture, and representative consumers were green.
 - The hardened validator now enforces authenticated read-feed setup, ENGIE CA setup, `AZURE_ARTIFACTS_READ_PAT` read mode, Docker private-feed environment propagation, matching read-only `.netrc` and CA mount paths, `UV_SYSTEM_CERTS=true`, SHA-256-pinned Lambda images, and a clear boundary between structural validation and runtime CI evidence.
 - The stronger validator exposed existing debt in repositories then named `sff-common-data-model` and `sff-microservice-meteomatics-client`: mutable Lambda images and pre-existing mutating tox environments. These were left untouched in the source conversation and are tracked in [[actions]].
+- A July 21 Modernizer attempt on the freshly migrated `sff-infra-strategy` repository completed with no changes because the Copilot runner could not reach `mcp-registry.walnut.myengie.com`. Local reconstruction also found a repository-specific readiness issue: the ADO deploy step used `cd ./internal-web`, but the checked repository evidence pointed to `strategy-common/` as the CDK app directory. The repo was rolled back from GitHub before pipeline modernization proceeded.
+- The strategy repo episode reinforces the current boundary: infrastructure/deployment modernization needs repo-local evidence for the real app directory, validated OIDC role naming such as `AWS_ROLE_ARN_NOPROD` / `AWS_ROLE_ARN_PROD`, and access to live shared-action contracts. If runner network access blocks registry lookup, the handoff must supply those contracts as evidence rather than letting the agent infer them.
 
 ## Open Questions
 
 - UNCERTAIN: Whether prompt-only Modernizer guidance can consistently prevent misses such as omitted CA forwarding or mutable Lambda images; July 20 evidence suggests executable validation is the reliable control.
 - UNCERTAIN: Which additional organization-level Copilot agents are worth contributing to `qrm-dms/.github`.
 - UNCERTAIN: Whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
+- UNCERTAIN: Whether GitHub-side Copilot runners will be granted access to `mcp-registry.walnut.myengie.com`, or whether registry-derived contracts must be supplied out-of-band in each infrastructure modernization handoff.
+- UNCERTAIN: Whether `strategy-common/` is definitively the intended deployment directory for `strategy-common-infra`; it was the proven checked-in CDK path, but the ADO pipeline's `internal-web` path was stale or unexplained.
 
 ## Sources
 
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/codex-conversations/2026-07-20-codex-conversations.md`
+- `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
-Last Updated: 2026-07-20
+Last Updated: 2026-07-21

@@ -90,7 +90,19 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Work through Bong's ADO-to-new-repo migration list from the Abstract meeting.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
+- [ ] Decide whether the migration age-priority audit should remain a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
+- [ ] Clarify and fix `strategy-common-infra` pipeline readiness before attempting migration again, especially the stale `internal-web` deploy path and GitHub OIDC role model.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
+- [ ] Plan pipeline modernization for `qrm-dms/sff-lib-wss-client` after the completed Git-only migration.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
 - [ ] Decide whether to enable `master` branch protection for `sff-lib-user-ms-client` and `sff-lib-web-common`.
   - Context: [[team-operations]]
@@ -318,6 +330,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[github-copilot-custom-agents]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
+- [ ] Decide how Modernizer handoffs should handle private Walnut MCP registry access when GitHub-side Copilot runners cannot reach `mcp-registry.walnut.myengie.com`.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`; `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`; `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
@@ -471,6 +487,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Twenty workbook-confirmed repositories were renamed while preserving repository IDs, private visibility, and unarchived state; `sff-actions` and the no-op `sff-tool-tdb-client` were intentionally left unchanged.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`; `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
+
+- [x] Produce an evidence-based age audit for unmigrated ADO repositories.
+  - Closure: The July 21 audit covered 126 unmigrated records, verified latest commit evidence for 124, recorded one empty repo and one inaccessible/missing ADO URL, converted the audit to a readable workbook, and removed 16 explicit PLEXOS/pegase out-of-scope repositories to leave 110 in-scope records.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
+- [x] Migrate `wss_client` to `qrm-dms/sff-lib-wss-client` and lock the ADO source branches.
+  - Closure: The Git-only migration preserved 9 branches and 12 tags, created a private GitHub repository with default branch `master`, and locked all 9 ADO source branches.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
+
+- [x] Roll back the `strategy-common-infra` GitHub migration.
+  - Closure: `qrm-dms/sff-infra-strategy` was deleted, ADO `SFF/strategy-common-infra` branch `main` was unlocked, and `sff-lib-wss-client` was intentionally left untouched.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
 - [x] Document user secrets and Python dependency addition process.
   - Context: [[smp-platform]]

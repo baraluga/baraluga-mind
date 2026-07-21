@@ -27,6 +27,8 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The July 18 capture set contained one Codex session, zero Copilot sessions, and a Granola status note saying no meetings dated 2026-07-18 Asia/Manila were returned by the connector. The Codex session only captured the export-only daily Codex conversation capture run.
 - The July 19 capture set contained three Codex sessions, zero Copilot sessions, and a Granola status note saying no meetings matched the 2026-07-19 Asia/Manila date filter. The Codex sessions only captured the export-only daily Copilot, Granola, and Codex capture runs.
 - The July 20 capture set contained ten Codex sessions, one Copilot session with no transcript messages, two Granola meeting notes, and a short manual daily checklist. The durable work centered on SFF/Walnut migration, Modernizer and `sff-actions` hardening, Confluence migration playbooks, Japan interconnector follow-up, and SMP technical-activities work.
+- The July 21 capture set contained six Codex sessions, zero Copilot sessions, and a Granola status note saying no meetings dated 2026-07-21 Asia/Manila were returned by the connector. Durable work included creating the global `consult-mind-palace` skill, producing an evidence-based unmigrated-repository age audit, migrating `wss_client` to GitHub, and rolling back `strategy-common-infra` after pipeline modernization readiness issues surfaced.
+- `consult-mind-palace` is a global Codex skill under `/Users/qn5792/.codex/skills/consult-mind-palace/`. It treats this repository as a read-only "mind palace" from any working directory, searches durable wiki pages before action/source evidence, and returns source-backed synthesis for tasks such as Confluence drafting.
 
 ## Open Questions
 
@@ -72,5 +74,8 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/meetings/2026-07-20-1415-granola-standup.md`
 - `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
 - `sources/notes/2026-07-20.md`
+- `sources/codex-conversations/2026-07-21-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-21-copilot-conversations.md`
+- `sources/meetings/2026-07-21-granola-meeting-notes-status.md`
 
-Last Updated: 2026-07-20
+Last Updated: 2026-07-21
