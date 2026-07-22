@@ -69,6 +69,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Model Runner migration status on July 20: Alfred had migrated EFS and images; database and file migration should occur when users cut over to production. The cutover plan is to scale up cluster instances rather than redeploy, and a new ADO pipeline pushes images to MS accounts with a separate promotion pipeline across accounts.
 - Prosumer data migration was planned for 2026-07-21. Preparation required adding old Prosumer prod and DMS prod S3 buckets to an Azure admin role with `s3:GetObject` and `s3:ListBucket`, plus enabling cost-center tags for ABAC. A reset/delete-then-restore script using `s3 sync --delete` was created for the prod account.
 - July 20 "Wallet Migration" notes say three SFF repositories had been migrated. Brian clarified on 2026-07-21 that the source phrase transcribed as `web-colon` means `web_common`, matching the broader Codex evidence for `user_ms_client`, `web_common`, and `user_microservice`.
+- July 22 `smp-india` onboarding work verified that the intended new-DAG entry point exists as the `DAG Helper` custom agent, not "DAG Scaffolder". The process starts from the `New DAG` issue template, assigns Copilot and the DAG Helper custom agent, and expects the agent to create a feature branch, scaffold files, and open a draft PR for the contributor to finish.
+- The same work found the README and CONTRIBUTING docs sufficient for Mateo to start as a beta tester, but improved the first-day path before handoff: prerequisites, beta-test stopping point, failure evidence, escalation guidance, explicit `dev` PR targeting, and consistent Airflow Variables secrets guidance were added and pushed to `qrm-dms/smp-india` commit `a49a969`.
 
 ## Open Questions
 
@@ -89,6 +91,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `ngloud` is the exact AMI/image family name behind the GMR CrowdStrike coverage issue.
 - UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
 - UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
+- UNCERTAIN: Whether Mateo's beta-test scope is only to verify the DAG Helper scaffold or to complete a real DAG contribution through local testing and review; the July 22 docs added a beta checkpoint, but actual expectations may still need team confirmation.
 
 ## Sources
 
@@ -122,5 +125,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-20-1415-granola-standup.md`
 - `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
 - `sources/codex-conversations/2026-07-20-codex-conversations.md`
+- `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
-Last Updated: 2026-07-21
+Last Updated: 2026-07-22

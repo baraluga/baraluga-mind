@@ -55,6 +55,12 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 21 migration planning created a separate Markdown audit and polished spreadsheet from the master workbook's unmigrated rows. The audit found 126 unmigrated records, with 124 verified latest commits, one empty repository (`NEMO / NEMO`), and one Azure DevOps URL that returned missing or inaccessible (`Prosumer / prosumer-shared-tools`). A later scope cut removed 16 PLEXOS and pegase repositories from the workbook, leaving 110 in-scope records sorted oldest activity first.
 - The migration-age workbook was kept as a companion artifact rather than merged into the live shared SharePoint master workbook. The rationale was to avoid disrupting an actively edited master while preserving a timestamped, replaceable audit snapshot. A future integration could add namespaced audit sheets directly to the SharePoint workbook if stakeholders prefer one file.
 - July 21 Git-only migration moved `wss_client` to private `qrm-dms/sff-lib-wss-client`, preserved 9 branches and 12 tags, set default branch `master`, and locked all 9 ADO source branches. `strategy-common-infra` was briefly migrated to `qrm-dms/sff-infra-strategy`, but the migration was rolled back the same day: the GitHub repository was deleted, and the ADO `main` branch was unlocked after pipeline modernization evidence showed the repo was not ready.
+- July 22 DeCliC work migrated three repositories into private `qrm-dms` GitHub repositories and locked their ADO source branches: `declic-kpicalculator`, `declic-okta-scripts`, and `DigitalizeTaxoMatchForms`. ADO reported `main` as the default branch for all three, so GitHub was configured to match. GitHub descriptions were then updated from repository evidence: decarbonization KPI library, Excel-driven Okta user provisioning and group assignment, and bilingual EU Taxonomy form and decision-tree generator.
+- A July 22 audit found that `declic-app`, `declic-backend`, and `declic-infra` are technically clean to mirror but not safe for full cutover. The blockers are active development and deployment flow: 13 active ADO PRs across the three repositories, enabled recent YAML pipelines, AWS deployments, private package feeds, Sentry token transfer, deployment controls, and a required final freeze/sync window.
+- The audited DeCliC application repositories have no LFS, no current submodules, no blob over about 24 MB, and no pre-existing GitHub targets. The ADO defaults are `dev` for `declic-app` and `declic-backend`, and `main` for `declic-infra`; `declic-infra` needs default-branch confirmation because `main` was reported about 982 commits behind `dev` while active delivery branches included `dev`, `qa`, `preprd`, `prd`, `stage`, and `prod`.
+- July 22 artifact discussion clarified the GitHub-to-ADO bridge: GitHub Actions can publish tested Python distributions directly to the existing Azure Artifacts PyPI-compatible feed using `uv publish`, authenticated by `AZURE_ARTIFACTS_PUBLISH_PAT` from a technical account. Dry-run publication should precede real upload, and the selected commit should already have a successful push CI run with a `dist` artifact.
+- If SFF package publishing moves to Walnut Artifactory/JFrog, the tested-artifact flow and `uv publish` command can stay, but the destination URL, credentials, shared configuration action, and consumer install index must change. The correct SFF Artifactory repository, permissions, retention, historical versions, and consumer cutover remain unsettled.
+- The July 22 answer to Guido framed repository migration as staged rather than binary: Git history can be moved and validated before JFrog is ready, but a repository should not be declared fully cut over or have its ADO path retired until build, publish, deployment, and downstream package consumption are proven.
 
 ## Open Questions
 
@@ -70,6 +76,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Chantal Lee` is the exact spelling from the July 20 standup.
 - UNCERTAIN: Whether the July 21 migration-age audit should stay as a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
 - UNCERTAIN: Whether `strategy-common-infra` should be migrated only after its stale ADO deploy path and GitHub OIDC deployment model are fixed, or whether it should remain out of the current batch.
+- UNCERTAIN: Whether `declic-infra` should keep ADO's reported `main` default branch in GitHub, or use an active delivery branch such as `dev`.
+- UNCERTAIN: Whether the SFF package destination should become Walnut Artifactory/JFrog for all package types, and what repository, credential, retention, and consumer-cutover model applies.
+- UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
 
 ## Sources
 
@@ -97,5 +106,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-07-20-codex-conversations.md`
 - `sources/notes/2026-07-20.md`
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
+- `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
-Last Updated: 2026-07-21
+Last Updated: 2026-07-22

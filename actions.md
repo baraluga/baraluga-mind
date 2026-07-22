@@ -34,7 +34,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm the final package-hosting standard for the GitHub/Walnut migration; Walnut Artifactory is the emerging primary path, GitHub Packages is a secondary option, and ADO Artifacts via technical-account PAT is the current bridge.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 - [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
@@ -66,7 +66,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Set up the shared Azure Artifacts variables/secrets model for migrated GitHub repositories.
   - Context: [[team-operations]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 - [ ] Finish the `common_data_model` pipeline migration before starting additional pipeline transfers.
   - Context: [[team-operations]]
@@ -90,7 +90,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Work through Bong's ADO-to-new-repo migration list from the Abstract meeting.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
+
+- [ ] Prepare the staged `declic-app`, `declic-backend`, and `declic-infra` migration by resolving active ADO PR handling, confirming the `declic-infra` default branch, setting up AWS OIDC roles and package credentials, moving the Sentry token, recreating deployment controls, and agreeing a freeze window.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 - [ ] Decide whether the migration age-priority audit should remain a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
   - Context: [[team-operations]]
@@ -298,7 +302,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Onboard Mateo to SMP India by confirming GitHub corporate license, granting `qrm-dms` / SMP India access, and granting dev dashboard rights.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
+
+- [ ] Collect Mateo's beta-test feedback on the `smp-india` DAG Helper onboarding flow, especially confusing, awkward, or broken steps.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 - [ ] Follow up on the billing ticket with the corrected explanation that the 1,000-instance run was manual error, not a billing-system bug.
   - Context: [[smp-platform]]
@@ -440,6 +448,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Confirmed on 2026-07-15 that the normalized manual DAG parameter behavior is already up and running.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-14-codex-conversations.md`; `sources/notes/2026-07-15-ingest-handover-clarifications.md`
+
+### Team Operations
+
+- [x] Migrate `declic-kpicalculator`, `declic-okta-scripts`, and `DigitalizeTaxoMatchForms` into `qrm-dms`, lock their ADO source branches, and update GitHub descriptions from code evidence.
+  - Closure: All three private GitHub repositories were verified with ADO-reported `main` defaults, matching Git refs, locked ADO branches, and concise implementation-grounded descriptions; pipeline work was intentionally left untouched.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 ### SMP Platform
 
