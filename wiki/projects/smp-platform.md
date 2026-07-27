@@ -71,8 +71,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - July 20 "Wallet Migration" notes say three SFF repositories had been migrated. Brian clarified on 2026-07-21 that the source phrase transcribed as `web-colon` means `web_common`, matching the broader Codex evidence for `user_ms_client`, `web_common`, and `user_microservice`.
 - July 22 `smp-india` onboarding work verified that the intended new-DAG entry point exists as the `DAG Helper` custom agent, not "DAG Scaffolder". The process starts from the `New DAG` issue template, assigns Copilot and the DAG Helper custom agent, and expects the agent to create a feature branch, scaffold files, and open a draft PR for the contributor to finish.
 - The same work found the README and CONTRIBUTING docs sufficient for Mateo to start as a beta tester, but improved the first-day path before handoff: prerequisites, beta-test stopping point, failure evidence, escalation guidance, explicit `dev` PR targeting, and consistent Airflow Variables secrets guidance were added and pushed to `qrm-dms/smp-india` commit `a49a969`.
-- July 24 technical standup says the Pyrene EKS update Snow ticket had been assigned since Monday without progress. The requested changes were weekday cluster scheduling and labels needed for pod deployment; follow-up with the assignee was due.
-- The same meeting says JMR final migration was tentatively planned for the following week after Abraham's confirmation, with Nicola still needed for schedule alignment.
+- July 24 technical standup says the Pyrene EKS update Snow ticket had been assigned since Monday without progress. The requested changes were weekday cluster scheduling and labels needed for pod deployment; follow-up with the assignee was due. Brian confirmed on July 27 that the source spelling `Pyrine` means Pyrene.
+- The same meeting says GMR final migration was tentatively planned for the following week after Abraham's confirmation, with Nicola still needed for schedule alignment. Brian confirmed on July 27 that the source acronym `JMR` means GMR.
 - July 24 standup says the migrated `smp-japan` repository appeared archived and did not redirect correctly. Brian planned to post the correct repository URLs so the team could create a test DAG for TSDB validation.
 
 ## Open Questions
@@ -95,8 +95,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
 - UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
 - UNCERTAIN: Whether Mateo's beta-test scope is only to verify the DAG Helper scaffold or to complete a real DAG contribution through local testing and review; the July 22 docs added a beta checkpoint, but actual expectations may still need team confirmation.
-- UNCERTAIN: Whether `Pyrine` in the July 24 technical standup is the same system consistently documented elsewhere as `Pyrene`.
-- UNCERTAIN: Whether `JMR` is the exact project name or the same Model Runner/GMR migration discussed in earlier notes.
 
 ## Sources
 
@@ -133,5 +131,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-22-codex-conversations.md`
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+- `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-27

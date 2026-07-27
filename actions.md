@@ -356,9 +356,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
-- [ ] Confirm the JMR final-migration schedule with Nicola after Abraham's proposed next-week window.
+- [ ] Confirm the GMR final-migration schedule with Nicola after Abraham's proposed next-week window.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`; `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 
 ### AI Assisted Engineering
 
@@ -391,12 +391,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 ## Waiting
-
-### APAC TSDB Scraper
-
-- [ ] Wait for Mateo's Darwin historical backfill and confirmation of the covered missing-data interval.
-  - Context: [[apac-tsdb-scraper]]
-  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
 ### Recruitment
 
@@ -457,6 +451,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
 ## Done
+
+### APAC TSDB Scraper
+
+- [x] Wait for Mateo's Darwin historical backfill and repair confirmation.
+  - Closure: Brian confirmed on 2026-07-27 that Mateo fixed the Darwin issue and completed the follow-up.
+  - Context: [[apac-tsdb-scraper]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`; `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 
 ### Baraluga Mind
 

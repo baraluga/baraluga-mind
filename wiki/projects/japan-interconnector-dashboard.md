@@ -76,7 +76,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `SCR-1206` added operating capacity to the four live OCCTO parsers, reconciliation, CDH schemas, and all seven interconnector panels. The canonical dashboard shows two subtle neutral-grey dotted operating-capacity lines, one per direction, while retaining the existing available-capacity styling.
 - The implementation was pushed to `smp-japan` dev and `smp-dashboard` main on July 23, then `smp-japan` was promoted to QA at `edb8f2d`. July 24 standup says dev validation passed and QA testing of yearly, monthly, weekly, daily, and Grafana mapping was still ongoing.
 - `SCR-1207` is the separate two-point historical operating-capacity backfill. It must follow `SCR-1206`; historical records remain null for operating capacity until the backfill is run.
-- July 24 Codex work also implemented an event-driven TSDB capacity publisher and forecast-version conflict probe locally, but the capture explicitly says no commit was created. Treat those changes as unlanded until repository evidence confirms otherwise.
+- July 24 Codex work implemented an event-driven TSDB capacity publisher and forecast-version conflict probe. Brian confirmed on July 27 that this work was subsequently landed and is operating correctly.
 
 ## Open Questions
 
@@ -94,7 +94,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
-- UNCERTAIN: Whether the July 24 local TSDB publisher decoupling and conflict-probe changes were later committed or deployed.
 
 ## Sources
 
@@ -127,5 +126,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-23-codex-conversations.md`
 - `sources/codex-conversations/2026-07-24-codex-conversations.md`
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+- `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-27

@@ -39,8 +39,6 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - UNCERTAIN: Who owns approval and custody for the GAMS installers and licence needed by Data Types and OR Common.
 - UNCERTAIN: Which AWS roles, protected GitHub environments, smoke tests, and recovery procedure should authorize the Service Desk deployment cutover.
 - UNCERTAIN: Whether all seven Azure-only pipelines should migrate in the current program or remain until their owners establish readiness.
-- UNCERTAIN: Whether the July 24 target of roughly 500 converted pipelines by the end of July was a firm commitment or a transcription error; it is inconsistent with the audited SFF repository count.
-- UNCERTAIN: The meeting phrase `Haiku 5.6` may be a mistranscribed model or tool name.
 
 ## Sources
 
@@ -50,5 +48,6 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - `sources/codex-conversations/2026-07-26-codex-conversations.md`
 - `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
 - `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+- `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-27
