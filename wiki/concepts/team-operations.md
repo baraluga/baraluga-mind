@@ -61,6 +61,10 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 22 artifact discussion clarified the GitHub-to-ADO bridge: GitHub Actions can publish tested Python distributions directly to the existing Azure Artifacts PyPI-compatible feed using `uv publish`, authenticated by `AZURE_ARTIFACTS_PUBLISH_PAT` from a technical account. Dry-run publication should precede real upload, and the selected commit should already have a successful push CI run with a `dist` artifact.
 - If SFF package publishing moves to Walnut Artifactory/JFrog, the tested-artifact flow and `uv publish` command can stay, but the destination URL, credentials, shared configuration action, and consumer install index must change. The correct SFF Artifactory repository, permissions, retention, historical versions, and consumer cutover remain unsettled.
 - The July 22 answer to Guido framed repository migration as staged rather than binary: Git history can be moved and validated before JFrog is ready, but a repository should not be declared fully cut over or have its ADO path retired until build, publish, deployment, and downstream package consumption are proven.
+- July 23-25 SFF work established Walnut Artifactory DEV as the proven destination for the current Python package migration, published the recoverable dependency chain, accepted reusable CI contracts, and closed the first organization-wide CI centralization pass. The detailed program state now lives in [[sff-walnut-migration]].
+- The Pipeline Modernizer was decommissioned after its useful rules were converted into executable `sff-actions` contracts and tested human-facing recipes. This supersedes the earlier assumption that the organization agent itself would remain the primary migration interface.
+- July 24 meeting notes say the SFF functional account requires an SFF project in CMDB first. Someone with Snow/CMDB catalog access must create the project before the linked account request can be submitted.
+- July 24 daily standup says Brian's migrated-Jira access problem remained unresolved and may require a new manually associated account because the old email may not be integrated with Okta.
 
 ## Open Questions
 
@@ -77,8 +81,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the July 21 migration-age audit should stay as a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
 - UNCERTAIN: Whether `strategy-common-infra` should be migrated only after its stale ADO deploy path and GitHub OIDC deployment model are fixed, or whether it should remain out of the current batch.
 - UNCERTAIN: Whether `declic-infra` should keep ADO's reported `main` default branch in GitHub, or use an active delivery branch such as `dev`.
-- UNCERTAIN: Whether the SFF package destination should become Walnut Artifactory/JFrog for all package types, and what repository, credential, retention, and consumer-cutover model applies.
+- UNCERTAIN: Whether Walnut Artifactory/JFrog should be the destination for non-Python package types and production promotion; the current evidence proves only the SFF Python DEV contract.
 - UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
+- UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
 
 ## Sources
 
@@ -107,5 +112,12 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/notes/2026-07-20.md`
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
 - `sources/codex-conversations/2026-07-22-codex-conversations.md`
+- `sources/codex-conversations/2026-07-23-codex-conversations.md`
+- `sources/codex-conversations/2026-07-24-codex-conversations.md`
+- `sources/codex-conversations/2026-07-25-codex-conversations.md`
+- `sources/codex-conversations/2026-07-26-codex-conversations.md`
+- `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
+- `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+- `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
-Last Updated: 2026-07-22
+Last Updated: 2026-07-27

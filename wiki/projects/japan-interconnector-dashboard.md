@@ -70,6 +70,13 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - July 20 standup says `SCR-1171` was still waiting on Carlos's approval of the spreadsheet listing expected TSDB catalog changes and time-series IDs. The proposed path was for Carlos to approve and contact Laurent to execute the TSDB changes; Brian planned email/DM follow-up if there was no response by end of day.
 - July 20 standup says `SCR-1197` was set to validation, production was confirmed stable, all interconnector docs were enabled, and 2019-2025 fiscal-year data had been backfilled for capacity, JPX prices, and actual flow from Bloomberg and OCCTO.
 - July 20 standup says `SCR-1202` HJKS 2Y look-back was in review. It was functionally done the prior Friday but needed enough weekend data to display. The same day's manual note marks the action to ask Japan to check the 2Y look-back feature as done.
+- July 24 standup records `SCR-1202` as done after Francois confirmed in the Japan group chat that the 2Y dashboard looked correct. Operational follow-ups are outside that ticket's scope.
+- A July 23 investigation proved that the reported zero Tohoku-to-Tokyo capacity at 2026-07-22 15:00 JST came directly from OCCTO's `空容量`, or remaining available capacity. OCCTO reported 5,250 MW operating capacity, 5,090 MW planned flow, 160 MW margin, and therefore zero remaining capacity while actual flow averaged 5,083 MW. The scraper JSON and OCCTO's downloadable revised same-day CSV matched on all 672 business rows.
+- Hiromi's original epic deck exposed the product-level distinction: its delivered-period example treated `運用容量`, or operating capacity, as availability. The source pipeline was faithfully showing `空容量`, but the dashboard requirement also needed operating capacity.
+- `SCR-1206` added operating capacity to the four live OCCTO parsers, reconciliation, CDH schemas, and all seven interconnector panels. The canonical dashboard shows two subtle neutral-grey dotted operating-capacity lines, one per direction, while retaining the existing available-capacity styling.
+- The implementation was pushed to `smp-japan` dev and `smp-dashboard` main on July 23, then `smp-japan` was promoted to QA at `edb8f2d`. July 24 standup says dev validation passed and QA testing of yearly, monthly, weekly, daily, and Grafana mapping was still ongoing.
+- `SCR-1207` is the separate two-point historical operating-capacity backfill. It must follow `SCR-1206`; historical records remain null for operating capacity until the backfill is run.
+- July 24 Codex work also implemented an event-driven TSDB capacity publisher and forecast-version conflict probe locally, but the capture explicitly says no commit was created. Treat those changes as unlanded until repository evidence confirms otherwise.
 
 ## Open Questions
 
@@ -85,8 +92,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether `zs5929` can approve both the `smp_interconnector_recon` model metadata and the five OCCTO UAT `TimeseriesChange` records without additional TSDB administrators.
 - UNCERTAIN: Whether dashboard feedback after the early-week auction requires immediate Grafana changes.
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
-- UNCERTAIN: Whether `SCR-1202` has been validated with a real scheduled QA Airflow run after the QA promotion.
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
+- UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
+- UNCERTAIN: Whether the July 24 local TSDB publisher decoupling and conflict-probe changes were later committed or deployed.
 
 ## Sources
 
@@ -116,5 +124,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-07-17.md`
 - `sources/meetings/2026-07-20-1415-granola-standup.md`
 - `sources/notes/2026-07-20.md`
+- `sources/codex-conversations/2026-07-23-codex-conversations.md`
+- `sources/codex-conversations/2026-07-24-codex-conversations.md`
+- `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
-Last Updated: 2026-07-20
+Last Updated: 2026-07-27

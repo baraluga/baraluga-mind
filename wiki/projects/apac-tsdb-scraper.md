@@ -22,15 +22,22 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
   - `b195edd refactor(scr-1014): isolate Aurora TSDB catalog resolution`
   - `2fd54d3 refactor(scr-1014): isolate Aurora TSDB configuration`
 - By the end of the capture, the payload extraction slice had started but was not shown as committed before the source ended.
+- July 23 Darwin investigation found a real prod configuration defect: the active config pointed Darwin at UAT Athena workgroup `cdh_solarisapac_22047` rather than prod workgroup `cdh_solarisapac_48380`. The defect was introduced in commit `bace005` on 2026-03-03; the original Lambda prod config used the correct workgroup.
+- Mateo's report that all scrapers stopped on April 26 initially suggested a shared RestKafka/topic failure, but he later clarified that the other scrapers recovered while Darwin remained broken. The task-creation screenshot proved discovery and task creation only, leaving execution, Athena, and TSDB write stages as the relevant failure boundary.
+- The Darwin workgroup correction and local-test documentation were committed and pushed to `origin/main` as `5258e66 fix: use prod Athena workgroup for Darwin` and `5c3c081 docs: document local test commands`. The captured validation reports 119 passing tests.
+- July 24 standup says the Darwin root cause was accepted and Mateo committed to perform the backfill, but the backfill had not yet been reported complete.
 
 ## Open Questions
 
 - UNCERTAIN: Whether Mateo's future Aurora templates will stay structurally compatible enough for the new discovery checks.
 - UNCERTAIN: Whether the payload extraction slice was completed and committed after the July 15 capture ended.
 - UNCERTAIN: Whether a read-only UAT catalog lookup was later run for the catalog refactor; dry run does not exercise TSDB catalog resolution.
+- UNCERTAIN: The exact Darwin missing-data interval and whether Mateo completed the promised backfill.
 
 ## Sources
 
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
+- `sources/codex-conversations/2026-07-23-codex-conversations.md`
+- `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
-Last Updated: 2026-07-15
+Last Updated: 2026-07-27

@@ -32,9 +32,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-0945-granola-am-standup.md`
 
-- [ ] Confirm the final package-hosting standard for the GitHub/Walnut migration; Walnut Artifactory is the emerging primary path, GitHub Packages is a secondary option, and ADO Artifacts via technical-account PAT is the current bridge.
-  - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
+- [ ] Confirm the package-hosting and promotion standard beyond the proven SFF Python-to-Artifactory-DEV path, including non-Python packages, production promotion, retention, and consumer cutover.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`
 
 - [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
@@ -68,10 +68,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
-- [ ] Finish the `common_data_model` pipeline migration before starting additional pipeline transfers.
-  - Context: [[team-operations]]
-  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`; `sources/notes/2026-07-16.md`
-
 - [ ] Resolve the inherited GitHub Actions / Dependency Graph validation issue for `sff-tool-tdb-cliennt`, then lock the ADO source branches.
   - Context: [[ado-ios]]
   - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`; `sources/notes/2026-07-16.md`
@@ -89,12 +85,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 
 - [ ] Work through Bong's ADO-to-new-repo migration list from the Abstract meeting.
-  - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`
 
-- [ ] Prepare the staged `declic-app`, `declic-backend`, and `declic-infra` migration by resolving active ADO PR handling, confirming the `declic-infra` default branch, setting up AWS OIDC roles and package credentials, moving the Sentry token, recreating deployment controls, and agreeing a freeze window.
+- [ ] Finish the staged DeCliC application cutover: reconcile active ADO PRs and branch/stage mappings, confirm the `declic-infra` default branch, establish protected environments and AWS OIDC roles, move package/Sentry credentials, prove deployment artifacts and smoke/recovery behavior, and agree a freeze window.
   - Context: [[team-operations]]
-  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`; `sources/codex-conversations/2026-07-26-codex-conversations.md`
 
 - [ ] Decide whether the migration age-priority audit should remain a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
   - Context: [[team-operations]]
@@ -118,7 +114,23 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Fix the Jira email issue from the July 20 note.
   - Context: [[team-operations]]
-  - Source: `sources/notes/2026-07-20.md`
+  - Source: `sources/notes/2026-07-20.md`; `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+
+- [ ] Find an owner with Snow/CMDB catalog access, create the SFF project in CMDB, then submit the linked SFF functional-account request.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+
+- [ ] Secure approved GitHub-accessible GAMS installers and licence custody, then migrate Data Types before the downstream Limma package; handle OR Common independently once its GAMS gate is ready.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`
+
+- [ ] Double-check the development token and stage-scoped variable configuration before further pipeline conversions.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
+
+- [ ] Decide whether next week's technical standups should be cancelled in favor of daily DMS One Team chat updates while migration remains unblocked.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
 ### Job Search
 
@@ -143,10 +155,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Validate the HJKS shadow evaluation DAG in QA before retiring the current mega-orchestrator.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
-
-- [ ] Validate a real scheduled HJKS 2Y look-back snapshot in Airflow before production rollout.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
 
 - [ ] Follow up with Carlos on `SCR-1171` spreadsheet approval, then have Laurent execute the TSDB catalog changes once approved.
   - Context: [[japan-interconnector-dashboard]]
@@ -183,6 +191,26 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Confirm which environment the recent interconnector dashboard fix was deployed to.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
+- [ ] Run `SCR-1207` after `SCR-1206` is stable to backfill historical operating capacity without changing the immutable available-capacity history.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`
+
+- [ ] Complete `SCR-1206` QA validation across yearly, monthly, weekly, and daily OCCTO runs plus the canonical Grafana dashboard mapping.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+
+- [ ] Post the correct active `smp-japan` repository URLs so the team can create the TSDB-validation test DAG.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+
+- [ ] Identify the approval owner for production TSDB catalog changes after UAT validation.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+
+- [ ] Hold the deferred interconnector grooming session on Tuesday evening after the India call.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
 ### SMP Dashboards
 
@@ -324,6 +352,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
 
+- [ ] Follow up with the assigned Snow ticket owner on Pyrene weekday cluster scheduling and pod-deployment labels.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+
+- [ ] Confirm the JMR final-migration schedule with Nicola after Abraham's proposed next-week window.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+
 ### AI Assisted Engineering
 
 - [ ] Confirm Copilot token billing model with Irun.
@@ -337,10 +373,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Clean up mutable Lambda images and mutating tox environments in `sff-data-common-models` and `sff-lib-meteomatics-client`.
   - Context: [[github-copilot-custom-agents]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
-
-- [ ] Decide how Modernizer handoffs should handle private Walnut MCP registry access when GitHub-side Copilot runners cannot reach `mcp-registry.walnut.myengie.com`.
-  - Context: [[github-copilot-custom-agents]]
-  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`
 
 - [ ] Finish testing the encrypted common-stack SNS topic for Grafana APM alerts, then proceed with Sentry for APL and coordinate the Teams channel subscriber with Nilo.
   - Context: [[smp-alerting-and-ops]]
@@ -360,6 +392,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Waiting
 
+### APAC TSDB Scraper
+
+- [ ] Wait for Mateo's Darwin historical backfill and confirmation of the covered missing-data interval.
+  - Context: [[apac-tsdb-scraper]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+
 ### Recruitment
 
 - [ ] Wait for Alfred's further assessment of Matt Mendez.
@@ -375,6 +413,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for CDH support to resolve or explain the missing production Bloomberg actual-flow table between CDH and Grafana.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`
+
+- [ ] Wait for the whole-team UAT TSDB data-access request, likely routed to Carlos, before completing the validation script and test DAG.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
 ### Team Operations
 
@@ -435,9 +477,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/notes/2026-07-17.md`
 
 - [x] Send Japan team the `SCR-1202` HJKS 2Y look-back dashboard for validation.
-  - Closure: The July 20 note marks the Japan check request as done; the separate scheduled-Airflow validation item remains open.
+  - Closure: The July 20 note marks the Japan check request as sent; the July 24 standup later supplied the acceptance evidence tracked in the following completed action.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`
+
+- [x] Validate the `SCR-1202` HJKS 2Y look-back with the Japan team.
+  - Closure: The July 24 standup records the ticket as done after Francois confirmed in the Japan group chat that the dashboard looked correct.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`; `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 
 - [x] Send the CDH support request for the stuck production Bloomberg crawler.
   - Closure: July 17 standup evidence says the CDH support ticket was raised and a call was pending; the remaining issue is tracked as waiting on CDH support.
@@ -457,6 +504,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
 ### SMP Platform
+
+- [x] Complete the `common_data_model` pipeline and Artifactory migration.
+  - Closure: `common-data-model==3.5.1` was published to Artifactory DEV with green CI, dry-run, publication, authenticated readback, and a clean synchronized repository.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/notes/2026-07-15.md`; `sources/notes/2026-07-16.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`
 
 - [x] Document the public-facing repository and pipeline migration process before further automation.
   - Closure: Three Confluence child pages were published: repository migration, pipeline migration, and an explicitly WIP/TBD artifact migration page; the finished guides avoid mentioning the internal migration helper.
@@ -620,6 +672,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### AI Assisted Engineering
+
+- [x] Decide how Pipeline Modernizer handoffs should handle private Walnut registry access.
+  - Closure: The Pipeline Modernizer and its offline handoff prompt were decommissioned after reusable `sff-actions` contracts and tested human-facing recipes replaced the agent as the primary migration interface.
+  - Context: [[github-copilot-custom-agents]]
+  - Source: `sources/codex-conversations/2026-07-21-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`
 
 - [x] Pilot the `qrm-dms/.github` ADO Pipeline Modernizer agent on a real migrated repository pipeline and fold lessons into the agent.
   - Closure: Copilot's generated attempts for `sff-lib-user-ms-client`, `sff-lib-web-common`, and `sff-ms-user` were reviewed, repaired where needed, and used to harden the live Modernizer profile and `sff-actions` validator.

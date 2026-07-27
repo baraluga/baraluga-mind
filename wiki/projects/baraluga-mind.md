@@ -28,6 +28,10 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The July 19 capture set contained three Codex sessions, zero Copilot sessions, and a Granola status note saying no meetings matched the 2026-07-19 Asia/Manila date filter. The Codex sessions only captured the export-only daily Copilot, Granola, and Codex capture runs.
 - The July 20 capture set contained ten Codex sessions, one Copilot session with no transcript messages, two Granola meeting notes, and a short manual daily checklist. The durable work centered on SFF/Walnut migration, Modernizer and `sff-actions` hardening, Confluence migration playbooks, Japan interconnector follow-up, and SMP technical-activities work.
 - The July 21 capture set contained six Codex sessions, zero Copilot sessions, and a Granola status note saying no meetings dated 2026-07-21 Asia/Manila were returned by the connector. Durable work included creating the global `consult-mind-palace` skill, producing an evidence-based unmigrated-repository age audit, migrating `wss_client` to GitHub, and rolling back `strategy-common-infra` after pipeline modernization readiness issues surfaced.
+- The July 23 capture set contained thirteen Codex sessions, zero Copilot sessions, and a Granola status note saying no matching local-date meetings were returned. Durable work included `SCR-1206` operating-capacity implementation, Darwin diagnosis and correction, the first SFF Artifactory publication waves, and a DAG Helper show-and-tell deck.
+- The July 24 capture set contained fifty-nine Codex session records, three Granola meetings, and one Copilot session. Many Codex records were delegated or repeated views of the same SFF migration work. Durable outcomes included the recovered `data-common` library, accepted Python CI contracts, further Artifactory publication, and the Walnut/SMP standup state.
+- The July 25 capture set contained fourteen Codex sessions, zero Copilot sessions, and a no-meetings Granola status. Durable outcomes included organization-wide SFF CI closeout, GAMS readiness documentation, Pipeline Modernizer decommissioning, DeCliC migration work, and the installed Buddy v2 Codex pet.
+- The July 26 capture set contained six Codex sessions, zero Copilot sessions, and a no-meetings Granola status. Durable outcomes included DeCliC deployment-runway validation and the Pipeline Customs Broker proof of concept.
 - `consult-mind-palace` is a global Codex skill under `/Users/qn5792/.codex/skills/consult-mind-palace/`. It treats this repository as a read-only "mind palace" from any working directory, searches durable wiki pages before action/source evidence, and returns source-backed synthesis for tasks such as Confluence drafting.
 
 ## Open Questions
@@ -77,5 +81,19 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-21-copilot-conversations.md`
 - `sources/meetings/2026-07-21-granola-meeting-notes-status.md`
+- `sources/codex-conversations/2026-07-23-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-23-copilot-conversations.md`
+- `sources/meetings/2026-07-23-granola-meeting-notes-status.md`
+- `sources/codex-conversations/2026-07-24-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-24-copilot-conversations.md`
+- `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
+- `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
+- `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+- `sources/codex-conversations/2026-07-25-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-25-copilot-conversations.md`
+- `sources/meetings/2026-07-25-granola-meeting-notes-status.md`
+- `sources/codex-conversations/2026-07-26-codex-conversations.md`
+- `sources/copilot-conversations/2026-07-26-copilot-conversations.md`
+- `sources/meetings/2026-07-26-granola-meeting-notes-status.md`
 
-Last Updated: 2026-07-21
+Last Updated: 2026-07-27

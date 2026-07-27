@@ -4,7 +4,7 @@
 
 GitHub Copilot custom agents can be shared across the `qrm-dms` organization through the special repository `qrm-dms/.github`. The repository name is exact: GitHub discovers organization-level agents only from `.github` or `.github-private`, not from arbitrary names such as `sff-agents`.
 
-The first durable agent direction is an ADO Pipeline Modernizer. Its job is to help rebuild Azure DevOps YAML pipelines as idiomatic GitHub Actions workflows while preserving the pipeline's externally observable contract and documenting every intentional behavior change.
+The first organization-wide migration agent was an ADO Pipeline Modernizer. It helped establish executable migration contracts, but was decommissioned on July 25 after the reusable `sff-actions` contracts and human-facing recipe storefront became the more reliable operating model. Later agents are narrower: they assemble deployment-readiness evidence or dependency shopping lists without activating cloud changes.
 
 ## Details
 
@@ -25,6 +25,10 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 - The hardened validator now enforces authenticated read-feed setup, ENGIE CA setup, `AZURE_ARTIFACTS_READ_PAT` read mode, Docker private-feed environment propagation, matching read-only `.netrc` and CA mount paths, `UV_SYSTEM_CERTS=true`, SHA-256-pinned Lambda images, and a clear boundary between structural validation and runtime CI evidence.
 - The stronger validator exposed existing debt in repositories then named `sff-common-data-model` and `sff-microservice-meteomatics-client`: mutable Lambda images and pre-existing mutating tox environments. These were left untouched in the source conversation and are tracked in [[actions]].
 - A July 21 Modernizer attempt on the freshly migrated `sff-infra-strategy` repository completed with no changes because the Copilot runner could not reach `mcp-registry.walnut.myengie.com`. Local reconstruction also found a repository-specific readiness issue: the ADO deploy step used `cd ./internal-web`, but the checked repository evidence pointed to `strategy-common/` as the CDK app directory. The repo was rolled back from GitHub before pipeline modernization proceeded.
+- July 23-25 work converted the strongest repeated Python CI behavior into accepted reusable `sff-actions` contracts, a deterministic initializer, and a human-first recipe storefront. See [[sff-walnut-migration]].
+- On July 25, the Pipeline Modernizer agent, its offline prompt, and its dedicated validation script were removed after the organization-wide CI closeout. The independently useful executable actions, reusable workflows, validators, profile contracts, templates, and structural recipe tests remain.
+- The Deployment Runway Marshal creates inert, manual-only deployment readiness paths. A governance `403` must produce one handoff note and continued execution under its embedded contract; it is not itself a repository-readiness blocker.
+- The Pipeline Customs Broker is intentionally analysis-oriented. It traces checked-in Azure dependencies and produces a concise owner/resource shopping list plus a reconciled evidence appendix; it does not design workflows, retrieve secrets, authenticate to cloud providers, deploy, publish, or delete Azure configuration.
 - The strategy repo episode reinforces the current boundary: infrastructure/deployment modernization needs repo-local evidence for the real app directory, validated OIDC role naming such as `AWS_ROLE_ARN_NOPROD` / `AWS_ROLE_ARN_PROD`, and access to live shared-action contracts. If runner network access blocks registry lookup, the handoff must supply those contracts as evidence rather than letting the agent infer them.
 
 ## Open Questions
@@ -34,6 +38,7 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 - UNCERTAIN: Whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
 - UNCERTAIN: Whether GitHub-side Copilot runners will be granted access to `mcp-registry.walnut.myengie.com`, or whether registry-derived contracts must be supplied out-of-band in each infrastructure modernization handoff.
 - UNCERTAIN: Whether `strategy-common/` is definitively the intended deployment directory for `strategy-common-infra`; it was the proven checked-in CDK path, but the ADO pipeline's `internal-web` path was stale or unexplained.
+- UNCERTAIN: Whether the Deployment Runway Marshal and Pipeline Customs Broker will remain durable organization workflows after their current DeCliC proof-of-concept phase.
 
 ## Sources
 
@@ -41,5 +46,8 @@ The first durable agent direction is an ADO Pipeline Modernizer. Its job is to h
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/codex-conversations/2026-07-20-codex-conversations.md`
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
+- `sources/codex-conversations/2026-07-24-codex-conversations.md`
+- `sources/codex-conversations/2026-07-25-codex-conversations.md`
+- `sources/codex-conversations/2026-07-26-codex-conversations.md`
 
-Last Updated: 2026-07-21
+Last Updated: 2026-07-27
