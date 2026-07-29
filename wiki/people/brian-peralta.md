@@ -25,5 +25,6 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 - `sources/meetings/2026-07-01-0945-granola-am-standup.md`
 - `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
 - `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
+- `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-30

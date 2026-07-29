@@ -85,6 +85,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `smp-common 0.5.0` introduced a shared canonical TSDB publication runtime. Regional producers remain responsible for source-schema mapping, catalogue semantics, credentials, and independent audit projection; the common layer owns canonical payload validation, incremental writes, forecast-version protection, read-back verification, and JSON-safe results.
 - The `smp-common 0.5.0` release was published from commit `bed6bb3`. Its pytest CI was then enabled permanently, all 34 legacy test failures were corrected without runtime changes, and commit `aede349` passed all 209 tests and the full GitHub workflow.
 - A branch-level OCCTO adoption POC in `smp-japan` replaced the recurring publication orchestration with `smp-common 0.5.0` while retaining Japan-owned mappings, catalogue checks, credentials, audit logic, and diagnostic transport helpers. The full suite passed 496 tests. The remaining deployment prerequisite in the capture is promotion of `smp-common 0.5.0` from the development package repository to the production package index.
+- A 2026-07-30 clarification supersedes that package prerequisite: the shared runtime was promoted to the production package index, and the corrected current version is `smp-common 0.6.0`.
 - The emerging data-access architecture treats TSDB as the governed consumer source for reusable time series, CDH as durable upstream evidence and analytical storage, and Grafana as presentation/discovery. Dashboard panels should nominate underlying data products rather than be published blindly because panel SQL can hide joins, aggregation, and sign changes.
 - The July 29 sprint review preferred TSDB for Louis's programmatic access because the same client can work locally and in AWS. The team still needs to identify the required series and complete metadata/provider approvals; the India generation-data push may require a separate access call and could extend beyond the final sprint.
 
@@ -110,7 +111,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
-- UNCERTAIN: Whether the production package-index promotion for `smp-common 0.5.0` was completed after the July 29 POC.
 
 ## Sources
 
@@ -154,5 +154,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-29-codex-conversations.md`
 - `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
 - `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+- `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-30

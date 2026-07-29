@@ -93,7 +93,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
 - UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
 - UNCERTAIN: Whether stale WoW PR 6422 should be closed or migrated before `wow-okta-scripts`.
-- UNCERTAIN: Whether the client accepted the projected SMP budget overshoot and full-time August allocation.
 
 ## Sources
 
@@ -135,5 +134,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/notes/2026-07-29-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-07-29-codex-conversations.md`
 - `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
+- `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-30

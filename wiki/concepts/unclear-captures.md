@@ -14,12 +14,13 @@ Some source captures are too sparse or ambiguous to convert into durable project
 
 - UNCERTAIN: Actual FEDV Chapter discussion content is not recoverable from the available Granola summary.
 - UNCERTAIN: Whether the July 7 21:00 capture should be kept long term; it was preserved as source evidence because normal ingest should not delete raw captures.
-- UNCERTAIN: In the July 29 performance review, `SMB`, `guitar announcements`, and `surgeon skills` may be transcription errors for SMP, GitHub announcements, and another skills-development term. They should not be normalized without confirmation.
+- UNCERTAIN: In the July 29 performance review, `guitar announcements` and `surgeon skills` may be transcription errors. `SMB` has been confirmed as SMP, but the other two phrases should not be normalized without confirmation.
 
 ## Sources
 
 - `sources/meetings/2026-06-29-1600-granola-fedv-chapter.md`
 - `sources/voice/2026-07-07-2100-granola-tentative.md`
 - `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
+- `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-30

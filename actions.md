@@ -16,6 +16,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[brian-peralta]]
   - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
 
+- [ ] Francois to follow up with Bastien on further Iberia questions or interest in SMP.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+
 - [ ] Complete the overdue "5 Keys to Sustainable Performance" training module.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
@@ -156,6 +160,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Japan Interconnector
 
+- [ ] Continue collecting and reconcile Japan specialists' feedback on the operating-capacity interpretation.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+
 - [ ] Try the interconnector historical backfill as a month-by-month run.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/notes/2026-07-07.md`
@@ -248,9 +256,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### SMP Platform
 
-- [ ] Promote `smp-common 0.5.0` to the production package index, then complete the OCCTO adoption path and Airflow image/UAT smoke test.
+- [ ] Complete the OCCTO adoption path with the promoted `smp-common 0.6.0` package, then run the Airflow image/UAT smoke test.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 - [ ] Identify the dashboard data products Louis needs, define their TSDB series and metadata/providers, and agree the programmatic access path.
   - Context: [[smp-platform]]
@@ -260,9 +268,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
 
-- [ ] Confirm whether Japan OR-curve data is available through an API; if not, scope the India-style Excel ingestion and prioritize it against TSDB work.
+- [ ] Carlos to confirm whether Japan Aurora-curve data is available through an API; if not, scope the India-style Excel ingestion and prioritize it against TSDB work.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 
 - [ ] Add Japan operating-capacity series to TSDB and backfill at least from 2025, ideally from 2019 to match the dashboard.
   - Context: [[japan-interconnector-dashboard]]
