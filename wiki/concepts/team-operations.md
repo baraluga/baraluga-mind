@@ -70,6 +70,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The historical Python package backfill process was documented in `sff-actions`, with an organization policy pointer and tests for semantic/path safety. The procedure preserves source evidence and fails closed rather than treating package reconstruction as ordinary publication.
 - A July 28 inactivity audit found `wow-infra` and `wow-scripts-import-xlsx` ready for migration, and `wow-okta-scripts` ready with the caveat of stale PR 6422. `wow-app` and `wow-backend` were active that day and should be rechecked on 2026-08-11 if no newer activity occurs.
 - The DeCliC sharing note's `custom orchestrator agent` was a proposed generic abstraction, not an existing named agent.
+- The July 29 SMP retro projected roughly a 15% budget overshoot, around EUR 5,900, driven by added scope including Japan look-back work. The agreed default was to keep Brian full-time through August and reduce capacity only if the client rejects the scope-based explanation.
+- The same retro recommended stopping speculative scope discovery while budget is tight and waiting for explicit user pain before investing.
+- Brian's Atlassian blocker is an identity collision rather than missing product entitlement. The inaccessible `brian.peralta@engie.com` account already owns the target email and is protected by unavailable MFA/recovery credentials, while the previously usable Tractebel account lost service access after migration. An administrator must reset/recover the ENGIE account or free its email by changing or deleting that account.
 
 ## Open Questions
 
@@ -90,6 +93,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
 - UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
 - UNCERTAIN: Whether stale WoW PR 6422 should be closed or migrated before `wow-okta-scripts`.
+- UNCERTAIN: Whether the client accepted the projected SMP budget overshoot and full-time August allocation.
 
 ## Sources
 
@@ -129,5 +133,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
 - `sources/notes/2026-07-29-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-29-codex-conversations.md`
+- `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
 
-Last Updated: 2026-07-29
+Last Updated: 2026-07-30

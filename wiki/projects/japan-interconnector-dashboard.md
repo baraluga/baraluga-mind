@@ -84,6 +84,10 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - QA exposed a historical-horizon defect in `SCR-1208`: filtering only to the selected snapshot dropped pre-snapshot legacy data. The dashboard query was corrected to combine unversioned legacy rows with the selected snapshot and prefer selected rows on overlap. Selection and the full 2016-2028 horizon were then validated; a second scheduled run is still required to prove that the look-back preserves an older forecast while `Latest` advances.
 - `SCR-1171` gained production-safe versions of the existing catalogue provisioning, approver discovery, and smoke-test commands. Production mutations remain dry-run by default and require both `--apply` and the exact `CONFIRM PROD` guard. The code was pushed to `dev` with green CI, but production catalogue approvals and VPN-side execution remain separate work.
 - The July 27 standup described `SCR-1171` as waiting on `Franco`; Brian confirmed on July 29 that this means [[francois]].
+- The July 29 sprint review records the three Japan look-back dashboards as delivered and accepted, with one to three historical snapshots per day depending on the dashboard.
+- The interconnector dashboard now shows operating capacity alongside available capacity, actual flow, and EEX/JPX prices. Dashboard data was backfilled to 2019, but Japan trading specialists still need to validate the business interpretation.
+- The project is expected to exceed its original budget because look-back work and other requests were added to scope. The July 29 retro chose to continue Brian at full capacity through August unless the client rejects the projected overshoot.
+- The next proposed Japan data item is OR curves. The team must first confirm whether the data exists in an API; otherwise the proposed fallback is the Excel-based approach already used for India.
 
 ## Open Questions
 
@@ -92,6 +96,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether capacity yearly/monthly/weekly historical rows with missing max values should ever be supported, or whether daily-only historical capacity is sufficient.
 - UNCERTAIN: The parent Jira tickets `SCR-1126`, `SCR-1127`, `SCR-1128`, `SCR-1129`, `SCR-1168`, `SCR-1138`, and `SCR-1137` may still need workflow cleanup after an interrupted transition attempt.
 - UNCERTAIN: Whether the existing dashboard export feature satisfies the requested accepted data export once the current dashboard is finalized.
+- UNCERTAIN: Whether Japan operating-capacity interpretation has been validated by a trading-domain expert.
+- UNCERTAIN: Whether Japan OR-curve data is available through an API or requires an Excel-based ingestion path.
 - UNCERTAIN: Whether the remaining JEPX and shared-worker concurrency risks need proactive hardening before a large manual run.
 - UNCERTAIN: Whether the Bloomberg manual backfill has completed successfully in QA after promotion and workbook upload.
 - UNCERTAIN: Whether CDH support can reset the stuck production Bloomberg crawler before the July 17 EOD Manila timebox.
@@ -138,5 +144,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-27-codex-conversations.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
 - `sources/notes/2026-07-29-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-29-codex-conversations.md`
+- `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
+- `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
 
-Last Updated: 2026-07-29
+Last Updated: 2026-07-30

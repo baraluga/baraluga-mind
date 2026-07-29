@@ -8,6 +8,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Team Operations
 
+- [ ] Update Brian's goal documentation with the July 29 review evidence, especially GitHub governance, SMP proactivity, knowledge sharing, and broader technical-lead contributions.
+  - Context: [[brian-peralta]]
+  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
+
+- [ ] Prepare Brian's next development-review session covering skills development, mobility, career planning, and a development plan.
+  - Context: [[brian-peralta]]
+  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
+
 - [ ] Complete the overdue "5 Keys to Sustainable Performance" training module.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
@@ -16,9 +24,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-08-0945-granola-am-standup.md`
 
-- [ ] Finalize GitHub organization members, targets, and git rules before end of July.
+- [ ] Finalize and document GitHub organization members, targets, pull-request/merge controls, CLI login standards, and git rules before end of July.
   - Context: [[team-operations]]
-  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+  - Source: `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`; `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/meetings/2026-07-14-0945-granola-team-meeting.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
 
 - [ ] Post a short team-chat note documenting the GitHub CLI remote-transfer approach for existing repos.
   - Context: [[team-operations]]
@@ -240,6 +248,26 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### SMP Platform
 
+- [ ] Promote `smp-common 0.5.0` to the production package index, then complete the OCCTO adoption path and Airflow image/UAT smoke test.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+
+- [ ] Identify the dashboard data products Louis needs, define their TSDB series and metadata/providers, and agree the programmatic access path.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+
+- [ ] Schedule the India generation-data access call to confirm the CDH location, sharing method, and access pain points before the TSDB push.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+
+- [ ] Confirm whether Japan OR-curve data is available through an API; if not, scope the India-style Excel ingestion and prioritize it against TSDB work.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+
+- [ ] Add Japan operating-capacity series to TSDB and backfill at least from 2025, ideally from 2019 to match the dashboard.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+
 - [ ] Finalize CSCR-119 Docker image separation for Japan and India Airflow version conflicts.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-08-0945-granola-am-standup.md`
@@ -438,6 +466,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Team Operations
 
+- [ ] Wait for an Atlassian administrator to recover/reset the inaccessible ENGIE account or free `brian.peralta@engie.com` so the Tractebel account can be migrated.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+
 - [ ] Wait for `baraluga` GitHub authorization with `delete_repo` scope, then delete only the accidental private `baraluga/ado-ios` mirror and reverify `QN5792_engieco/ado-ios`.
   - Context: [[ado-ios]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
@@ -545,6 +577,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
 ### SMP Platform
+
+- [x] Document and implement the SMP-owned Tools/Walnut Artifactory access-request path for new DAG contributors.
+  - Closure: Mateo's test proved the missing application entitlement; the docs now direct developers to the SMP team, which submits the `Modify Walnut Project` IT form.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+
+- [x] Release the shared `smp-common 0.5.0` TSDB publication runtime.
+  - Closure: The canonical publication API was released from commit `bed6bb3`; focused tests, build, push CI, and package publication succeeded without live TSDB calls.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+
+- [x] Enable and repair the full `smp-common` pytest CI job.
+  - Closure: Commit `aede349` enabled the Walnut/ENGIE-CA test job, corrected all 34 legacy test failures, passed 209 tests, and completed GitHub CI successfully.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
 
 - [x] Complete the `common_data_model` pipeline and Artifactory migration.
   - Closure: `common-data-model==3.5.1` was published to Artifactory DEV with green CI, dry-run, publication, authenticated readback, and a clean synchronized repository.

@@ -81,6 +81,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Jupyter/Airflow integration is feasible when a whole notebook is one task, using Airflow's Papermill operator. Automatically converting arbitrary notebook cells into reliable production tasks is not a dependable default: it loses task-level monitoring unless notebooks follow strict conventions or use additional tooling.
 - On July 28, `smp-india` and `smp-japan` received matching rulesets for `dev`, `qa`, and `prod`: pull requests, one `SMP-CODEOWNERS` approval, approval after the latest push, and deletion/force-push prevention, with unconditional bypass for the code-owner team. `main` remained unaffected.
 - Brian clarified on July 29 that `SCR-1058` is Mateo's test of the onboarding experience for contributing a DAG to `smp-india`. This resolves the earlier uncertainty about whether the beta stopped at scaffolding or covered a real contribution path.
+- Mateo's DAG Helper test reached draft-PR generation and failed only at `uv sync` because he lacked Tools/Walnut Artifactory application access. The SMP team owns this request through the `Modify Walnut Project` IT form; developers should contact the SMP team. The onboarding and troubleshooting docs were updated with this two-stage access path.
+- `smp-common 0.5.0` introduced a shared canonical TSDB publication runtime. Regional producers remain responsible for source-schema mapping, catalogue semantics, credentials, and independent audit projection; the common layer owns canonical payload validation, incremental writes, forecast-version protection, read-back verification, and JSON-safe results.
+- The `smp-common 0.5.0` release was published from commit `bed6bb3`. Its pytest CI was then enabled permanently, all 34 legacy test failures were corrected without runtime changes, and commit `aede349` passed all 209 tests and the full GitHub workflow.
+- A branch-level OCCTO adoption POC in `smp-japan` replaced the recurring publication orchestration with `smp-common 0.5.0` while retaining Japan-owned mappings, catalogue checks, credentials, audit logic, and diagnostic transport helpers. The full suite passed 496 tests. The remaining deployment prerequisite in the capture is promotion of `smp-common 0.5.0` from the development package repository to the production package index.
+- The emerging data-access architecture treats TSDB as the governed consumer source for reusable time series, CDH as durable upstream evidence and analytical storage, and Grafana as presentation/discovery. Dashboard panels should nominate underlying data products rather than be published blindly because panel SQL can hide joins, aggregation, and sign changes.
+- The July 29 sprint review preferred TSDB for Louis's programmatic access because the same client can work locally and in AWS. The team still needs to identify the required series and complete metadata/provider approvals; the India generation-data push may require a separate access call and could extend beyond the final sprint.
 
 ## Open Questions
 
@@ -104,6 +110,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
+- UNCERTAIN: Whether the production package-index promotion for `smp-common 0.5.0` was completed after the July 29 POC.
 
 ## Sources
 
@@ -144,5 +151,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
 - `sources/notes/2026-07-29-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-29-codex-conversations.md`
+- `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
+- `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
 
-Last Updated: 2026-07-29
+Last Updated: 2026-07-30
