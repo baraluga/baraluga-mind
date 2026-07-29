@@ -69,6 +69,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 28 normalized DeCliC GitHub environments from stage-by-stage names to `qrm-noprod`, `qrm-prod`, and `declic-prod`, retaining only the required OIDC variable and placeholder secrets. This reduced configuration noise but did not complete deployment cutover.
 - The historical Python package backfill process was documented in `sff-actions`, with an organization policy pointer and tests for semantic/path safety. The procedure preserves source evidence and fails closed rather than treating package reconstruction as ordinary publication.
 - A July 28 inactivity audit found `wow-infra` and `wow-scripts-import-xlsx` ready for migration, and `wow-okta-scripts` ready with the caveat of stale PR 6422. `wow-app` and `wow-backend` were active that day and should be rechecked on 2026-08-11 if no newer activity occurs.
+- The DeCliC sharing note's `custom orchestrator agent` was a proposed generic abstraction, not an existing named agent.
 
 ## Open Questions
 
@@ -127,5 +128,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-07-27-codex-conversations.md`
 - `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
+- `sources/notes/2026-07-29-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-29

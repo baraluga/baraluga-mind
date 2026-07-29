@@ -80,6 +80,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - New DAG-developer onboarding is fragmented across QRMDMS organization access, team assignment, and Grafana email invitations. The grooming direction is one concise Confluence page that consolidates the entry path.
 - Jupyter/Airflow integration is feasible when a whole notebook is one task, using Airflow's Papermill operator. Automatically converting arbitrary notebook cells into reliable production tasks is not a dependable default: it loses task-level monitoring unless notebooks follow strict conventions or use additional tooling.
 - On July 28, `smp-india` and `smp-japan` received matching rulesets for `dev`, `qa`, and `prod`: pull requests, one `SMP-CODEOWNERS` approval, approval after the latest push, and deletion/force-push prevention, with unconditional bypass for the code-owner team. `main` remained unaffected.
+- Brian clarified on July 29 that `SCR-1058` is Mateo's test of the onboarding experience for contributing a DAG to `smp-india`. This resolves the earlier uncertainty about whether the beta stopped at scaffolding or covered a real contribution path.
 
 ## Open Questions
 
@@ -100,9 +101,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `ngloud` is the exact AMI/image family name behind the GMR CrowdStrike coverage issue.
 - UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
 - UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
-- UNCERTAIN: Whether Mateo's beta-test scope is only to verify the DAG Helper scaffold or to complete a real DAG contribution through local testing and review; the July 22 docs added a beta checkpoint, but actual expectations may still need team confirmation.
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
+- UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
 
 ## Sources
 
@@ -142,5 +143,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 - `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
+- `sources/notes/2026-07-29-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-29

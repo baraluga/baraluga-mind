@@ -83,7 +83,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `SCR-1208` applied the established snapshot-manifest pattern to the Japan nuclear dashboard. The producer and dashboard changes were merged and promoted to QA; CDH registration and one scheduled run proved the selector and snapshot plumbing.
 - QA exposed a historical-horizon defect in `SCR-1208`: filtering only to the selected snapshot dropped pre-snapshot legacy data. The dashboard query was corrected to combine unversioned legacy rows with the selected snapshot and prefer selected rows on overlap. Selection and the full 2016-2028 horizon were then validated; a second scheduled run is still required to prove that the look-back preserves an older forecast while `Latest` advances.
 - `SCR-1171` gained production-safe versions of the existing catalogue provisioning, approver discovery, and smoke-test commands. Production mutations remain dry-run by default and require both `--apply` and the exact `CONFIRM PROD` guard. The code was pushed to `dev` with green CI, but production catalogue approvals and VPN-side execution remain separate work.
-- The July 27 standup described `SCR-1171` as waiting on an approver transcribed as `Franco`; this may refer to [[francois]], but the source does not establish that safely.
+- The July 27 standup described `SCR-1171` as waiting on `Franco`; Brian confirmed on July 29 that this means [[francois]].
 
 ## Open Questions
 
@@ -101,7 +101,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
-- UNCERTAIN: Whether `Franco` in the July 27 standup means [[francois]] or another approver.
 
 ## Sources
 
@@ -138,5 +137,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
 - `sources/codex-conversations/2026-07-27-codex-conversations.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
+- `sources/notes/2026-07-29-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-29

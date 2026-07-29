@@ -340,9 +340,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`
 
-- [ ] Collect Mateo's beta-test feedback on the `smp-india` DAG Helper onboarding flow, especially confusing, awkward, or broken steps.
+- [ ] Complete `SCR-1058` by collecting Mateo's feedback on the full `smp-india` DAG-contribution onboarding experience, especially confusing, awkward, or broken steps.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/notes/2026-07-29-ingest-handover-clarifications.md`
 
 - [ ] Follow up on the billing ticket with the corrected explanation that the 1,000-instance run was manual error, not a billing-system bug.
   - Context: [[smp-platform]]
