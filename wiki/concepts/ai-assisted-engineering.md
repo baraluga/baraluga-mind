@@ -22,6 +22,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - July 17 diagnostics for [[zscaler-codex-access]] showed that Codex can sometimes keep an existing response stream alive during Zscaler handoff, but fresh Codex/OpenAI requests can fail with 403 through the Zscaler path. Private-site browser testing may still work once Zscaler settles, but durable agentic access needs an approved networking policy rather than local protocol workarounds.
 - July 21 work created a global `consult-mind-palace` Codex skill that can use this repository as a source-backed memory layer from any working directory. A forward test produced a Japan Interconnector briefing with facts, decisions, actions, uncertainty, and stale-status caveats separated.
 - July 21 also showed a practical limit of GitHub-side custom agents: a Modernizer run may finish without changes when the runner cannot reach internal registry evidence. In that case, Codex can reconstruct and supply a grounded handoff, but authentication and repo readiness still control whether relaunching is appropriate.
+- July 28 grooming proposed a dry run of Copilot automatic PR review. The working theory was that the PR creator's credits would be charged, but the team wanted a small test and confirmation with Pierre before adopting the automation.
 
 ## Open Questions
 
@@ -30,6 +31,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: The ADO Pipeline Modernizer agent had only been lightly tried by July 15; it still needs real-pipeline pilots before being treated as a proven migration path.
 - UNCERTAIN: Whether IT will approve a ChatGPT/Codex Zscaler bypass or split-routing policy for private-site agentic testing.
 - UNCERTAIN: Whether internal registry access for GitHub-side agent runners will be solved centrally or handled with per-run evidence handoffs.
+- UNCERTAIN: Whether automatic Copilot PR review is charged to the PR creator or another organization billing pool.
 
 ## Sources
 
@@ -44,5 +46,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
+- `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-Last Updated: 2026-07-21
+Last Updated: 2026-07-29

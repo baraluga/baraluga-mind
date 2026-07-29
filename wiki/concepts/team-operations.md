@@ -65,6 +65,10 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The Pipeline Modernizer was decommissioned after its useful rules were converted into executable `sff-actions` contracts and tested human-facing recipes. This supersedes the earlier assumption that the organization agent itself would remain the primary migration interface.
 - July 24 meeting notes say the SFF functional account requires an SFF project in CMDB first. Someone with Snow/CMDB catalog access must create the project before the linked account request can be submitted.
 - July 24 daily standup says Brian's migrated-Jira access problem remained unresolved and may require a new manually associated account because the old email may not be integrated with Okta.
+- July 27 DeCliC work established real credential-free CI on `declic-app` and `declic-infra`, corrected and merged `declic-backend` PR 4, and published the historical package dependencies needed by the infrastructure checks. Both DeCliC application repositories were aligned to `dev`, but CD remained intentionally parked behind environment, credentials, OIDC, approval, smoke-test, and recovery gates.
+- July 28 normalized DeCliC GitHub environments from stage-by-stage names to `qrm-noprod`, `qrm-prod`, and `declic-prod`, retaining only the required OIDC variable and placeholder secrets. This reduced configuration noise but did not complete deployment cutover.
+- The historical Python package backfill process was documented in `sff-actions`, with an organization policy pointer and tests for semantic/path safety. The procedure preserves source evidence and fails closed rather than treating package reconstruction as ordinary publication.
+- A July 28 inactivity audit found `wow-infra` and `wow-scripts-import-xlsx` ready for migration, and `wow-okta-scripts` ready with the caveat of stale PR 6422. `wow-app` and `wow-backend` were active that day and should be rechecked on 2026-08-11 if no newer activity occurs.
 
 ## Open Questions
 
@@ -84,6 +88,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether Walnut Artifactory/JFrog should be the destination for non-Python package types and production promotion; the current evidence proves only the SFF Python DEV contract.
 - UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
 - UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
+- UNCERTAIN: Whether stale WoW PR 6422 should be closed or migrated before `wow-okta-scripts`.
 
 ## Sources
 
@@ -119,5 +124,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
+- `sources/codex-conversations/2026-07-27-codex-conversations.md`
+- `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
+- `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
-Last Updated: 2026-07-27
+Last Updated: 2026-07-29

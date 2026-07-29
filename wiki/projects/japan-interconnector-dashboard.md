@@ -77,6 +77,13 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - The implementation was pushed to `smp-japan` dev and `smp-dashboard` main on July 23, then `smp-japan` was promoted to QA at `edb8f2d`. July 24 standup says dev validation passed and QA testing of yearly, monthly, weekly, daily, and Grafana mapping was still ongoing.
 - `SCR-1207` is the separate two-point historical operating-capacity backfill. It must follow `SCR-1206`; historical records remain null for operating capacity until the backfill is run.
 - July 24 Codex work implemented an event-driven TSDB capacity publisher and forecast-version conflict probe. Brian confirmed on July 27 that this work was subsequently landed and is operating correctly.
+- July 27 standup confirms the `SCR-1197` interconnector dashboard was live in production and treated as fully released. Hiromi was redirected from the old QA link to the production dashboard; future additions should still pass through QA before production.
+- `SCR-1206` operating capacity remained in QA. The feature worked, but historical persistence was wrong: the visible start date moved forward with time instead of carrying the last known capacity across missing days. Graph styling feedback also suggested making the non-price series more visible before stakeholder demos.
+- `SCR-1207` added a guarded single-run QA workflow for historical operating-capacity backfill. The first run exposed a legitimate forward-year case because OCCTO target year 2026 extends through March 2027; the workflow was fixed to snapshot and compare that outside-range year, promoted to QA, and left ready for recovery by clearing only the commit task in the same run.
+- `SCR-1208` applied the established snapshot-manifest pattern to the Japan nuclear dashboard. The producer and dashboard changes were merged and promoted to QA; CDH registration and one scheduled run proved the selector and snapshot plumbing.
+- QA exposed a historical-horizon defect in `SCR-1208`: filtering only to the selected snapshot dropped pre-snapshot legacy data. The dashboard query was corrected to combine unversioned legacy rows with the selected snapshot and prefer selected rows on overlap. Selection and the full 2016-2028 horizon were then validated; a second scheduled run is still required to prove that the look-back preserves an older forecast while `Latest` advances.
+- `SCR-1171` gained production-safe versions of the existing catalogue provisioning, approver discovery, and smoke-test commands. Production mutations remain dry-run by default and require both `--apply` and the exact `CONFIRM PROD` guard. The code was pushed to `dev` with green CI, but production catalogue approvals and VPN-side execution remain separate work.
+- The July 27 standup described `SCR-1171` as waiting on an approver transcribed as `Franco`; this may refer to [[francois]], but the source does not establish that safely.
 
 ## Open Questions
 
@@ -94,6 +101,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
+- UNCERTAIN: Whether `Franco` in the July 27 standup means [[francois]] or another approver.
 
 ## Sources
 
@@ -127,5 +135,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-07-24-codex-conversations.md`
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
+- `sources/codex-conversations/2026-07-27-codex-conversations.md`
+- `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
-Last Updated: 2026-07-27
+Last Updated: 2026-07-29

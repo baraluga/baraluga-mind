@@ -74,6 +74,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - July 24 technical standup says the Pyrene EKS update Snow ticket had been assigned since Monday without progress. The requested changes were weekday cluster scheduling and labels needed for pod deployment; follow-up with the assignee was due. Brian confirmed on July 27 that the source spelling `Pyrine` means Pyrene.
 - The same meeting says GMR final migration was tentatively planned for the following week after Abraham's confirmation, with Nicola still needed for schedule alignment. Brian confirmed on July 27 that the source acronym `JMR` means GMR.
 - July 24 standup says the migrated `smp-japan` repository appeared archived and did not redirect correctly. Brian planned to post the correct repository URLs so the team could create a test DAG for TSDB validation.
+- July 28 grooming introduced a Gen-A ingestion flow: an SFTP file in a service transcribed as `Go Anywhere` grows from zero to 96 rows in 15-minute increments, resets at midnight, and needs a 05:00 recovery scrape for late prior-day data. The current-day TSDB window should be overwritten every 15 minutes. Standard TSDB insertion should be tried before adding a fast-access layer.
+- The Gen-A work is blocked on access facts from Matthew and Adrian: exact endpoint, machine-to-machine authentication, permissions, and whether geo-blocking could repeat the earlier India scraping issue.
+- Grafana dashboard source control remains a priority: the target is Git as the single source of truth with rollback and no drift between checked-in JSON and live Grafana.
+- New DAG-developer onboarding is fragmented across QRMDMS organization access, team assignment, and Grafana email invitations. The grooming direction is one concise Confluence page that consolidates the entry path.
+- Jupyter/Airflow integration is feasible when a whole notebook is one task, using Airflow's Papermill operator. Automatically converting arbitrary notebook cells into reliable production tasks is not a dependable default: it loses task-level monitoring unless notebooks follow strict conventions or use additional tooling.
+- On July 28, `smp-india` and `smp-japan` received matching rulesets for `dev`, `qa`, and `prod`: pull requests, one `SMP-CODEOWNERS` approval, approval after the latest push, and deletion/force-push prevention, with unconditional bypass for the code-owner team. `main` remained unaffected.
 
 ## Open Questions
 
@@ -95,6 +101,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Abstract`, `Bong`, `Milo`, and `Jeka` are exact names from the July 17 technical-activities source or transcript artifacts.
 - UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
 - UNCERTAIN: Whether Mateo's beta-test scope is only to verify the DAG Helper scaffold or to complete a real DAG contribution through local testing and review; the July 22 docs added a beta checkpoint, but actual expectations may still need team confirmation.
+- UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
+- UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
 
 ## Sources
 
@@ -132,5 +140,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+- `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
-Last Updated: 2026-07-27
+Last Updated: 2026-07-29

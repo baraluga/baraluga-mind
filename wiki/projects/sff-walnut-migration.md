@@ -33,6 +33,9 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - `sff-ms-service-desk` has GitHub-owned tests, builds, Lambda packaging, artifacts, and infrastructure imports, but Azure still uniquely owns environment mapping, AWS authentication, and CDK deployment. Missing AWS role metadata, protected GitHub environments, synth-safe account resolution, and runtime proof block cutover.
 - `declic-backend` was mirrored into `qrm-dms`. Draft PR 1 has green CI and an intentionally failing deployment-readiness check that preserves the remaining branch/stage, infrastructure, image-provenance, dependency, security, smoke-test, environment, OIDC, and recovery gates.
 - The SFF functional account cannot be requested until an SFF project exists in CMDB. The July 24 technical standup proposed finding someone with Snow/CMDB catalog access, creating the project, and then submitting the linked functional-account request.
+- July 27 work published the missing historical `common-stacks==8.4.6` dependency from exact source and proved independent and combined resolution with `user==7.1.3`. It also added a tested `sff-actions` historical-package-backfill recipe and organization policy pointer.
+- DeCliC application readiness advanced: `declic-backend` PR 4 merged with green CI, `declic-app` gained green credential-free CI, and `declic-infra` gained green credential-free CI after the historical dependency backfill. Deployment remains parked because environment ownership, secret custody, AWS OIDC, approvals, smoke tests, and rollback are not complete.
+- July 28 environment cleanup consolidated active DeCliC GitHub environments into shared non-production and production boundaries. The cleanup did not create a deployable CD contract or authorize cloud changes.
 
 ## Open Questions
 
@@ -49,5 +52,8 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
 - `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-07-27-codex-conversations.md`
+- `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
+- `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
-Last Updated: 2026-07-27
+Last Updated: 2026-07-29
