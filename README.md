@@ -18,6 +18,7 @@ The goal is not to manually write perfect notes. The goal is to capture raw mate
 - `sources/meetings/` - meeting transcripts, summaries, agendas, and decisions.
 - `sources/voice/` - dictated thoughts and voice-note transcripts.
 - `sources/pdfs/` - PDFs and extracted PDF notes.
+- `sources/codex-conversations/` - small Markdown indexes paired with complete raw `.txt` transcripts so Obsidian does not parse oversized conversation exports.
 - `wiki/people/` - durable notes about people, teams, stakeholders, and relationships.
 - `wiki/projects/` - durable notes about active or past projects.
 - `wiki/concepts/` - durable notes about reusable ideas, patterns, topics, and frameworks.
@@ -41,3 +42,5 @@ Prefer stable topic names over dates, except for decisions and time-bound logs.
 Raw material can be messy. Wiki pages should be useful.
 
 Every wiki page should make it clear what is known, what is inferred, what is uncertain, and where the information came from.
+
+Codex conversation captures are emitted as a pair: an Obsidian-safe Markdown index and a raw text transcript. Keep and move both files together during ingest; do not rename a large transcript to `.md`.

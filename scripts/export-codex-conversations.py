@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export local Codex user/assistant conversations into the vault inbox."""
+"""Export local Codex conversations as an Obsidian-safe index and raw transcript."""
 
 from __future__ import annotations
 
@@ -101,34 +101,8 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
     return sessions
 
 
-def render(capture_date: str, codex_home: Path, sessions: list[dict]) -> str:
-    year, month, day = capture_date.split("-")
-    session_dir = codex_home / "sessions" / year / month / day
-    lines: list[str] = [
-        f"# Codex Conversations - {capture_date}",
-        "",
-        "## Capture Summary",
-        "",
-        "Source type: mixed capture / Codex conversation export.",
-        "",
-        "This file is a daily inbox landing capture for Codex conversations. It preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.",
-        "",
-        "Facts:",
-        f"- Capture date: `{capture_date}`",
-        f"- Generated from local session directory: `{session_dir}`",
-        f"- Sessions found: {len(sessions)}",
-        "",
-        "Inferences:",
-        "- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.",
-        "",
-        "## Preliminary Ingest Notes",
-        "",
-        "- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.",
-        "- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.",
-        f"- Suggested post-ingest destination for this evidence file: `sources/codex-conversations/{capture_date}-codex-conversations.md` or another appropriate source folder.",
-        "",
-        "## Thread Index",
-        "",
+def render_thread_index(sessions: list[dict]) -> list[str]:
+    lines = [
         "| Thread | Session | Started | Updated | Messages | CWD | Raw File |",
         "| --- | --- | --- | --- | ---: | --- | --- |",
     ]
@@ -147,6 +121,83 @@ def render(capture_date: str, codex_home: Path, sessions: list[dict]) -> str:
                 path=session["path"],
             )
         )
+
+    return lines
+
+
+def render_index(
+    capture_date: str,
+    codex_home: Path,
+    sessions: list[dict],
+    transcript_name: str,
+) -> str:
+    year, month, day = capture_date.split("-")
+    session_dir = codex_home / "sessions" / year / month / day
+    lines: list[str] = [
+        f"# Codex Conversations - {capture_date}",
+        "",
+        "## Capture Summary",
+        "",
+        "Source type: mixed capture / Codex conversation export.",
+        "",
+        "This Obsidian-safe index describes the captured sessions without embedding their full transcripts. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are excluded.",
+        "",
+        "Facts:",
+        f"- Capture date: `{capture_date}`",
+        f"- Generated from local session directory: `{session_dir}`",
+        f"- Sessions found: {len(sessions)}",
+        f"- Complete filtered transcript: `{transcript_name}`",
+        "",
+        "Inferences:",
+        "- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.",
+        "",
+        "## Ingest Notes",
+        "",
+        "- Review the paired text transcript for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.",
+        "- Keep the transcript as `.txt`; large Markdown transcripts can crash Obsidian during indexing.",
+        "- Move this index and its paired transcript together during ingest.",
+        "",
+        "## Thread Index",
+        "",
+        *render_thread_index(sessions),
+        "",
+        f"Last Updated: {capture_date}",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def render_transcript(capture_date: str, codex_home: Path, sessions: list[dict]) -> str:
+    year, month, day = capture_date.split("-")
+    session_dir = codex_home / "sessions" / year / month / day
+    lines: list[str] = [
+        f"# Codex Conversations - {capture_date}",
+        "",
+        "## Capture Summary",
+        "",
+        "Source type: mixed capture / Codex conversation export.",
+        "",
+        "This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.",
+        "",
+        "Facts:",
+        f"- Capture date: `{capture_date}`",
+        f"- Generated from local session directory: `{session_dir}`",
+        f"- Sessions found: {len(sessions)}",
+        "",
+        "Inferences:",
+        "- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.",
+        "",
+        "## Preliminary Ingest Notes",
+        "",
+        "- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.",
+        "- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.",
+        f"- Move this file together with the paired `{capture_date}-codex-conversations.md` index during ingest.",
+        "- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.",
+        "",
+        "## Thread Index",
+        "",
+        *render_thread_index(sessions),
+    ]
 
     lines.extend(["", "## Transcript", ""])
 
@@ -184,6 +235,28 @@ def render(capture_date: str, codex_home: Path, sessions: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def write_capture(
+    vault: Path,
+    capture_date: str,
+    codex_home: Path,
+    sessions: list[dict],
+) -> tuple[Path, Path]:
+    inbox = vault / "inbox"
+    inbox.mkdir(parents=True, exist_ok=True)
+    stem = f"{capture_date}-codex-conversations"
+    index_output = inbox / f"{stem}.md"
+    transcript_output = inbox / f"{stem}.txt"
+    index_output.write_text(
+        render_index(capture_date, codex_home, sessions, transcript_output.name),
+        encoding="utf-8",
+    )
+    transcript_output.write_text(
+        render_transcript(capture_date, codex_home, sessions),
+        encoding="utf-8",
+    )
+    return index_output, transcript_output
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--date", help="Date to export in YYYY-MM-DD format. Defaults to local today.")
@@ -196,11 +269,9 @@ def main() -> None:
     codex_home = Path(args.codex_home)
     sessions = extract_sessions(codex_home, capture_date)
 
-    inbox = vault / "inbox"
-    inbox.mkdir(parents=True, exist_ok=True)
-    output = inbox / f"{capture_date}-codex-conversations.md"
-    output.write_text(render(capture_date, codex_home, sessions))
-    print(output)
+    index_output, transcript_output = write_capture(vault, capture_date, codex_home, sessions)
+    print(index_output)
+    print(transcript_output)
     print(f"sessions={len(sessions)}")
 
 
