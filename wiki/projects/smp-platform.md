@@ -88,6 +88,13 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - A 2026-07-30 clarification supersedes that package prerequisite: the shared runtime was promoted to the production package index, and the corrected current version is `smp-common 0.6.0`.
 - The emerging data-access architecture treats TSDB as the governed consumer source for reusable time series, CDH as durable upstream evidence and analytical storage, and Grafana as presentation/discovery. Dashboard panels should nominate underlying data products rather than be published blindly because panel SQL can hide joins, aggregation, and sign changes.
 - The July 29 sprint review preferred TSDB for Louis's programmatic access because the same client can work locally and in AWS. The team still needs to identify the required series and complete metadata/provider approvals; the India generation-data push may require a separate access call and could extend beyond the final sprint.
+- The July 30 India generation-data meeting established that the Khaba/Cabo source is a CDH-managed S3 file in `ap-south-1`, refreshed roughly every 15 minutes and overwritten through the day. The intended TSDB outputs are Active Power, GHI, Module Surface Temperature, and Ambient Temperature, averaged into complete 15-minute windows.
+- `SCR-1218` proved the complete read path in both India dev and production after the `khaba_generation` dataset was attached to the corresponding CDH projects. Both environments assumed the intended CDH role, downloaded the same 2,172,772-byte SSE-KMS object, produced the same SHA-256, and proved KMS decryption and temporary-file cleanup. The temporary probe was then removed.
+- The first production probe exposed two useful safety lessons: bucket listing was broader than the feature needed, so the final proof used exact-object access; Botocore request-level debug logging could expose temporary credentials, so SDK wire logging was suppressed before rerunning.
+- `SCR-1209` now has two India DAGs sharing one parser/publisher: a realtime DAG every 15 minutes for the current IST day, and a 05:00 IST reconciliation DAG for the previous day with manual date override for backfill. Publishing is fail-closed behind `KHABA_GENERATION_TSDB_PUBLISH_ENABLED`; absent or false means validation-only with no TSDB calls.
+- The real CSV contains one-minute readings rather than one 15-minute row. The implementation publishes only complete 15-minute averages and ignores the current partial interval. It selects four plant-level signals without depending on the malformed inverter tail where the header advertises inverter 55 but rows stop after inverter 54.
+- Live QA evidence showed the July 30 file contained 1,433 contiguous minutes through 23:52 IST, yielding 95 complete intervals and leaving seven trailing minutes missing. Validation mode reports this boundary rather than failing, while the write path remains stricter pending a deliberate policy decision.
+- Matéo supplied the four stable TSDB series IDs and provider metadata `R&F India` / `rf_india`. The IDs are versioned in code; only the publication enable flag remains operational Airflow configuration. As of July 31, `smp-india` dev and QA contained this mapping, while prod remained untouched.
 
 ## Open Questions
 
@@ -102,6 +109,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: `Peer` may be a mistranscribed person name and needs more context.
 - UNCERTAIN: Whether `Extruder` is the exact project/system name from the July 14 meeting capture.
 - UNCERTAIN: Whether an unauthenticated `/filebrowser/health` endpoint or authenticated synthetic browse check is needed after the daily monitor has run for a while.
+- UNCERTAIN: Whether the Khaba source's 23:52 IST cutoff is expected and stable, and whether reconciliation should formally accept 95 complete intervals for publication.
+- UNCERTAIN: Whether Matéo's four Khaba series IDs exist in TSDB UAT as well as production; dev/QA deliberately target UAT.
+- UNCERTAIN: Whether the CDH dataset's durable name is `Cabo Generation` (Granola meeting note) or `Khaba Generation` / `khaba_generation` (runtime and later Codex evidence).
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
@@ -155,5 +165,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
 - `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-30-1232-granola-generation-data-scraper.md`
+- `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
+- `sources/notes/2026-07-30.md`
+- `sources/codex-conversations/2026-07-30-codex-conversations.md`
+- `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
-Last Updated: 2026-07-30
+Last Updated: 2026-07-31

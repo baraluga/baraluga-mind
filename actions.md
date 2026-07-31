@@ -154,9 +154,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Job Search
 
-- [ ] Enable Chrome local file access for Codex, then submit the queued LinkedIn/manual applications.
+- [ ] Verify salary and Philippine hiring eligibility for the initial HiringCafe leads Trustana, Soum, and Omilia before deciding whether to apply.
   - Context: [[job-search-2026]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
 ### Japan Interconnector
 
@@ -180,9 +180,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
 
-- [ ] Follow up with Carlos on `SCR-1171` spreadsheet approval, then have Laurent execute the TSDB catalog changes once approved.
+- [ ] Resolve the PROD taxonomy decision for `interconnection, available capacity` and `interconnection, available capacity, minimum` with Rodrigue Sandrin and Alexandre Huynen, then complete the 35-series approval path.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/notes/2026-07-30.md`; `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
 - [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
   - Context: [[japan-interconnector-dashboard]]
@@ -220,6 +220,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/meetings/2026-07-24-1415-granola-daily-standup.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
 
+- [ ] Complete `SCR-1216` acceptance: validate the remaining two HJKS DAGs in QA without email tasks, then promote and confirm production report emails stop while uploads continue.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`
+
+- [ ] Rerun the `SCR-1219` weekly-capacity job in QA and confirm the publication-date selector returns the full 4,704-row August 1 week.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`
+
 - [ ] Validate `SCR-1208` nuclear look-back after the next scheduled QA run: `Latest` should advance while the 2026-07-28 16:05 JST snapshot preserves the earlier forecast and full history.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-28-codex-conversations.md`
@@ -256,17 +264,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### SMP Platform
 
-- [ ] Complete the OCCTO adoption path with the promoted `smp-common 0.6.0` package, then run the Airflow image/UAT smoke test.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`
-
 - [ ] Identify the dashboard data products Louis needs, define their TSDB series and metadata/providers, and agree the programmatic access path.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
-
-- [ ] Schedule the India generation-data access call to confirm the CDH location, sharing method, and access pain points before the TSDB push.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
 
 - [ ] Carlos to confirm whether Japan Aurora-curve data is available through an API; if not, scope the India-style Excel ingestion and prioritize it against TSDB work.
   - Context: [[japan-interconnector-dashboard]]
@@ -274,7 +274,27 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Add Japan operating-capacity series to TSDB and backfill at least from 2025, ideally from 2019 to match the dashboard.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [ ] Observe the Khaba realtime and reconciliation DAGs in QA with publication disabled, then decide whether a contiguous 95-interval day is acceptable for reconciliation writes.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [ ] Ask CDH whether Khaba's 23:52 IST cutoff is expected and whether the missing 23:53-23:59 readings can be delivered.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [ ] Send the time-and-material extension request for the two uncovered weeks after the current SMP period, noting the existing budget overshoot and remaining backlog.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
+
+- [ ] Validate carried-over sprint tickets `SCR-1206`, `FIL-07`, `SCR-1208`, and `SCR-1058`, with Matéo leading the validation process.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
 
 - [ ] Finalize CSCR-119 Docker image separation for Japan and India Airflow version conflicts.
   - Context: [[smp-platform]]
@@ -522,6 +542,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Done
 
+### Job Search
+
+- [x] Replace the blocked LinkedIn file-upload workflow with the current human-in-the-loop HiringCafe and employer-portal flow.
+  - Closure: On July 31 the scheduled LinkedIn automation was deleted, HiringCafe became the sole active discovery source, employer portals became the submission path, and three applications were submitted successfully.
+  - Context: [[job-search-2026]]
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
 ### APAC TSDB Scraper
 
 - [x] Wait for Mateo's Darwin historical backfill and repair confirmation.
@@ -585,6 +612,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
 ### SMP Platform
+
+- [x] Complete the India generation-data access call and establish the source contract.
+  - Closure: The July 30 meeting confirmed the CDH dataset, S3 overwrite cadence, required fields, 15-minute aggregation, and access questions; July 31 runtime work then proved the dataset in dev and production.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/meetings/2026-07-30-1232-granola-generation-data-scraper.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [x] Prove `SCR-1218` cross-account Khaba S3 access from SMP India dev and production.
+  - Closure: Both environments assumed the intended CDH role, downloaded the same SSE-KMS object, matched its checksum, and proved KMS decryption after the dataset was attached to the CDH projects.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+
+- [x] Complete the OCCTO adoption path with `smp-common 0.6.0` and prove the shared publisher/backfill in UAT.
+  - Closure: The combined refactor and bounded historical campaign passed repository validation and a live UAT write with exact read-back and independent audit; production rollout remains governed by the separate catalog-approval action.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`; `sources/notes/2026-07-30-ingest-handover-clarifications.md`; `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
 - [x] Document and implement the SMP-owned Tools/Walnut Artifactory access-request path for new DAG contributors.
   - Closure: Mateo's test proved the missing application entitlement; the docs now direct developers to the SMP team, which submits the `Modify Walnut Project` IT form.

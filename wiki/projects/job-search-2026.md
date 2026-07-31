@@ -23,11 +23,18 @@ The July 7 Codex capture shows the workflow can screen LinkedIn recommendations,
 - July 9 fit gaps: DevRev asks for Go/serverless edge and travel up to 30%; Zero may require US Eastern overlap; Stratpoint is weaker on AI/agentic fit and stronger on cloud architecture/stakeholder delivery.
 - July 13 run reached the 40-listing cap. It queued Axos Business Center Artificial Intelligence Engineer and LSEG Senior AI Engineer as `To Apply`, created and visually verified both JD/resume/cover-letter artifact sets, and submitted no application because Chrome again rejected the tailored-resume upload with `Not allowed`.
 - July 13 fit gaps: Axos has a lower-seniority 3+ year bar and Azure AI Foundry as a ramp area; LSEG asks for Langfuse, vector stores, fine-tuning/model deployment, and current expert Java/Python depth.
+- On July 31, confirmed applications were submitted to Foundry for Good, ChainGPT, and Builder.io. The active tracker was migrated to `application-tracker.xlsx` and then deliberately reduced to only those three applications; the Markdown tracker remains a legacy copy.
+- The job-search system is now human-in-the-loop. Brian supplies or opens a posting; Codex explains what the job would feel like and recommends apply/skip, fills evidence-backed fields, batches uncertain or sensitive questions, and submits automatically once those uncertainties are resolved. Judgment-based skip recommendations pause for Brian; hard-filter failures do not.
+- Current hard filters: PHP-denominated roles must meet PHP 220,000/month; other currencies require discussion; current salary is never disclosed; primary hours after 22:00 Manila are a no-go; more than one specified onsite day per week is a no-go; unspecified hybrid frequency can proceed.
+- A tailored resume is prepared for each application. A cover letter is created only when required or strategically useful. Tracker status becomes `Applied` only after confirmed submission; blocked portals become `Needs Action` with the exact blocker.
+- HiringCafe is the sole active discovery source for now, with employer portals used for definitive JD verification and submission. LinkedIn and other boards are excluded from discovery. The repeatable query set covers AI solutions, agentic, AI implementation, AI automation, forward-deployed AI, applied AI, and customer engineering roles.
+- The original `umur957/hiring-cafe-job-scraper` API integration was stale (`404/405`). A bounded server-rendered-results adapter proved viable: the first experiment parsed 40 cards, removed likely duplicates and non-remote roles, rejected a below-floor range, and caught night/US-hours roles during full-description review.
 
 ## Open Questions
 
 - UNCERTAIN: Whether the Chrome file-upload permission has since been enabled.
 - UNCERTAIN: Whether ECLARO, JTI, Agile & Co., WTW, RealPage, DevRev, Zero Hiring, Stratpoint, Axos, or LSEG were manually submitted after being queued.
+- UNCERTAIN: Salary and Philippine hiring eligibility for the initial HiringCafe leads Trustana, Soum, and Omilia still need verification.
 
 ## Sources
 
@@ -35,5 +42,6 @@ The July 7 Codex capture shows the workflow can screen LinkedIn recommendations,
 - `sources/codex-conversations/2026-07-08-codex-conversations.md`
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
+- `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
-Last Updated: 2026-07-13
+Last Updated: 2026-07-31
