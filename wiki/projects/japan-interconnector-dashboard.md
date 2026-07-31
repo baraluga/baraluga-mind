@@ -93,7 +93,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `SCR-1207` production backfill exposed that current OCCTO files revise existing Available Capacity as well as add Operating Capacity. The repair policy was changed so current OCCTO values are authoritative inside the selected repair range while outside-range history remains unchanged; the change was promoted through production and the failed run's prepared artifacts remained reusable.
 - The shared `smp-common 0.6.0` OCCTO publisher and bounded historical TSDB campaign were combined in draft PR 21. The agreed default scope is capacity from 2021-01-01 and actual flow from 2025-04-01 through the latest completed JST day, with capacity serialized before actual flow and `write=false` by default.
 - A UAT backfill write completed successfully, with per-chunk TSDB read-back and an independent Japan source-versus-TSDB audit. The preferred exhaustive confirmation is rerunning the exact resolved range with `write=false` and requiring zero would-write rows; a one-day all-series check should report 3,360 unchanged points.
-- Production approval for the 28 capacity-series variable groups remains unresolved. Rodrigue asked for validation of `interconnection, available capacity` and `interconnection, available capacity, minimum`; Alexandre suggested removing `interconnection`. The exact structure was already approved and verified in UAT, but changing it would recreate deterministic IDs in UAT and production, so this needs an explicit taxonomy decision.
+- Rodrigue asked for validation of `interconnection, available capacity` and `interconnection, available capacity, minimum`; Alexandre Huynen subsequently confirmed that both variable groups should remain unchanged, including the `interconnection` qualifier. The remaining work is the ordinary production approval path for the 35 series, not a taxonomy redesign.
 
 ## Open Questions
 
@@ -111,7 +111,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether Carlos, Laurent, or `zs5929` is the current approval path for all `SCR-1171` TSDB catalog changes; the July 17 standup and July 16 Codex evidence name different approval routes.
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
-- UNCERTAIN: Whether removing `interconnection` from the two capacity variable groups is a mandatory TSDB taxonomy correction or only a suggestion.
 - UNCERTAIN: Whether the completed UAT campaign has since received an exact-range `write=false` rerun proving zero would-write rows across all source-complete chunks.
 
 ## Sources
@@ -158,5 +157,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-07-30.md`
 - `sources/codex-conversations/2026-07-30-codex-conversations.md`
 - `sources/codex-conversations/2026-07-31-codex-conversations.md`
+- `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
 Last Updated: 2026-07-31

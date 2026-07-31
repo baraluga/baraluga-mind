@@ -9,12 +9,14 @@ Some source captures are too sparse or ambiguous to convert into durable project
 - The June 29 FEDV Chapter Granola note says the captured content was too brief and unclear to produce meaningful meeting notes.
 - No identifiable topic, decisions, or action items were available from that note.
 - The July 7 21:00 Granola tentative note appears to be ambient/personal audio rather than an intentional work meeting. It mixed background conversation, TV/show dialogue, and personal commentary, with no captured decisions or action items.
+- Brian does not recognize `FIL-07` or `Euro Mission` from the July 30 sprint-planning transcript. They remain preserved as source text but should not be normalized into ticket, person, team, or owner facts without new evidence.
 
 ## Open Questions
 
 - UNCERTAIN: Actual FEDV Chapter discussion content is not recoverable from the available Granola summary.
 - UNCERTAIN: Whether the July 7 21:00 capture should be kept long term; it was preserved as source evidence because normal ingest should not delete raw captures.
 - UNCERTAIN: In the July 29 performance review, `guitar announcements` and `surgeon skills` may be transcription errors. `SMB` has been confirmed as SMP, but the other two phrases should not be normalized without confirmation.
+- UNCERTAIN: What `FIL-07` and `Euro Mission` were intended to mean in the July 30 sprint-planning source.
 
 ## Sources
 
@@ -22,5 +24,7 @@ Some source captures are too sparse or ambiguous to convert into durable project
 - `sources/voice/2026-07-07-2100-granola-tentative.md`
 - `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
+- `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
-Last Updated: 2026-07-30
+Last Updated: 2026-07-31

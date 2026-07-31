@@ -180,9 +180,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-16-codex-conversations.md`; `sources/notes/2026-07-16.md`
 
-- [ ] Resolve the PROD taxonomy decision for `interconnection, available capacity` and `interconnection, available capacity, minimum` with Rodrigue Sandrin and Alexandre Huynen, then complete the 35-series approval path.
+- [ ] Complete the 35-series PROD approval path using the confirmed variable groups `interconnection, available capacity` and `interconnection, available capacity, minimum`.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/notes/2026-07-30.md`; `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-20-1415-granola-standup.md`; `sources/notes/2026-07-20.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/notes/2026-07-30.md`; `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
 - [ ] Send Japan group chat message on dashboard review, historical look-back feedback, and `SCR-1198` export confirmation.
   - Context: [[japan-interconnector-dashboard]]
@@ -288,13 +288,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
-- [ ] Send the time-and-material extension request for the two uncovered weeks after the current SMP period, noting the existing budget overshoot and remaining backlog.
+- [ ] Identify the intended recipient mistranscribed as `Euro Mission`, then send the time-and-material extension request for the two uncovered weeks after the current SMP period.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
-- [ ] Validate carried-over sprint tickets `SCR-1206`, `FIL-07`, `SCR-1208`, and `SCR-1058`, with Matéo leading the validation process.
+- [ ] Validate carried-over sprint tickets `SCR-1206`, `SCR-1208`, and `SCR-1058`, with Matéo leading the validation process.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
 - [ ] Finalize CSCR-119 Docker image separation for Japan and India Airflow version conflicts.
   - Context: [[smp-platform]]
@@ -563,6 +563,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-06-codex-conversations.md`
 
 ### Japan Interconnector
+
+- [x] Decide whether to retain the `interconnection` qualifier in the two capacity variable groups.
+  - Closure: Alexandre Huynen confirmed that both variable groups should remain unchanged.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
 - [x] Decide the initial TSDB cadence and value semantics for `SCR-1171`.
   - Closure: Capacity uses 30-minute reconciled values with positive directional conversion at the TSDB boundary; actual flow keeps signed five-minute values.
