@@ -7,3 +7,4 @@
 # Keep transient inbox captures local until they are processed into sources/wiki.
 inbox/*
 !inbox/.gitkeep
+!inbox/AGENTS.md

@@ -93,6 +93,10 @@ When processing files from `inbox/` or `sources/`:
    - `sources/meetings/` for meeting transcripts, agendas, and summaries
    - `sources/voice/` for voice-note transcripts and dictated thoughts
    - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
 8. Add a short `Last Updated` date using `YYYY-MM-DD`.
 9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
 

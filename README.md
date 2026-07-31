@@ -7,6 +7,7 @@ The goal is not to manually write perfect notes. The goal is to capture raw mate
 ## Workflow
 
 1. Drop raw captures into `inbox/`.
+   - For conversational journaling, invoke the global `$dump` skill or start a message with `dump:`. It creates and maintains `inbox/YYYY-MM-DD.md` as a live stateful note.
 2. Move source files into the right `sources/` folder when useful.
 3. Ask an AI agent to run the ingest workflow in `scripts/ingest.md`.
 4. Review the resulting wiki changes for accuracy.
@@ -14,9 +15,11 @@ The goal is not to manually write perfect notes. The goal is to capture raw mate
 ## Folder Map
 
 - `inbox/` - temporary landing zone for messy captures, pasted notes, transcripts, links, and voice dumps.
+- `inbox/YYYY-MM-DD.md` - live daily note maintained from chat, with provisional tasks, annotations, notes, and a raw timeline.
 - `sources/articles/` - saved articles, web clips, and reading notes.
 - `sources/meetings/` - meeting transcripts, summaries, agendas, and decisions.
 - `sources/voice/` - dictated thoughts and voice-note transcripts.
+- `sources/notes/` - processed daily notes preserved as source evidence.
 - `sources/pdfs/` - PDFs and extracted PDF notes.
 - `sources/codex-conversations/` - small Markdown indexes paired with complete raw `.txt` transcripts so Obsidian does not parse oversized conversation exports.
 - `wiki/people/` - durable notes about people, teams, stakeholders, and relationships.

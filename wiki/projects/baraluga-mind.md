@@ -19,7 +19,10 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - Raw transcripts must remain `.txt` because oversized Markdown transcripts can crash Obsidian 1.12.7 during indexing.
 - The July 6 capture showed that full daily transcripts can be large, so the durable wiki should summarize only decisions, implementation outcomes, risks, and follow-ups.
 - The corrected July 7 capture found five local Codex sessions and was ingested as source evidence. The July 8 capture found zero sessions and is preserved separately.
-- The daily Codex conversation capture automation was confirmed active on July 9. It runs daily at 23:00, writes the paired `.md` index and `.txt` transcript to `inbox/`, and explicitly stays export-only until a separate ingest pass.
+- The daily Codex conversation capture automation was confirmed active on July 9. It writes the paired `.md` index and `.txt` transcript to `inbox/` and explicitly stays export-only until a separate ingest pass.
+- On July 30, the Codex exporter was changed to scan continuing sessions across the local session tree and include only messages whose timestamps fall on the capture date in `Asia/Manila`. This allows one long-lived pinned Daily Dump task to be captured correctly across multiple days instead of relying on the task's creation-date folder. The automation now runs at 00:10 and explicitly exports the previous Asia/Manila calendar day so messages sent between 23:00 and midnight are included.
+- On July 31, the Codex exporter was changed to skip writing inbox capture files when no sessions have user/assistant messages for the target local date. Empty days should be visible in automation logs as `sessions=0` and `skipped=no-sessions`, not preserved as empty source evidence.
+- A global `dump` skill now provides a chat-first, note-visible capture path without requiring a pinned task. Explicit `$dump` invocation or clear capture signals such as `dump:` create or update `inbox/YYYY-MM-DD.md` immediately. The note maintains provisional task state, completion annotations, notes, and an immutable raw timeline; ingestion later reconciles it with `actions.md` and preserves it under `sources/notes/`.
 - GitHub Copilot conversations can also be exported from local Copilot CLI state under `/Users/qn5792/.copilot/session-state` and VS Code Copilot Chat workspace storage. The July 9 capture found ten local Copilot sessions and followed the same inbox-first ingest path.
 - By July 12, Codex, GitHub Copilot, and Granola capture automations were all operating as inbox-only exporters. The July 12 captures contained six Codex sessions, two Copilot sessions, and a Granola status recording that the connector returned no meetings.
 - The July 13 captures contained twelve Codex sessions, zero Copilot sessions, and one Granola standup. A trial morning brief grouped the previous day's evidence into `DONE`, `TODO`, and `BLOCKERS` and stayed in chat while the format is evaluated.
@@ -42,6 +45,8 @@ The current ingest convention is that captured material lands in `inbox/` first.
 
 ## Sources
 
+- `scripts/export-codex-conversations.py`
+- `inbox/AGENTS.md`
 - `sources/codex-conversations/2026-07-06-codex-conversations.md`
 - `sources/codex-conversations/2026-07-07-codex-conversations.md`
 - `sources/codex-conversations/2026-07-08-codex-conversations.md`
@@ -98,4 +103,4 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/copilot-conversations/2026-07-26-copilot-conversations.md`
 - `sources/meetings/2026-07-26-granola-meeting-notes-status.md`
 
-Last Updated: 2026-07-30
+Last Updated: 2026-07-31
