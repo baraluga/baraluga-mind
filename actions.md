@@ -152,7 +152,19 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
+- [ ] Prepare and present the Task 355 spike investigation findings as a presentation or supporting document.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-31-0945-granola-am-standup.md`
+
+- [ ] Confirm whether the proposed artifact-subdomain email setup at EUR 180 per user per year is acceptable before proceeding.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-07-31-0945-granola-am-standup.md`
+
 ### Job Search
+
+- [ ] Complete the AllView Real Estate Culture Index assessment for the Director of AI & Systems Architecture application, or request an extension if still possible.
+  - Context: [[job-search-2026]]
+  - Source: `sources/codex-conversations/2026-08-01-codex-conversations.md`
 
 - [ ] Verify salary and Philippine hiring eligibility for the initial HiringCafe leads Trustana, Soum, and Omilia before deciding whether to apply.
   - Context: [[job-search-2026]]
@@ -222,11 +234,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Complete `SCR-1216` acceptance: validate the remaining two HJKS DAGs in QA without email tasks, then promote and confirm production report emails stop while uploads continue.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 
 - [ ] Rerun the `SCR-1219` weekly-capacity job in QA and confirm the publication-date selector returns the full 4,704-row August 1 week.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 
 - [ ] Validate `SCR-1208` nuclear look-back after the next scheduled QA run: `Latest` should advance while the 2026-07-28 16:05 JST snapshot preserves the earlier forecast and full history.
   - Context: [[japan-interconnector-dashboard]]
@@ -263,6 +275,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
 ### SMP Platform
+
+- [ ] Document the Data Type 3 inventory gaps, especially provider and update-frequency details not visible in the dashboard, for Adrian, Louis, and Carlos.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 
 - [ ] Identify the dashboard data products Louis needs, define their TSDB series and metadata/providers, and agree the programmatic access path.
   - Context: [[smp-platform]]
@@ -545,9 +561,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 ### Job Search
 
 - [x] Replace the blocked LinkedIn file-upload workflow with the current human-in-the-loop HiringCafe and employer-portal flow.
-  - Closure: On July 31 the scheduled LinkedIn automation was deleted, HiringCafe became the sole active discovery source, employer portals became the submission path, and three applications were submitted successfully.
+  - Closure: On July 31 the scheduled LinkedIn automation was deleted, HiringCafe became the global discovery source, employer portals became the submission path, and three applications were submitted successfully. TokyoDev was added on August 1 as a separate, manually initiated Japan-specific source.
   - Context: [[job-search-2026]]
-  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-07-codex-conversations.md`; `sources/codex-conversations/2026-07-08-codex-conversations.md`; `sources/codex-conversations/2026-07-09-codex-conversations.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/codex-conversations/2026-08-01-codex-conversations.md`
 
 ### APAC TSDB Scraper
 

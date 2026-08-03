@@ -71,6 +71,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - A July 28 inactivity audit found `wow-infra` and `wow-scripts-import-xlsx` ready for migration, and `wow-okta-scripts` ready with the caveat of stale PR 6422. `wow-app` and `wow-backend` were active that day and should be rechecked on 2026-08-11 if no newer activity occurs.
 - The DeCliC sharing note's `custom orchestrator agent` was a proposed generic abstraction, not an existing named agent.
 - The July 29 SMP retro projected roughly a 15% budget overshoot, around EUR 5,900, driven by added scope including Japan look-back work. The agreed default was to keep Brian full-time through August and reduce capacity only if the client rejects the scope-based explanation.
+- A July 31 standup says Francois sent a request covering a 15% current-sprint increase plus a time-and-materials provision from mid-August to the first steering committee. A steering-committee preparation meeting with Bong was brought forward because of upcoming holidays.
+- The same day, the team flagged gaps in the Data Type 3 inventory—especially provider and update-frequency details not visible in the dashboard—and offered to help Adrian, Louis, and Carlos complete it.
 - The same retro recommended stopping speculative scope discovery while budget is tight and waiting for explicit user pain before investing.
 - Brian's Atlassian blocker is an identity collision rather than missing product entitlement. The inaccessible `brian.peralta@engie.com` account already owns the target email and is protected by unavailable MFA/recovery credentials, while the previously usable Tractebel account lost service access after migration. An administrator must reset/recover the ENGIE account or free its email by changing or deleting that account.
 
@@ -135,5 +137,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-07-29-codex-conversations.md`
 - `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+- `sources/meetings/2026-07-31-0945-granola-am-standup.md`
+- `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 
-Last Updated: 2026-07-30
+Last Updated: 2026-08-03

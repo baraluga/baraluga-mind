@@ -1,0 +1,1696 @@
+# Codex Conversations - 2026-08-01
+
+## Capture Summary
+
+Source type: mixed capture / Codex conversation export.
+
+This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.
+
+Facts:
+- Capture date: `2026-08-01`
+- Generated from local session directory: `/Users/qn5792/.codex/sessions/2026/08/01`
+- Sessions found: 6
+
+Inferences:
+- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.
+
+## Preliminary Ingest Notes
+
+- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.
+- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.
+- Move this file together with the paired `2026-08-01-codex-conversations.md` index during ingest.
+- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.
+
+## Thread Index
+
+| Thread | Session | Started | Updated | Messages | CWD | Raw File |
+| --- | --- | --- | --- | ---: | --- | --- |
+| Daily Codex Conversation Capture | `019fb8f1-0ca3-7fa3-91c9-bd10276eeacf` | `2026-07-31T16:10:33.113Z` | `2026-07-31T16:10:35.273834Z` | 8 user / 32 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-10-33-019fb8f1-0ca3-7fa3-91c9-bd10276eeacf.jsonl` |
+| Complete AllView Culture Index | `019fb907-a7c4-7ce0-a2be-41406bf2f469` | `2026-07-31T16:35:14.501Z` | `2026-07-31T16:35:53.005284Z` | 3 user / 4 assistant | `/Users/qn5792/Desktop/Greenfield 2026` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-35-14-019fb907-a7c4-7ce0-a2be-41406bf2f469.jsonl` |
+| Refactor job scraper adapters | `019fb912-10f9-79d3-8abf-d525b747880c` | `2026-07-31T16:46:36.793Z` | `2026-07-31T16:46:46.706423Z` | 2 user / 9 assistant | `/Users/qn5792/Documents/Codex/2026-08-01/refactor-brian-s-local-job-search` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-46-36-019fb912-10f9-79d3-8abf-d525b747880c.jsonl` |
+| Add TokyoDev source adapter | `019fb91c-48cb-7211-8270-f12a739e7d29` | `2026-07-31T16:57:46.443Z` | `2026-07-31T16:57:55.488267Z` | 2 user / 11 assistant | `/Users/qn5792/Documents/Codex/2026-08-01/implement-tokyodev-as-the-second-source` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-57-46-019fb91c-48cb-7211-8270-f12a739e7d29.jsonl` |
+| Daily Granola Meeting Notes Capture | `019fbdd7-0156-7f41-88c8-b1cedf542861` | `2026-08-01T15:00:13.020Z` | `2026-08-01T15:00:14.976055Z` | 2 user / 6 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T23-00-13-019fbdd7-0156-7f41-88c8-b1cedf542861.jsonl` |
+| Daily GitHub Copilot Conversation Capture | `019fbdd7-eaf8-7150-9b93-fa41873cbe2a` | `2026-08-01T15:01:12.185Z` | `2026-08-01T15:01:14.093191Z` | 2 user / 9 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T23-01-12-019fbdd7-eaf8-7150-9b93-fa41873cbe2a.jsonl` |
+
+## Transcript
+
+## Daily Codex Conversation Capture
+
+- Session: `019fb8f1-0ca3-7fa3-91c9-bd10276eeacf`
+- Started: `2026-07-31T16:10:33.113Z`
+- Updated: `2026-07-31T16:10:35.273834Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-10-33-019fb8f1-0ca3-7fa3-91c9-bd10276eeacf.jsonl`
+
+### User - 2026-07-31T16:10:38.214Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-07-31T16:10:38.267Z
+
+Automation: Daily Codex Conversation Capture
+Automation ID: daily-codex-conversation-capture
+Automation memory: $CODEX_HOME/automations/daily-codex-conversation-capture/memory.md
+Last run: 2026-07-30T16:11:52.564Z (1785427912564)
+
+You are running Brian's daily Codex conversation capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export the complete previous Asia/Manila calendar day's local Codex conversations into the Baraluga Mind `inbox/` folder as an Obsidian-safe Markdown index paired with a complete raw text transcript.
+- Preserve the source conversation material without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine yesterday's calendar date in `Asia/Manila` as `YYYY-MM-DD`.
+3. Run `/Users/qn5792/baraluga-mind/scripts/export-codex-conversations.py --date YYYY-MM-DD --timezone Asia/Manila` from `/Users/qn5792/baraluga-mind`, substituting the date determined in step 2.
+4. Verify that both `inbox/YYYY-MM-DD-codex-conversations.md` and `inbox/YYYY-MM-DD-codex-conversations.txt` exist for that previous date.
+5. Confirm that the Markdown index does not embed a `## Transcript` section and that the complete filtered user/assistant transcript is present in the paired text file.
+6. Report both output paths, the session count printed by the script, and any errors.
+
+Rules:
+- Keep raw transcripts as `.txt`; do not rename them to `.md` because oversized Markdown transcripts can crash Obsidian during indexing.
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw Codex session files.
+- If the script fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-07-31T16:10:49.415Z
+
+I’ll run the scheduled capture exactly as an export-only task: read the repo instructions and automation memory, compute the Asia/Manila previous date, run the exporter, then verify the paired files without ingesting them.
+
+### Assistant - 2026-07-31T16:11:03.420Z
+
+The root instructions match the export-only objective: preserve the capture, do not ingest, and leave wiki/actions/source folders alone. There is no existing automation memory file, so this run starts without prior local notes.
+
+### Assistant - 2026-07-31T16:11:38.523Z
+
+The broad nested-instruction scan is taking too long from the parent directory, so I’m stopping that scan and switching to a scoped `rg` search inside the workspace. That keeps the verification bounded to the files this task will touch.
+
+### Assistant - 2026-07-31T16:11:48.474Z
+
+Yesterday in Asia/Manila resolves to `2026-07-31`. There is a nested `inbox/AGENTS.md`, so I’m reading that before writing the capture files there.
+
+### Assistant - 2026-07-31T16:11:53.592Z
+
+The nested inbox rules are for live daily notes; this task is exporting a paired Markdown index and raw `.txt` transcript, so I’ll keep it as raw capture and avoid touching the daily-note/task workflow.
+
+### Assistant - 2026-07-31T16:12:04.870Z
+
+The exporter failed before writing because the local script does not accept the requested `--timezone Asia/Manila` argument. Per the automation rule, I’m leaving existing inbox files untouched and only checking/reporting the expected output state.
+
+### Assistant - 2026-07-31T16:12:12.254Z
+
+Verification confirms neither expected `2026-07-31` Codex capture file exists, and there are no changes under `inbox/`, `actions.md`, `wiki/`, or `sources/` from this failed run. I’m recording that in the automation memory now.
+
+### Assistant - 2026-07-31T16:12:20.036Z
+
+`$CODEX_HOME` is not resolving in the shell environment, so the first memory write tried `/automations/...` and was rejected. I’m locating the Codex home path explicitly before writing the automation memory.
+
+### Assistant - 2026-07-31T16:12:23.124Z
+
+The effective Codex home is `/Users/qn5792/.codex`; I’ll use that for the automation memory path since the environment variable itself is empty in this shell.
+
+### Assistant - 2026-07-31T16:12:40.111Z
+
+Capture failed before export.
+
+The computed Asia/Manila previous date was `2026-07-31`. I ran:
+
+```sh
+scripts/export-codex-conversations.py --date 2026-07-31 --timezone Asia/Manila
+```
+
+The script exited with code `2` because it does not recognize `--timezone Asia/Manila`. It printed no session count.
+
+Expected outputs were not created:
+
+- [`/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.md)
+- [`/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.txt`](/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.txt)
+
+I left existing inbox files untouched and did not ingest anything into wiki pages, `actions.md`, or `sources/`. I also recorded the failure in [`/Users/qn5792/.codex/automations/daily-codex-conversation-capture/memory.md`](/Users/qn5792/.codex/automations/daily-codex-conversation-capture/memory.md).
+
+::inbox-item{title="Codex capture blocked" summary="Exporter rejects timezone argument; no files created"}
+
+### User - 2026-07-31T17:20:35.793Z
+
+<environment_context>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root><root>/Users/qn5792/.codex/visualizations/2026/07/31/019fb8f1-0ca3-7fa3-91c9-bd10276eeacf</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-07-31T17:20:35.846Z
+
+is this going to be a problem for us moving fwd? Do we have to fix this or 'tis a one time thing?
+
+### Assistant - 2026-07-31T17:20:44.265Z
+
+I’ll check the exporter’s actual argument handling before calling this one way or the other. The key question is whether the automation prompt drifted from the script interface, or whether the script recently regressed.
+
+### Assistant - 2026-07-31T17:20:51.246Z
+
+The script already writes the intended split index plus `.txt` transcript; the breakage is specifically the automation invoking a flag the script never implemented. I’m checking the bottom of the script now to confirm whether timezone is handled implicitly or absent.
+
+### Assistant - 2026-07-31T17:21:03.323Z
+
+This is not a one-off caused by missing session data. As written, the scheduled command will fail every run because `argparse` exits before any export whenever `--timezone` is passed.
+
+### Assistant - 2026-07-31T17:21:08.993Z
+
+I’m recording the conclusion in the automation memory: the exporter itself is structurally fine for the split Markdown/text capture, but its CLI contract does not match the scheduler prompt.
+
+### Assistant - 2026-07-31T17:21:20.023Z
+
+Yes, this will be a recurring problem unless we fix either the automation command or the script.
+
+What happened: the exporter supports `--date`, `--vault`, and `--codex-home`, but the automation always calls it with `--timezone Asia/Manila`. Python exits before doing any export when it sees that unknown flag, so future scheduled runs will fail the same way.
+
+It is a small fix. Best option: update [`/Users/qn5792/baraluga-mind/scripts/export-codex-conversations.py`](/Users/qn5792/baraluga-mind/scripts/export-codex-conversations.py) to accept `--timezone`, and ideally use it for the default date calculation. That keeps the automation prompt correct and makes the script more explicit. Alternative is changing the automation to stop passing `--timezone`, but then timezone behavior stays implicit.
+
+::inbox-item{title="Codex capture needs CLI fix" summary="Timezone flag mismatch will recur until patched"}
+
+### User - 2026-07-31T17:21:52.797Z
+
+timezone will always be the same though...
+
+### Assistant - 2026-07-31T17:21:58.872Z
+
+Right, the timezone value being stable changes the shape of the fix. The bug is not timezone variability; it is that the scheduled command passes an argument the script refuses to parse.
+
+### Assistant - 2026-07-31T17:22:13.546Z
+
+That makes it simpler. We do not need dynamic timezone support.
+
+But we still need to fix the mismatch, because the script currently fails just from seeing `--timezone`. Best fix is one of these:
+
+1. Remove `--timezone Asia/Manila` from the automation command.
+2. Add a tiny compatibility flag to the script, defaulting to `Asia/Manila`, even if it does not do much.
+
+I’d pick option 2 if the automation prompt is harder to change or may be regenerated. It makes the script tolerant and future scheduled runs won’t break on the same argument.
+
+::inbox-item{title="Codex capture fix clarified" summary="Timezone is fixed; parser still needs compatibility"}
+
+### User - 2026-07-31T17:22:53.094Z
+
+nah, let's remove pls. Iterate until fixed
+
+### Assistant - 2026-07-31T17:22:56.625Z
+
+I’ll remove the bad `--timezone Asia/Manila` from the scheduled automation rather than changing the exporter. First I’m locating where this automation is defined, then I’ll run the capture again to verify it works end to end.
+
+### Assistant - 2026-07-31T17:23:07.857Z
+
+I found the automation definition. I’m updating only step 3 of its prompt, preserving the schedule, model, project, and export-only rules.
+
+### Assistant - 2026-07-31T17:23:26.590Z
+
+The automation prompt is updated in the app. Now I’m running the corrected command manually for `2026-07-31` and validating the two output files so we know the next scheduled run has the right shape.
+
+### Assistant - 2026-07-31T17:23:36.687Z
+
+The corrected command succeeded and exported 19 sessions. I’m doing the content checks now: index stays lightweight, transcript lives in the `.txt`, and no unintended wiki/actions/source edits appeared.
+
+### Assistant - 2026-07-31T17:23:40.299Z
+
+The verification passed: Markdown index has no transcript section, the paired text file has the transcript, and `actions.md`, `wiki/`, `sources/`, and `scripts/` remain untouched. I’m recording the fix and verification in the automation memory.
+
+### Assistant - 2026-07-31T17:23:57.546Z
+
+Fixed and verified.
+
+I removed `--timezone Asia/Manila` from the `Daily Codex Conversation Capture` automation prompt, preserving the existing schedule, model, project, and export-only rules.
+
+Then I reran the corrected command:
+
+```sh
+scripts/export-codex-conversations.py --date 2026-07-31
+```
+
+It succeeded with `sessions=19` and created:
+
+- [`/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.md)
+- [`/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.txt`](/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.txt)
+
+Validation passed: the Markdown index has no `## Transcript` section, and the `.txt` file contains the transcript. I did not touch `actions.md`, `wiki/`, `sources/`, or `scripts/`.
+
+::inbox-item{title="Codex capture automation fixed" summary="Timezone flag removed; export verified with 19 sessions"}
+
+### User - 2026-07-31T17:24:49.214Z
+
+Thanks. Although, I 've already ran and ingested that for today so... delete for now... OR MAYBE, double check in the sources pls.
+
+### Assistant - 2026-07-31T17:24:58.286Z
+
+I’ll check whether today’s generated Codex capture is already represented under `sources/` before deleting anything. If it is safely present there, I’ll remove only the duplicate `inbox/2026-07-31-codex-conversations.*` files.
+
+### Assistant - 2026-07-31T17:25:06.250Z
+
+There are no literal `codex-conversations` files under `sources/`, so I’m checking source contents for references to the July 31 Codex capture/session paths before deciding whether the inbox copy is redundant.
+
+### Assistant - 2026-07-31T17:25:15.995Z
+
+The source copy is present: both `sources/codex-conversations/2026-07-31-codex-conversations.md` and `.txt` exist, and `actions.md` already references that source in multiple places. I’m comparing sizes/hashes enough to confirm the inbox files are just the regenerated duplicate before removing them.
+
+### Assistant - 2026-07-31T17:25:25.659Z
+
+The source copy is not byte-identical to the regenerated inbox copy, but it is already ingested and referenced canonically from `actions.md`. The regenerated inbox files are therefore duplicate working outputs, so I’m deleting only those two inbox files now.
+
+### Assistant - 2026-07-31T17:25:35.124Z
+
+The duplicate inbox pair is gone. I’m doing one final status check and recording the cleanup in the automation memory.
+
+### Assistant - 2026-07-31T17:25:51.814Z
+
+Checked first, then deleted the duplicate.
+
+The ingested source files already exist:
+
+- [`/Users/qn5792/baraluga-mind/sources/codex-conversations/2026-07-31-codex-conversations.md`](/Users/qn5792/baraluga-mind/sources/codex-conversations/2026-07-31-codex-conversations.md)
+- [`/Users/qn5792/baraluga-mind/sources/codex-conversations/2026-07-31-codex-conversations.txt`](/Users/qn5792/baraluga-mind/sources/codex-conversations/2026-07-31-codex-conversations.txt)
+
+`actions.md` also already references the `2026-07-31` Codex source, so I removed only the regenerated inbox pair:
+
+- `/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.md`
+- `/Users/qn5792/baraluga-mind/inbox/2026-07-31-codex-conversations.txt`
+
+Final status for `inbox`, `sources/codex-conversations`, `actions.md`, `wiki`, and `scripts` is clean.
+
+::inbox-item{title="Duplicate Codex capture removed" summary="Sources already had ingested July 31 copy"}
+
+### User - 2026-07-31T17:25:58.342Z
+
+thanks. Anything to commit and push?
+
+### Assistant - 2026-07-31T17:26:05.924Z
+
+I’ll check the repo status directly. The automation memory lives under `~/.codex`, so I’ll separate that from anything commit-worthy in Baraluga Mind.
+
+### Assistant - 2026-07-31T17:26:09.232Z
+
+The Baraluga Mind repo is clean and `main` is even with `origin/main`. The only files changed during this exchange were Codex automation state/memory under `~/.codex`, which is not a git repo.
+
+### Assistant - 2026-07-31T17:26:19.868Z
+
+Nothing to commit or push in Baraluga Mind.
+
+`/Users/qn5792/baraluga-mind` is clean, and `main` is even with `origin/main`. The automation changes were saved in Codex app state under `/Users/qn5792/.codex`, which is not a git repo.
+
+::inbox-item{title="No commit needed" summary="Baraluga Mind clean and synced with origin"}
+
+## Complete AllView Culture Index
+
+- Session: `019fb907-a7c4-7ce0-a2be-41406bf2f469`
+- Started: `2026-07-31T16:35:14.501Z`
+- Updated: `2026-07-31T16:35:53.005284Z`
+- CWD: `/Users/qn5792/Desktop/Greenfield 2026`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-35-14-019fb907-a7c4-7ce0-a2be-41406bf2f469.jsonl`
+
+### User - 2026-07-31T16:35:47.212Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/Desktop/Greenfield 2026
+
+<INSTRUCTIONS>
+# Job Search Workspace — Brian
+
+This file is the single source of truth for Brian's job-search workflow. Other README or legacy instruction files must point here instead of repeating these rules.
+
+## Working Principle
+
+This is a human-in-the-loop application workflow, initiated by Brian.
+
+- Never run unattended or scheduled job searches.
+- HiringCafe is the sole active job-discovery source until Brian explicitly changes this direction.
+- Do not browse LinkedIn, general job boards, specialist boards, recruiter feeds, or search engines for new leads.
+- Brian starts a HiringCafe search explicitly, or starts an application by sharing or opening a HiringCafe posting.
+- Employer career sites and applicant-tracking portals may be used only to verify and submit a role discovered through HiringCafe. They are submission destinations, not parallel discovery sources.
+- The LinkedIn URL in Brian's verified profile is contact information only; it does not authorize LinkedIn job discovery.
+- Treat that action as an instruction to apply, subject to the checks below.
+- Complete everything supported by verified information.
+- Collect uncertain, subjective, or sensitive questions into one compact batch and ask Brian.
+- After Brian resolves the questions, continue and submit automatically. Do not ask for another final confirmation.
+- Never fabricate experience, qualifications, dates, compensation, or personal information.
+
+## Before Applying
+
+Read the posting and show Brian only:
+
+1. **What the job would feel like** — a concrete, concise description of the day-to-day work and expectations.
+2. **Recommendation** — apply or skip, with a brief rationale.
+
+Assess detailed matches and gaps internally. Save them for interview preparation rather than presenting a scoring table upfront.
+
+If the recommendation is to skip for a judgment-based reason, pause for Brian's decision. Hard-filter failures below are automatic no-go decisions.
+
+## HiringCafe Discovery
+
+Use `tools/hiring-cafe-job-scraper/greenfield_scraper.py` for every requested search. Do not use the repository's original API-based scraper; those endpoints are retired.
+
+- Keep searches bounded and initiated by Brian. Never schedule or continuously poll HiringCafe.
+- Search the primary role families first: staff/principal platform engineering, developer experience, engineering productivity, internal developer platforms, data-platform technical leadership, platform product engineering, and workflow automation.
+- Search AI enablement, agentic developer tooling, forward-deployed engineering, customer engineering, and hands-on solutions engineering as secondary families.
+- Treat `AI Solutions Engineer` as a secondary title, not the anchor. Prefer it only when the role owns discovery and implementation; deprioritize pre-sales, quota support, demo-heavy work, and CRM configuration.
+- Default to remote roles that explicitly include the Philippines, Asia/APAC, worldwide, or another clearly compatible hiring region.
+- Do not entertain postings older than 30 days. A listing marked `1mo` is acceptable; `5w`, `31d`, `2mo`, or older is not. If the posting age is unavailable, verify freshness on the employer portal before recommending it.
+- Deduplicate against `application-tracker.xlsx`, the legacy `application-tracker.md`, and matching descriptions in `jd-archive/` before reviewing a role.
+- Apply the compensation, schedule, and onsite hard filters before recommending a role.
+- Inspect the full HiringCafe description before treating a card as viable. Summary cards alone are insufficient because schedule and regional restrictions may appear only in the full posting.
+- Verify that the employer portal is still accepting applications. Reject filled, closed, expired, generic talent-pool, and expression-of-interest listings that do not represent a current opening.
+- Reject roles whose mandatory work authorization, citizenship, security clearance, or language requirements Brian cannot satisfy. Do not infer eligibility when the wording is unclear.
+- Present only the strongest viable results. Do not turn the search into a large undifferentiated job dump.
+- After a role passes review, follow its employer-site link for definitive verification and submission.
+
+## Hard Filters
+
+### Compensation
+
+- If compensation is stated in Philippine pesos, PHP 220,000 per month is a hard floor. Do not apply when the top of the stated range is below it.
+- If compensation is stated in another currency, pause and discuss it with Brian before proceeding.
+- If no compensation is stated, proceed.
+- When an expected-salary field requires an answer and the role has no stated salary, use PHP 220,000 per month or the form's equivalent period.
+- Never disclose Brian's current salary. If a required field cannot be left blank or answered with a non-disclosure response, ask Brian.
+
+### Schedule
+
+- Do not apply when the role's primary working hours begin after 10:00 PM Manila time.
+- If late-night overlap or the schedule is ambiguous, pause and ask Brian.
+
+### Onsite Work
+
+- If a specific onsite frequency is stated, do not apply when it exceeds one day per week.
+- One required onsite day per week or less is acceptable.
+- If a role only says "hybrid" without specifying the number of days, proceed and flag it for later verification.
+
+## Application Workflow
+
+### 1. Capture the Posting
+
+- Read the posting from the provided link or the internal browser.
+- Save the verbatim job-description text to `jd-archive/[Company]_jd.txt`.
+- Do not clean up, summarize, or reformat the archived copy.
+
+### 2. Prepare the Resume
+
+- Always read `resumes/base-resume.docx`; it is the read-only master.
+- Create `resumes/[Company]_resume.docx`.
+- Preserve the base resume's section order, job order, styles, typography, and layout.
+- The professional summary and experience bullets may be rewritten or reordered to emphasize truthful, relevant evidence.
+- Do not add unsupported skills or experience.
+- Render and visually verify the finished document before using it.
+
+### 3. Decide Whether a Cover Letter Helps
+
+Create `cover-letters/[Company]_cover.docx` only when:
+
+- the application requires one; or
+- it materially strengthens the application by explaining motivation, a career shift, or an interesting stretch.
+
+Use the files in `writing-samples/` as the voice authority. Use only a small number of strong prior cover letters as relevant examples; do not read every generated letter by default.
+
+Cover letters must be concise, direct, and specific. Use no more than two paragraphs, avoid corporate filler, and vary the evidence according to the role instead of automatically repeating the same flagship stories.
+
+### 4. Complete the Application
+
+- Use the internal browser and Brian's verified profile below.
+- Fill every field whose answer is supported by the profile, base resume, archived facts, or Brian's prior explicit answers.
+- Do not guess at subjective screening questions, unfamiliar technology durations, legal attestations, availability exceptions, compensation in foreign currencies, or other uncertain information.
+- Finish all certain fields first, then ask all unresolved questions in one compact batch.
+- After Brian answers, continue and submit without asking for a separate final confirmation.
+- Stop for CAPTCHAs, bot checks, inaccessible portals, or technical blockers that cannot be safely resolved.
+
+### 5. Track the Result
+
+`application-tracker.xlsx` is the active tracker.
+
+- Add `Applied` only after submission is confirmed.
+- If an application worth pursuing cannot be completed, add `Needs Action` with the exact blocker, job link, portal link when available, and next action.
+- Do not add roles that were reviewed and skipped.
+- Keep detailed screening answers and useful follow-ups in the Notes field.
+
+### 6. Report Back
+
+Tell Brian:
+
+- whether submission was confirmed;
+- which resume and optional cover letter were used;
+- any answers supplied during the application that are worth remembering; and
+- any remaining action or verification needed.
+
+## Brian's Current Direction
+
+Brian's current role thesis is **staff-level platform, automation, and developer-experience engineering with strong stakeholder proximity**. AI is a delivery multiplier within this profile, not the entire professional identity.
+
+Prioritize work that combines several of these qualities:
+
+- staff/principal-level ownership of ambiguous, meaningful technical problems
+- platform engineering, developer experience, engineering productivity, data platforms, or workflow automation
+- direct stakeholder, customer, or end-user proximity
+- hands-on architecture and implementation across product, data, infrastructure, and delivery boundaries
+- turning one-off solutions into reusable platforms, contracts, controls, tooling, and paved paths
+- technical enablement, adoption, mentoring, governance, or engineering-culture influence
+- AI-enabled delivery, agent supervision, agentic tooling, or developer AI enablement
+- TypeScript, Python, Node.js, APIs, data platforms, and cloud integration
+
+Strong target titles include Staff Software Engineer, Staff/Principal Platform Engineer, Technical Lead for a data or developer platform, Engineering Productivity Engineer, Platform Product Engineer, AI Enablement Engineer, and hands-on Forward Deployed Engineer.
+
+Framework gaps matter less than engineering fundamentals, AI-tooling fluency, ownership, and the actual mandate. Pure frontend roles are lower priority. Also deprioritize model-training/ML-research roles, isolated operations-only SRE work, formal people-management roles that require established direct-report experience, and implementation roles where architecture and stakeholder ownership sit elsewhere.
+
+Customer engineering, forward-deployed engineering, or solutions roles remain compelling when Brian is expected to discover the problem and build the solution. Avoid versions centered on pre-sales demonstrations, quota support, or configuration work.
+
+Brian is happy at Engie and is searching opportunistically. A role should be either genuinely desirable or genuinely interesting—not merely possible to apply for.
+
+Travel is not a constraint. Full-time employment, part-time employment, fixed-term work, contract work, and independent-contractor arrangements are all acceptable. Do not penalize or filter a role based on travel or employment type; assess the actual mandate, compensation, schedule, eligibility, and terms instead.
+
+## Verified Profile
+
+- **Full name:** Brian Alexander Peralta
+- **Email:** baperaltaa@gmail.com
+- **Phone:** +63 9175789747
+- **Location:** Metro Manila, Philippines
+- **LinkedIn:** https://www.linkedin.com/in/baraluga
+- **Notice period / availability:** 1 month
+- **Expected salary when required and no range is stated:** PHP 220,000/month
+- **Work authorization:** Philippine citizen; eligible to work in the Philippines and remotely for international employers; open to relocation
+
+Never infer a different legal, visa, relocation, or employment status from the line above. Ask Brian when a form's wording requires a more specific answer.
+
+## Document Voice
+
+Brian's writing is declarative, direct, and action-oriented. It mixes concise statements with longer explanations, uses plain language, and avoids hedging or corporate filler.
+
+Avoid phrases such as:
+
+- "I am passionate about"
+- "utilize"
+- "synergy"
+- "leverage"
+- "I am a fast learner"
+
+Use analogies or blunt phrasing only when they genuinely improve the application. A cover letter should sound like Brian, not like a caricature assembled from his strongest writing habits.
+
+## Interview Preparation
+
+Create interview-prep material only when Brian has a foot in the door or explicitly asks for it. At that stage, surface detailed matches, gaps, likely questions, honest gap answers, company motivation, logistics, and questions Brian should ask.
+
+Follow `interview-prep/README.md` for the document format.
+
+## Workspace Files
+
+```
+Greenfield 2026/
+├── AGENTS.md                    # Single source of truth
+├── application-tracker.xlsx    # Active application tracker
+├── application-tracker.md      # Legacy tracker archive
+├── resumes/
+│   └── base-resume.docx        # Read-only master resume
+├── cover-letters/
+├── writing-samples/
+├── interview-prep/
+├── job-descriptions/
+├── jd-archive/
+└── tools/
+    └── hiring-cafe-job-scraper/ # Sole active discovery tool
+```
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/Desktop/Greenfield 2026</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/Desktop/Greenfield 2026</root><root>/Users/qn5792/.codex/visualizations/2026/07/31/019fb907-a7c4-7ce0-a2be-41406bf2f469</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-07-31T16:35:47.264Z
+
+AllView responded agad!
+
+Brian ,
+
+We are excited to move forward with your candidacy at AllView Real Estate for the Director of AI & Systems Architecture position! As the next step in our process, please complete the **Culture Index survey** using the link below:
+ 
+[https://go.cultureindex.com/p/074D8QEoHaDaGHb](https://go.cultureindex.com/p/074D8QEoHaDaGHb)
+ 
+This helps us better understand your strengths and working style. The survey takes about 10–15 minutes to complete. Please kindly complete the Culture Index assessment within 1–2 business days of receiving this link. If you need additional time, we are happy to accommodate, just reach out and let us know. Please note that candidates who do not complete this step or request an extension within that timeframe will be considered non-responsive.
+ 
+Thank you, and we look forward to reviewing your results soon.
+ 
+Thank you,
+All View Real Estate Recruiting Team
+
+-- fill in for me pls. Just confirm w me what you inputted before submitting
+
+### Assistant - 2026-07-31T16:35:56.015Z
+
+I’ll open the Culture Index survey, fill any factual fields, and work through the assessment based on your established working style. I’ll stop before submission and show you exactly what I selected so you can confirm. I’m using the in-app browser skill because this depends on an interactive form.
+
+### Assistant - 2026-07-31T16:37:38.800Z
+
+I’ve filled:
+
+- Name: Brian Alexander Peralta
+- Email: baperaltaa@gmail.com
+- Phone: +63 917 578 9747
+- Language: English
+
+The form requires your birth month and day before the assessment begins. What are they?
+
+### User - 2026-07-31T16:39:20.283Z
+
+Ah it's an assessment. K. I'll do it tomorrow nalang lol
+
+### Assistant - 2026-07-31T16:39:29.201Z
+
+Yep—this one is a genuine self-assessment, so it’s better answered by you. I’ll leave the partially filled survey open for tomorrow; nothing has been submitted.
+
+### Assistant - 2026-07-31T16:39:34.416Z
+
+Makes sense 😄 Nothing was submitted. The survey link is reusable tomorrow, though the partially filled contact details may need re-entering.
+
+## Refactor job scraper adapters
+
+- Session: `019fb912-10f9-79d3-8abf-d525b747880c`
+- Started: `2026-07-31T16:46:36.793Z`
+- Updated: `2026-07-31T16:46:46.706423Z`
+- CWD: `/Users/qn5792/Documents/Codex/2026-08-01/refactor-brian-s-local-job-search`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-46-36-019fb912-10f9-79d3-8abf-d525b747880c.jsonl`
+
+### User - 2026-07-31T16:46:41.419Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+<environment_context>
+  <cwd>/Users/qn5792/Documents/Codex/2026-08-01/refactor-brian-s-local-job-search</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/Documents/Codex</root><root>/Users/qn5792/Documents/Codex/2026-08-01/refactor-brian-s-local-job-search</root><root>/Users/qn5792/.codex/visualizations/2026/07/31/019fb912-10f9-79d3-8abf-d525b747880c</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-07-31T16:46:41.471Z
+
+<codex_delegation>
+  <source_thread_id>019fb8ce-e8e5-7121-8c3a-372bdb210e8f</source_thread_id>
+  <input>Refactor Brian's local job-search scraper into a clean source-adapter architecture using targeted TDD.
+
+Delegation ID: GFREF-0801-X7K2
+Origin task: threadId=019fb8ce-e8e5-7121-8c3a-372bdb210e8f, hostId=local
+Workspace to modify: /Users/qn5792/Desktop/Greenfield 2026
+Primary current implementation: /Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper/greenfield_scraper.py
+Repository/workspace instructions: read and obey /Users/qn5792/Desktop/Greenfield 2026/AGENTS.md before changing anything.
+
+Requested terminal outcome:
+1. Refactor the existing HiringCafe implementation so source-specific fetching/parsing is separated from reusable job normalization, screening, ranking, tracker/archive deduplication, and CLI/output orchestration.
+2. Introduce a small, explicit normalized Job model and a source-adapter boundary suitable for a later TokyoDev adapter.
+3. Preserve the current HiringCafe CLI behavior and output compatibility unless a narrowly justified compatibility improvement is documented.
+4. Apply targeted TDD:
+   - First add characterization tests for existing HiringCafe parsing and CLI/screening behavior using local deterministic fixtures.
+   - Add contract-focused tests for normalization, freshness, compensation, schedule filtering, scoring, tracker/archive deduplication, and adapter output.
+   - Do not over-test BeautifulSoup internals, exact implementation details, or every CSS selector.
+   - No live-network dependency in the automated test suite.
+5. Convert HiringCafe into the first concrete adapter. Do NOT implement the TokyoDev scraper in this task; only leave the architecture ready for it.
+6. Update relevant local documentation and dependency/test setup only as needed.
+7. Run the focused test suite and a proportionate compatibility smoke check. Report exact commands/results.
+8. Inspect the existing worktree first and preserve unrelated user changes. Do not commit, push, create a PR, install a plugin, schedule searches, or perform any job discovery/application work.
+
+Expected evidence:
+- Concise architecture summary.
+- List of modified/created files using absolute paths.
+- Tests and smoke checks with results.
+- Any compatibility risks, intentionally deferred work, or recommended next action (expected next action: implement TokyoDev as the second adapter).
+
+Handoff protocol:
+- Keep ordinary progress updates inside this worker task.
+- If new user input or authority is required, immediately call send_message_to_thread for the origin above with delegation ID GFREF-0801-X7K2, status needs_input, and the exact question.
+- When the work reaches a terminal state, call send_message_to_thread exactly once for the origin above. Send a concise, self-contained message containing: delegation ID GFREF-0801-X7K2; status completed, blocked, or failed; the result; artifact paths or links; test evidence; and the recommended next action.
+- Do not archive this worker task.</input>
+</codex_delegation>
+
+### Assistant - 2026-07-31T16:46:45.338Z
+
+I’ll first inspect the repository instructions and current worktree, then map the existing scraper and tests before making changes. I’ll preserve unrelated edits and keep all automated checks local and network-free.
+
+### Assistant - 2026-07-31T16:46:55.146Z
+
+The workspace instructions confirm this is a refactor-only task: HiringCafe remains the sole active source, and no discovery or application activity is authorized. The workspace root itself is not a Git repository, so I’m locating the actual repository boundary and reading the scraper’s local structure before touching files.
+
+### Assistant - 2026-07-31T16:47:23.769Z
+
+The scraper repository already contains uncommitted user work (`greenfield_scraper.py`, `GREENFIELD.md`, plus README and ignore-file edits). I’ll build on those files without staging or altering unrelated content. I’m now adding characterization tests against the current script first, so the refactor has a concrete compatibility baseline.
+
+### Assistant - 2026-07-31T16:48:10.026Z
+
+The first baseline run found my expected score was off by two; the current implementation correctly totals 13 for that fixture (6 for internal developer platform, 2 for Python, 5 for remote). I’m correcting the characterization expectation—not the production code—then I’ll proceed from a green baseline.
+
+### Assistant - 2026-07-31T16:49:41.983Z
+
+The contract suite is now deliberately red because the new `job_search` package does not exist yet. The planned boundary is small: adapters return normalized `Job` objects; reusable screening and deduplication operate only on that model; the CLI coordinates an injected adapter and asks it to serialize source-compatible output. HiringCafe will be the first adapter, while the top-level script remains the existing entry point.
+
+### Assistant - 2026-07-31T16:52:17.810Z
+
+The reusable contracts are green, but two characterization tests still patched the old module locations. One CLI test consequently reached HiringCafe once during this intermediate run; I’m fixing the seams now so the suite is strictly local and cannot depend on network state. No job data was acted on or saved.
+
+### Assistant - 2026-07-31T16:52:43.639Z
+
+The local-only suite is green: 12 tests now cover the preserved CLI/card behavior and the new contracts for normalization, freshness, compensation, schedules, scoring, both tracker formats, archive deduplication, and adapter output. I’m doing a compatibility review now, including subtle JSON omission rules, then I’ll update the local architecture/testing notes and run final smoke checks.
+
+### Assistant - 2026-07-31T16:53:30.526Z
+
+The final review found and preserved one subtle compatibility detail: after a successful detail-page check with no schedule match, the JSON still includes `"schedule_evidence": null`, as the original did. All 13 tests pass, bytecode compilation succeeds, the help command exits cleanly, invalid `--limit 0` still exits 2 with the same message, and the diff has no whitespace errors. I’m preparing the required terminal handoff now.
+
+### Assistant - 2026-07-31T16:54:05.635Z
+
+Completed and handed back to the origin task under delegation `GFREF-0801-X7K2`.
+
+Architecture:
+
+- `HiringCafeAdapter` owns source-specific fetching, parsing, detail checks, and legacy serialization.
+- Normalized `Job` model and reusable screening, ranking, deduplication, and CLI orchestration live in `job_search/`.
+- `greenfield_scraper.py` remains the compatible entry point.
+- TokyoDev was intentionally deferred.
+
+Created or updated:
+
+- `/Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper/greenfield_scraper.py`
+- `/Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper/job_search/`
+- `/Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper/tests/`
+- `/Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper/GREENFIELD.md`
+
+Verification:
+
+- 13 deterministic tests passed.
+- Compilation check passed.
+- CLI help smoke check passed.
+- Invalid `--limit 0` behavior remains exit code 2.
+- `git diff --check` passed.
+- No commit, push, PR, plugin installation, job discovery, or application work performed.
+
+Recommended next action: implement TokyoDev as the second `JobSourceAdapter`.
+
+## Add TokyoDev source adapter
+
+- Session: `019fb91c-48cb-7211-8270-f12a739e7d29`
+- Started: `2026-07-31T16:57:46.443Z`
+- Updated: `2026-07-31T16:57:55.488267Z`
+- CWD: `/Users/qn5792/Documents/Codex/2026-08-01/implement-tokyodev-as-the-second-source`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T00-57-46-019fb91c-48cb-7211-8270-f12a739e7d29.jsonl`
+
+### User - 2026-07-31T16:57:51.210Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+<environment_context>
+  <cwd>/Users/qn5792/Documents/Codex/2026-08-01/implement-tokyodev-as-the-second-source</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/Documents/Codex</root><root>/Users/qn5792/Documents/Codex/2026-08-01/implement-tokyodev-as-the-second-source</root><root>/Users/qn5792/.codex/visualizations/2026/07/31/019fb91c-48cb-7211-8270-f12a739e7d29</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-07-31T16:57:51.245Z
+
+<codex_delegation>
+  <source_thread_id>019fb8ce-e8e5-7121-8c3a-372bdb210e8f</source_thread_id>
+  <input>Implement TokyoDev as the second source adapter in Brian's refactored local job-search tooling.
+
+Delegation ID: GFTOKYO-0801-P4M7
+Origin task: threadId=019fb8ce-e8e5-7121-8c3a-372bdb210e8f, hostId=local
+Workspace to modify: /Users/qn5792/Desktop/Greenfield 2026
+Scraper repository: /Users/qn5792/Desktop/Greenfield 2026/tools/hiring-cafe-job-scraper
+Relevant current architecture:
+- job_search/adapters.py
+- job_search/models.py
+- job_search/hiringcafe.py
+- job_search/screening.py
+- job_search/deduplication.py
+- job_search/cli.py
+- greenfield_scraper.py
+- tests/
+Repository/workspace instructions: read and obey /Users/qn5792/Desktop/Greenfield 2026/AGENTS.md before changing anything.
+
+User authorization and direction:
+- Brian explicitly authorizes adding TokyoDev as a Japan-focused discovery source.
+- Keep all searches bounded, manually initiated, and human-in-the-loop. Never schedule or continuously poll.
+- HiringCafe remains the global discovery source. TokyoDev becomes the Japan-specific source.
+- LinkedIn is out of scope for this task.
+- Do not apply to any job or alter trackers/JD archives as part of implementation or smoke testing.
+
+Known official-site research (verify safely if implementation needs it):
+- Public index: https://www.tokyodev.com/jobs
+- robots.txt currently allows public crawling except /c/, /frames/, /ja/frames/.
+- The jobs page is server-rendered Rails HTML and recently exposed the complete current inventory in semantic links shaped like /companies/{company}/jobs/{slug}.
+- Detail pages expose posting date, annual JPY compensation, Japanese/English requirements, resident/apply-from-abroad status, remote policy, seniority, years of experience, description, requirements, and application route.
+- “Fully remote” can still mean remote within Japan; do not treat it as permission to work from the Philippines.
+- Example structure previously inspected: https://www.tokyodev.com/companies/moneyforward/jobs/principal-engineer-developer-productivity-cto-office-tokyo
+
+Requested terminal outcome:
+1. Implement a TokyoDevAdapter using the existing JobSourceAdapter boundary and shared screening/ranking/deduplication pipeline.
+2. Add a clear user-facing CLI entry point for bounded TokyoDev searches while leaving greenfield_scraper.py/HiringCafe compatibility intact. Choose the smallest coherent interface (for example tokyodev_scraper.py or a well-tested unified source selection) and document it.
+3. Extend the normalized model and common policy only where genuinely source-neutral. TokyoDev-specific parsing stays in its adapter.
+4. Normalize and preserve at least:
+   - source URL and application URL when obtainable
+   - title, company, location, workplace/remote policy, commitment
+   - absolute posting date/freshness
+   - annual JPY compensation
+   - Japanese and English requirements
+   - apply-from-abroad versus Japan-residents-only eligibility
+   - relocation/visa signal when present
+   - seniority/experience, specialties/tags, description/requirements
+5. Brian eligibility/policy:
+   - Reject Japan-residents-only roles.
+   - Reject roles requiring Japanese unless explicitly marked no Japanese required. Brian's verified profile does not claim Japanese proficiency; never infer it.
+   - Require an explicit apply-from-abroad/overseas eligibility signal for recommendations.
+   - Do not conflate Japan-remote with Philippines-remote.
+   - Enforce the existing &lt;=30-day freshness rule using absolute TokyoDev dates.
+   - Foreign-currency compensation must be retained and flagged for discussion; do not silently compare JPY with the PHP floor.
+   - Continue shared duplicate checks against trackers and jd-archive.
+   - Preserve Brian's current staff/platform/DevEx/automation/stakeholder-facing ranking thesis.
+6. Use targeted TDD:
+   - Add deterministic local index and detail fixtures.
+   - Add adapter contract/characterization tests for index enumeration, detail parsing, local query matching, eligibility/language/remote semantics, absolute-date freshness, foreign salary handling, serialization, and the CLI.
+   - No live network dependency in automated tests.
+   - Do not test BeautifulSoup internals or freeze every selector.
+7. Perform a bounded live smoke check after deterministic tests pass. Make only a small number of polite public GET requests with an identifying personal-tool User-Agent and no authentication/bypass. Verify parsing against current TokyoDev HTML, but do not apply, save jobs, write tracker entries, or turn the smoke output into a recommendation list.
+8. Update /Users/qn5792/Desktop/Greenfield 2026/AGENTS.md minimally so it no longer falsely says HiringCafe is the sole active source: document HiringCafe as global and TokyoDev as Japan-specific, both manually initiated. Preserve all other job-search constraints.
+9. Update relevant scraper documentation.
+10. Inspect the existing dirty worktree first and preserve all unrelated user/delegated changes. Do not commit, push, create a PR, create a skill, install a plugin, or schedule searches.
+
+Expected evidence:
+- Concise design and behavior summary.
+- Absolute paths for modified/created files.
+- Exact deterministic test commands/results.
+- Exact bounded live-smoke command/result and request count.
+- Confirmation that HiringCafe tests/CLI remain compatible.
+- Known limitations, source fragility, and recommended next action (likely run an explicitly requested Brian-profile TokyoDev search and manually validate the top 2–3 results before considering a skill).
+
+Handoff protocol:
+- Keep ordinary progress updates inside this worker task.
+- If new user input or authority is required, immediately call send_message_to_thread for the origin above with delegation ID GFTOKYO-0801-P4M7, status needs_input, and the exact question.
+- When work reaches a terminal state, call send_message_to_thread exactly once for the origin above. Send a concise, self-contained message containing delegation ID GFTOKYO-0801-P4M7; status completed, blocked, or failed; result; artifact paths/links; test and smoke evidence; known limitations; and recommended next action.
+- Do not archive this worker task.</input>
+</codex_delegation>
+
+### Assistant - 2026-07-31T16:57:55.253Z
+
+I’ll first inspect the repository instructions and dirty worktree, then map the existing adapter, model, policy, CLI, and tests before making scoped changes. I’ll preserve unrelated work and keep all TokyoDev validation bounded and read-only.
+
+### Assistant - 2026-07-31T16:58:02.900Z
+
+The workspace instructions confirm the guardrails, and the Git repository is nested under the scraper directory. I’m now checking its existing uncommitted changes and reading the current implementation/tests so the TokyoDev work fits the refactored boundary without disturbing other edits.
+
+### Assistant - 2026-07-31T16:59:33.868Z
+
+The design keeps source-specific HTML and semantics inside a new adapter while adding only reusable normalized concepts: absolute posting date, application URL, language/overseas eligibility, currency, visa/relocation, description, seniority, and tags. The shared policy will reject residents-only, required/ambiguous Japanese where explicit clearance is required, and missing overseas eligibility; HiringCafe’s legacy output remains unchanged.
+
+### Assistant - 2026-07-31T17:05:32.355Z
+
+The first TDD pass is implemented. One intentional failure exposed that foreign-salary discussion status was only being set during screening; I moved that signal into TokyoDev parsing as well, so serialized detail records remain safe even before policy orchestration. I’m now running the complete deterministic suite, including HiringCafe characterization tests.
+
+### Assistant - 2026-07-31T17:05:42.738Z
+
+All 20 deterministic tests now pass, including the unchanged HiringCafe CLI/output contract. Per the authorization, I’m proceeding with a single bounded live smoke run: one public index request plus at most one matched detail request, using the identifying personal-tool user agent, with no authentication and no writes to trackers or archives.
+
+### Assistant - 2026-07-31T17:05:58.922Z
+
+The bounded CLI smoke completed with exactly two GETs and safely produced no recommendations: the one locally matched “platform” role was rejected by the overseas/language eligibility gate. I’m doing one final two-request parser-only verification to inspect the normalized current fields themselves; this remains read-only and will not be treated as a shortlist.
+
+### Assistant - 2026-07-31T17:06:14.638Z
+
+The parser-only check found a real source-shape issue: current TokyoDev pages expose core date/title/company correctly, but several eligibility and description fields are not in definition lists, and local index text allowed a category match (“platform”) on an SEO role. I’m inspecting that one already identified public detail page’s semantic labels, then I’ll tighten the parser and query matching and rerun deterministic tests.
+
+### Assistant - 2026-07-31T17:08:20.093Z
+
+The parser is now aligned with the current semantic shape: JSON-LD supplies absolute dates, location, description, and applicant-region scope; visible badges supply remote, language, experience, and overseas eligibility; internal `/c/...` application routes are preserved but never fetched. Broad index tags no longer satisfy local query matching. All 21 tests pass again.
+
+### Assistant - 2026-07-31T17:09:32.076Z
+
+Documentation and the workspace policy now describe HiringCafe as global and TokyoDev as Japan-specific, both manual and bounded. I also kept the HiringCafe JSON filter shape unchanged rather than adding a new shared output field, and added an explicit test proving ambiguous Japanese/overseas eligibility is rejected. Final verification is underway.
+
+### Assistant - 2026-07-31T17:10:01.969Z
+
+Implementation and verification are complete. No jobs were applied to, saved, archived, or written to either tracker; no searches were scheduled. I’m sending the required terminal handoff to the origin task now, including the exact test and live-request evidence.
+
+### Assistant - 2026-07-31T17:10:44.726Z
+
+Implemented TokyoDev as the Japan-specific second source adapter.
+
+Key results:
+
+- Added bounded `tokyodev_scraper.py` CLI and `job_search/tokyodev.py`.
+- Extended shared modeling/screening for absolute dates, JPY salary, language, overseas eligibility, remote scope, visa/relocation, and descriptions.
+- Preserved HiringCafe CLI and serialized output compatibility.
+- Updated `AGENTS.md`, `README.md`, and `GREENFIELD.md`.
+- Added deterministic TokyoDev fixtures and contract/policy/CLI tests.
+
+Verification:
+
+- `22` tests passed.
+- Compilation and `git diff --check` passed.
+- Live validation used exactly six polite public GETs total.
+- Current TokyoDev JSON-LD and badge fields parsed successfully.
+- No applications, tracker/archive writes, scheduling, commits, pushes, or PRs occurred.
+
+Known limitation: local query matching deliberately uses strict title/company terms, so several focused queries are preferable to one broad query.
+
+The completed handoff was sent to the origin task exactly once with full commands, paths, smoke evidence, and recommended next action.
+
+## Daily Granola Meeting Notes Capture
+
+- Session: `019fbdd7-0156-7f41-88c8-b1cedf542861`
+- Started: `2026-08-01T15:00:13.020Z`
+- Updated: `2026-08-01T15:00:14.976055Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T23-00-13-019fbdd7-0156-7f41-88c8-b1cedf542861.jsonl`
+
+### User - 2026-08-01T15:00:19.048Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-01T15:00:19.081Z
+
+Automation: Daily Granola Meeting Notes Capture
+Automation ID: daily-granola-meeting-notes-capture
+Automation memory: $CODEX_HOME/automations/daily-granola-meeting-notes-capture/memory.md
+Last run: 2026-07-31T15:01:32.509Z (1785510092509)
+
+You are running Brian's daily Granola meeting notes capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export today's Granola meeting notes into the Baraluga Mind `inbox/` folder as the ingestion entry point.
+- Create one markdown file per Granola meeting for the current local date in Asia/Manila.
+- Preserve the available Granola notes/summaries without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine today's local date using the runtime date in Asia/Manila.
+3. Use the Granola connector to list available meetings for `this_week`.
+4. Filter the listed meetings to meetings whose meeting date is today in Asia/Manila.
+5. For each matching meeting, retrieve the detailed Granola meeting notes/summaries. Prefer `get_meetings` by meeting ID if available; otherwise use the Granola query tool scoped to that meeting if available.
+6. Write one markdown file per meeting into `/Users/qn5792/baraluga-mind/inbox/` using this filename shape: `YYYY-MM-DD-HHMM-granola-<slug>.md`.
+7. Each file must include: title, source type `Granola meeting notes`, meeting ID, meeting date/time, known participants if available, a clear note that this is not a verbatim transcript, the discussion notes/summary, any next steps/action items present in Granola, and `Last Updated: YYYY-MM-DD`.
+8. Verify the expected inbox files exist. Report the output paths, meeting count, and any errors.
+
+Rules:
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw inputs or previous inbox captures.
+- Do not fabricate details that are not in Granola notes.
+- If a meeting has no useful notes, still write a small file for it with `UNCERTAIN:` explaining that Granola did not provide usable content.
+- If no meetings are found for today, do not write any inbox status file. Report meeting count `0` and leave existing inbox files untouched.
+- If the Granola connector fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-01T15:00:27.185Z
+
+I’ll pull the local instructions and prior automation memory first, then use the Granola connector to enumerate today’s meetings before writing any inbox captures.
+
+### Assistant - 2026-08-01T15:00:30.739Z
+
+There’s no prior memory file yet for this automation. The workspace instructions confirm this run should only preserve captures in `inbox/`, with no wiki/action/source ingest.
+
+### Assistant - 2026-08-01T15:00:36.292Z
+
+I found the Granola tools. Next I’m listing this week’s notes and filtering locally to August 1, 2026 in Asia/Manila.
+
+### Assistant - 2026-08-01T15:00:48.977Z
+
+Granola returned 11 meetings for this week, all dated July 27-31, 2026 GMT+8. None match today’s local date, August 1, 2026, so I won’t write any inbox files.
+
+### Assistant - 2026-08-01T15:00:57.463Z
+
+The capture decision is complete; I hit an environment issue while writing automation memory because `$CODEX_HOME` is unset in this shell and expanded to `/automations`. I’m writing it to the default Codex home path instead.
+
+### Assistant - 2026-08-01T15:01:07.951Z
+
+Daily Granola capture completed.
+
+Meeting count for 2026-08-01 Asia/Manila: `0`
+
+Granola returned 11 meetings for `this_week`, but all were dated 2026-07-27 through 2026-07-31 GMT+8. No inbox files were written, and existing inbox files were left untouched.
+
+Note: Granola reported that public workspace notes are excluded by the current Granola plan.
+
+::inbox-item{title="No Granola meetings today" summary="No August 1 captures were written"}
+
+## Daily GitHub Copilot Conversation Capture
+
+- Session: `019fbdd7-eaf8-7150-9b93-fa41873cbe2a`
+- Started: `2026-08-01T15:01:12.185Z`
+- Updated: `2026-08-01T15:01:14.093191Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/01/rollout-2026-08-01T23-01-12-019fbdd7-eaf8-7150-9b93-fa41873cbe2a.jsonl`
+
+### User - 2026-08-01T15:01:20.056Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Box (box@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-01</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-01T15:01:20.113Z
+
+Automation: Daily GitHub Copilot Conversation Capture
+Automation ID: daily-github-copilot-conversation-capture
+Automation memory: $CODEX_HOME/automations/daily-github-copilot-conversation-capture/memory.md
+Last run: 2026-07-31T15:01:02.511Z (1785510062511)
+
+You are running Brian's daily GitHub Copilot conversation capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export today's local GitHub Copilot conversations into the Baraluga Mind `inbox/` folder as the ingestion entry point.
+- Preserve the source conversation material without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Run `/Users/qn5792/baraluga-mind/scripts/export-copilot-conversations.py` from `/Users/qn5792/baraluga-mind`.
+3. Verify that `inbox/YYYY-MM-DD-copilot-conversations.md` exists for the current local date.
+4. Report the output path, session count if printed by the script, and any errors.
+
+Rules:
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw Copilot state files, session databases, session event logs, VS Code workspace storage, or generated inbox captures.
+- If the script fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-01T15:01:27.102Z
+
+I’ll run the capture only, keeping it out of the ingest workflow and leaving wiki/actions/source files untouched. First I’m checking the automation memory and local instructions so the run is consistent with prior captures.
+
+### Assistant - 2026-08-01T15:01:35.125Z
+
+The root instructions match the automation constraint: this is a raw capture pass, not an ingest pass. I’m checking for any nested instructions around `scripts/` or `inbox/`, then I’ll run the exporter.
+
+### Assistant - 2026-08-01T15:01:38.424Z
+
+There’s no prior memory file for this automation, and there is a nested `inbox/AGENTS.md` that applies to the generated capture. I’m reading that before writing into `inbox/`.
+
+### Assistant - 2026-08-01T15:01:44.427Z
+
+The nested inbox rules are for live daily notes; this automation’s target is a dated Copilot conversation capture, and the user rule says not to promote or ingest it. I’m running the exporter now and will verify the expected file for 2026-08-01.
+
+### Assistant - 2026-08-01T15:01:53.166Z
+
+The exporter completed successfully and printed `sessions=0`. I’m doing a quick existence check on the generated capture and then I’ll record the automation memory for this run.
+
+### Assistant - 2026-08-01T15:01:56.242Z
+
+The expected file exists at 33 lines, so the capture path is present even though no sessions were exported. I’m writing the small automation memory note now.
+
+### Assistant - 2026-08-01T15:02:04.170Z
+
+The capture itself is done. The memory write failed because `$CODEX_HOME` is unset in this shell and expanded to `/automations`; I’m resolving the actual Codex home path and writing the memory there.
+
+### Assistant - 2026-08-01T15:02:10.282Z
+
+`$CODEX_HOME` is not exported, so I’m using the standard local Codex home at `/Users/qn5792/.codex`, matching the configured skills and app context.
+
+### Assistant - 2026-08-01T15:02:21.422Z
+
+Daily Copilot capture completed.
+
+Output path: [`/Users/qn5792/baraluga-mind/inbox/2026-08-01-copilot-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-08-01-copilot-conversations.md)
+
+Script result: `sessions=0`
+
+Verification: file exists, 33 lines, 1810 bytes. No ingest was performed, and I did not edit `actions.md`, wiki pages, or `sources/`.
+
+Note: `$CODEX_HOME` was unset in the shell, so I wrote the automation memory to the standard Codex home path: [`/Users/qn5792/.codex/automations/daily-github-copilot-conversation-capture/memory.md`](/Users/qn5792/.codex/automations/daily-github-copilot-conversation-capture/memory.md)
+
+::inbox-item{title="Copilot capture completed" summary="No sessions found; inbox capture verified"}
+
+Last Updated: 2026-08-01

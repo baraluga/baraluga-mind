@@ -90,6 +90,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The July 29 sprint review preferred TSDB for Louis's programmatic access because the same client can work locally and in AWS. The team still needs to identify the required series and complete metadata/provider approvals; the India generation-data push may require a separate access call and could extend beyond the final sprint.
 - The July 30 India generation-data meeting established that the `khaba_generation` source is a CDH-managed S3 file in `ap-south-1`, refreshed roughly every 15 minutes and overwritten through the day. The intended TSDB outputs are Active Power, GHI, Module Surface Temperature, and Ambient Temperature, averaged into complete 15-minute windows. Brian confirmed `khaba_generation` as the correct durable dataset name; `Cabo Generation` in the Granola note is a transcription error.
 - `SCR-1218` proved the complete read path in both India dev and production after the `khaba_generation` dataset was attached to the corresponding CDH projects. Both environments assumed the intended CDH role, downloaded the same 2,172,772-byte SSE-KMS object, produced the same SHA-256, and proved KMS decryption and temporary-file cleanup. The temporary probe was then removed.
+- The July 31 standup captures the earlier spike framing for `SCR-1218`: prove cross-region S3 access without infrastructure changes, and request an alternate access path only if the direct path failed. Later Codex evidence supersedes this provisional state with the successful dev-and-production proof above.
 - The first production probe exposed two useful safety lessons: bucket listing was broader than the feature needed, so the final proof used exact-object access; Botocore request-level debug logging could expose temporary credentials, so SDK wire logging was suppressed before rerunning.
 - `SCR-1209` now has two India DAGs sharing one parser/publisher: a realtime DAG every 15 minutes for the current IST day, and a 05:00 IST reconciliation DAG for the previous day with manual date override for backfill. Publishing is fail-closed behind `KHABA_GENERATION_TSDB_PUBLISH_ENABLED`; absent or false means validation-only with no TSDB calls.
 - The real CSV contains one-minute readings rather than one 15-minute row. The implementation publishes only complete 15-minute averages and ignores the current partial interval. It selects four plant-level signals without depending on the malformed inverter tail where the header advertises inverter 55 but rows stop after inverter 54.
@@ -169,6 +170,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/notes/2026-07-30.md`
 - `sources/codex-conversations/2026-07-30-codex-conversations.md`
 - `sources/codex-conversations/2026-07-31-codex-conversations.md`
+- `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
-Last Updated: 2026-07-31
+Last Updated: 2026-08-03
