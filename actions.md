@@ -292,9 +292,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`
 
-- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, retry the India write path using the corrected `RF` technical name instead of `RNF`, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
+- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, retry the India write path using the corrected `rf_india` code alias instead of the mistranscribed `RNF` variant, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`; `sources/notes/2026-08-04-ingest-handover-clarifications.md`
 
 - [ ] Ask CDH whether Khaba's 23:52 IST cutoff is expected and whether the missing 23:53-23:59 readings can be delivered.
   - Context: [[smp-platform]]

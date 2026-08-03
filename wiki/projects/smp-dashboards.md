@@ -28,7 +28,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - July 17 Codex notes requested hardening the manual `cdh-register.yml` workflow so the target environment is inferred from the branch and the one-hour CDH token can be pasted as an explicit workflow input. The motivation was to avoid a dev branch run accidentally targeting production.
 - July 17 `SCR-1202` dashboard work added an opt-in HJKS 2Y `As of` selector pattern with immediate visibility for complete scheduled snapshots, exact snapshot filtering across all 12 panels, and a reusable look-back playbook for future dashboards.
 - August 3 SMP India notes reaffirm the dashboard publication path for new DAG outputs: create the CDH dataset in the project, write parquet under a matching S3 dataset key and stage, then query it from Grafana through Athena once CDH registration exposes the table.
-- Mateo identified generation dashboarding as a straightforward first India DAG-to-Grafana use case, with forecaster benchmarking as a more complex follow-up because it compares three external forecasters against actual generation curves and may require several data sources.
+- Mateo identified generation dashboarding as a straightforward first India DAG-to-Grafana use case, with forecaster benchmarking as a more complex follow-up because it compares three external forecasters against actual generation curves and may require several data sources. Brian could not yet confirm the forecaster benchmarking ownership or source breakdown on 2026-08-04.
 
 ## Open Questions
 
@@ -49,5 +49,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/meetings/2026-08-03-1415-granola-busy.md`
+- `sources/notes/2026-08-04-ingest-handover-clarifications.md`
 
-Last Updated: 2026-08-03
+Last Updated: 2026-08-04
