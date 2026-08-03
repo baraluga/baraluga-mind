@@ -96,6 +96,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The real CSV contains one-minute readings rather than one 15-minute row. The implementation publishes only complete 15-minute averages and ignores the current partial interval. It selects four plant-level signals without depending on the malformed inverter tail where the header advertises inverter 55 but rows stop after inverter 54.
 - Live QA evidence showed the July 30 file contained 1,433 contiguous minutes through 23:52 IST, yielding 95 complete intervals and leaving seven trailing minutes missing. Validation mode reports this boundary rather than failing, while the write path remains stricter pending a deliberate policy decision.
 - Matéo supplied the four stable TSDB series IDs and provider metadata `R&F India` / `rf_india`. The IDs are versioned in code; only the publication enable flag remains operational Airflow configuration. As of July 31, `smp-india` dev and QA contained this mapping, while prod remained untouched.
+- August 3 onboarding notes corrected a naming trap for India TSDB writes: when calling the India provider via Python, the technical name is `RF`, not `RNF`; this appears related to the earlier `R&F India` / `rf_india` provider metadata.
+- The same walkthrough restated the SMP DAG-to-Grafana runtime shape: a DAG writes parquet to EFS, optionally uploads to S3/CDH through `smp-common`, and Grafana can query the resulting parquet through Athena. DAG sources are not limited to TSDB; they can also use public sites or Aurora.
+- For CDH-backed dashboard outputs, the dataset must already exist in the CDH project, the S3 dataset key must match the CDH dataset name, and at least one stage such as `latest` is required before the dataset appears in Grafana's table explorer.
+- Upcoming India use cases from Mateo are generation dashboarding as the simpler first case, followed by forecaster benchmarking that compares three external forecasters against actual generation curves. The second case may need multiple non-TSDB data sources and was framed as a next-month topic.
 
 ## Open Questions
 
@@ -121,6 +125,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
+- UNCERTAIN: Whether `RF`, `RNF`, and `R&F India` are distinct provider names, aliases, or transcript variants; the August 3 source is clear that Python calls should use `RF`.
 
 ## Sources
 
@@ -172,5 +177,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-07-31-codex-conversations.md`
 - `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-31-ingest-handover-clarifications.md`
+- `sources/meetings/2026-08-03-1415-granola-busy.md`
 
 Last Updated: 2026-08-03

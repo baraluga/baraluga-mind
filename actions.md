@@ -290,11 +290,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Observe the Khaba realtime and reconciliation DAGs in QA with publication disabled, then decide whether a contiguous 95-interval day is acceptable for reconciliation writes.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`
 
-- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
+- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, retry the India write path using the corrected `RF` technical name instead of `RNF`, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`
 
 - [ ] Ask CDH whether Khaba's 23:52 IST cutoff is expected and whether the missing 23:53-23:59 readings can be delivered.
   - Context: [[smp-platform]]
@@ -307,6 +307,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Validate carried-over sprint tickets `SCR-1206`, `SCR-1208`, and `SCR-1058`, with Matéo leading the validation process.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
+
+- [ ] Keep Mateo updated on the India generation DAG progress while he is in France, and capture any feedback that affects the `SCR-1058` onboarding path.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-03-1415-granola-busy.md`
+
+- [ ] Revisit India generation and forecaster-benchmarking DAG-to-Grafana tasks with Adrian around mid-August and decide what Brian's team should collaborate on.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-03-1415-granola-busy.md`
 
 - [ ] Finalize CSCR-119 Docker image separation for Japan and India Airflow version conflicts.
   - Context: [[smp-platform]]
