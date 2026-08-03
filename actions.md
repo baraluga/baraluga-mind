@@ -162,10 +162,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Job Search
 
-- [ ] Complete the AllView Real Estate Culture Index assessment for the Director of AI & Systems Architecture application, or request an extension if still possible.
-  - Context: [[job-search-2026]]
-  - Source: `sources/codex-conversations/2026-08-01-codex-conversations.md`
-
 - [ ] Verify salary and Philippine hiring eligibility for the initial HiringCafe leads Trustana, Soum, and Omilia before deciding whether to apply.
   - Context: [[job-search-2026]]
   - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
@@ -559,6 +555,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 ## Done
 
 ### Job Search
+
+- [x] Complete the AllView Real Estate Culture Index assessment for the Director of AI & Systems Architecture application.
+  - Closure: Brian confirmed on 2026-08-03 that the assessment was completed.
+  - Context: [[job-search-2026]]
+  - Source: `sources/codex-conversations/2026-08-01-codex-conversations.md`; `sources/notes/2026-08-03-ingest-handover-clarifications.md`
 
 - [x] Replace the blocked LinkedIn file-upload workflow with the current human-in-the-loop HiringCafe and employer-portal flow.
   - Closure: On July 31 the scheduled LinkedIn automation was deleted, HiringCafe became the global discovery source, employer portals became the submission path, and three applications were submitted successfully. TokyoDev was added on August 1 as a separate, manually initiated Japan-specific source.

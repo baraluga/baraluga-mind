@@ -32,14 +32,13 @@ HiringCafe is the global discovery source and TokyoDev is the Japan-specific sou
 - On August 1, the local scraper was refactored around a normalized job model and source-adapter boundary. HiringCafe retained its existing CLI and output behavior, while shared screening, ranking, tracker/archive deduplication, and orchestration became source-neutral and locally tested.
 - TokyoDev was then added as the Japan-specific second adapter. Its policy rejects Japan-residents-only roles, roles without explicit overseas eligibility, and roles that require or ambiguously describe Japanese proficiency. Japan-remote is not treated as Philippines-remote, and JPY compensation is preserved for discussion rather than compared directly with the PHP floor.
 - The TokyoDev adapter uses absolute posting dates, keeps searches manual and bounded, and preserves source/application URLs, language and overseas eligibility, remote scope, visa/relocation signals, seniority, tags, and description fields when available. Deterministic tests and a small read-only public-site smoke check passed without applying, saving, or modifying trackers.
-- AllView Real Estate advanced Brian's Director of AI & Systems Architecture application to a Culture Index assessment on July 31. The assessment was not submitted; Brian chose to complete it himself later.
+- AllView Real Estate advanced Brian's Director of AI & Systems Architecture application to a Culture Index assessment on July 31. Brian subsequently confirmed that he completed it.
 
 ## Open Questions
 
 - UNCERTAIN: Whether the Chrome file-upload permission has since been enabled.
 - UNCERTAIN: Whether ECLARO, JTI, Agile & Co., WTW, RealPage, DevRev, Zero Hiring, Stratpoint, Axos, or LSEG were manually submitted after being queued.
 - UNCERTAIN: Salary and Philippine hiring eligibility for the initial HiringCafe leads Trustana, Soum, and Omilia still need verification.
-- UNCERTAIN: Whether Brian completed the AllView Culture Index assessment within the requested one-to-two-business-day window.
 
 ## Sources
 
@@ -49,5 +48,6 @@ HiringCafe is the global discovery source and TokyoDev is the Japan-specific sou
 - `sources/codex-conversations/2026-07-13-codex-conversations.md`
 - `sources/codex-conversations/2026-07-31-codex-conversations.md`
 - `sources/codex-conversations/2026-08-01-codex-conversations.md`
+- `sources/notes/2026-08-03-ingest-handover-clarifications.md`
 
 Last Updated: 2026-08-03
