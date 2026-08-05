@@ -101,6 +101,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - For CDH-backed dashboard outputs, the dataset must already exist in the CDH project, the S3 dataset key must match the CDH dataset name, and at least one stage such as `latest` is required before the dataset appears in Grafana's table explorer.
 - Upcoming India use cases from Mateo are generation dashboarding as the simpler first case, followed by forecaster benchmarking that compares three external forecasters against actual generation curves. The second case may need multiple non-TSDB data sources and was framed as a next-month topic.
 - Brian clarified on 2026-08-04 that Solaris is the usual framework used for writing TSDB-publishing scrapers.
+- On August 3, `SCR-1209` was moved to In Review with a QA-testing comment, `SCR-1217` was moved to In Review after Carlos confirmed capacity from FY2021 and actual flow from FY2025, and `SCR-1058` was set to Blocked because Matéo still needed assistance from Brian.
+- `SCR-1209` implementation reached `smp-india` dev and QA in validation-only mode. The realtime DAG validated a current Khaba file, and the reconciliation DAG proved the previous-day source can be contiguous but incomplete: 1,433 minutes from 00:00 to 23:52 IST, 95 complete 15-minute intervals, 380 points, and a missing 23:53-23:59 tail.
+- Matéo supplied the four Khaba TSDB IDs and provider metadata `R&F India` / `rf_india`; the IDs were versioned in code so `KHABA_GENERATION_TSDB_SERIES_IDS` is no longer an Airflow variable. Publication remains gated by `KHABA_GENERATION_TSDB_PUBLISH_ENABLED`.
+- A QA publication attempt failed during the safety read with `DataNotAvailableException` on the module-surface-temperature series. The evidence points to TSDB UAT provider or series access for the QA SMP application, not to S3/CDH access or parser behavior.
+- The August 4 daily standup says the last TSDB backfill DAG ran for 11 hours and failed after token expiry. The in-progress mitigation is parallel writes with per-task token renewal; Francois also suggested splitting backfills by year.
+- Gold-layer access remains intentionally demand-driven: writing to TSDB is unchanged, while consumers switch reads from `timeseries.read()` to `timeseries.readest_version()`. Francois took the follow-up to document the gold-layer read function.
 
 ## Open Questions
 
@@ -117,6 +123,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether an unauthenticated `/filebrowser/health` endpoint or authenticated synthetic browse check is needed after the daily monitor has run for a while.
 - UNCERTAIN: Whether the Khaba source's 23:52 IST cutoff is expected and stable, and whether reconciliation should formally accept 95 complete intervals for publication.
 - UNCERTAIN: Whether Matéo's four Khaba series IDs exist in TSDB UAT as well as production; dev/QA deliberately target UAT.
+- UNCERTAIN: Whether the QA SMP service application has read/write access to the `rf_india` provider in TSDB UAT.
+- UNCERTAIN: Whether the TSDB backfill parallelization plus per-task token renewal is sufficient, or whether yearly execution should become the standard operating shape.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
@@ -179,5 +187,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 - `sources/meetings/2026-08-03-1415-granola-busy.md`
 - `sources/notes/2026-08-04-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+- `sources/meetings/2026-08-04-1415-granola-daily-standup.md`
 
-Last Updated: 2026-08-04
+Last Updated: 2026-08-05

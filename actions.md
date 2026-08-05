@@ -100,6 +100,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[sff-walnut-migration]]
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`; `sources/codex-conversations/2026-07-21-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`
 
+- [ ] Give Steffen access to the migrated private `qrm-dms/sff-ai-halo` repository.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
+- [ ] Decide whether to fix `sff-ai-halo`'s MCP 2.x dependency incompatibility before adding CI or leave the Git-only mirror unchanged for Steffen first.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
 - [ ] Finish the staged DeCliC application cutover: reconcile active ADO PRs and branch mappings, establish AWS OIDC roles and protected deployment controls, move package/Sentry credentials, prove deployment artifacts and smoke/recovery behavior, and agree a freeze window.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`; `sources/codex-conversations/2026-07-26-codex-conversations.md`; `sources/codex-conversations/2026-07-27-codex-conversations.md`; `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`; `sources/codex-conversations/2026-07-28-codex-conversations.md`
@@ -228,14 +236,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/meetings/2026-07-24-1415-granola-daily-standup.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
 
-- [ ] Complete `SCR-1216` acceptance: validate the remaining two HJKS DAGs in QA without email tasks, then promote and confirm production report emails stop while uploads continue.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
-
-- [ ] Rerun the `SCR-1219` weekly-capacity job in QA and confirm the publication-date selector returns the full 4,704-row August 1 week.
-  - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
-
 - [ ] Validate `SCR-1208` nuclear look-back after the next scheduled QA run: `Latest` should advance while the 2026-07-28 16:05 JST snapshot preserves the earlier forecast and full history.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/codex-conversations/2026-07-28-codex-conversations.md`
@@ -270,6 +270,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
+- [ ] Fix or document `smp-dashboard` CDH registration so green production runs do not hide skipped stage refreshes or crawler-already-running outcomes.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
+- [ ] Replace the personal GitHub Tools PAT dependency for `smp-dashboard` CDH registration with a packaged `cdh-sdk` or an organization-managed machine-account secret.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
 ### SMP Platform
 
 - [ ] Document the Data Type 3 inventory gaps, especially provider and update-frequency details not visible in the dashboard, for Adrian, Louis, and Carlos.
@@ -288,25 +296,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
-- [ ] Observe the Khaba realtime and reconciliation DAGs in QA with publication disabled, then decide whether a contiguous 95-interval day is acceptable for reconciliation writes.
+- [ ] Decide whether a contiguous 95-interval Khaba day is acceptable for reconciliation writes, or keep publication strict until CDH explains the 23:52 IST cutoff.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`
-
-- [ ] Confirm the four Khaba series IDs exist in TSDB UAT, retry the India write path using the corrected `rf_india` code alias instead of the mistranscribed `RNF` variant, then enable `KHABA_GENERATION_TSDB_PUBLISH_ENABLED` in QA and prove write/read-back before any production promotion.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`; `sources/notes/2026-08-04-ingest-handover-clarifications.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-03-1415-granola-busy.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 - [ ] Ask CDH whether Khaba's 23:52 IST cutoff is expected and whether the missing 23:53-23:59 readings can be delivered.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 - [ ] Identify the intended recipient mistranscribed as `Euro Mission`, then send the time-and-material extension request for the two uncovered weeks after the current SMP period.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 
-- [ ] Validate carried-over sprint tickets `SCR-1206`, `SCR-1208`, and `SCR-1058`, with Matéo leading the validation process.
+- [ ] Validate carried-over sprint tickets `SCR-1208` and `SCR-1058`, with Matéo leading the validation process where applicable.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 - [ ] Keep Mateo updated on the India generation DAG progress while he is in France, and capture any feedback that affects the `SCR-1058` onboarding path.
   - Context: [[smp-platform]]
@@ -470,6 +474,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[github-copilot-custom-agents]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
 
+- [ ] Align `smp-japan` DAG Helper instructions with `smp-india` so the agent explicitly opens a draft PR targeting `dev`.
+  - Context: [[copilot-dag-agent]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
 - [ ] Clean up mutable Lambda images and mutating tox environments in `sff-data-common-models` and `sff-lib-meteomatics-client`.
   - Context: [[github-copilot-custom-agents]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
@@ -489,6 +497,20 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Ask IT for an approved Zscaler bypass or split-routing policy for ChatGPT/Codex traffic while private-site access remains on Zscaler.
   - Context: [[zscaler-codex-access]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+### Thailand 2026
+
+- [ ] Submit the Thailand Digital Arrival Card no earlier than 2026-08-10 for the August 13 arrival.
+  - Context: [[thailand-2026]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
+- [ ] Book or decide BKK to Pattaya, Pattaya to Bangkok, and Bangkok to BKK transfers, with Klook TTD preferred when the final price is close to Agoda after tolls.
+  - Context: [[thailand-2026]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
+- [ ] Ask HR whether company iCare covers emergency hospitalization and medical evacuation in Thailand.
+  - Context: [[thailand-2026]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
 ## Waiting
 
@@ -555,6 +577,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
 ### SMP Platform
+
+- [ ] Wait for Matéo or TSDB support to grant the QA SMP application read/write access to the `rf_india` provider and four Khaba TSDB series in UAT, then retry QA publication.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 - [ ] Wait for Matthew and Adrian to confirm the Gen-A `Go Anywhere` endpoint, machine-to-machine credentials, access rights, and geo-blocking constraints.
   - Context: [[smp-platform]]
@@ -629,6 +655,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[japan-interconnector-dashboard]]
   - Source: `sources/meetings/2026-07-17-1415-granola-daily-standup.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/codex-conversations/2026-07-27-codex-conversations.md`
 
+- [x] Complete `SCR-1216` acceptance for deactivated HJKS report emails.
+  - Closure: The August 3 sprint status records automatic mail reports deactivated and `SCR-1216` done.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+
+- [x] Complete `SCR-1219` weekly-capacity month-boundary fix validation.
+  - Closure: The August 3 sprint status records the critical weekly-capacity DAG failure resolved and `SCR-1219` done.
+  - Context: [[japan-interconnector-dashboard]]
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+
 ### Team Operations
 
 - [x] Migrate `declic-kpicalculator`, `declic-okta-scripts`, and `DigitalizeTaxoMatchForms` into `qrm-dms`, lock their ADO source branches, and update GitHub descriptions from code evidence.
@@ -641,6 +677,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-28-codex-conversations.md`
 
+- [x] Migrate Steffen's `mcp_proto` repository to `qrm-dms/sff-ai-halo` and lock the Azure source branch.
+  - Closure: The Git-only migration created a private `qrm-dms/sff-ai-halo` repository, preserved all 29 commits on `main`, matched the Azure SHA, confirmed zero tags and no pipelines, and locked Azure `main` after verification.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+
 ### SMP Platform
 
 - [x] Complete the India generation-data access call and establish the source contract.
@@ -651,7 +692,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [x] Prove `SCR-1218` cross-account Khaba S3 access from SMP India dev and production.
   - Closure: Both environments assumed the intended CDH role, downloaded the same SSE-KMS object, matched its checksum, and proved KMS decryption after the dataset was attached to the CDH projects.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 - [x] Complete the OCCTO adoption path with `smp-common 0.6.0` and prove the shared publisher/backfill in UAT.
   - Closure: The combined refactor and bounded historical campaign passed repository validation and a live UAT write with exact read-back and independent audit; production rollout remains governed by the separate catalog-approval action.

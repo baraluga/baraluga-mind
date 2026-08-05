@@ -23,6 +23,9 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - July 21 work created a global `consult-mind-palace` Codex skill that can use this repository as a source-backed memory layer from any working directory. A forward test produced a Japan Interconnector briefing with facts, decisions, actions, uncertainty, and stale-status caveats separated.
 - July 21 also showed a practical limit of GitHub-side custom agents: a Modernizer run may finish without changes when the runner cannot reach internal registry evidence. In that case, Codex can reconstruct and supply a grounded handoff, but authentication and repo readiness still control whether relaunching is appropriate.
 - July 28 grooming proposed a dry run of Copilot automatic PR review. The working theory was that the PR creator's credits would be charged, but the team wanted a small test and confirmation with Pierre before adopting the automation.
+- The August 4 Application Team AI Corner used [[copilot-dag-agent]] as a concrete example: the team chose a GitHub Copilot custom agent as a POC for DAG contributor onboarding because SMP India and Japan had recently moved to GitHub, and because repo-grounded scaffolding can evolve with code changes better than long Confluence instructions.
+- The same meeting framed model quality as a real constraint: the DAG Helper result remains under the mercy of the selected model's capability, so a capable thinking model and human review are still part of the operating model.
+- The Omniron spec-driven-development pilot used an orchestrator plus specialized agents for PO, architect, tech lead, front end, back end, and sub-agent roles. It ran end-to-end and produced a deployable web app candidate, but the team explicitly said not to adopt the approach elsewhere yet because inter-agent communication, standards size, completion checks, compliance, and token burn still need tuning.
 
 ## Open Questions
 
@@ -32,6 +35,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether IT will approve a ChatGPT/Codex Zscaler bypass or split-routing policy for private-site agentic testing.
 - UNCERTAIN: Whether internal registry access for GitHub-side agent runners will be solved centrally or handled with per-run evidence handoffs.
 - UNCERTAIN: Whether automatic Copilot PR review is charged to the PR creator or another organization billing pool.
+- UNCERTAIN: Whether Omniron's spec-driven-development agent workflow will become a reusable team pattern after the planned workshop and compliance review.
 
 ## Sources
 
@@ -47,5 +51,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
 - `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+- `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
+- `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
-Last Updated: 2026-07-29
+Last Updated: 2026-08-05

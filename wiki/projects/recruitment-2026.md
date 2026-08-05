@@ -30,12 +30,14 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - In the AWS serverless design review, Angelica suggested ELB, SNS, SQS, and Secrets Manager improvements, but did not independently spot the DynamoDB stream/S3/Lambda infinite-loop risk.
 - Interviewer assessment in the note: medium-low, not clearly senior compared with Matt, with communication often staying at obvious statements. If passing, the next step would be a panel interview with European colleagues.
 - Future technical interviews should be at least 1.5 hours to leave enough time for demo and code review.
+- August 4 application-team notes say recruitment for a Senior Software Engineer in the Philippines was still active, with multiple technical interviews underway.
 
 ## Open Questions
 
 - UNCERTAIN: The count moved from 33 candidates on June 30 to 41 candidates on July 2; this likely reflects pipeline growth, but the notes do not reconcile the numbers.
 - UNCERTAIN: The Granola title says "Matt Mendez" but the candidate overview says "Matt Mendeswell"; this may be a transcription/name artifact.
 - UNCERTAIN: Angelica's exact seniority signal may need calibration against Alfred's assessment and any panel feedback if the process continues.
+- UNCERTAIN: The August 4 meeting does not identify which candidates were in the active technical-interview set.
 
 ## Sources
 
@@ -46,5 +48,6 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - `sources/notes/2026-07-08.md`
 - `sources/meetings/2026-07-09-1000-granola-tech-interview-angelica-lapastora.md`
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
+- `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 
-Last Updated: 2026-07-09
+Last Updated: 2026-08-05

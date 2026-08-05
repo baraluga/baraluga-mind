@@ -6,6 +6,23 @@ The SFF migration moves Azure DevOps repositories and pipelines into the `qrm-dm
 
 By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub-only, 1 GitHub-plus-Azure, 7 Azure-only, and 16 with neither pipeline. `sff-ms-service-desk` was the sole remaining dual-pipeline repository because its Azure deployment identity and environment contract were not yet reproducible safely in GitHub.
 
+## Repository Naming Convention
+
+Repositories within the SFF project use a purpose-based `sff-*` prefix:
+
+| Prefix | Repository purpose |
+|---|---|
+| `sff-lib-` | Shared libraries |
+| `sff-ms-` | Shared microservices |
+| `sff-fw-` | Frameworks |
+| `sff-tool-` | Utilities and tooling |
+| `sff-infra-` | Infrastructure components |
+| `sff-action-` | GitHub Actions |
+| `sff-template-` | Repository templates |
+| `sff-ai-` | AI assets and agents |
+| `sff-data-` | Data components |
+| `sff-doc-` | Documentation and standards |
+
 ## Python Artifact Migration
 
 - The proven Python flow installs the ENGIE CA, configures Artifactory reads through organization variables and secrets, runs non-mutating host and Lambda-parity tests, builds `dist` once, retains it as a CI artifact, and publishes through a protected reusable workflow with authenticated no-cache readback.
@@ -36,12 +53,16 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - July 27 work published the missing historical `common-stacks==8.4.6` dependency from exact source and proved independent and combined resolution with `user==7.1.3`. It also added a tested `sff-actions` historical-package-backfill recipe and organization policy pointer.
 - DeCliC application readiness advanced: `declic-backend` PR 4 merged with green CI, `declic-app` gained green credential-free CI, and `declic-infra` gained green credential-free CI after the historical dependency backfill. Deployment remains parked because environment ownership, secret custody, AWS OIDC, approvals, smoke tests, and rollback are not complete.
 - July 28 environment cleanup consolidated active DeCliC GitHub environments into shared non-production and production boundaries. The cleanup did not create a deployable CD contract or authorize cloud changes.
+- On August 4, Steffen's Azure DevOps repository `SFF/_git/mcp_proto` was migrated as a private Git-only mirror to `qrm-dms/sff-ai-halo`. The chosen name follows the SFF naming convention and the repository's own Halo product identity rather than using the generic source prototype name.
+- The `mcp_proto` migration preserved all 29 commits, one `main` branch, and zero tags; the GitHub branch SHA matched Azure at `96f9578e...`, and Azure `main` was locked after verification. There were no Azure pipelines, classic releases, repository pipeline YAML, GitHub Actions workflows, tags, LFS, submodules, or active PRs to migrate.
+- The remaining `sff-ai-halo` follow-up is operational, not migration parity: Steffen still needs access to the new private GitHub repository, and the repository's fresh install has an MCP 2.x dependency incompatibility because `mcp>=1.2.0` resolves to an incompatible major version.
 
 ## Open Questions
 
 - UNCERTAIN: Who owns approval and custody for the GAMS installers and licence needed by Data Types and OR Common.
 - UNCERTAIN: Which AWS roles, protected GitHub environments, smoke tests, and recovery procedure should authorize the Service Desk deployment cutover.
 - UNCERTAIN: Whether all seven Azure-only pipelines should migrate in the current program or remain until their owners establish readiness.
+- UNCERTAIN: Whether `sff-ai-halo` should pin its MCP dependency before adding CI, or keep the Git-only mirror unchanged until Steffen has access.
 
 ## Sources
 
@@ -55,5 +76,6 @@ By July 25, 2026, the active SFF estate audit counted 47 repositories: 23 GitHub
 - `sources/codex-conversations/2026-07-27-codex-conversations.md`
 - `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
+- `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
-Last Updated: 2026-07-29
+Last Updated: 2026-08-05

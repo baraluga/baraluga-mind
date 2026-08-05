@@ -75,6 +75,11 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The same day, the team flagged gaps in the Data Type 3 inventory—especially provider and update-frequency details not visible in the dashboard—and offered to help Adrian, Louis, and Carlos complete it.
 - The same retro recommended stopping speculative scope discovery while budget is tight and waiting for explicit user pain before investing.
 - Brian's Atlassian blocker is an identity collision rather than missing product entitlement. The inaccessible `brian.peralta@engie.com` account already owns the target email and is protected by unavailable MFA/recovery credentials, while the previously usable Tractebel account lost service access after migration. An administrator must reset/recover the ENGIE account or free its email by changing or deleting that account.
+- August 4 application-team notes say all SFF/common component city migrations to Walnut GitHub were complete, Artifactory access was available for Python packages only, and project-specific repository migrations were still in progress through tech-lead and PO coordination.
+- The same meeting says personal access tokens were still in use for some migrated workflows; the durable direction is still a functional-user setup, with ServiceNow project linkage and a GitHub service-account token both discussed as possible paths requiring a dedicated alignment meeting.
+- The August 4 portfolio snapshot listed upcoming Onset Energy, SDB metadata, and Delphi extension work; Kiva industrialization kicking off on August 5; ABS Index Builder in development; WOW and Best-of Sign-ups near completion; and AWS/Walnut-Centiment migration, Pyrene, and Storm as ongoing support/monitoring.
+- Tempo and Promethe were in a final parallel run through August 2026. The team should fill in Promethe every Friday, with Tempo planned for decommissioning at the end of August.
+- Team-life notes from the same meeting captured the July 10 QRM first anniversary recap, a requirements-solicitation/stakeholder-management workshop planned for August 28, anniversaries for Hook and Pierre, August birthdays for Joyce and Nico, Rudy joining Pierre's team, and a reminder to update Sezane Career Explorer skills and trajectory.
 
 ## Open Questions
 
@@ -95,6 +100,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
 - UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
 - UNCERTAIN: Whether stale WoW PR 6422 should be closed or migrated before `wow-okta-scripts`.
+- UNCERTAIN: Whether the long-term migrated-repository authentication path will be a ServiceNow-linked functional user, a GitHub service-account token, or another approved model.
+- UNCERTAIN: Whether `Centiment` is the exact migration name from the August 4 meeting source; it may be a transcript artifact.
+- UNCERTAIN: Whether `Rudy`, `Hook`, `Joyce`, `Nico`, and `Sezane` are exact spellings from the August 4 meeting source.
 
 ## Sources
 
@@ -139,5 +147,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 - `sources/meetings/2026-07-31-0945-granola-am-standup.md`
 - `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
+- `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
+- `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
-Last Updated: 2026-08-03
+Last Updated: 2026-08-05

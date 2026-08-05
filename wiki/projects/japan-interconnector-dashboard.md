@@ -96,6 +96,11 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - The shared `smp-common 0.6.0` OCCTO publisher and bounded historical TSDB campaign were combined in draft PR 21. The agreed default scope is capacity from 2021-01-01 and actual flow from 2025-04-01 through the latest completed JST day, with capacity serialized before actual flow and `write=false` by default.
 - A UAT backfill write completed successfully, with per-chunk TSDB read-back and an independent Japan source-versus-TSDB audit. The preferred exhaustive confirmation is rerunning the exact resolved range with `write=false` and requiring zero would-write rows; a one-day all-series check should report 3,360 unchanged points.
 - Rodrigue asked for validation of `interconnection, available capacity` and `interconnection, available capacity, minimum`; Alexandre Huynen subsequently confirmed that both variable groups should remain unchanged, including the `interconnection` qualifier. The remaining work is the ordinary production approval path for the 35 series, not a taxonomy redesign.
+- On August 3, `SCR-1217` was moved to In Review after Carlos confirmed the bounded TSDB campaign shape: capacity starts from FY2021 while actual flow starts from FY2025.
+- On August 4, the 2Y and nuclear dashboard production missing-table errors were traced to absent production `*_snapshot_manifest` Athena tables, not to missing DAG promotion. The producer code and a compatible Airflow image had reached production on July 30, while production CDH registration evidence was missing.
+- The scoped nuclear history fix from QA, commit `3d205df`, was cherry-picked to `smp-dashboard/main` as `659995d`; the stale feature branch was then deleted. This fix prevents historical nuclear snapshot selection from dropping the older 2016-mid-2026 legacy horizon.
+- Production CDH registrations for `hjks_2y_status` and `hjks_nuclear_by_region` later succeeded after the GitHub Tools credential used to install private `cdh-sdk` was renewed. The submitted crawler job IDs were `ca11da69-a242-4faa-96a9-34f93d5f623b` and `ccd17c6e-f297-4601-809a-44b032362c6e`.
+- Brian later confirmed in CDH that successful production registration did not automatically refresh the affected stages; he had to refresh them manually. The likely difference from QA is the newer registration manager behavior that submits crawler work and exits green without waiting for every stage refresh to complete.
 
 ## Open Questions
 
@@ -114,6 +119,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether Carlos's July 20 spreadsheet approval covers the same TSDB objects as the earlier `zs5929` approval path or a broader catalog-change package.
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
 - UNCERTAIN: Whether the completed UAT campaign has since received an exact-range `write=false` rerun proving zero would-write rows across all source-complete chunks.
+- UNCERTAIN: Whether the production CDH registration workflow should block until each requested stage refresh has completed, or at least surface crawler-already-running outcomes as an explicit follow-up.
 
 ## Sources
 
@@ -162,5 +168,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-31-ingest-handover-clarifications.md`
 - `sources/notes/2026-08-03-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
-Last Updated: 2026-08-03
+Last Updated: 2026-08-05
