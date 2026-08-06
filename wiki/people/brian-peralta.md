@@ -17,6 +17,8 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 - Bong's 2026-07-29 performance review rated Brian beyond expectations. The cited strengths were stakeholder responsiveness, technical leadership beyond the formal SMP scope, end-to-end delivery, mentoring, knowledge sharing, and expansion from front-end work into backend, CI/CD, infrastructure, and automation.
 - The development feedback was to complete small administrative tasks before they accumulate, improve demo framing and audience calibration, keep Tempo entries current, and formalize GitHub governance and engineering practices.
 - The next review session is intended to cover skills development, mobility, career planning, and a development plan. The source phrase `surgeon skills` is likely a transcription error and remains unconfirmed.
+- The August 6 development-form discussion set Brian's preferred direction as the technical track rather than management, with architect as the target level. The form goals were technical leadership and architecture partnership, stronger leadership/communication/operating cadence, sprint delivery velocity, and scaling engineering standards through governance and mentorship.
+- Geographic mobility preferences captured in the form discussion favored Europe, with Japan and Singapore also mentioned as possible locations.
 
 ## Sources
 
@@ -26,5 +28,6 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 - `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
 - `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
+- `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
-Last Updated: 2026-07-30
+Last Updated: 2026-08-06

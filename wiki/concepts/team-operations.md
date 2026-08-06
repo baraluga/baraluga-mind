@@ -61,6 +61,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - July 22 artifact discussion clarified the GitHub-to-ADO bridge: GitHub Actions can publish tested Python distributions directly to the existing Azure Artifacts PyPI-compatible feed using `uv publish`, authenticated by `AZURE_ARTIFACTS_PUBLISH_PAT` from a technical account. Dry-run publication should precede real upload, and the selected commit should already have a successful push CI run with a `dist` artifact.
 - If SFF package publishing moves to Walnut Artifactory/JFrog, the tested-artifact flow and `uv publish` command can stay, but the destination URL, credentials, shared configuration action, and consumer install index must change. The correct SFF Artifactory repository, permissions, retention, historical versions, and consumer cutover remain unsettled.
 - The July 22 answer to Guido framed repository migration as staged rather than binary: Git history can be moved and validated before JFrog is ready, but a repository should not be declared fully cut over or have its ADO path retired until build, publish, deployment, and downstream package consumption are proven.
+- The August 5 GitHub Actions access guidance distinguishes repository visibility from deployment authority. Read-only access is low risk if repository contents and logs are safe to share; write access can still be acceptable when protected deployment branches, blocked direct pushes, owner-reviewed PRs, CODEOWNERS protection for workflow changes, and restricted GitHub environments with separate approval prevent repo access from becoming privileged deployment access.
 - July 23-25 SFF work established Walnut Artifactory DEV as the proven destination for the current Python package migration, published the recoverable dependency chain, accepted reusable CI contracts, and closed the first organization-wide CI centralization pass. The detailed program state now lives in [[sff-walnut-migration]].
 - The Pipeline Modernizer was decommissioned after its useful rules were converted into executable `sff-actions` contracts and tested human-facing recipes. This supersedes the earlier assumption that the organization agent itself would remain the primary migration interface.
 - July 24 meeting notes say the SFF functional account requires an SFF project in CMDB first. Someone with Snow/CMDB catalog access must create the project before the linked account request can be submitted.
@@ -149,5 +150,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06

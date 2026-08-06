@@ -8,13 +8,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Team Operations
 
-- [ ] Update Brian's goal documentation with the July 29 review evidence, especially GitHub governance, SMP proactivity, knowledge sharing, and broader technical-lead contributions.
+- [ ] Finalize and submit Brian's development form, including at least one activity per goal and the technical-track/architect direction.
   - Context: [[brian-peralta]]
-  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
-
-- [ ] Prepare Brian's next development-review session covering skills development, mobility, career planning, and a development plan.
-  - Context: [[brian-peralta]]
-  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
+  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
 - [ ] Francois to follow up with Bastien on further Iberia questions or interest in SMP.
   - Context: [[team-operations]]
@@ -304,9 +300,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
-- [ ] Identify the intended recipient mistranscribed as `Euro Mission`, then send the time-and-material extension request for the two uncovered weeks after the current SMP period.
+- [ ] Follow up on the SMP budget extension request and escalate at the next sprint review if there is still no response.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
 - [ ] Validate carried-over sprint tickets `SCR-1208` and `SCR-1058`, with Matéo leading the validation process where applicable.
   - Context: [[smp-platform]]
@@ -314,7 +310,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Keep Mateo updated on the India generation DAG progress while he is in France, and capture any feedback that affects the `SCR-1058` onboarding path.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-03-1415-granola-busy.md`
+  - Source: `sources/meetings/2026-08-03-1415-granola-busy.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
+- [ ] Check whether QA actual-flow backfill data can be copied directly to production, and document why the earlier attempt was abandoned.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
 - [ ] Revisit India generation and forecaster-benchmarking DAG-to-Grafana tasks with Adrian around mid-August and decide what Brian's team should collaborate on.
   - Context: [[smp-platform]]
@@ -468,7 +468,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm Copilot token and automatic PR-review billing with Irun or Pierre, including whether the PR creator is charged.
   - Context: [[ai-assisted-engineering]]
-  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+  - Source: `sources/meetings/2026-07-07-1530-granola-francois-help.md`; `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`; `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
 - [ ] Decide whether `Validate migration contract` should become a required branch-protection check after the next real migration trial.
   - Context: [[github-copilot-custom-agents]]
@@ -578,9 +578,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### SMP Platform
 
-- [ ] Wait for Matéo or TSDB support to grant the QA SMP application read/write access to the `rf_india` provider and four Khaba TSDB series in UAT, then retry QA publication.
+- [ ] Wait for Matéo to confirm the India generation TSDB production side is healthy, then close ticket 9.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+  - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
 - [ ] Wait for Matthew and Adrian to confirm the Gen-A `Go Anywhere` endpoint, machine-to-machine credentials, access rights, and geo-blocking constraints.
   - Context: [[smp-platform]]
@@ -689,10 +689,20 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/meetings/2026-07-30-1232-granola-generation-data-scraper.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
+- [x] Complete generation/Khaba ticket 25 after addressing Francois's comment and the Artifactory workaround.
+  - Closure: The August 6 standup says the ticket was set to done; Matéo will not hit the described issue because of separate GitHub groups, and the Artifactory workaround had already been communicated.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
 - [x] Prove `SCR-1218` cross-account Khaba S3 access from SMP India dev and production.
   - Closure: Both environments assumed the intended CDH role, downloaded the same SSE-KMS object, matched its checksum, and proved KMS decryption after the dataset was attached to the CDH projects.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
+
+- [x] Wait for Matéo or TSDB support to grant the QA SMP application read/write access to the `rf_india` provider and four Khaba TSDB series in UAT, then retry QA publication.
+  - Closure: The August 6 standup records QA confirmation, the same time series visible in production TSDB through the UI, and the realtime plus reconciliation DAGs merged to production; Matéo's final production-side confirmation is tracked separately.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-03-codex-conversations.txt`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
 - [x] Complete the OCCTO adoption path with `smp-common 0.6.0` and prove the shared publisher/backfill in UAT.
   - Closure: The combined refactor and bounded historical campaign passed repository validation and a live UAT write with exact read-back and independent audit; production rollout remains governed by the separate catalog-approval action.
@@ -939,6 +949,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### People
+
+- [x] Prepare Brian's next development-review session covering skills development, mobility, career planning, and a development plan.
+  - Closure: The August 6 1:1 covered the development form, technical-track aspirations, geographic mobility, and formalized development goals; the remaining work is submitting the form.
+  - Context: [[brian-peralta]]
+  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
 - [x] Improve loop-in process for ticket updates and stakeholder messages.
   - Context: [[brian-peralta]]

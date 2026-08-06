@@ -107,6 +107,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - A QA publication attempt failed during the safety read with `DataNotAvailableException` on the module-surface-temperature series. The evidence points to TSDB UAT provider or series access for the QA SMP application, not to S3/CDH access or parser behavior.
 - The August 4 daily standup says the last TSDB backfill DAG ran for 11 hours and failed after token expiry. The in-progress mitigation is parallel writes with per-task token renewal; Francois also suggested splitting backfills by year.
 - Gold-layer access remains intentionally demand-driven: writing to TSDB is unchanged, while consumers switch reads from `timeseries.read()` to `timeseries.readest_version()`. Francois took the follow-up to document the gold-layer read function.
+- The August 6 standup says the generation/Khaba ticket 25 was set to done after Francois's comment was addressed and the Artifactory workaround was already communicated to Matéo. The source title says `Generation Kaaba`; existing confirmed durable naming remains Khaba.
+- Ticket 9 TSDB publishing had QA confirmation and the same time series visible in production TSDB through the UI. The two production DAGs were merged: realtime every 10 minutes and reconciliation around 02:30 IST. Final closure still waits on Matéo's production-side confirmation because Brian still could not personally verify data reads.
+- For ticket 12-17 actual-flow backfill, a full FY2025 run took about 15 hours, consistent with roughly 366 days at about two minutes per OCCTO request. A current run covered May 3 to June 8 because data exists from June 8 onward. The open operational question is whether QA backfill data can be copied directly to production to avoid re-scraping OCCTO, and why an earlier attempt was abandoned.
+- Ticket 12-15 operational capacity to TSDB was pulled in alongside 12-17 and estimated at 3 story points. The described process was SDK request, spreadsheet creation, email to Carlos, then Airflow activation and backfill waiting. Metadata work remains: inventory existing data, check duplicates, create remaining time series, and inject; Louis may handle portions.
 
 ## Open Questions
 
@@ -125,6 +129,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether Matéo's four Khaba series IDs exist in TSDB UAT as well as production; dev/QA deliberately target UAT.
 - UNCERTAIN: Whether the QA SMP service application has read/write access to the `rf_india` provider in TSDB UAT.
 - UNCERTAIN: Whether the TSDB backfill parallelization plus per-task token renewal is sufficient, or whether yearly execution should become the standard operating shape.
+- UNCERTAIN: Whether QA backfill data can safely be copied directly to production without re-scraping OCCTO, and why the previous attempt was abandoned.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
@@ -189,5 +194,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/notes/2026-08-04-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 - `sources/meetings/2026-08-04-1415-granola-daily-standup.md`
+- `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06

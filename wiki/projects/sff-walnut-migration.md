@@ -56,6 +56,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - On August 4, Steffen's Azure DevOps repository `SFF/_git/mcp_proto` was migrated as a private Git-only mirror to `qrm-dms/sff-ai-halo`. The chosen name follows the SFF naming convention and the repository's own Halo product identity rather than using the generic source prototype name.
 - The `mcp_proto` migration preserved all 29 commits, one `main` branch, and zero tags; the GitHub branch SHA matched Azure at `96f9578e...`, and Azure `main` was locked after verification. There were no Azure pipelines, classic releases, repository pipeline YAML, GitHub Actions workflows, tags, LFS, submodules, or active PRs to migrate.
 - The remaining `sff-ai-halo` follow-up is operational, not migration parity: Steffen still needs access to the new private GitHub repository, and the repository's fresh install has an MCP 2.x dependency incompatibility because `mcp>=1.2.0` resolves to an incompatible major version.
+- On August 5, three `qrm-dms` repositories were renamed to align with the SFF naming convention: `sff-tool-tdb-client` became `sff-lib-tdb-client`, `sff-tool-json-ref-dict` became `sff-lib-json-ref-dict`, and `sff-tool-or-common` became `sff-common-or`.
 
 ## Open Questions
 
@@ -77,5 +78,6 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06

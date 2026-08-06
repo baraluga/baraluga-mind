@@ -26,6 +26,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - The August 4 Application Team AI Corner used [[copilot-dag-agent]] as a concrete example: the team chose a GitHub Copilot custom agent as a POC for DAG contributor onboarding because SMP India and Japan had recently moved to GitHub, and because repo-grounded scaffolding can evolve with code changes better than long Confluence instructions.
 - The same meeting framed model quality as a real constraint: the DAG Helper result remains under the mercy of the selected model's capability, so a capable thinking model and human review are still part of the operating model.
 - The Omniron spec-driven-development pilot used an orchestrator plus specialized agents for PO, architect, tech lead, front end, back end, and sub-agent roles. It ran end-to-end and produced a deployable web app candidate, but the team explicitly said not to adopt the approach elsewhere yet because inter-agent communication, standards size, completion checks, compliance, and token burn still need tuning.
+- The August 6 1:1 notes say Copilot/token budget was discussed as roughly 300,000 cases or credits, purchased as VP/Partner tokens, with a budget figure of EUR 5,000. The exact billing mechanics for automatic PR review remain separate and unconfirmed.
 
 ## Open Questions
 
@@ -53,5 +54,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+- `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06
