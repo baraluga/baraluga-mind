@@ -19,6 +19,7 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 - The next review session is intended to cover skills development, mobility, career planning, and a development plan. The source phrase `surgeon skills` is likely a transcription error and remains unconfirmed.
 - The August 6 development-form discussion set Brian's preferred direction as the technical track rather than management, with architect as the target level. The form goals were technical leadership and architecture partnership, stronger leadership/communication/operating cadence, sprint delivery velocity, and scaling engineering standards through governance and mentorship.
 - Geographic mobility preferences captured in the form discussion favored Europe, with Japan and Singapore also mentioned as possible locations.
+- Later on August 6, Brian used the mind palace evidence to add six completed SAP SuccessFactors achievements and one in-progress Khaba/SMP India activity, all linked to relevant performance and development goals. The completed achievements covered the shared `smp-common` TSDB publication runtime, Japan interconnector delivery, SFF migration standards, Aurora forecast ingestion hardening, Darwin production Athena routing, and the Copilot DAG Helper.
 
 ## Sources
 
@@ -29,5 +30,6 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 - `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
 - `sources/notes/2026-07-30-ingest-handover-clarifications.md`
 - `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
+- `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07

@@ -40,9 +40,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-07-08-0945-granola-am-standup.md`
 
-- [ ] Confirm the package-hosting and promotion standard beyond the proven SFF Python-to-Artifactory-DEV path, including non-Python packages, production promotion, retention, and consumer cutover.
+- [ ] Confirm the package-hosting and promotion standard beyond the proven SFF Python-to-Artifactory-DEV consume/publish path, including non-Python packages, production promotion, retention, and consumer cutover.
   - Context: [[sff-walnut-migration]]
-  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`; `sources/codex-conversations/2026-07-13-codex-conversations.md`; `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`; `sources/codex-conversations/2026-07-15-codex-conversations.md`; `sources/codex-conversations/2026-07-22-codex-conversations.md`; `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
 - [ ] Sync Pyrene and GMR / Model Runner tickets to Dale's board.
   - Context: [[team-operations]]
@@ -311,6 +311,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Keep Mateo updated on the India generation DAG progress while he is in France, and capture any feedback that affects the `SCR-1058` onboarding path.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-03-1415-granola-busy.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
+- [ ] Clarify with François whether he wants permanent SMP write access beyond the onboarding-test period.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
 - [ ] Check whether QA actual-flow backfill data can be copied directly to production, and document why the earlier attempt was abandoned.
   - Context: [[smp-platform]]
@@ -694,6 +698,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
+- [x] Create the six SAP SuccessFactors achievements and one Khaba/SMP India in-progress activity with linked goals.
+  - Closure: The August 6 SAP session created and verified all six completed achievement records with evidence-backed completion dates, plus a separate Khaba/SMP India in-progress activity.
+  - Context: [[brian-peralta]]
+  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`
+
 - [x] Prove `SCR-1218` cross-account Khaba S3 access from SMP India dev and production.
   - Closure: Both environments assumed the intended CDH role, downloaded the same SSE-KMS object, matched its checksum, and proved KMS decryption after the dataset was attached to the CDH projects.
   - Context: [[smp-platform]]
@@ -713,6 +722,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Mateo's test proved the missing application entitlement; the docs now direct developers to the SMP team, which submits the `Modify Walnut Project` IT form.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-07-29-codex-conversations.md`
+
+- [x] Document the SFF Python Artifactory package-consumption recipe and link it from the organization `.github` documentation.
+  - Closure: `sff-actions` commit `01b42e9` added the implementation recipe, `.github` commit `d08f040` linked it from the organization docs, and both repositories' CI passed.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
 - [x] Release the shared `smp-common 0.5.0` TSDB publication runtime.
   - Closure: The canonical publication API was released from commit `bed6bb3`; focused tests, build, push CI, and package publication succeeded without live TSDB calls.
@@ -954,6 +968,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: The August 6 1:1 covered the development form, technical-track aspirations, geographic mobility, and formalized development goals; the remaining work is submitting the form.
   - Context: [[brian-peralta]]
   - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
+
+- [x] Create the manually invoked BIPO Clock In/Out skill.
+  - Closure: A personal skill was created and validated for explicit one-punch clock-in or clock-out requests, with timestamp verification and no stored credentials.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
 - [x] Improve loop-in process for ticket updates and stakeholder messages.
   - Context: [[brian-peralta]]

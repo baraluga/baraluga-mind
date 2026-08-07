@@ -38,6 +38,8 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - A deterministic initializer can generate or check only the owned `ci.yml`, `publish.yml`, and `release.yml` callers for repositories that satisfy the accepted profile. It refuses ambiguous or ineligible repositories and does not edit source, tox, dependencies, metadata, or tests.
 - A shared `install-python-tox-ci-tools` action standardized pinned public installation of `build`, `tox`, and `tox-uv`. The bounded rollout reached all ten documented eligible existing-CI consumers without changing their repository-specific test or artifact behavior.
 - The organization-wide closeout found no honest reason for further whole-job centralization. Repositories with different coverage, sdist, deployment, or publication behavior keep composed shared actions rather than being forced into one reusable workflow.
+- On August 6, Guido's Artifactory question exposed a discoverability gap rather than a missing Python capability. `sff-actions` already standardized Python package consumption with `configure-artifactory-python@v1` and publication through tested artifacts plus authenticated readback; the new work added a task-oriented recipe for "I depend on package `abc` in Artifactory" and linked it from the organization `.github` documentation.
+- The durable split remains: `.github` is the policy and starting-point layer, while `sff-actions` owns executable actions, reusable workflows, and copy-paste implementation recipes. A broader universal Artifactory consumption standard should be a contract across repository naming, environment semantics, authentication, trust, verification, failure behavior, ownership, and local development; ecosystem-specific adapters should be added only after repeated real consumers prove the same boundary.
 
 ## Agent Lifecycle
 
@@ -64,6 +66,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - UNCERTAIN: Which AWS roles, protected GitHub environments, smoke tests, and recovery procedure should authorize the Service Desk deployment cutover.
 - UNCERTAIN: Whether all seven Azure-only pipelines should migrate in the current program or remain until their owners establish readiness.
 - UNCERTAIN: Whether `sff-ai-halo` should pin its MCP dependency before adding CI, or keep the Git-only mirror unchanged until Steffen has access.
+- UNCERTAIN: Whether non-Python packages, generic binaries, production promotion, retention, and cross-team `expose` access should follow Walnut Artifactory, another package platform, or separate governance.
 
 ## Sources
 
@@ -79,5 +82,6 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sources/codex-conversations/2026-07-28-codex-conversations.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07

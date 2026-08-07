@@ -111,6 +111,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Ticket 9 TSDB publishing had QA confirmation and the same time series visible in production TSDB through the UI. The two production DAGs were merged: realtime every 10 minutes and reconciliation around 02:30 IST. Final closure still waits on Matéo's production-side confirmation because Brian still could not personally verify data reads.
 - For ticket 12-17 actual-flow backfill, a full FY2025 run took about 15 hours, consistent with roughly 366 days at about two minutes per OCCTO request. A current run covered May 3 to June 8 because data exists from June 8 onward. The open operational question is whether QA backfill data can be copied directly to production to avoid re-scraping OCCTO, and why an earlier attempt was abandoned.
 - Ticket 12-15 operational capacity to TSDB was pulled in alongside 12-17 and estimated at 3 story points. The described process was SDK request, spreadsheet creation, email to Carlos, then Airflow activation and backfill waiting. Metadata work remains: inventory existing data, check duplicates, create remaining time series, and inject; Louis may handle portions.
+- August 6 SCR-1220 access clarification separated GitHub repository access from Tools Artifactory access. SMP repository access was described as three teams: `SMP` read access for the scrum team, `SMP-CODEOWNERS` admin access for core developers, and `SMP-INDIA` write access for DAG contributors and interested stakeholders. François's write access was temporary during onboarding testing; Matéo should not hit that GitHub blocker because he is already in `SMP-INDIA`.
+- The same clarification says Tools Artifactory access is unrelated to GitHub repository permissions and carries extra licensing cost. The recommended Matéo path was the documented `smp-india` README fallback, `python scripts/sync_local.py`, which installs the pinned `smp-common` release from GitHub instead of requiring Tools Artifactory access.
 
 ## Open Questions
 
@@ -130,6 +132,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the QA SMP service application has read/write access to the `rf_india` provider in TSDB UAT.
 - UNCERTAIN: Whether the TSDB backfill parallelization plus per-task token renewal is sufficient, or whether yearly execution should become the standard operating shape.
 - UNCERTAIN: Whether QA backfill data can safely be copied directly to production without re-scraping OCCTO, and why the previous attempt was abandoned.
+- UNCERTAIN: Whether François wants permanent SMP write access after the onboarding-test period, or whether the temporary-access model should stay.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
@@ -195,5 +198,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 - `sources/meetings/2026-08-04-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+- `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
