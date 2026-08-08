@@ -170,6 +170,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[job-search-2026]]
   - Source: `sources/codex-conversations/2026-07-31-codex-conversations.md`
 
+### Personal Projects
+
+- [ ] Decide whether to try PSPrices for one or two sale cycles or build a personal URL-driven game price tracker first.
+  - Context: [[game-price-tracker]]
+  - Source: `sources/codex-conversations/2026-08-07-codex-conversations.txt`
+
 ### Japan Interconnector
 
 - [ ] Continue collecting and reconcile Japan specialists' feedback on the operating-capacity interpretation.
@@ -585,6 +591,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for Matéo to confirm the India generation TSDB production side is healthy, then close ticket 9.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
+- [ ] Wait for local TSDB credentials and ENGIE Artifactory connectivity, then run live read-only UAT/prod acceptance for the SMP TSDB Explorer.
+  - Context: [[smp-tsdb-explorer]]
+  - Source: `sources/codex-conversations/2026-08-07-codex-conversations.txt`
 
 - [ ] Wait for Matthew and Adrian to confirm the Gen-A `Go Anywhere` endpoint, machine-to-machine credentials, access rights, and geo-blocking constraints.
   - Context: [[smp-platform]]

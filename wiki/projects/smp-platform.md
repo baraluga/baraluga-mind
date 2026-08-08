@@ -113,6 +113,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Ticket 12-15 operational capacity to TSDB was pulled in alongside 12-17 and estimated at 3 story points. The described process was SDK request, spreadsheet creation, email to Carlos, then Airflow activation and backfill waiting. Metadata work remains: inventory existing data, check duplicates, create remaining time series, and inject; Louis may handle portions.
 - August 6 SCR-1220 access clarification separated GitHub repository access from Tools Artifactory access. SMP repository access was described as three teams: `SMP` read access for the scrum team, `SMP-CODEOWNERS` admin access for core developers, and `SMP-INDIA` write access for DAG contributors and interested stakeholders. François's write access was temporary during onboarding testing; Matéo should not hit that GitHub blocker because he is already in `SMP-INDIA`.
 - The same clarification says Tools Artifactory access is unrelated to GitHub repository permissions and carries extra licensing cost. The recommended Matéo path was the documented `smp-india` README fallback, `python scripts/sync_local.py`, which installs the pinned `smp-common` release from GitHub instead of requiring Tools Artifactory access.
+- [[smp-tsdb-explorer]] is a local-only, read-only TSDB diagnostic app created on August 7. Offline implementation and security validation passed, but live UAT/prod acceptance remained gated by local TSDB credentials and ENGIE Artifactory connectivity.
 
 ## Open Questions
 
@@ -133,6 +134,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the TSDB backfill parallelization plus per-task token renewal is sufficient, or whether yearly execution should become the standard operating shape.
 - UNCERTAIN: Whether QA backfill data can safely be copied directly to production without re-scraping OCCTO, and why the previous attempt was abandoned.
 - UNCERTAIN: Whether François wants permanent SMP write access after the onboarding-test period, or whether the temporary-access model should stay.
+- UNCERTAIN: Whether the local SMP TSDB Explorer has since completed live UAT/prod acceptance.
 - UNCERTAIN: Who can update the AWS IAM trust policy for the new `qrm-dms/smp-tool` India deployment subjects.
 - UNCERTAIN: Whether `smp-dashboard` should upgrade from `cdh-sdk 1.1.81` to `1.1.91` after the crawler-status workflow hardening.
 - UNCERTAIN: Whether `STSS` is the exact service-account/web-identity error name from the July 17 technical-activities source.
@@ -199,5 +201,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-08-04-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 - `sources/codex-conversations/2026-08-06-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-07-codex-conversations.txt`
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-08
