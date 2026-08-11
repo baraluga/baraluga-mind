@@ -33,6 +33,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `smp-dashboard` depends on private `cdh-sdk` directly from GitHub Tools, not only on Artifactory packages. The manual CDH registration workflow therefore needs `ENGIE_GITHUB_TOOLS_NETRC` for dependency installation and `CDH_TOKEN_ONESHOT` for CDH itself.
 - The August 4 production registration failure was caused by an expired or revoked GitHub Tools credential while installing `cdh-sdk`; it did not reach CDH and caused no partial registration. A fresh GitHub Tools PAT with access to `GBSEngieDigitalDPAAS/cdh-sdk` fixed the dependency step.
 - The long-term cleanup preference is to publish `cdh-sdk` to Artifactory or use an organization-managed machine account, rather than keeping a personal GitHub Tools PAT in `smp-dashboard`.
+- August 11 standup and grooming notes kept old Louis-dashboard metadata as a blocker. The team can pre-check whether providers already exist in TSDB, identify provider owners, and coordinate injection scheduling so dashboard continuity is not disrupted.
+- The August 11 feature spike makes Grafana alerting a possible alternative to stakeholders manually checking dashboards every day, especially for threshold-based monitoring such as power-price triggers. Grafana monitoring views also need an inventory before the team claims a reusable operations pattern.
 
 ## Open Questions
 
@@ -43,6 +45,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether the forecaster benchmarking sources and ownership will be handled by Brian's team, Mateo, Adrian, or a broader India workflow.
 - UNCERTAIN: Whether `cdh-register.yml` should fail, wait, or emit a separate required follow-up when requested production stage refreshes are skipped because a crawler is already running.
 - UNCERTAIN: Whether `cdh-sdk` will be packaged into Artifactory or remain a direct GitHub Tools dependency.
+- UNCERTAIN: Which old Louis-dashboard providers and metadata owners are needed before TSDB injection can proceed.
 
 ## Sources
 
@@ -57,5 +60,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-08-03-1415-granola-busy.md`
 - `sources/notes/2026-08-04-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+- `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
+- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-11

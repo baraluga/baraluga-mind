@@ -84,6 +84,10 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The same session established a repeatable timesheet workflow shape: Brian pre-fills scheduled Teams meetings, then the remaining daily capacity is allocated through Tempo and Prométhée using the sprint that was active for the target week. Tempo should use designated logging tickets `SCR-1203` for Japan, `SCR-1204` for India, and `SCR-1205` for Common; Prométhée should map to the matching CAPEX rows and be explicitly saved and reload-verified rather than treated as autosaved.
 - Guardrails for that workflow include inspecting existing entries first, excluding declined/cancelled or personal calendar items, respecting leave and holidays, using 15-minute Tempo increments and 0.125-day Prométhée increments, and saving Prométhée by default while treating final submission as a separate explicit action.
 - Team-life notes from the same meeting captured the July 10 QRM first anniversary recap, a requirements-solicitation/stakeholder-management workshop planned for August 28, anniversaries for Hook and Pierre, August birthdays for Joyce and Nico, Rudy joining Pierre's team, and a reminder to update Sezane Career Explorer skills and trajectory.
+- August 11 weekly team notes said Walnut migration is now project-specific, with actual deployment moving to AWS. POCs and tech leads should coordinate with POs while Michael has availability, without requiring extra allocation from the project side.
+- The August 11 development-plan reminder made the pre-work more concrete: update the skills page with proficiency ratings, fill in career aspirations, set geographic mobility preference, and then connect completed career goals to existing goals before the next meeting with Bong.
+- The same weekly notes captured team-calendar constraints: Philippine holidays on August 21 and August 31, one RTO workshop on August 28, a tentative Dinner and Dance on November 12, and full-force attendance requested for Fred and Christina's Philippines visit on November 16-20.
+- Second-quadrimester team-building planning targets August or September and can be a full-day non-overnight activity; volunteers were asked to send suggestions for review.
 
 ## Open Questions
 
@@ -108,6 +112,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Centiment` is the exact migration name from the August 4 meeting source; it may be a transcript artifact.
 - UNCERTAIN: Whether `Rudy`, `Hook`, `Joyce`, `Nico`, and `Sezane` are exact spellings from the August 4 meeting source.
 - UNCERTAIN: Whether `Prométhée` is the preferred spelling for the timesheet system in durable notes; older sources spell it as `Promethe`.
+- UNCERTAIN: Whether `Sesame` in the August 11 weekly notes is the same HR/development system previously captured as `Sezane Career Explorer`.
+- UNCERTAIN: Whether `Reina`, `Carlo`, `Pear`, and `Guido` are exact names from the August 11 weekly notes.
 
 ## Sources
 
@@ -156,5 +162,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-10-codex-conversations.txt`
+- `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 
-Last Updated: 2026-08-10
+Last Updated: 2026-08-11

@@ -101,6 +101,9 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - The scoped nuclear history fix from QA, commit `3d205df`, was cherry-picked to `smp-dashboard/main` as `659995d`; the stale feature branch was then deleted. This fix prevents historical nuclear snapshot selection from dropping the older 2016-mid-2026 legacy horizon.
 - Production CDH registrations for `hjks_2y_status` and `hjks_nuclear_by_region` later succeeded after the GitHub Tools credential used to install private `cdh-sdk` was renewed. The submitted crawler job IDs were `ca11da69-a242-4faa-96a9-34f93d5f623b` and `ccd17c6e-f297-4601-809a-44b032362c6e`.
 - Brian later confirmed in CDH that successful production registration did not automatically refresh the affected stages; he had to refresh them manually. The likely difference from QA is the newer registration manager behavior that submits crawler work and exits green without waiting for every stage refresh to complete.
+- August 11 standup notes framed the sprint-review message for Japan as TSDB push for spatial capacity and port activation, with operational-capacity metadata validation still waiting on Carlos and old Louis-dashboard metadata still pending.
+- For the next engagement period, the source split Japan next steps by budget: support mode means no proactive next steps; full budget would push old operational-capacity data to TSDB. The team also wanted Japan stakeholders to surface future needs because next-period visibility was low.
+- August 11 backlog grooming described the new interconnector metadata ticket as blocked, with old-dashboard time-series tickets waiting on Louis's team to push to TSDB. The practical unblock path is to check whether providers already exist, identify provider owners, and schedule injection so dashboards are not disrupted.
 
 ## Open Questions
 
@@ -120,6 +123,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Who approves production TSDB changes after UAT validation; the July 24 standup says the current contact manages only UAT.
 - UNCERTAIN: Whether the completed UAT campaign has since received an exact-range `write=false` rerun proving zero would-write rows across all source-complete chunks.
 - UNCERTAIN: Whether the production CDH registration workflow should block until each requested stage refresh has completed, or at least surface crawler-already-running outcomes as an explicit follow-up.
+- UNCERTAIN: Whether `port activation` in the August 11 standup is the exact TSDB/Japan term.
 
 ## Sources
 
@@ -170,5 +174,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/notes/2026-08-03-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+- `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
+- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-11

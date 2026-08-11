@@ -12,9 +12,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-10-codex-conversations.txt`
 
-- [ ] Finalize and submit Brian's development form, including at least one activity per goal and the technical-track/architect direction.
+- [ ] Finalize and submit Brian's development form, including the Sesame skills page, career aspirations, mobility preference, at least one activity per goal, and the technical-track/architect direction.
   - Context: [[brian-peralta]]
-  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
+  - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`; `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+
+- [ ] Send suggestions for the August-September second-quadrimester team-building activity.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+
+- [ ] Block November 16-20 for Fred and Christina's Philippines visit and avoid filing leave for those dates.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+
+- [ ] Coordinate project-specific Walnut migration confirmation between POCs, tech leads, POs, and Michael while Michael has availability.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 
 - [ ] Francois to follow up with Bastien on further Iberia questions or interest in SMP.
   - Context: [[team-operations]]
@@ -300,7 +312,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Add Japan operating-capacity series to TSDB and backfill at least from 2025, ideally from 2019 to match the dashboard.
   - Context: [[japan-interconnector-dashboard]]
-  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`
+  - Source: `sources/meetings/2026-07-29-1630-granola-sprint-review.md`; `sources/codex-conversations/2026-07-31-codex-conversations.md`; `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
 
 - [ ] Decide whether a contiguous 95-interval Khaba day is acceptable for reconciliation writes, or keep publication strict until CDH explains the 23:52 IST cutoff.
   - Context: [[smp-platform]]
@@ -312,7 +324,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Follow up on the SMP budget extension request and escalate at the next sprint review if there is still no response.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+  - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+
+- [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
+
+- [ ] Prepare Brian's Japan and India sprint-review slides before Francois presents them.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
 
 - [ ] Validate carried-over sprint tickets `SCR-1208` and `SCR-1058`, with Matéo leading the validation process where applicable.
   - Context: [[smp-platform]]
@@ -464,7 +484,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Pair with Joyce or Michael on `SCR-507` to automate SMP Docker image build and push to AWS ECR.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
 - [ ] Create one concise Confluence page for new DAG developers covering QRMDMS organization access, team assignment, and Grafana invitation.
   - Context: [[smp-platform]]
@@ -474,9 +494,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-- [ ] Prepare the August steering-committee material for Japan, India, and the user-empowerment/Git-push proposal after Matthew's test.
+- [ ] Prepare the August steering-committee material for Japan, India, the user-empowerment/Git-push proposal, and the Airflow/Grafana feature spike.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
 ### AI Assisted Engineering
 
@@ -507,6 +527,18 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Evaluate account-level global alarms for shared AWS Batch capacity saturation.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+
+- [ ] Complete the Airflow and Grafana feature spike, covering Airflow assets, Grafana alerting, and Grafana monitoring views, with findings ready by 2026-08-21.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+
+- [ ] Create separate Jira tickets for the Airflow feature spike and the Grafana feature spike.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+
+- [ ] Share the Airflow and Grafana spike discoveries in the relevant front-end/back-end chapter or equivalent team forum.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
 - [ ] Ask IT for an approved Zscaler bypass or split-routing policy for ChatGPT/Codex traffic while private-site access remains on Zscaler.
   - Context: [[zscaler-codex-access]]

@@ -25,6 +25,8 @@ SMP operational discussions in late June and early July focused on production in
 - July 14 technical standup said APM migration was complete and SNS infrastructure was done, but Grafana still needed AWS-admin help to create or confirm a role for CloudWatch/publish access in the APM context.
 - July 17 technical-activities notes say an SNS publisher role had been created and attached to the Grafana service account, but a web-identity/STSS error still persisted and Jeka was asked for namespace access. The SNS ticket was not expected to close that day because of a later demo.
 - The same meeting introduced a broader alerting idea from the Prosumer simulation blockage: restore Prosumer-specific alarms if needed, but also consider account-level global alarms because the immediate root cause was shared AWS infrastructure capacity rather than a Prosumer application failure.
+- August 11 backlog grooming proposed a short spike on out-of-the-box Airflow and Grafana features not yet used by the team. Airflow assets were called out as unexplored potential low-hanging fruit; Grafana alerting could replace daily manual dashboard checks for threshold-driven cases such as power prices; and Grafana monitoring views should be mapped for operational reuse.
+- The intended spike output feeds the August 28 steering committee presentation, with findings expected by August 21 before the other speaker's August 24-30 holiday. The meeting expected two tickets: one for Grafana features and one for Airflow features.
 
 ## Open Questions
 
@@ -33,6 +35,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the Grafana alert destination should be one shared Teams channel or separate per system still needs confirmation.
 - UNCERTAIN: Which AWS admin can create the Grafana role needed for APM CloudWatch/publish access.
 - UNCERTAIN: Whether `STSS` and `Jeka` are exact names from the July 17 technical-activities source.
+- UNCERTAIN: Whether Airflow `assets` are mature enough for the team's current DAG model; the August 11 source frames this only as a spike candidate.
 
 ## Sources
 
@@ -51,5 +54,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 - `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
+- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
-Last Updated: 2026-07-17
+Last Updated: 2026-08-11

@@ -114,6 +114,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - August 6 SCR-1220 access clarification separated GitHub repository access from Tools Artifactory access. SMP repository access was described as three teams: `SMP` read access for the scrum team, `SMP-CODEOWNERS` admin access for core developers, and `SMP-INDIA` write access for DAG contributors and interested stakeholders. François's write access was temporary during onboarding testing; Matéo should not hit that GitHub blocker because he is already in `SMP-INDIA`.
 - The same clarification says Tools Artifactory access is unrelated to GitHub repository permissions and carries extra licensing cost. The recommended Matéo path was the documented `smp-india` README fallback, `python scripts/sync_local.py`, which installs the pinned `smp-common` release from GitHub instead of requiring Tools Artifactory access.
 - [[smp-tsdb-explorer]] is a local-only, read-only TSDB diagnostic app created on August 7. Offline implementation and security validation passed, but live UAT/prod acceptance remained gated by local TSDB credentials and ENGIE Artifactory connectivity.
+- August 11 standup notes say the ticket captured as `2017 / 12-15` had been validated by Francois and was awaiting Carlos's approval. Remaining work in the source was `KSDB` push, DAG execution, QA approval, and production approval; `KSDB` may be a transcription artifact for TSDB and should not be normalized without confirmation.
+- The same standup said ticket `1209` for `CABA` generation was mostly complete, while another interconnector-data ticket remained blocked by concerns on newly added operational-capacity data.
+- Old-dashboard metadata remained a blocker: the team needed to confirm metadata collection progress with `Fluid`, continue waiting on metadata for Louis's dashboards, pre-check whether providers already exist in TSDB, identify provider owners, and schedule injection carefully to avoid disrupting dashboards.
+- August 11 backlog grooming recorded no confirmed budget and no formal sprint plan for the upcoming two-week period. Most tickets were blocked on metadata or external inputs; the fallback support-mode shape was roughly 30% per day only when a ticket is raised, while full-time Brian engagement still depended on budget approval.
+- The same grooming notes kept automated Docker image push and deployment triggering as a low-priority, budget-dependent workflow improvement, with board/Grafana backup cleanup treated as nice-to-have rather than urgent.
 
 ## Open Questions
 
@@ -144,6 +149,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
+- UNCERTAIN: Whether `KSDB` in the August 11 standup is exact or a transcription artifact for TSDB.
+- UNCERTAIN: Whether `Fluid`, `Material`, and `CABA` are exact names from the August 11 standup and grooming notes.
 
 ## Sources
 
@@ -202,5 +209,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 - `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-07-codex-conversations.txt`
+- `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
+- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 
-Last Updated: 2026-08-08
+Last Updated: 2026-08-11
