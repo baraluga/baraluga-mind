@@ -1,0 +1,1458 @@
+# Codex Conversations - 2026-08-10
+
+## Capture Summary
+
+Source type: mixed capture / Codex conversation export.
+
+This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.
+
+Facts:
+- Capture date: `2026-08-10`
+- Generated from local session directory: `/Users/qn5792/.codex/sessions/2026/08/10`
+- Sessions found: 4
+
+Inferences:
+- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.
+
+## Preliminary Ingest Notes
+
+- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.
+- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.
+- Move this file together with the paired `2026-08-10-codex-conversations.md` index during ingest.
+- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.
+
+## Thread Index
+
+| Thread | Session | Started | Updated | Messages | CWD | Raw File |
+| --- | --- | --- | --- | ---: | --- | --- |
+| Daily Codex Conversation Capture | `019fe74c-0f77-7dd2-bc49-98e89b92bcda` | `2026-08-09T16:12:29.488Z` | `2026-08-09T16:12:31.27466Z` | 2 user / 9 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T00-12-29-019fe74c-0f77-7dd2-bc49-98e89b92bcda.jsonl` |
+| Explore Firefox tabs | `019feaf0-89eb-7771-be95-17275a5599b8` | `2026-08-10T09:11:00.331Z` | `2026-08-10T09:14:51.900249Z` | 7 user / 16 assistant | `/Users/qn5792/Documents/Codex/2026-08-10/chat-you-there-can-you-see` | `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T17-11-00-019feaf0-89eb-7771-be95-17275a5599b8.jsonl` |
+| Daily Granola Meeting Notes Capture | `019fec35-2dc2-7d50-968f-e1dfeb69285a` | `2026-08-10T15:05:40.948Z` | `2026-08-10T15:06:07.802676Z` | 2 user / 3 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T23-05-40-019fec35-2dc2-7d50-968f-e1dfeb69285a.jsonl` |
+| Daily Baraluga Mind Ingest | `019fec4c-0e05-7313-afaf-b0833d21b7a9` | `2026-08-10T15:30:35.197Z` | `2026-08-10T15:30:36.999955Z` | 2 user / 5 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T23-30-35-019fec4c-0e05-7313-afaf-b0833d21b7a9.jsonl` |
+
+## Transcript
+
+## Daily Codex Conversation Capture
+
+- Session: `019fe74c-0f77-7dd2-bc49-98e89b92bcda`
+- Started: `2026-08-09T16:12:29.488Z`
+- Updated: `2026-08-09T16:12:31.27466Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T00-12-29-019fe74c-0f77-7dd2-bc49-98e89b92bcda.jsonl`
+
+### User - 2026-08-09T16:28:03.672Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-10</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-09T16:28:03.724Z
+
+Automation: Daily Codex Conversation Capture
+Automation ID: daily-codex-conversation-capture
+Automation memory: $CODEX_HOME/automations/daily-codex-conversation-capture/memory.md
+Last run: 2026-08-08T16:16:25.048Z (1786205785048)
+
+You are running Brian's daily Codex conversation capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export the complete previous Asia/Manila calendar day's local Codex conversations into the Baraluga Mind `inbox/` folder as an Obsidian-safe Markdown index paired with a complete raw text transcript.
+- Preserve the source conversation material without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine yesterday's calendar date in `Asia/Manila` as `YYYY-MM-DD`.
+3. Run `/Users/qn5792/baraluga-mind/scripts/export-codex-conversations.py --date YYYY-MM-DD` from `/Users/qn5792/baraluga-mind`, substituting the date determined in step 2.
+4. Verify that both `inbox/YYYY-MM-DD-codex-conversations.md` and `inbox/YYYY-MM-DD-codex-conversations.txt` exist for that previous date.
+5. Confirm that the Markdown index does not embed a `## Transcript` section and that the complete filtered user/assistant transcript is present in the paired text file.
+6. Report both output paths, the session count printed by the script, and any errors.
+
+Rules:
+- Keep raw transcripts as `.txt`; do not rename them to `.md` because oversized Markdown transcripts can crash Obsidian during indexing.
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw Codex session files.
+- If the script fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-09T16:28:35.806Z
+
+I’ll run the daily capture as a preservation-only task: read the repo instructions and automation memory, compute the Asia/Manila previous date, run the exporter, then verify the two expected inbox files without ingesting anything.
+
+### Assistant - 2026-08-09T16:28:38.838Z
+
+The automation memory file does not exist yet, so this is the first remembered run for this automation. Yesterday in Asia/Manila is `2026-08-09`; I’m running the exporter for that date now.
+
+### Assistant - 2026-08-09T16:29:08.769Z
+
+The export completed and reported `sessions=4`. I’m checking the Markdown/text pair now: existence, no embedded transcript section in the index, and non-empty user/assistant transcript content in the raw `.txt`.
+
+### Assistant - 2026-08-09T16:29:45.424Z
+
+The raw text transcript is present and sized normally for the four sessions. Its transcript section uses the exporter’s formatted transcript headings rather than simple `User:` line prefixes, so I’m doing one more targeted check for the section and message blocks.
+
+### Assistant - 2026-08-09T16:30:13.095Z
+
+The paired `.txt` definitely contains a `## Transcript` section and four thread transcript sections. I’m checking the exact message label format before I write the run memory and close this out.
+
+### Assistant - 2026-08-09T16:30:16.988Z
+
+The transcript labels are timestamped headings like `### User - ...` and `### Assistant - ...`, and the first transcript body is visible in the raw text file. I’m recording this run in the automation memory now.
+
+### Assistant - 2026-08-09T16:30:45.350Z
+
+`$CODEX_HOME` is unset in this shell, so I’m using the standard Codex home path `/Users/qn5792/.codex` for the automation memory path specified by the task.
+
+### Assistant - 2026-08-09T16:30:47.781Z
+
+I’m making the only non-capture edit now: creating the automation memory file with the run summary and timestamp. No wiki, source, or action files are being touched.
+
+### Assistant - 2026-08-09T20:23:18.253Z
+
+Daily Codex conversation capture completed for Asia/Manila date `2026-08-09`.
+
+Outputs:
+- Markdown index: [`/Users/qn5792/baraluga-mind/inbox/2026-08-09-codex-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-08-09-codex-conversations.md)
+- Raw transcript: [`/Users/qn5792/baraluga-mind/inbox/2026-08-09-codex-conversations.txt`](/Users/qn5792/baraluga-mind/inbox/2026-08-09-codex-conversations.txt)
+
+Script reported `sessions=4`. Verification passed: both files exist, the Markdown index does not contain `## Transcript`, and the paired `.txt` contains the complete transcript section with timestamped user/assistant message headings. No errors reported, and I did not ingest or edit `actions.md`, wiki pages, or source folders.
+
+::inbox-item{title="Codex conversations captured" summary="2026-08-09 export verified with four sessions"}
+
+## Explore Firefox tabs
+
+- Session: `019feaf0-89eb-7771-be95-17275a5599b8`
+- Started: `2026-08-10T09:11:00.331Z`
+- Updated: `2026-08-10T09:14:51.900249Z`
+- CWD: `/Users/qn5792/Documents/Codex/2026-08-10/chat-you-there-can-you-see`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T17-11-00-019feaf0-89eb-7771-be95-17275a5599b8.jsonl`
+
+### User - 2026-08-10T09:14:43.274Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+<environment_context>
+  <cwd>/Users/qn5792/Documents/Codex/2026-08-10/chat-you-there-can-you-see</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-10</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/Documents/Codex</root><root>/Users/qn5792/Documents/Codex/2026-08-10/chat-you-there-can-you-see</root><root>/Users/qn5792/.codex/visualizations/2026/08/10/019feaf0-89eb-7771-be95-17275a5599b8</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-10T09:14:43.307Z
+
+# Applications mentioned by the user:
+
+<appshot app="Firefox" bundle-identifier="org.mozilla.firefox" window-title="Tempo - JIRA" image="Firefox Appshot 2026-08-10T09-10-46.257Z.png">
+Window: "Tempo - JIRA", App: Firefox.
+standard window Tempo - JIRA
+	container Tempo - JIRA
+		toolbar Browser tabs
+			toggle button
+			tab group
+				tab Value: Timesheet, Timesheet
+Close tab
+				tab (selected) Value: Tempo - JIRA, Tempo - JIRA
+Close tab
+				button
+			button
+		toolbar Navigation
+			button
+			button
+			button
+			button
+			container
+				button
+				button
+				combo box (settable, string) Description: Search with Google or enter address, Value: tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03
+					text tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03
+				button
+			button
+			button
+			button
+			button
+			button
+			button
+			button
+		scroll area
+			HTML Content Description: Tempo - JIRA, URL: tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03, Value: Skip to:&lt;u&gt;[Top BarMain ContentSidebar](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#_Rkea99cnal6p_)&lt;/u&gt;Collapse sidebar [Switch sites or apps[group][Jira](tractebel-et.atlassian.net/jira)[text field: Search, press enter to navigate to advanced search with your text query][group]Create6 NotificationsHelpSettings[group]brian.peralta@engie.com[For you](tractebel-et.atlassian.net/jira/for-you)[group]Recent[group][group]Starred[group][group]Apps[group][group]Your apps[Quantify - My Work](tractebel-et.atlassian.net/plugins/servlet/ac/quantify/mywork?project.key=SCR&amp;project.id=10956)[image]More actions[group]Structure[image]More actions[group][Tempo](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!?project.key=SCR&amp;project.id=10956)[image]More actions[group]Recommended for your team[Zephyr - Test Management and Automation for Jira](tractebel-et.atlassian.net/jira/marketplace/discover/app/com.kanoah.test-manager?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=2d1820cf0b583ed61e7144c9a57c6419519bbf70729da64f2871eb67f634a49a)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/com.kanoah.test-manager?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=2d1820cf0b583ed61e7144c9a57c6419519bbf70729da64f2871eb67f634a49a)[image][WBS Gantt-Chart - Enterprise Project Management for Jira](tractebel-et.atlassian.net/jira/marketplace/discover/app/jp.ricksoft.plugins.wbsgantt-for-jira?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=3af20a5472f160eedc67b01b13b853cb3310b15f177eae0ea5e4ab033c2c9f70)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/jp.ricksoft.plugins.wbsgantt-for-jira?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=3af20a5472f160eedc67b01b13b853cb3310b15f177eae0ea5e4ab033c2c9f70)[image][Time in Status](tractebel-et.atlassian.net/jira/marketplace/discover/app/time-in-status-report?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=500799360c0e995a3303897d2edff20edff9fc505be9245d369adc987e7e692d)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/time-in-status-report?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=500799360c0e995a3303897d2edff20edff9fc505be9245d369adc987e7e692d)[image][Explore more apps](tractebel-et.atlassian.net/jira/marketplace/discover)[group]Spaces[group]More actions for spacesFilters[group][group]Dashboards[group]Create dashboardOperations[group][Confluence](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Assets](tractebel-et.atlassian.net/jira/assets)[, (opens new window)](tractebel-et.atlassian.net/jira/assets)[image][group][Teams](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[image]Teams[group][Goals](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Projects](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group]Customize sidebar[group][slider]Resize panel[group][scroll area: Tempo][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]
+
+The focused UI element is HTML Content URL: app.tempo.io/io/web/tempo-app/, Value: [group][image]Timesheets[image][image][image][My Work](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work)[group][image][Projects](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/financial-manager/projects)[group][image][Reports](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/reports)[group][image][Teams](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/teams)[group][image][Accounts](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/accounts)[group][image]Teams like yours also use[image][image]Structure[image]Custom ChartsSave &amp; Bundle with Project Collections. Try today for Free.[image][image][Apps](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/apps?tab=products)[group][image]Tempo Help[group][image: Settings][Settings](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/configuration)[group][image: User Avatar]PERALTA Brian Alexander (ENGIE Services Philippines)Current Period -112[image][Calendar](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?date=2026-08-03&amp;type=TIME)[List](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?date=2026-08-03&amp;type=LIST)[Timesheet](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/timesheet)[image]03 Aug - 09 Aug, 2026[image][image]TodayLog All ActivitiesWeek: 0h of 40h[group][image][image][group][image][image]Mon030h of 8hLog TimePlan TimeLog Activities(1h 45m)Tue040h of 8hLog TimePlan TimeLog Activities(1h 45m)Wed050h of 8hLog TimePlan TimeLog Activities(1h 45m)Thu060h of 8hLog TimePlan TimeLog Activities(3h 45m)Fri070h of 8hLog TimePlan TimeLog Activities(2h 45m)Sat080h of 0hLog TimePlan TimeSun090h of 0hLog TimePlan TimeACTIVITIES[group]Recovering Generation data and pushing them to TSDBActivity: Jira[image][SCR-1209](tractebel-et.atlassian.net/browse/SCR-1209)30m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)45m[group]Recovering Generation data and pushing them to TSDBActivity: Jira, Commented, Updated Attachment, Changed Status[image][SCR-1209](tractebel-et.atlassian.net/browse/SCR-1209)30mACTIVITIES[group]Backfill the existing 35 Japan interconnector time series in TSDBActivity: Jira, Changed Status[image][SCR-1217](tractebel-et.atlassian.net/browse/SCR-1217)30m[group]Add snapshot look-back to Japan Nuclear Generation by Region dashboardActivity: Jira, Changed Status, Assigned[image][SCR-1208](tractebel-et.atlassian.net/browse/SCR-1208)15m[group]JAPAN_GET_OUTAGE_VTSActivity: Jira[image][SCR-235](tractebel-et.atlassian.net/browse/SCR-235)1hACTIVITIES[group]Giving India Users access rights and trainingActivity: Jira, Changed Status[image][SCR-1058](tractebel-et.atlassian.net/browse/SCR-1058)15m[group]Giving India Users access rights and trainingActivity: Jira[image][SCR-1058](tractebel-et.atlassian.net/browse/SCR-1058)15m[group]Backfill the existing 35 Japan interconnector time series in TSDBActivity: Jira[image][SCR-1217](tractebel-et.atlassian.net/browse/SCR-1217)1h[group]Giving India Users access rights and trainingActivity: Jira, Updated Attachment, Assigned, Commented, Changed Status[image][SCR-1058](tractebel-et.atlassian.net/browse/SCR-1058)15mACTIVITIES[group]Backfill the existing 35 Japan interconnector time series in TSDBActivity: Jira[image][SCR-1217](tractebel-et.atlassian.net/browse/SCR-1217)15m[group]Completing interconnector's time series push to TSDBActivity: Jira, Assigned, Changed Status[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)45m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)45m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)30m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)30m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15mACTIVITIES[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)30m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)30m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)45m[group]Completing interconnector's time series push to TSDBActivity: Jira[image][SCR-1215](tractebel-et.atlassian.net/browse/SCR-1215)15m[group][group][group][image][group][application status][alert][group][group][group][group][group][group][group]
+</appshot>
+
+## My request for Codex:
+Codex you there? Can you see the firefox instance I just attached here? Can you explore both tabs to have a good baseline understanding on how they work and shit?
+
+Our goal is to define a skill that will accomplish my timesheet in the 2 websites. 1 skill per website, if it makes sense. But first, explore! Let me know what u think. 
+
+If something's unclear, pls ask after
+
+### Assistant - 2026-08-10T09:14:48.455Z
+
+Yep, I can see the Firefox window and the two tabs. I’m going to use the Mac app-control skill to inspect both sites read-only—navigation, fields, workflows, and where a future timesheet skill would need safeguards. I won’t submit or alter any entries while exploring.
+
+### Assistant - 2026-08-10T09:15:30.794Z
+
+First pass: Tempo is activity-driven and granular; Prométhée is a monthly matrix of project codes × days, with weekly navigation and separate work-from-home / out-of-office controls. I’m checking the non-destructive navigation and form structure now, because that difference is likely to drive the split into two skills.
+
+### Assistant - 2026-08-10T09:16:30.933Z
+
+Quick heads-up: while testing a Tempo activity card, the click appears to have dismissed one 30-minute suggestion (the weekly logged total stayed at 0h, so no worklog was created). I’m checking whether a refresh restores the suggestion; I’ll report the exact outcome.
+
+### Assistant - 2026-08-10T09:17:03.212Z
+
+Yep—I can see and inspect both Firefox tabs. Two separate skills make sense, possibly with a thin coordinator later.
+
+What I found:
+
+- Tempo/Jira is the detailed worklog system.
+  - Weekly view, expected 8h per weekday / 40h per week.
+  - It discovers Jira activity suggestions with issue, timestamp, and inferred duration.
+  - Logging requires: Jira work item, date, duration, description, and WBS work attribute.
+  - It supports manual logging, individual activity logging, and “Log All Activities.”
+  - Current displayed week is 3–9 August 2026 with 0h actually logged.
+
+- Prométhée is the monthly allocation/administrative timesheet.
+  - Status is “To Create.”
+  - It is a matrix of project codes × dates, using decimal-day/hour inputs.
+  - It separately tracks work from home, out of office, on-call, and on-call work.
+  - The available project codes include APAC/Japan/India CAPEX/OPEX and non-billable categories.
+  - A standard weekday appears to be 7.75h, which conflicts with Tempo’s displayed 8h expectation and needs an explicit rule.
+
+My recommended design:
+
+1. `tempo-timesheet`
+   - Gather Jira activity evidence.
+   - Propose daily worklogs.
+   - Validate issue, duration, description, WBS, duplicates, and daily totals.
+   - Fill entries and optionally submit only after an explicit review/confirmation step.
+
+2. `promethee-timesheet`
+   - Translate approved daily allocations into the correct project-code rows.
+   - Apply WFH/OOO/on-call information.
+   - Validate weekday totals, weekends, month status, and project mappings.
+   - Save first; treat final submission as a separate confirmed action.
+
+3. Later, optionally add a coordinator that prepares one normalized allocation plan and invokes both skills. This avoids duplicating the reasoning about what you worked on.
+
+One unfortunate exploration side effect: testing a Tempo activity card dismissed one 30-minute `SCR-1209` suggestion—apparently the 14:00 “Recovering Generation data…” activity. Reloading did not restore it. No worklog was created and the week remains at 0h, but the suggestion list changed from Monday’s 1h45m to 1h30m.
+
+Before defining the skills, I need three policy decisions:
+
+- Is Tempo/Jira activity the source of truth, or should we also consult your calendar/notes?
+- How should Tempo’s 8h expectation reconcile with Prométhée’s apparent 7.75h standard day?
+- Should the skills stop at a reviewable draft, save entries, or also perform final submission after showing you a summary?
+
+### User - 2026-08-10T09:34:27.166Z
+
+# Applications mentioned by the user:
+
+<appshot app="Firefox" bundle-identifier="org.mozilla.firefox" window-title="Scrapers board - Backlog - JIRA" image="Firefox Appshot 2026-08-10T09-34-25.054Z.png">
+Window: "Scrapers board - Backlog - JIRA", App: Firefox.
+standard window Scrapers board - Backlog - JIRA
+	container Scrapers board - Backlog - JIRA
+		toolbar Browser tabs
+			toggle button
+			tab group
+				tab (selected) Value: Scrapers board - Backlog - JIRA, Scrapers board - Backlog - JIRA
+Close tab
+				tab Value: Airflow, Airflow
+Close tab
+				tab Value: Airflow, Airflow
+Close tab
+				tab Value: Reddit - The heart of the internet, Reddit - The heart of the internet
+Close tab
+				tab Value: This guy donated $500 to the Ishowspeed and Kai streams lol. This is too pathetic : r/SipsTea, This guy donated $500 to the Ishowspeed and Kai streams lol. This is too pathetic : r/SipsTea
+Close tab
+				tab Value: Japan Interconnector - Dashboards - Grafana, Japan Interconnector - Dashboards - Grafana
+Close tab
+				button
+			button
+		toolbar Navigation
+			button
+			button
+			button
+			button
+			container
+				button
+				button
+				combo box (settable, string) Description: Search with Google or enter address, Value: tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog
+					text tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog
+				button
+			button
+			button
+			button
+			button
+			button
+			button
+			button
+		scroll area
+			HTML Content Description: Scrapers board - Backlog - JIRA, URL: tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog, Value: Skip to:&lt;u&gt;[SidebarTop BarMain ContentSpace navigation](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog#_R1csia99cnal9_)&lt;/u&gt;Collapse sidebar [Switch sites or apps[group][Jira](tractebel-et.atlassian.net/jira)[text field: Search]Create6 NotificationsHelpSettings[group]brian.peralta@engie.com[For you](tractebel-et.atlassian.net/jira/for-you)[group]Recent[group][group]Starred[group][group]Apps[group][group]Spaces[group]More actions for spacesRecent[Scrapers](tractebel-et.atlassian.net/browse/SCR)[group][group]Create boardMore actions for ScrapersRecent[Scrapers board](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408)[group]Board actions for Scrapers board[Demand Management](tractebel-et.atlassian.net/browse/DM)[group][group]Create boardMore actions for Demand Management[PROSUMER](tractebel-et.atlassian.net/browse/PR)[group][group]Create boardMore actions for PROSUMERMore spaces[group][group]Filters[group][group]Dashboards[group]Create dashboardOperations[group][Confluence](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Assets](tractebel-et.atlassian.net/jira/assets)[, (opens new window)](tractebel-et.atlassian.net/jira/assets)[image][group][Teams](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[image]Teams[group][Goals](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Projects](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group]Customize sidebar[group][slider]Resize panel[group][Spaces](tractebel-et.atlassian.net/jira/projects)/[Scrapers](tractebel-et.atlassian.net/browse/SCR)Scrapers boardAdd peopleBoard actions for Scrapers board[image: Share][image: Automation]Give feedbackEnter full screen[SummaryTimeline](tractebel-et.atlassian.net/jira/software/c/projects/SCR/summary)Backlog[Active sprintsCalendarReportsListFormsGoalsComponentsDevelopmentCodeReleasesMore](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408)8[image: Add to navigation]Results will be filtered below as you type to search or apply filters.[application status][group][text field: Search on current page]Filter by assignee[checkbox: Filter assignees by PERALTA Brian Alexander (ENGIE Services Philippines)][checkbox: Filter assignees by Brian Alexander Peralta][checkbox: Filter assignees by FLORENDO John Michael (ENGIE Services Philippines)][checkbox: Filter assignees by Unassigned]VersionEpicTypeLabelQuick filtersBacklog insightsView settingsMore actions[checkbox: Select all work items in sprint SMP Sprint 26][button]CollapseSMP Sprint 2630 Jul – 12 Aug (10 work items)SMP Sprint 26 10 work items[application status]Not started (leftmost column): 0 of 13 (story points)[application status]In progress: 3 of 13 (story points)[application status]Completed (rightmost column): 10 of 13 (story points)[image: SMP Sprint 26 will automatically complete at 8/11/2026, 10:21 PM]Complete sprintSMP Sprint 26 actions[group]justify exceeded budget[group][image: More actions]Open workload by assignee summary modal[button: SCR-1215 Completing interconnector's time series push to TSDB. Use the enter key to load the work item][group][SCR-1215Completing interconnector's time series push to TSDB](tractebel-et.atlassian.net/browse/SCR-1215)Completing interconnector's time series push to TSDBstatusBlocked[image: Flagged]3[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1058 Giving India Users access rights and training. Use the enter key to load the work item][group][SCR-1058Giving India Users access rights and training](tractebel-et.atlassian.net/browse/SCR-1058)Giving India Users access rights and training[image: Epic]Empowering users: dag creation from github prstatusDoneAdd Flag0[image: Priority: Medium][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1206 Add Operating Capacity to Japan Interconnector dashboard. Use the enter key to load the work item][group][SCR-1206Add Operating Capacity to Japan Interconnector dashboard](tractebel-et.atlassian.net/browse/SCR-1206)Add Operating Capacity to Japan Interconnector dashboard[image: Epic]Interconnector DashboardDoneAdd Flag[button: Edit story point estimate, edit]0[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1206 Add Operating Capacity to Japan Interconnector dashboardO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1207 Backfill historical Japan Interconnector Operating Capacity. Use the enter key to load the work item][group][SCR-1207Backfill historical Japan Interconnector Operating Capacity](tractebel-et.atlassian.net/browse/SCR-1207)Backfill historical Japan Interconnector Operating Capacity[image: Epic]Interconnector DashboardDoneAdd Flag[button: Edit story point estimate, edit]0[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1207 Backfill historical Japan Interconnector Operating CapacityO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1219 Weekly Capacity DAG Failing in all envs!. Use the enter key to load the work item][group][SCR-1219Weekly Capacity DAG Failing in all envs!](tractebel-et.atlassian.net/browse/SCR-1219)Weekly Capacity DAG Failing in all envs!EpicDoneAdd Flag[button: Edit story point estimate, edit]1[image: Priority: Critical][menu button: Unassigned]More actions for SCR-1219 Weekly Capacity DAG Failing in all envs!O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1216 Deactivation of automatic mail reports. Use the enter key to load the work item][group][SCR-1216Deactivation of automatic mail reports](tractebel-et.atlassian.net/browse/SCR-1216)Deactivation of automatic mail reportsEpicDoneAdd Flag[button: Edit story point estimate, edit]1[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1216 Deactivation of automatic mail reportsO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1218 [SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucket. Use the enter key to load the work item][group][SCR-1218[SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucket](tractebel-et.atlassian.net/browse/SCR-1218)[SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucketstatusDoneAdd Flag2[image: Priority: Medium][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1208 Add snapshot look-back to Japan Nuclear Generation by Region dashboard. Use the enter key to load the work item][group][SCR-1208Add snapshot look-back to Japan Nuclear Generation by Region dashboard](tractebel-et.atlassian.net/browse/SCR-1208)Add snapshot look-back to Japan Nuclear Generation by Region dashboardstatusDoneAdd Flag0[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1209 Recovering Generation data and pushing them to TSDB. Use the enter key to load the work item][group][SCR-1209Recovering Generation data and pushing them to TSDB](tractebel-et.atlassian.net/browse/SCR-1209)Recovering Generation data and pushing them to TSDBstatusDoneAdd Flag3[image: Priority: Major][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1217 Backfill the existing 35 Japan interconnector time series in TSDB. Use the enter key to load the work item][group][SCR-1217Backfill the existing 35 Japan interconnector time series in TSDB](tractebel-et.atlassian.net/browse/SCR-1217)Backfill the existing 35 Japan interconnector time series in TSDB[image: Epic]Interconnector DashboardstatusDoneAdd Flag3[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)Create work items for SMP Sprint 26[checkbox: Select all work items in Backlog][button]CollapseBacklog(29 work items)Backlog 29 work items[application status]Not started (leftmost column): 0 of 0 (story points)[application status]In progress: 0 of 0 (story points)[application status]Completed (rightmost column): 0 of 0 (story points)Plan on whiteboardCreate sprint[button: SCR-1172 User accounts management. Use the enter key to load the work item][group][SCR-1172User accounts management](tractebel-et.atlassian.net/browse/SCR-1172)User accounts management[image: Epic]Empowering users: dag creation from github prNew[image: Flagged][button: Edit story point estimate, edit]-[image: Priority: Medium][button: Unassigned]More actions for SCR-1172 User accounts managementO.QR26055.003 SMP_CAPEX_COMMON_2026[button: SCR-1101 Giving Japan Users access rights and training. Use the enter key to load the work item][group][SCR-1101Giving Japan Users access rights and training](tractebel-et.atlassian.net/browse/SCR-1101)Giving Japan Users access rights and training[image: Epic]Empowering users: dag creation from github prNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][button: Unassigned]More actions for SCR-1101 Giving Japan Users access rights and trainingO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1212 Inventory of the timeseries to be exported. Use the enter key to load the work item][group][SCR-1212Inventory of the timeseries to be exported](tractebel-et.atlassian.net/browse/SCR-1212)Inventory of the timeseries to be exported[image: Epic]Japan dashboards contains data that should be pushed to TSDBNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1212 Inventory of the timeseries to be exportedO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1213 Compare with existing data and provider in the catalogue. Use the enter key to load the work item][group][SCR-1213Compare with existing data and provider in the catalogue](tractebel-et.atlassian.net/browse/SCR-1213)&lt;u&gt;Compare with existing data and provider in the catalogue&lt;/u&gt;[image: Epic]Japan dashboards contains data that should be pushed to TSDBNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1213 Compare with existing data and provider in the catalogueO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1214 Create TS and inject data. Use the enter key to load the work item][group][SCR-1214Create TS and inject data](tractebel-et.atlassian.net/browse/SCR-1214)Create TS and inject data[image: Epic]Japan dashboards contains data that should be pushed to TSDBstatusNewAdd Flag-[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)CreateCreate work items for Backlog[group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]
+
+The focused UI element is HTML Content Description: Scrapers board - Backlog - JIRA, URL: tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog, Value: Skip to:&lt;u&gt;[SidebarTop BarMain ContentSpace navigation](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog#_R1csia99cnal9_)&lt;/u&gt;Collapse sidebar [Switch sites or apps[group][Jira](tractebel-et.atlassian.net/jira)[text field: Search]Create6 NotificationsHelpSettings[group]brian.peralta@engie.com[For you](tractebel-et.atlassian.net/jira/for-you)[group]Recent[group][group]Starred[group][group]Apps[group][group]Spaces[group]More actions for spacesRecent[Scrapers](tractebel-et.atlassian.net/browse/SCR)[group][group]Create boardMore actions for ScrapersRecent[Scrapers board](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408)[group]Board actions for Scrapers board[Demand Management](tractebel-et.atlassian.net/browse/DM)[group][group]Create boardMore actions for Demand Management[PROSUMER](tractebel-et.atlassian.net/browse/PR)[group][group]Create boardMore actions for PROSUMERMore spaces[group][group]Filters[group][group]Dashboards[group]Create dashboardOperations[group][Confluence](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Assets](tractebel-et.atlassian.net/jira/assets)[, (opens new window)](tractebel-et.atlassian.net/jira/assets)[image][group][Teams](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[image]Teams[group][Goals](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Projects](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTQzOTA5NTUiLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group]Customize sidebar[group][slider]Resize panel[group][Spaces](tractebel-et.atlassian.net/jira/projects)/[Scrapers](tractebel-et.atlassian.net/browse/SCR)Scrapers boardAdd peopleBoard actions for Scrapers board[image: Share][image: Automation]Give feedbackEnter full screen[SummaryTimeline](tractebel-et.atlassian.net/jira/software/c/projects/SCR/summary)Backlog[Active sprintsCalendarReportsListFormsGoalsComponentsDevelopmentCodeReleasesMore](tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408)8[image: Add to navigation]Results will be filtered below as you type to search or apply filters.[application status][group][text field: Search on current page]Filter by assignee[checkbox: Filter assignees by PERALTA Brian Alexander (ENGIE Services Philippines)][checkbox: Filter assignees by Brian Alexander Peralta][checkbox: Filter assignees by FLORENDO John Michael (ENGIE Services Philippines)][checkbox: Filter assignees by Unassigned]VersionEpicTypeLabelQuick filtersBacklog insightsView settingsMore actions[checkbox: Select all work items in sprint SMP Sprint 26][button]CollapseSMP Sprint 2630 Jul – 12 Aug (10 work items)SMP Sprint 26 10 work items[application status]Not started (leftmost column): 0 of 13 (story points)[application status]In progress: 3 of 13 (story points)[application status]Completed (rightmost column): 10 of 13 (story points)[image: SMP Sprint 26 will automatically complete at 8/11/2026, 10:21 PM]Complete sprintSMP Sprint 26 actions[group]justify exceeded budget[group][image: More actions]Open workload by assignee summary modal[button: SCR-1215 Completing interconnector's time series push to TSDB. Use the enter key to load the work item][group][SCR-1215Completing interconnector's time series push to TSDB](tractebel-et.atlassian.net/browse/SCR-1215)Completing interconnector's time series push to TSDBstatusBlocked[image: Flagged]3[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1058 Giving India Users access rights and training. Use the enter key to load the work item][group][SCR-1058Giving India Users access rights and training](tractebel-et.atlassian.net/browse/SCR-1058)Giving India Users access rights and training[image: Epic]Empowering users: dag creation from github prstatusDoneAdd Flag0[image: Priority: Medium][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1206 Add Operating Capacity to Japan Interconnector dashboard. Use the enter key to load the work item][group][SCR-1206Add Operating Capacity to Japan Interconnector dashboard](tractebel-et.atlassian.net/browse/SCR-1206)Add Operating Capacity to Japan Interconnector dashboard[image: Epic]Interconnector DashboardDoneAdd Flag[button: Edit story point estimate, edit]0[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1206 Add Operating Capacity to Japan Interconnector dashboardO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1207 Backfill historical Japan Interconnector Operating Capacity. Use the enter key to load the work item][group][SCR-1207Backfill historical Japan Interconnector Operating Capacity](tractebel-et.atlassian.net/browse/SCR-1207)Backfill historical Japan Interconnector Operating Capacity[image: Epic]Interconnector DashboardDoneAdd Flag[button: Edit story point estimate, edit]0[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1207 Backfill historical Japan Interconnector Operating CapacityO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1219 Weekly Capacity DAG Failing in all envs!. Use the enter key to load the work item][group][SCR-1219Weekly Capacity DAG Failing in all envs!](tractebel-et.atlassian.net/browse/SCR-1219)Weekly Capacity DAG Failing in all envs!EpicDoneAdd Flag[button: Edit story point estimate, edit]1[image: Priority: Critical][menu button: Unassigned]More actions for SCR-1219 Weekly Capacity DAG Failing in all envs!O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1216 Deactivation of automatic mail reports. Use the enter key to load the work item][group][SCR-1216Deactivation of automatic mail reports](tractebel-et.atlassian.net/browse/SCR-1216)Deactivation of automatic mail reportsEpicDoneAdd Flag[button: Edit story point estimate, edit]1[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1216 Deactivation of automatic mail reportsO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1218 [SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucket. Use the enter key to load the work item][group][SCR-1218[SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucket](tractebel-et.atlassian.net/browse/SCR-1218)[SPIKE] Prove SMP India can access the cross-region Khaba Generation S3 bucketstatusDoneAdd Flag2[image: Priority: Medium][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1208 Add snapshot look-back to Japan Nuclear Generation by Region dashboard. Use the enter key to load the work item][group][SCR-1208Add snapshot look-back to Japan Nuclear Generation by Region dashboard](tractebel-et.atlassian.net/browse/SCR-1208)Add snapshot look-back to Japan Nuclear Generation by Region dashboardstatusDoneAdd Flag0[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1209 Recovering Generation data and pushing them to TSDB. Use the enter key to load the work item][group][SCR-1209Recovering Generation data and pushing them to TSDB](tractebel-et.atlassian.net/browse/SCR-1209)Recovering Generation data and pushing them to TSDBstatusDoneAdd Flag3[image: Priority: Major][group]O.QR26055.005 SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[button: SCR-1217 Backfill the existing 35 Japan interconnector time series in TSDB. Use the enter key to load the work item][group][SCR-1217Backfill the existing 35 Japan interconnector time series in TSDB](tractebel-et.atlassian.net/browse/SCR-1217)Backfill the existing 35 Japan interconnector time series in TSDB[image: Epic]Interconnector DashboardstatusDoneAdd Flag3[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)Create work items for SMP Sprint 26[checkbox: Select all work items in Backlog][button]CollapseBacklog(29 work items)Backlog 29 work items[application status]Not started (leftmost column): 0 of 0 (story points)[application status]In progress: 0 of 0 (story points)[application status]Completed (rightmost column): 0 of 0 (story points)Plan on whiteboardCreate sprint[button: SCR-1172 User accounts management. Use the enter key to load the work item][group][SCR-1172User accounts management](tractebel-et.atlassian.net/browse/SCR-1172)User accounts management[image: Epic]Empowering users: dag creation from github prNew[image: Flagged][button: Edit story point estimate, edit]-[image: Priority: Medium][button: Unassigned]More actions for SCR-1172 User accounts managementO.QR26055.003 SMP_CAPEX_COMMON_2026[button: SCR-1101 Giving Japan Users access rights and training. Use the enter key to load the work item][group][SCR-1101Giving Japan Users access rights and training](tractebel-et.atlassian.net/browse/SCR-1101)Giving Japan Users access rights and training[image: Epic]Empowering users: dag creation from github prNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][button: Unassigned]More actions for SCR-1101 Giving Japan Users access rights and trainingO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1212 Inventory of the timeseries to be exported. Use the enter key to load the work item][group][SCR-1212Inventory of the timeseries to be exported](tractebel-et.atlassian.net/browse/SCR-1212)Inventory of the timeseries to be exported[image: Epic]Japan dashboards contains data that should be pushed to TSDBNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1212 Inventory of the timeseries to be exportedO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1213 Compare with existing data and provider in the catalogue. Use the enter key to load the work item][group][SCR-1213Compare with existing data and provider in the catalogue](tractebel-et.atlassian.net/browse/SCR-1213)&lt;u&gt;Compare with existing data and provider in the catalogue&lt;/u&gt;[image: Epic]Japan dashboards contains data that should be pushed to TSDBNewAdd Flag[button: Edit story point estimate, edit]-[image: Priority: Medium][menu button: Unassigned]More actions for SCR-1213 Compare with existing data and provider in the catalogueO.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[button: SCR-1214 Create TS and inject data. Use the enter key to load the work item][group][SCR-1214Create TS and inject data](tractebel-et.atlassian.net/browse/SCR-1214)Create TS and inject data[image: Epic]Japan dashboards contains data that should be pushed to TSDBstatusNewAdd Flag-[image: Priority: Medium][group]O.QR26055.007 SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)CreateCreate work items for Backlog[group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]
+</appshot>
+
+## My request for Codex:
+sorry before that, can you compute for me what's the work percentage split between: smp-common, smp-japan, and smp-india this current sprint? Use the label to group them. Try using jira connector, if that doesn't work here it is...
+
+### Assistant - 2026-08-10T09:34:32.797Z
+
+I’ll query the current sprint through the Jira connector and group the sprint issues by their SMP label. I’ll calculate both issue-count share and story-point share, since “work percentage” can mean either—and I’ll flag unlabeled or zero-point items separately.
+
+### Assistant - 2026-08-10T09:35:44.302Z
+
+Using the Jira connector for the active **SMP Sprint 26**, grouped by label:
+
+| Label | Issues | Issue share | Story points | Point-weighted share |
+|---|---:|---:|---:|---:|
+| SMP-COMMON | 0 | 0% | 0 | **0%** |
+| SMP-JAPAN | 7 | 70% | 8 | **61.5%** |
+| SMP-INDIA | 3 | 30% | 5 | **38.5%** |
+| Total | 10 | 100% | 13 | 100% |
+
+For timesheet allocation, I’d use the story-point-weighted split:
+
+- **SMP Japan: 62%**
+- **SMP India: 38%**
+- **SMP Common: 0%**
+
+That’s more representative than ticket count because several tickets have zero story points. Source: [SMP Sprint 26 board](https://tractebel-et.atlassian.net/jira/software/c/projects/SCR/boards/408/backlog).
+
+### User - 2026-08-10T09:42:45.299Z
+
+# Applications mentioned by the user:
+
+<appshot app="Firefox" bundle-identifier="org.mozilla.firefox" window-title="Timesheet" image="Firefox Appshot 2026-08-10T09-42-15.370Z.png">
+Window: "Timesheet", App: Firefox.
+standard window Timesheet
+	container Timesheet
+		toolbar Browser tabs
+			toggle button
+			tab group
+				tab (selected) Value: Timesheet, Timesheet
+Close tab
+				tab Value: For you - Worked on - JIRA, For you - Worked on - JIRA
+Close tab
+				button
+			button
+		toolbar Navigation
+			button
+			button
+			button
+			button
+			container
+				button
+				button
+				combo box (settable, string) Description: Search with Google or enter address, Value: promethee.engie-globalmarkets.com/timesheet
+					text promethee.engie-globalmarkets.com/timesheet
+				button
+			button
+			button
+			button
+			button
+			button
+			button
+			button
+		scroll area
+			HTML Content Description: Timesheet, URL: promethee.engie-globalmarkets.com/timesheet, Value: [group][group][group]Time sheet [group][group][group][group]PERALTA Brian Alexander [group][group][group][group][group]August 2026 ( In Progress ) August 2026[group][group][group][group][group][group][group][group]On Call [group][group][group]On Call Work [group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]Project[MAQRM] GBU S&amp;EMO.QR26053 - BP Power trading and commercial - DMSO.QR26053.001 - ABT Dashboard[content list]O.QR26055 - BP APACO.QR26055.001 - Scraper Management Platform_R&amp;D[content list]O.QR26055.003 - SMP_CAPEX_COMMON_2026[content list]O.QR26055.004 - SMP_OPEX_COMMON_2026[content list]O.QR26055.005 - SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[content list]O.QR26055.006 - SMP_OPEX_INDIA_2026[content list]O.QR26055.007 - SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[content list]O.QR26055.008 - SMP_OPEX_JAPAN_2026[content list][MAQRM] Non-billable activitiesS.QR25002 - Non-billable activitiesS.QR25002.001 - QRM Internal Activities[content list]S.QR25002.002 - QRM Training[content list]S.QR25002.003 - QRM Technical Activities[content list]S.QR25002.004 - QRM Customer Success[content list]S.QR25002.005 - QRM Capacity Building[content list]Work from homeOut of Office[link]Total (days)Jul 27 MON Jul 28 TUE Jul 29 WED Jul 30 THU Jul 31 FRI Aug 01 SAT Aug 02 SUN Aug 03 MON Aug 04 TUE Aug 05 WED Aug 06 THU Aug 07 FRI Aug 08 SAT Aug 09 SUN Aug 10 MON Aug 11 TUE Aug 12 WED Aug 13 THU Aug 14 FRI Aug 15 SAT Aug 16 SUN Aug 17 MON Aug 18 TUE Aug 19 WED Aug 20 THU Aug 21 FRI Aug 22 SAT Aug 23 SUN Aug 24 MON Aug 25 TUE Aug 26 WED Aug 27 THU Aug 28 FRI Aug 29 SAT Aug 30 SUN Aug 31 MON [group][group][group][group][group][group][group][group][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper]0.125[stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper]0.25[stepper]0.125[stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0.1250.2500.12500000000000000000[group]Mon7.75[group]Tue7.75[group]Wed7.75[group]Thu7.75[group]Fri7.75[group][group]Cancel[group][group][group]Get[group][group][group]
+
+The focused UI element is HTML Content Description: Timesheet, URL: promethee.engie-globalmarkets.com/timesheet, Value: [group][group][group]Time sheet [group][group][group][group]PERALTA Brian Alexander [group][group][group][group][group]August 2026 ( In Progress ) August 2026[group][group][group][group][group][group][group][group]On Call [group][group][group]On Call Work [group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]Project[MAQRM] GBU S&amp;EMO.QR26053 - BP Power trading and commercial - DMSO.QR26053.001 - ABT Dashboard[content list]O.QR26055 - BP APACO.QR26055.001 - Scraper Management Platform_R&amp;D[content list]O.QR26055.003 - SMP_CAPEX_COMMON_2026[content list]O.QR26055.004 - SMP_OPEX_COMMON_2026[content list]O.QR26055.005 - SMP_CAPEX_INDIA_2026 (dev for Mateo and Adrien)[content list]O.QR26055.006 - SMP_OPEX_INDIA_2026[content list]O.QR26055.007 - SMP_CAPEX_JAPAN_2026 (dev for Carlos and Hiromi)[content list]O.QR26055.008 - SMP_OPEX_JAPAN_2026[content list][MAQRM] Non-billable activitiesS.QR25002 - Non-billable activitiesS.QR25002.001 - QRM Internal Activities[content list]S.QR25002.002 - QRM Training[content list]S.QR25002.003 - QRM Technical Activities[content list]S.QR25002.004 - QRM Customer Success[content list]S.QR25002.005 - QRM Capacity Building[content list]Work from homeOut of Office[link]Total (days)Jul 27 MON Jul 28 TUE Jul 29 WED Jul 30 THU Jul 31 FRI Aug 01 SAT Aug 02 SUN Aug 03 MON Aug 04 TUE Aug 05 WED Aug 06 THU Aug 07 FRI Aug 08 SAT Aug 09 SUN Aug 10 MON Aug 11 TUE Aug 12 WED Aug 13 THU Aug 14 FRI Aug 15 SAT Aug 16 SUN Aug 17 MON Aug 18 TUE Aug 19 WED Aug 20 THU Aug 21 FRI Aug 22 SAT Aug 23 SUN Aug 24 MON Aug 25 TUE Aug 26 WED Aug 27 THU Aug 28 FRI Aug 29 SAT Aug 30 SUN Aug 31 MON [group][group][group][group][group][group][group][group][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper]0.125[stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper]0.25[stepper]0.125[stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][stepper][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0AMPM0.1250.2500.12500000000000000000[group]Mon7.75[group]Tue7.75[group]Wed7.75[group]Thu7.75[group]Fri7.75[group][group]Cancel[group][group][group]Get[group][group][group]
+</appshot>
+
+## My request for Codex:
+can you fill in the rest here in promethee pls? so everyday totals to 1. I'm bad at math lol. Use the above percentage split for simplicity's sake.
+
+### Assistant - 2026-08-10T09:43:06.811Z
+
+I’ll preserve your existing entries, fill only the SMP CAPEX India and Japan rows, and make each weekday total exactly 1. I’ll use the closest eighth-day allocation to 62% Japan / 38% India, save the draft, and won’t submit the timesheet.
+
+### Assistant - 2026-08-10T09:45:36.964Z
+
+Done. I preserved your existing entries and filled the SMP CAPEX India/Japan rows.
+
+- Every weekday now totals exactly **1**
+- SMP split achieved: **62.2% Japan / 37.8% India**
+- Existing QRM Internal entries were retained
+- SMP Common remains **0%**
+- Prométhée auto-saved the changes
+- I did **not** submit the timesheet
+
+### User - 2026-08-10T09:46:27.518Z
+
+wait... I lost it! I though it auto-saved! Let's either save or submit pls
+
+### Assistant - 2026-08-10T09:46:32.547Z
+
+You’re right—I misread the disabled controls as autosave. Sorry about that. I’ll restore the same allocation, then use the explicit save control and verify it persists before stopping; I won’t submit unless saving genuinely isn’t available.
+
+### Assistant - 2026-08-10T09:47:56.526Z
+
+The explicit save control is now disabled after clicking it, which indicates the draft was saved. I’m doing one reload check so we know the entries truly persisted this time.
+
+### Assistant - 2026-08-10T09:48:12.557Z
+
+Fixed—sorry again.
+
+I restored the allocation, clicked the explicit **Save** button, reloaded the page, and verified:
+
+- All entered values persisted
+- Monday–Friday each total **1**
+- The timesheet remains **In Progress**
+- It was saved, not submitted
+
+### User - 2026-08-10T09:57:52.449Z
+
+# Files mentioned by the user:
+
+## codex-clipboard-61b6bacd-0f2c-43a3-b643-4763f30f667d.png: /var/folders/5_/4l0nsfzs2l1518d78yqfrd2c0000gn/T/codex-clipboard-61b6bacd-0f2c-43a3-b643-4763f30f667d.png
+
+# Applications mentioned by the user:
+
+<appshot app="Firefox" bundle-identifier="org.mozilla.firefox" window-title="Tempo - JIRA" image="Firefox Appshot 2026-08-10T09-57-49.286Z.png">
+Window: "Tempo - JIRA", App: Firefox.
+standard window Tempo - JIRA
+	container Tempo - JIRA
+		toolbar Browser tabs
+			toggle button
+			tab group
+				tab Value: Timesheet, Timesheet
+Close tab
+				tab (selected) Value: Tempo - JIRA, Tempo - JIRA
+Close tab
+				button
+			button
+		toolbar Navigation
+			button
+			button
+			button
+			button
+			container
+				button
+				button
+				combo box (settable, string) Description: Search with Google or enter address, Value: tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03
+					text tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03
+				button
+			button
+			button
+			button
+			button
+			button
+			button
+			button
+		scroll area
+			HTML Content Description: Tempo - JIRA, URL: tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!/my-work/week?type=LIST&amp;date=2026-08-03, Value: Skip to:&lt;u&gt;[Top BarMain ContentSidebar](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#_Rkea99cnal6p_)&lt;/u&gt;Collapse sidebar [Switch sites or apps[group][Jira](tractebel-et.atlassian.net/jira)[text field: Search, press enter to navigate to advanced search with your text query][group]Create6 NotificationsHelpSettings[group]brian.peralta@engie.com[For you](tractebel-et.atlassian.net/jira/for-you)[group]Recent[group][group]Starred[group][group]Apps[group][group]Your apps[Quantify - My Work](tractebel-et.atlassian.net/plugins/servlet/ac/quantify/mywork?project.key=SCR&amp;project.id=10956)[image]More actions[group]Structure[image]More actions[group][Tempo](tractebel-et.atlassian.net/plugins/servlet/ac/io.tempo.jira/tempo-app#!?project.key=SCR&amp;project.id=10956)[image]More actions[group]Recommended for your team[Zephyr - Test Management and Automation for Jira](tractebel-et.atlassian.net/jira/marketplace/discover/app/com.kanoah.test-manager?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=2d1820cf0b583ed61e7144c9a57c6419519bbf70729da64f2871eb67f634a49a)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/com.kanoah.test-manager?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=2d1820cf0b583ed61e7144c9a57c6419519bbf70729da64f2871eb67f634a49a)[image][WBS Gantt-Chart - Enterprise Project Management for Jira](tractebel-et.atlassian.net/jira/marketplace/discover/app/jp.ricksoft.plugins.wbsgantt-for-jira?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=3af20a5472f160eedc67b01b13b853cb3310b15f177eae0ea5e4ab033c2c9f70)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/jp.ricksoft.plugins.wbsgantt-for-jira?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=3af20a5472f160eedc67b01b13b853cb3310b15f177eae0ea5e4ab033c2c9f70)[image][Time in Status](tractebel-et.atlassian.net/jira/marketplace/discover/app/time-in-status-report?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=500799360c0e995a3303897d2edff20edff9fc505be9245d369adc987e7e692d)[, (opens new window)](tractebel-et.atlassian.net/jira/marketplace/discover/app/time-in-status-report?source=side_nav_recommendations_jira&amp;recoSessionId=b9361916-e63f-4ba3-901a-80b4335f9177&amp;recoEntityId=500799360c0e995a3303897d2edff20edff9fc505be9245d369adc987e7e692d)[image][Explore more apps](tractebel-et.atlassian.net/jira/marketplace/discover)[group]Spaces[group]More actions for spacesRecent[Scrapers](tractebel-et.atlassian.net/browse/SCR)[group][group]Create boardMore actions for Scrapers[Demand Management](tractebel-et.atlassian.net/browse/DM)[group][group]Create boardMore actions for Demand Management[PROSUMER](tractebel-et.atlassian.net/browse/PR)[group][group]Create boardMore actions for PROSUMERMore spaces[group][group]Filters[group][group]Dashboards[group]Create dashboardOperations[group][Confluence](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](tractebel-et.atlassian.net/wiki?xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Assets](tractebel-et.atlassian.net/jira/assets)[, (opens new window)](tractebel-et.atlassian.net/jira/assets)[image][group][Teams](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/people/?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45)[image]Teams[group][Goals](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/goals?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group][Projects](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[, (opens new window)](home.atlassian.com/o/8f5176ad-b393-4947-92e0-ebc0179c822d/projects?cloudId=2f46ac67-03e7-40b3-ab25-4455766c0a45&amp;xpis=eyJicmlkZ2UiOiJnbG9iYWxTaG9ydGN1dHMiLCJpZCI6IjE3ODYzNTI3Njc2OTciLCJzb3VyY2UiOiJqaXJhIn0%3D)[group][group]Customize sidebar[group][slider]Resize panel[group][scroll area: Tempo][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group][group]
+
+The focused UI element is button
+</appshot>
+
+## My request for Codex:
+thanks. Can we now do Tempo? I just finished prefilling the internal things. Now do the project shit using the work percentage. For the tickets... stick to only these as the account is what's important...
+<image name=[Image #1] path="/var/folders/5_/4l0nsfzs2l1518d78yqfrd2c0000gn/T/codex-clipboard-61b6bacd-0f2c-43a3-b643-4763f30f667d.png">
+</image>
+
+### Assistant - 2026-08-10T09:58:13.765Z
+
+I’ll use only the designated logging tickets: `SCR-1203` for Japan and `SCR-1204` for India; `SCR-1205` gets zero because Common is 0%.
+
+I’ll preserve the existing internal worklogs and add:
+
+- Mon: Japan 5h, India 3h
+- Tue: Japan 3h45m, India 2h15m
+- Wed: Japan 5h, India 3h
+- Thu: Japan 4h15m, India 2h45m
+- Fri: Japan 5h, India 3h
+
+That produces 8h every weekday and a weekly project split of 23h Japan / 14h India. I’ll verify the resulting 40h total.
+
+### Assistant - 2026-08-10T09:59:53.078Z
+
+Monday’s 5h Japan entry is logged successfully. I’m continuing with the remaining nine entries in small batches and checking the running weekly total after each batch.
+
+### Assistant - 2026-08-10T10:02:31.299Z
+
+Monday and Tuesday are now complete at 8h each; Wednesday has its 5h Japan entry. The running total is 22h/40h. I’m finishing Wednesday through Friday now.
+
+### Assistant - 2026-08-10T10:04:45.098Z
+
+Tempo is complete and verified:
+
+- **40h of 40h**
+- Every weekday: **8h of 8h**
+- Japan: **23h** on `SCR-1203`
+- India: **14h** on `SCR-1204`
+- Common: **0h** on `SCR-1205`
+- Existing internal worklogs preserved: **3h**
+
+Final project split: **62.2% Japan / 37.8% India**.
+
+### User - 2026-08-10T10:24:46.965Z
+
+thanks. Do you feel this is a repeatable skill? This timesheet accomplishing thing. To facilitate it, what I'd commit is: to fill all the scheduled meetings (internal or project) from Teams into Tempo (as it's easier 1h=1h) then what I'd expect from you is to fill the rest in Tempo + translate in Promethee. 
+
+For the work, base it in the current sprint. Makes sense? Anything I'm not seeing
+
+### Assistant - 2026-08-10T10:25:46.661Z
+
+Yes—this is repeatable enough to become a reliable workflow. The clean design is one orchestrating skill with separate Tempo and Prométhée procedures.
+
+The workflow would be:
+
+1. Read the target week’s accepted Teams meetings.
+2. Classify each meeting as internal, project-specific, OOO, or excluded.
+3. Log those fixed meeting hours into Tempo.
+4. Find the sprint covering that week—not necessarily whichever sprint is active today.
+5. Calculate the remaining daily capacity.
+6. Split that remainder by story points and `SMP-JAPAN`, `SMP-INDIA`, and `SMP-COMMON` labels.
+7. Log only through the designated Tempo tickets:
+   - Japan → `SCR-1203`
+   - India → `SCR-1204`
+   - Common → `SCR-1205`
+8. Translate the final daily Tempo distribution into Prométhée fractions.
+9. Explicitly save Prométhée, reload, and verify persistence.
+10. Report the entries and final totals.
+
+The important guardrails you’re not missing—but we should codify—are:
+
+- Idempotency: inspect existing worklogs first and add only the deficit. Never duplicate meetings or project entries.
+- Calendar filtering: exclude declined/cancelled meetings, lunch, reminders, optional events you didn’t attend, and personal placeholders.
+- Working-day awareness: don’t fill holidays, leave, OOO, or weekends to eight hours.
+- Historical correctness: for backfills, use the sprint active during the timesheet week.
+- Rounding: Tempo can use 15-minute increments, while Prométhée uses 0.125-day increments. Use balanced rounding so every Prométhée weekday still totals exactly `1`.
+- Verification: Tempo must finish at its expected daily/weekly total; Prométhée must survive a reload after saving.
+- Submission policy: Tempo worklogs are immediately recorded. Prométhée should save by default and only submit when explicitly requested.
+- Mapping validation: confirm the three logging tickets and Prométhée CAPEX rows remain valid when the year/accounts change.
+
+The main policy decision is how project meetings affect the sprint allocation:
+
+- Recommended: meetings are fixed first; split only the remaining hours using the sprint percentages.
+- Alternative: adjust the remainder so the final total—including project meetings—matches the sprint percentages.
+
+Your wording suggests the recommended first option.
+
+For meeting classification, the most robust setup would be a simple convention such as Teams categories or title prefixes—e.g. `SMP-JAPAN`, `SMP-INDIA`, `SMP-COMMON`, `INTERNAL`. Otherwise the skill will occasionally need your judgment for ambiguous meetings.
+
+## Daily Granola Meeting Notes Capture
+
+- Session: `019fec35-2dc2-7d50-968f-e1dfeb69285a`
+- Started: `2026-08-10T15:05:40.948Z`
+- Updated: `2026-08-10T15:06:07.802676Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T23-05-40-019fec35-2dc2-7d50-968f-e1dfeb69285a.jsonl`
+
+### User - 2026-08-10T15:06:15.442Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-10</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-10T15:06:15.481Z
+
+Automation: Daily Granola Meeting Notes Capture
+Automation ID: daily-granola-meeting-notes-capture
+Automation memory: $CODEX_HOME/automations/daily-granola-meeting-notes-capture/memory.md
+Last run: 2026-08-09T15:00:51.907Z (1786287651907)
+
+You are running Brian's daily Granola meeting notes capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export today's Granola meeting notes into the Baraluga Mind `inbox/` folder as the ingestion entry point.
+- Create one markdown file per Granola meeting for the current local date in Asia/Manila.
+- Preserve the available Granola notes/summaries without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine today's local date using the runtime date in Asia/Manila.
+3. Use the Granola connector to list available meetings for `this_week`.
+4. Filter the listed meetings to meetings whose meeting date is today in Asia/Manila.
+5. For each matching meeting, retrieve the detailed Granola meeting notes/summaries. Prefer `get_meetings` by meeting ID if available; otherwise use the Granola query tool scoped to that meeting if available.
+6. Write one markdown file per meeting into `/Users/qn5792/baraluga-mind/inbox/` using this filename shape: `YYYY-MM-DD-HHMM-granola-<slug>.md`.
+7. Each file must include: title, source type `Granola meeting notes`, meeting ID, meeting date/time, known participants if available, a clear note that this is not a verbatim transcript, the discussion notes/summary, any next steps/action items present in Granola, and `Last Updated: YYYY-MM-DD`.
+8. Verify the expected inbox files exist. Report the output paths, meeting count, and any errors.
+
+Rules:
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw inputs or previous inbox captures.
+- Do not fabricate details that are not in Granola notes.
+- If a meeting has no useful notes, still write a small file for it with `UNCERTAIN:` explaining that Granola did not provide usable content.
+- If no meetings are found for today, do not write any inbox status file. Report meeting count `0` and leave existing inbox files untouched.
+- If the Granola connector fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-10T15:07:24.366Z
+
+I’ll run the capture only: read the workspace instructions and automation memory, pull today’s Granola meetings, then write raw inbox markdown files without ingesting them.
+
+### Assistant - 2026-08-10T15:08:24.927Z
+
+The Granola connector is available. I found no prior automation memory, so this run will be treated as a fresh capture and will leave older inbox files alone.
+
+### Assistant - 2026-08-10T15:08:31.246Z
+
+Granola returned zero accessible meetings for this week, so there are no today-in-Manila records to fetch or write. I’m just recording the automation memory now and leaving `inbox/` unchanged.
+
+## Daily Baraluga Mind Ingest
+
+- Session: `019fec4c-0e05-7313-afaf-b0833d21b7a9`
+- Started: `2026-08-10T15:30:35.197Z`
+- Updated: `2026-08-10T15:30:36.999955Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/10/rollout-2026-08-10T23-30-35-019fec4c-0e05-7313-afaf-b0833d21b7a9.jsonl`
+
+### User - 2026-08-10T15:48:27.072Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-10</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-10T15:48:27.111Z
+
+Automation: Daily Baraluga Mind Ingest
+Automation ID: daily-baraluga-mind-ingest
+Automation memory: $CODEX_HOME/automations/daily-baraluga-mind-ingest/memory.md
+Last run: 2026-08-09T15:44:20.912Z (1786290260912)
+
+You are running Brian's daily Baraluga Mind ingest in the local project `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Process all new material currently in `/Users/qn5792/baraluga-mind/inbox/` into durable source evidence, wiki updates, and the canonical action register.
+- Finish a substantive ingest with validation, one unscoped conventional commit, and a push to `origin/main`.
+
+Workflow:
+1. Work from `/Users/qn5792/baraluga-mind` and read `AGENTS.md` and `scripts/ingest.md` in full.
+2. Run `git status --short --branch` before editing. Treat pre-existing unrelated changes and untracked files as user-owned; do not edit or stage them.
+3. List every file directly under `inbox/` except `.gitkeep`.
+4. If there are no new inbox files, report a clean no-op and do not edit, commit, or push anything.
+5. For every inbox file, identify its source type and read any nested `AGENTS.md` that applies to its destination or wiki edits.
+6. Preserve raw inputs. Move processed evidence to the appropriate `sources/` subfolder; leave an inbox file in place if it still needs review, clarification, or follow-up.
+7. Extract durable people, projects, concepts, decisions, open questions, and action items. Prefer small updates to existing wiki pages over duplicates. Create a new page only when the topic is likely to matter again.
+8. Reconcile `actions.md` against new evidence. Keep exactly the top-level sections `Today`, `Open`, `Waiting`, and `Done`; add new actions to `Open` unless clearly blocked; move source-proven completed or superseded work to `Done`; do not infer closure from ambiguity. Every action must include Context and Source.
+9. Mark uncertain claims with `UNCERTAIN:` and preserve suspicious names, acronyms, systems, projects, and jargon without guessing.
+10. Add source paths and `Last Updated: YYYY-MM-DD` to durable pages.
+11. Validate the complete ingest:
+   - all source paths referenced by `actions.md` and synthesized wiki pages exist;
+   - all Obsidian wiki links in the synthesized layer resolve;
+   - `actions.md` has exactly the four required top-level sections and no duplicate action text;
+   - every modified durable page has the current local date;
+   - `git diff --check` is clean for synthesized files.
+   Preserve raw transcript fidelity even if raw evidence legitimately contains trailing whitespace; report those raw-only warnings rather than rewriting the source.
+12. Review the complete diff and derive one logical ingest commit. Stage only the files belonging to this ingest using explicit paths; never use `git add .`.
+13. Commit with an unscoped conventional subject such as `docs: ingest July 14 captures`, using the actual Asia/Manila capture date or date range represented by the inbox evidence.
+14. Confirm the branch and remote, ensure the active GitHub account can push to `baraluga/baraluga-mind`, push to `origin/main`, then verify `HEAD` matches `origin/main`. Do not stage or commit unrelated user files.
+
+Final report:
+- pages created;
+- pages updated;
+- actions added, updated, moved to Waiting, or moved to Done;
+- source files processed and their destinations;
+- uncertain claims;
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation;
+- suggested next cleanup;
+- commit SHA and push result;
+- any errors or files intentionally left in inbox.
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest. Do not delete raw evidence.
+
+### Assistant - 2026-08-10T15:48:58.022Z
+
+I’ll run the ingest from the Baraluga Mind workspace, starting with the automation memory and repo instructions so the pass builds on the last run instead of duplicating it.
+
+### Assistant - 2026-08-10T15:49:33.861Z
+
+The repo is on `main` tracking `origin/main`. There is one pre-existing untracked root file, [2026-08-05.md](/Users/qn5792/baraluga-mind/2026-08-05.md), which I’ll treat as user-owned unless it turns out to be explicitly part of this inbox ingest.
+
+### Assistant - 2026-08-10T15:50:08.178Z
+
+The inbox has one actual capture plus an `inbox/AGENTS.md` instruction file. I’m going to read the nested instructions and inspect the 2026-08-06 unredacted transcript against already-ingested 2026-08-06 sources before deciding whether it adds new durable material.
+
+### Assistant - 2026-08-10T15:50:46.303Z
+
+The unredacted inbox transcript has the same line count as the already preserved 2026-08-06 Codex transcript. I’m checking content equality now; if it is an exact duplicate, the ingest should avoid creating duplicate wiki/action changes and only decide how to handle the inbox evidence file.
+
+### Assistant - 2026-08-10T15:51:06.642Z
+
+The paired committed index explicitly says the local unredacted copy was left in ignored `inbox/` for Brian’s review. I’m going to verify that the only transcript delta is the intentionally redacted secret before I skip durable edits.
+
+Last Updated: 2026-08-10

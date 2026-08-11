@@ -8,6 +8,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Team Operations
 
+- [ ] Define a repeatable Tempo and Prométhée timesheet workflow, including Teams meeting classification, sprint-based allocation, idempotency, save-vs-submit policy, and yearly mapping validation.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-08-10-codex-conversations.txt`
+
 - [ ] Finalize and submit Brian's development form, including at least one activity per goal and the technical-track/architect direction.
   - Context: [[brian-peralta]]
   - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`

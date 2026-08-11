@@ -80,6 +80,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The same meeting says personal access tokens were still in use for some migrated workflows; the durable direction is still a functional-user setup, with ServiceNow project linkage and a GitHub service-account token both discussed as possible paths requiring a dedicated alignment meeting.
 - The August 4 portfolio snapshot listed upcoming Onset Energy, SDB metadata, and Delphi extension work; Kiva industrialization kicking off on August 5; ABS Index Builder in development; WOW and Best-of Sign-ups near completion; and AWS/Walnut-Centiment migration, Pyrene, and Storm as ongoing support/monitoring.
 - Tempo and Promethe were in a final parallel run through August 2026. The team should fill in Promethe every Friday, with Tempo planned for decommissioning at the end of August.
+- On August 10, Brian used the active SMP Sprint 26 story-point split as the project-time allocation basis: `SMP-JAPAN` 8 of 13 points, `SMP-INDIA` 5 of 13 points, and `SMP-COMMON` 0 points. For operational timesheet entry this rounded to 62.2% Japan, 37.8% India, and 0% Common.
+- The same session established a repeatable timesheet workflow shape: Brian pre-fills scheduled Teams meetings, then the remaining daily capacity is allocated through Tempo and Prométhée using the sprint that was active for the target week. Tempo should use designated logging tickets `SCR-1203` for Japan, `SCR-1204` for India, and `SCR-1205` for Common; Prométhée should map to the matching CAPEX rows and be explicitly saved and reload-verified rather than treated as autosaved.
+- Guardrails for that workflow include inspecting existing entries first, excluding declined/cancelled or personal calendar items, respecting leave and holidays, using 15-minute Tempo increments and 0.125-day Prométhée increments, and saving Prométhée by default while treating final submission as a separate explicit action.
 - Team-life notes from the same meeting captured the July 10 QRM first anniversary recap, a requirements-solicitation/stakeholder-management workshop planned for August 28, anniversaries for Hook and Pierre, August birthdays for Joyce and Nico, Rudy joining Pierre's team, and a reminder to update Sezane Career Explorer skills and trajectory.
 
 ## Open Questions
@@ -104,6 +107,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether the long-term migrated-repository authentication path will be a ServiceNow-linked functional user, a GitHub service-account token, or another approved model.
 - UNCERTAIN: Whether `Centiment` is the exact migration name from the August 4 meeting source; it may be a transcript artifact.
 - UNCERTAIN: Whether `Rudy`, `Hook`, `Joyce`, `Nico`, and `Sezane` are exact spellings from the August 4 meeting source.
+- UNCERTAIN: Whether `Prométhée` is the preferred spelling for the timesheet system in durable notes; older sources spell it as `Promethe`.
 
 ## Sources
 
@@ -151,5 +155,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-10-codex-conversations.txt`
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-10
