@@ -104,6 +104,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - August 11 standup notes framed the sprint-review message for Japan as TSDB push for spatial capacity and port activation, with operational-capacity metadata validation still waiting on Carlos and old Louis-dashboard metadata still pending.
 - For the next engagement period, the source split Japan next steps by budget: support mode means no proactive next steps; full budget would push old operational-capacity data to TSDB. The team also wanted Japan stakeholders to surface future needs because next-period visibility was low.
 - August 11 backlog grooming described the new interconnector metadata ticket as blocked, with old-dashboard time-series tickets waiting on Louis's team to push to TSDB. The practical unblock path is to check whether providers already exist, identify provider owners, and schedule injection so dashboards are not disrupted.
+- An August 11 code search found no current or historical SMP DAG scraping `setsuden.nw.tohoku-epco.co.jp/download.html` or its `setsuden` / `tohoku-epco` domain. Existing adjacent Tohoku coverage comes from other sources: Tesla residual-demand and solar forecasts, JEPX day-ahead prices, OCCTO actual flow and capacity for Hokkaido-Tohoku / Tohoku-Tokyo, and HJKS unit-status or outage data.
 
 ## Open Questions
 
@@ -124,6 +125,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the completed UAT campaign has since received an exact-range `write=false` rerun proving zero would-write rows across all source-complete chunks.
 - UNCERTAIN: Whether the production CDH registration workflow should block until each requested stage refresh has completed, or at least surface crawler-already-running outcomes as an explicit follow-up.
 - UNCERTAIN: Whether `port activation` in the August 11 standup is the exact TSDB/Japan term.
+- UNCERTAIN: Whether the Singapore user's requested Tohoku historical demand/supply-demand actuals should become a new SMP DAG scope.
 
 ## Sources
 
@@ -176,5 +178,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+- `sources/codex-conversations/2026-08-11-codex-conversations.txt`
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-13

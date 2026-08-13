@@ -548,11 +548,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Submit the Thailand Digital Arrival Card no earlier than 2026-08-10 for the August 13 arrival.
   - Context: [[thailand-2026]]
-  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`; `sources/codex-conversations/2026-08-11-codex-conversations.txt`
 
 - [ ] Book or decide BKK to Pattaya, Pattaya to Bangkok, and Bangkok to BKK transfers, with Klook TTD preferred when the final price is close to Agoda after tolls.
   - Context: [[thailand-2026]]
-  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`; `sources/codex-conversations/2026-08-12-codex-conversations.txt`
 
 - [ ] Ask HR whether company iCare covers emergency hospitalization and medical evacuation in Thailand.
   - Context: [[thailand-2026]]
