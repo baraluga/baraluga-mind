@@ -1,0 +1,1321 @@
+# Codex Conversations - 2026-08-14
+
+## Capture Summary
+
+Source type: mixed capture / Codex conversation export.
+
+This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.
+
+Facts:
+- Capture date: `2026-08-14`
+- Generated from local session directory: `/Users/qn5792/.codex/sessions/2026/08/14`
+- Sessions found: 4
+
+Inferences:
+- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.
+
+## Preliminary Ingest Notes
+
+- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.
+- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.
+- Move this file together with the paired `2026-08-14-codex-conversations.md` index during ingest.
+- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.
+
+## Thread Index
+
+| Thread | Session | Started | Updated | Messages | CWD | Raw File |
+| --- | --- | --- | --- | ---: | --- | --- |
+| Daily Codex Conversation Capture | `019ffbf0-2c87-7e23-923d-22d3de0fc4da` | `2026-08-13T16:24:09.167Z` | `2026-08-13T16:24:11.255551Z` | 2 user / 6 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T00-24-09-019ffbf0-2c87-7e23-923d-22d3de0fc4da.jsonl` |
+| Daily GitHub Copilot Conversation Capture | `01a000cc-3e46-7830-a0a3-adaebb19bf11` | `2026-08-14T15:03:00.751Z` | `2026-08-14T15:03:03.325109Z` | 2 user / 7 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-03-00-01a000cc-3e46-7830-a0a3-adaebb19bf11.jsonl` |
+| Daily Granola Meeting Notes Capture | `01a000cc-3e46-7830-a0a3-adba37e0a2c5` | `2026-08-14T15:03:00.753Z` | `2026-08-14T15:03:06.572116Z` | 2 user / 5 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-03-00-01a000cc-3e46-7830-a0a3-adba37e0a2c5.jsonl` |
+| Daily Baraluga Mind Ingest | `01a000ea-9c64-7750-8116-614e29d78bb1` | `2026-08-14T15:36:10.654Z` | `2026-08-14T15:36:12.441027Z` | 2 user / 5 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-36-10-01a000ea-9c64-7750-8116-614e29d78bb1.jsonl` |
+
+## Transcript
+
+## Daily Codex Conversation Capture
+
+- Session: `019ffbf0-2c87-7e23-923d-22d3de0fc4da`
+- Started: `2026-08-13T16:24:09.167Z`
+- Updated: `2026-08-13T16:24:11.255551Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T00-24-09-019ffbf0-2c87-7e23-923d-22d3de0fc4da.jsonl`
+
+### User - 2026-08-13T16:24:39.958Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-14</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-13T16:24:40.000Z
+
+Automation: Daily Codex Conversation Capture
+Automation ID: daily-codex-conversation-capture
+Automation memory: $CODEX_HOME/automations/daily-codex-conversation-capture/memory.md
+Last run: 2026-08-12T16:12:08.333Z (1786551128333)
+
+You are running Brian's daily Codex conversation capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export the complete previous Asia/Manila calendar day's local Codex conversations into the Baraluga Mind `inbox/` folder as an Obsidian-safe Markdown index paired with a complete raw text transcript.
+- Preserve the source conversation material without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine yesterday's calendar date in `Asia/Manila` as `YYYY-MM-DD`.
+3. Run `/Users/qn5792/baraluga-mind/scripts/export-codex-conversations.py --date YYYY-MM-DD` from `/Users/qn5792/baraluga-mind`, substituting the date determined in step 2.
+4. Verify that both `inbox/YYYY-MM-DD-codex-conversations.md` and `inbox/YYYY-MM-DD-codex-conversations.txt` exist for that previous date.
+5. Confirm that the Markdown index does not embed a `## Transcript` section and that the complete filtered user/assistant transcript is present in the paired text file.
+6. Report both output paths, the session count printed by the script, and any errors.
+
+Rules:
+- Keep raw transcripts as `.txt`; do not rename them to `.md` because oversized Markdown transcripts can crash Obsidian during indexing.
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw Codex session files.
+- If the script fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-13T16:24:48.480Z
+
+I’ll run the scheduled capture exactly as an export-only task. I’ll first check the automation memory and repo instructions, then run the existing export script for yesterday in Asia/Manila.
+
+### Assistant - 2026-08-13T16:24:51.797Z
+
+The previous Asia/Manila calendar day is `2026-08-13`. I found no existing automation memory content to preserve, so I’m proceeding with the export and then I’ll verify the two expected files and transcript split.
+
+### Assistant - 2026-08-13T16:25:04.477Z
+
+The export completed cleanly and printed `sessions=4`. I’m checking the Markdown/text contract now: the index should stay lightweight, and the full transcript should live only in the `.txt`.
+
+### Assistant - 2026-08-13T16:25:08.699Z
+
+Verification passed: the Markdown file exists with no `## Transcript` section, and the paired text file contains the transcript section plus user/assistant turns. I’m writing the automation memory with this run’s outcome before I close.
+
+### Assistant - 2026-08-13T16:25:18.359Z
+
+`$CODEX_HOME` is not set in this shell, so the literal expansion tried to write under `/automations` and was blocked. I’m using the Codex home path from this environment (`/Users/qn5792/.codex`) for the required memory file.
+
+### Assistant - 2026-08-13T16:25:34.879Z
+
+Daily Codex conversation capture completed for `2026-08-13` Asia/Manila.
+
+Outputs:
+- Markdown index: [/Users/qn5792/baraluga-mind/inbox/2026-08-13-codex-conversations.md](/Users/qn5792/baraluga-mind/inbox/2026-08-13-codex-conversations.md)
+- Raw transcript: [/Users/qn5792/baraluga-mind/inbox/2026-08-13-codex-conversations.txt](/Users/qn5792/baraluga-mind/inbox/2026-08-13-codex-conversations.txt)
+
+Script result: `sessions=4`.
+
+Verification passed: the Markdown index exists and does not contain a `## Transcript` section; the paired `.txt` file exists and contains the complete transcript section with user/assistant turns. No ingest was performed, and I did not edit `actions.md`, wiki pages, or `sources/`.
+
+One environment note: `$CODEX_HOME` was unset in the shell, so I wrote automation memory to `/Users/qn5792/.codex/automations/daily-codex-conversation-capture/memory.md`.
+
+::inbox-item{title="Codex capture exported" summary="2026-08-13 transcript ready in inbox"}
+
+## Daily GitHub Copilot Conversation Capture
+
+- Session: `01a000cc-3e46-7830-a0a3-adaebb19bf11`
+- Started: `2026-08-14T15:03:00.751Z`
+- Updated: `2026-08-14T15:03:03.325109Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-03-00-01a000cc-3e46-7830-a0a3-adaebb19bf11.jsonl`
+
+### User - 2026-08-14T15:03:16.944Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-14</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-14T15:03:16.974Z
+
+Automation: Daily GitHub Copilot Conversation Capture
+Automation ID: daily-github-copilot-conversation-capture
+Automation memory: $CODEX_HOME/automations/daily-github-copilot-conversation-capture/memory.md
+Last run: 2026-08-13T15:03:44.972Z (1786633424972)
+
+You are running Brian's daily GitHub Copilot conversation capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export today's local GitHub Copilot conversations into the Baraluga Mind `inbox/` folder as the ingestion entry point.
+- Preserve the source conversation material without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Run `/Users/qn5792/baraluga-mind/scripts/export-copilot-conversations.py` from `/Users/qn5792/baraluga-mind`.
+3. Verify that `inbox/YYYY-MM-DD-copilot-conversations.md` exists for the current local date.
+4. Report the output path, session count if printed by the script, and any errors.
+
+Rules:
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw Copilot state files, session databases, session event logs, VS Code workspace storage, or generated inbox captures.
+- If the script fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-14T15:03:25.242Z
+
+I’ll run the capture exactly as an export-only task, then update the automation memory with what happened.
+
+### Assistant - 2026-08-14T15:03:33.675Z
+
+The repository instructions are loaded. There was no existing automation memory file to reuse, so I’m proceeding with the export and keeping it out of wiki/actions/sources as requested.
+
+### Assistant - 2026-08-14T15:03:44.107Z
+
+The exporter completed cleanly and printed `sessions=0`. I’m verifying the expected inbox file exists, then I’ll write the automation memory note.
+
+### Assistant - 2026-08-14T15:19:37.996Z
+
+The expected capture file exists at 33 lines. The memory path expansion failed because `$CODEX_HOME` is unset in this shell; I’m checking the Codex home path and will write the memory file at the explicit path if needed.
+
+### Assistant - 2026-08-14T15:19:53.695Z
+
+`$CODEX_HOME` is unset, but the Codex home directory is present at `/Users/qn5792/.codex`. I’m using that explicit automation memory location now.
+
+### Assistant - 2026-08-14T15:20:03.110Z
+
+There is existing memory from yesterday, so I’m appending today’s result rather than replacing it.
+
+### Assistant - 2026-08-14T15:20:21.887Z
+
+Capture completed successfully.
+
+Output: [`/Users/qn5792/baraluga-mind/inbox/2026-08-14-copilot-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-08-14-copilot-conversations.md)
+
+Script result: `sessions=0`. Verified the file exists at 33 lines / 1810 bytes. No ingest work was done, and I did not edit `actions.md`, wiki pages, or `sources/`.
+
+I also appended today’s run summary to [`/Users/qn5792/.codex/automations/daily-github-copilot-conversation-capture/memory.md`](/Users/qn5792/.codex/automations/daily-github-copilot-conversation-capture/memory.md).
+
+::inbox-item{title="Copilot capture completed" summary="Today’s export saved; zero sessions found"}
+
+## Daily Granola Meeting Notes Capture
+
+- Session: `01a000cc-3e46-7830-a0a3-adba37e0a2c5`
+- Started: `2026-08-14T15:03:00.753Z`
+- Updated: `2026-08-14T15:03:06.572116Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-03-00-01a000cc-3e46-7830-a0a3-adba37e0a2c5.jsonl`
+
+### User - 2026-08-14T15:03:16.913Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-14</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-14T15:03:16.959Z
+
+Automation: Daily Granola Meeting Notes Capture
+Automation ID: daily-granola-meeting-notes-capture
+Automation memory: $CODEX_HOME/automations/daily-granola-meeting-notes-capture/memory.md
+Last run: 2026-08-13T15:03:44.967Z (1786633424967)
+
+You are running Brian's daily Granola meeting notes capture in the Baraluga Mind workspace at `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Export today's Granola meeting notes into the Baraluga Mind `inbox/` folder as the ingestion entry point.
+- Create one markdown file per Granola meeting for the current local date in Asia/Manila.
+- Preserve the available Granola notes/summaries without promoting anything directly into wiki pages, `actions.md`, or `sources/`.
+
+Steps:
+1. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and follow it.
+2. Determine today's local date using the runtime date in Asia/Manila.
+3. Use the Granola connector to list available meetings for `this_week`.
+4. Filter the listed meetings to meetings whose meeting date is today in Asia/Manila.
+5. For each matching meeting, retrieve the detailed Granola meeting notes/summaries. Prefer `get_meetings` by meeting ID if available; otherwise use the Granola query tool scoped to that meeting if available.
+6. Write one markdown file per meeting into `/Users/qn5792/baraluga-mind/inbox/` using this filename shape: `YYYY-MM-DD-HHMM-granola-<slug>.md`.
+7. Each file must include: title, source type `Granola meeting notes`, meeting ID, meeting date/time, known participants if available, a clear note that this is not a verbatim transcript, the discussion notes/summary, any next steps/action items present in Granola, and `Last Updated: YYYY-MM-DD`.
+8. Verify the expected inbox files exist. Report the output paths, meeting count, and any errors.
+
+Rules:
+- Do not ingest the capture during this scheduled task.
+- Do not edit `actions.md`, wiki pages, or source folders.
+- Do not delete raw inputs or previous inbox captures.
+- Do not fabricate details that are not in Granola notes.
+- If a meeting has no useful notes, still write a small file for it with `UNCERTAIN:` explaining that Granola did not provide usable content.
+- If no meetings are found for today, do not write any inbox status file. Report meeting count `0` and leave existing inbox files untouched.
+- If the Granola connector fails, report the failure and leave existing inbox files untouched.
+
+### Assistant - 2026-08-14T15:03:27.049Z
+
+I’ll run the Granola capture exactly as a staging step: read the workspace rules and automation memory, pull today’s meeting notes, then write only inbox files without ingesting them.
+
+### Assistant - 2026-08-14T15:03:34.400Z
+
+The workspace instructions are loaded. There was no prior automation memory file, so I’ll create it after this run with the meetings captured and any connector status.
+
+### Assistant - 2026-08-14T15:03:43.686Z
+
+Granola returned three meetings for this week, all dated August 11, 2026 in GMT+8. Since today in Asia/Manila is August 14, 2026, there are no matching meetings to export and I’m leaving `inbox/` untouched.
+
+### Assistant - 2026-08-14T16:00:49.366Z
+
+I verified there are no `2026-08-14-*-granola-*.md` inbox files from this run. The existing untracked files are unrelated, so I’m not touching them.
+
+### Assistant - 2026-08-14T16:00:56.606Z
+
+`$CODEX_HOME` is not set in this shell, so the literal env-based path resolved incorrectly. I’m using the Codex home directory at `/Users/qn5792/.codex` for the automation memory file.
+
+## Daily Baraluga Mind Ingest
+
+- Session: `01a000ea-9c64-7750-8116-614e29d78bb1`
+- Started: `2026-08-14T15:36:10.654Z`
+- Updated: `2026-08-14T15:36:12.441027Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/14/rollout-2026-08-14T23-36-10-01a000ea-9c64-7750-8116-614e29d78bb1.jsonl`
+
+### User - 2026-08-14T15:36:26.387Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Build iOS Apps (build-ios-apps@openai-curated-remote)
+- Build macOS Apps (build-macos-apps@openai-curated-remote)
+- Build Web Apps (build-web-apps@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Creative Production (creative-production@openai-curated-remote)
+- Data Analytics (data-analytics@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- HeyGen (heygen@openai-curated-remote)
+- HubSpot (hubspot@openai-curated-remote)
+- HyperFrames by HeyGen (hyperframes@openai-curated-remote)
+- Investment Banking (investment-banking@openai-curated-remote)
+- Linear (linear@openai-curated-remote)
+- Lovable (lovable@openai-curated-remote)
+- Monday.com (monday-com@openai-curated-remote)
+- Neon Postgres (neon-postgres@openai-curated-remote)
+- Notion (notion@openai-curated-remote)
+- OpenAI Developers (openai-developers@openai-curated-remote)
+- Outlook Calendar (outlook-calendar@openai-curated-remote)
+- Outlook Email (outlook-email@openai-curated-remote)
+- PostHog (posthog@openai-curated-remote)
+- Product Design (product-design@openai-curated-remote)
+- Public Equity Investing (public-equity-investing@openai-curated-remote)
+- Remotion (remotion@openai-curated-remote)
+- Replit (replit@openai-curated-remote)
+- Sales (sales@openai-curated-remote)
+- Semrush (semrush@openai-curated-remote)
+- Sentry (sentry@openai-curated-remote)
+- SharePoint (sharepoint@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+- Stripe (stripe@openai-curated-remote)
+- Supabase (supabase@openai-curated-remote)
+- Superpowers (superpowers@openai-curated-remote)
+- Teams (teams@openai-curated-remote)
+- Vercel (vercel@openai-curated-remote)
+- Wix (wix@openai-curated-remote)
+- Zotero (zotero@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+3. Update existing pages when possible.
+4. Create new pages only when the topic is likely to matter again.
+5. Add or update captured action items in `actions.md`.
+6. Add a short `Sources` section with the source filename or path.
+7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+8. Add a short `Last Updated` date using `YYYY-MM-DD`.
+9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-14</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-14T15:36:26.433Z
+
+Automation: Daily Baraluga Mind Ingest
+Automation ID: daily-baraluga-mind-ingest
+Automation memory: $CODEX_HOME/automations/daily-baraluga-mind-ingest/memory.md
+Last run: 2026-08-13T15:36:55.157Z (1786635415157)
+
+You are running Brian's daily Baraluga Mind ingest in the local project `/Users/qn5792/baraluga-mind`.
+
+Objective:
+- Process all new material currently in `/Users/qn5792/baraluga-mind/inbox/` into durable source evidence, wiki updates, and the canonical action register.
+- Finish a substantive ingest with validation, one unscoped conventional commit, and a push to `origin/main`.
+
+Workflow:
+1. Work from `/Users/qn5792/baraluga-mind` and read `AGENTS.md` and `scripts/ingest.md` in full.
+2. Run `git status --short --branch` before editing. Treat pre-existing unrelated changes and untracked files as user-owned; do not edit or stage them.
+3. List every file directly under `inbox/` except `.gitkeep`.
+4. If there are no new inbox files, report a clean no-op and do not edit, commit, or push anything.
+5. For every inbox file, identify its source type and read any nested `AGENTS.md` that applies to its destination or wiki edits.
+6. Preserve raw inputs. Move processed evidence to the appropriate `sources/` subfolder; leave an inbox file in place if it still needs review, clarification, or follow-up.
+7. Extract durable people, projects, concepts, decisions, open questions, and action items. Prefer small updates to existing wiki pages over duplicates. Create a new page only when the topic is likely to matter again.
+8. Reconcile `actions.md` against new evidence. Keep exactly the top-level sections `Today`, `Open`, `Waiting`, and `Done`; add new actions to `Open` unless clearly blocked; move source-proven completed or superseded work to `Done`; do not infer closure from ambiguity. Every action must include Context and Source.
+9. Mark uncertain claims with `UNCERTAIN:` and preserve suspicious names, acronyms, systems, projects, and jargon without guessing.
+10. Add source paths and `Last Updated: YYYY-MM-DD` to durable pages.
+11. Validate the complete ingest:
+   - all source paths referenced by `actions.md` and synthesized wiki pages exist;
+   - all Obsidian wiki links in the synthesized layer resolve;
+   - `actions.md` has exactly the four required top-level sections and no duplicate action text;
+   - every modified durable page has the current local date;
+   - `git diff --check` is clean for synthesized files.
+   Preserve raw transcript fidelity even if raw evidence legitimately contains trailing whitespace; report those raw-only warnings rather than rewriting the source.
+12. Review the complete diff and derive one logical ingest commit. Stage only the files belonging to this ingest using explicit paths; never use `git add .`.
+13. Commit with an unscoped conventional subject such as `docs: ingest July 14 captures`, using the actual Asia/Manila capture date or date range represented by the inbox evidence.
+14. Confirm the branch and remote, ensure the active GitHub account can push to `baraluga/baraluga-mind`, push to `origin/main`, then verify `HEAD` matches `origin/main`. Do not stage or commit unrelated user files.
+
+Final report:
+- pages created;
+- pages updated;
+- actions added, updated, moved to Waiting, or moved to Done;
+- source files processed and their destinations;
+- uncertain claims;
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation;
+- suggested next cleanup;
+- commit SHA and push result;
+- any errors or files intentionally left in inbox.
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest. Do not delete raw evidence.
+
+### Assistant - 2026-08-14T15:36:42.568Z
+
+I’ll run this as the daily ingest from the repo root: first I’m reading the ingest instructions and prior automation memory, then I’ll inventory the inbox before touching files.
+
+### Assistant - 2026-08-14T15:36:55.421Z
+
+The inbox has one current capture, the known sensitive August 6 transcript, and an `inbox/AGENTS.md` instruction file. I’ll read the nested instructions and inspect the captures before deciding what can be safely moved.
+
+### Assistant - 2026-08-14T15:37:09.579Z
+
+The August 14 Copilot capture has zero sessions, so it is source evidence only: no actions, wiki facts, or durable decisions to synthesize. I’m checking the existing August 6 redacted source now so the sensitive unredacted inbox file stays handled consistently with prior runs.
+
+### Assistant - 2026-08-14T15:37:27.560Z
+
+The nested wiki rules don’t require any wiki change for a zero-session Copilot capture. Before moving the new source file, I’m validating that the sensitive August 6 file is still only the already-known unredacted duplicate and will not be committed.
+
+### Assistant - 2026-08-14T15:37:31.976Z
+
+The August 6 sensitive file matches the committed redacted transcript except for one omitted line, so I’m leaving it in `inbox/` as ignored local evidence for Brian’s review. I’m moving only the August 14 zero-session Copilot capture into `sources/copilot-conversations/`.
+
+Last Updated: 2026-08-14
