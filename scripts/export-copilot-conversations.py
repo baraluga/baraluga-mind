@@ -377,7 +377,20 @@ def main() -> None:
         *extract_cli_sessions(copilot_home, capture_date),
         *extract_vscode_sessions(code_support, capture_date),
     ]
+    sessions = [
+        session
+        for session in sessions
+        if any(
+            message.get("role") == "user" and str(message.get("text") or "").strip()
+            for message in session.get("messages") or []
+        )
+    ]
     sessions.sort(key=lambda session: (session.get("started") or "", str(session["path"])))
+
+    if not sessions:
+        print("skipped=no-user-conversations")
+        print("sessions=0")
+        return
 
     inbox = vault / "inbox"
     inbox.mkdir(parents=True, exist_ok=True)

@@ -73,6 +73,33 @@ class ExportCodexConversationsTest(unittest.TestCase):
                 index_path.read_text(encoding="utf-8"),
             )
 
+    def test_select_meaningful_sessions_excludes_scheduled_automations(self) -> None:
+        automation_session = {
+            **self.sessions[0],
+            "session_id": "automation-session",
+            "messages": [
+                {
+                    "role": "user",
+                    "text": "Automation: Daily Capture\nAutomation ID: daily-capture\nAutomation memory: /tmp/memory.md",
+                }
+            ],
+        }
+
+        selected = EXPORTER.select_meaningful_sessions(
+            [automation_session, self.sessions[0]]
+        )
+
+        self.assertEqual(selected, self.sessions)
+
+    def test_select_meaningful_sessions_excludes_sessions_without_user_text(self) -> None:
+        assistant_only = {
+            **self.sessions[0],
+            "session_id": "assistant-only",
+            "messages": [{"role": "assistant", "text": "background result"}],
+        }
+
+        self.assertEqual(EXPORTER.select_meaningful_sessions([assistant_only]), [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 
 
+AUTOMATION_MARKERS = ("Automation ID:", "Automation memory:")
+
+
 def read_titles(codex_home: Path) -> tuple[dict[str, str], dict[str, str]]:
     titles: dict[str, str] = {}
     updated: dict[str, str] = {}
@@ -99,6 +102,29 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
             )
 
     return sessions
+
+
+def is_scheduled_automation(session: dict) -> bool:
+    """Return whether a session is a Codex scheduled-automation run."""
+    user_text = "\n".join(
+        str(message.get("text") or "")
+        for message in session.get("messages") or []
+        if message.get("role") == "user"
+    )
+    return all(marker in user_text for marker in AUTOMATION_MARKERS)
+
+
+def select_meaningful_sessions(sessions: list[dict]) -> list[dict]:
+    """Keep user-initiated sessions and exclude automation feedback loops."""
+    return [
+        session
+        for session in sessions
+        if any(
+            message.get("role") == "user" and str(message.get("text") or "").strip()
+            for message in session.get("messages") or []
+        )
+        and not is_scheduled_automation(session)
+    ]
 
 
 def render_thread_index(sessions: list[dict]) -> list[str]:
@@ -267,12 +293,20 @@ def main() -> None:
     capture_date = args.date or __import__("datetime").date.today().isoformat()
     vault = Path(args.vault)
     codex_home = Path(args.codex_home)
-    sessions = extract_sessions(codex_home, capture_date)
+    discovered_sessions = extract_sessions(codex_home, capture_date)
+    sessions = select_meaningful_sessions(discovered_sessions)
+
+    if not sessions:
+        print("skipped=no-meaningful-sessions")
+        print("sessions=0")
+        print(f"excluded={len(discovered_sessions)}")
+        return
 
     index_output, transcript_output = write_capture(vault, capture_date, codex_home, sessions)
     print(index_output)
     print(transcript_output)
     print(f"sessions={len(sessions)}")
+    print(f"excluded={len(discovered_sessions) - len(sessions)}")
 
 
 if __name__ == "__main__":

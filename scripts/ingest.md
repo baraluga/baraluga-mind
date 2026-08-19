@@ -9,6 +9,8 @@ Follow `AGENTS.md`.
 
 Goals:
 - Preserve raw inputs during ingest.
+- Apply an ingest-value gate before moving files: empty exports, scheduled-automation transcripts, capture bookkeeping, and repeated status-only records are no-ops.
+- Ingest a conversation capture only when a user-initiated exchange adds a durable fact, decision, action, open question, or reusable context.
 - Create or update durable wiki pages under `wiki/`.
 - Add or update captured follow-up work in root `actions.md`.
 - Put newly captured actions in `Open` by default; use `Waiting` only for blocked work and `Today` only when the user explicitly prioritizes it.
@@ -22,6 +24,7 @@ Goals:
 - Treat `YYYY-MM-DD-codex-conversations.md` and its paired `.txt` transcript as one source: review the text evidence and move both files together without changing the transcript back to Markdown.
 - Leave files in `inbox/` when they still need follow-up, review, or clarification.
 - Give me a concise changelog when finished.
+- If no inbox item passes the value gate, do not edit, move, commit, or push anything; report a clean no-op.
 - End with a `Needs Confirmation` handover that lists only suspicious terms, ambiguous owners, uncertain claims, and other clarification items worth asking me about.
 - Do not surface the full `Open` action register as my assignment unless I explicitly ask for it.
 
@@ -32,16 +35,18 @@ Do not delete files unless I explicitly ask.
 
 1. Read `AGENTS.md`.
 2. List files in `inbox/`.
-3. Search `wiki/` for related existing pages.
-4. Create or update the smallest useful set of pages.
-5. Add or update active follow-up work in `actions.md`.
-6. Add source references.
-7. Move processed `inbox/` files worth preserving to the right `sources/` folder. Keep Codex conversation `.md`/`.txt` pairs together.
+3. Apply the ingest-value gate and stop as a no-op when no item adds durable information.
+4. Search `wiki/` for related existing pages.
+5. Create or update the smallest useful set of pages.
+6. Add or update active follow-up work in `actions.md`.
+7. Add source references.
+8. Move processed `inbox/` files worth preserving to the right `sources/` folder. Keep Codex conversation `.md`/`.txt` pairs together.
    - Move live `inbox/YYYY-MM-DD.md` notes to `sources/notes/YYYY-MM-DD.md` after reconciling their task states with `actions.md`.
    - Deduplicate daily-note content against the paired Codex conversation transcript.
-8. Validate source references, wiki links, action sections, duplicate actions, current `Last Updated` dates, and synthesized-file whitespace.
-9. Report what changed.
-10. Include a `Needs Confirmation` handover:
+9. Validate source references, wiki links, action sections, duplicate actions, current `Last Updated` dates, and synthesized-file whitespace.
+10. Commit and push only when at least one item passed the value gate and produced a durable source, wiki, or action change.
+11. Report what changed.
+12. Include a `Needs Confirmation` handover:
     - group suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims by durable area;
     - include why each item needs confirmation;
     - include the source path or related wiki page;

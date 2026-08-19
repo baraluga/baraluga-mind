@@ -77,18 +77,22 @@ Instruction files should stay small and scoped. Prefer one local, source-specifi
 When processing files from `inbox/` or `sources/`:
 
 1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
-2. Extract durable entities:
+2. Apply an ingest-value gate before moving or editing anything:
+   - Scheduled-automation transcripts, empty/zero-session exports, capture bookkeeping, and repeated status-only records are not ingest-worthy.
+   - A conversation capture is ingest-worthy only when it contains at least one user-initiated exchange that adds a durable fact, decision, action, open question, or reusable project/person/concept context.
+   - If every inbox item fails this gate, make no source, wiki, action, commit, or push changes. Leave pre-existing raw inputs untouched and report a no-op.
+3. Extract durable entities:
    - people
    - projects
    - concepts
    - decisions
    - open questions
    - action items
-3. Update existing pages when possible.
-4. Create new pages only when the topic is likely to matter again.
-5. Add or update captured action items in `actions.md`.
-6. Add a short `Sources` section with the source filename or path.
-7. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+4. Update existing pages when possible.
+5. Create new pages only when the topic is likely to matter again.
+6. Add or update captured action items in `actions.md`.
+7. Add a short `Sources` section with the source filename or path.
+8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
    - `sources/articles/` for articles, links, and reading notes
    - `sources/meetings/` for meeting transcripts, agendas, and summaries
    - `sources/voice/` for voice-note transcripts and dictated thoughts
@@ -97,8 +101,8 @@ When processing files from `inbox/` or `sources/`:
    - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
    - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
    - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
-8. Add a short `Last Updated` date using `YYYY-MM-DD`.
-9. Validate the complete ingest diff, then commit and push all ingest changes using an unscoped conventional commit.
+9. Add a short `Last Updated` date using `YYYY-MM-DD`.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
 
 ## Wiki Page Shape
 

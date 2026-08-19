@@ -17,3 +17,9 @@
 - Observation: Obsidian 1.12.7 crashed its renderer while indexing daily Codex Markdown transcripts of 3.3 MB and 2.2 MB.
 - Suggested rule: Export Codex captures as a small Markdown index paired with a complete raw `.txt` transcript, and keep the pair together during ingest.
 - Example: The 2026-07-24 and 2026-07-25 raw transcripts remain intact as `.txt` while their original `.md` paths now contain lightweight indexes.
+
+### 2026-08-19
+
+- Observation: Daily conversation capture and ingest automations formed a feedback loop during Brian's August vacation: capture runs exported the automation sessions themselves, and ingest committed those derivatives even though they added no durable knowledge or actions.
+- Suggested rule: Exclude scheduled-automation and empty sessions during export, then require a durable knowledge or action delta before an inbox capture can be moved, committed, or pushed.
+- Example: The August 13-17 Codex exports contained only the four recurring automation tasks, while the Copilot exports contained zero sessions.
