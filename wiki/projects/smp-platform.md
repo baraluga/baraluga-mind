@@ -119,6 +119,14 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Old-dashboard metadata remained a blocker: the team needed to confirm metadata collection progress with `Fluid`, continue waiting on metadata for Louis's dashboards, pre-check whether providers already exist in TSDB, identify provider owners, and schedule injection carefully to avoid disrupting dashboards.
 - August 11 backlog grooming recorded no confirmed budget and no formal sprint plan for the upcoming two-week period. Most tickets were blocked on metadata or external inputs; the fallback support-mode shape was roughly 30% per day only when a ticket is raised, while full-time Brian engagement still depended on budget approval.
 - The same grooming notes kept automated Docker image push and deployment triggering as a low-priority, budget-dependent workflow improvement, with board/Grafana backup cleanup treated as nice-to-have rather than urgent.
+- August 19 notes identified the CSV partial-interval root cause for Khaba generation gaps: the DAG currently skips any interval missing at least one minute of data. The proposed fix is to handle partial intervals deliberately, then rerun the reconciliation DAG, but Matteo must confirm whether partial intervals are acceptable to process.
+- The August 19 SMP overview restated the current architecture: one SMP codebase serves isolated Japan and India environments, with scraper DAGs, transformation DAGs, optional reconciliation DAGs, and outputs published to CDH or TSDB. CDH remains the bridge for Grafana because direct Grafana-to-TSDB connectivity is not yet available.
+- SMP infrastructure runs Airflow on AWS EKS via Helm, with web server, scheduler, Celery workers, triggerer, and Git-sync sidecar pods. DAGs are imported from GitHub on merge; dev and QA are separate namespaces in a shared cluster, while production uses a dedicated cluster. Airflow metadata has moved from local PostgreSQL to AWS RDS.
+- Custom Airflow Docker images are stored in AWS ECR and built/pushed manually. The August 19 overview flagged two governance gaps: no CI/CD image rebuild path and no automated security-patch rebuild policy or vulnerability-auditing tool.
+- August 20 Codex evidence says SMP actively uses Bitnami for `bitnami/kubectl:latest` in the Airflow DAG processor `sync-perm-sidecar` across India and Japan environments, including production. `bitnamisecure/postgresql:latest` is configured broadly but disabled in checked-in dev/QA/prod configs, while the Bitnami PostgreSQL subchart is enabled only for Japan local development. This is checked-in configuration evidence, not live-cluster proof.
+- The AI DAG scaffolding agent has been live for about one month and is still a pilot. It is triggered from a structured GitHub issue, opens a draft PR, and has not yet produced production DAGs. Mateo/Matthew is blocked on local testing because of missing dependencies.
+- August 19 India workload planning expected work to start on September 1 or the first week of September as time-and-materials, staffed by Brian plus one other person, covering roughly 60-80% of India demand. Two people were considered the right staffing shape; three would likely be wasteful, and geolocation/access blockers need specialist escalation rather than more developers.
+- The four incoming India tickets were bilateral-contract scraper parsing and CDH publication, three bid-stack Grafana dashboards backed by 15-minute price/volume series, generation-data benchmarking infrastructure, and a geolocation-blocked Data Grid scraper that feeds Orchestrate and IDEN/PPA pricing through existing TSDB metadata.
 
 ## Open Questions
 
@@ -151,6 +159,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
 - UNCERTAIN: Whether `KSDB` in the August 11 standup is exact or a transcription artifact for TSDB.
 - UNCERTAIN: Whether `Fluid`, `Material`, and `CABA` are exact names from the August 11 standup and grooming notes.
+- UNCERTAIN: Whether live SMP clusters are still running the Bitnami images shown in checked-in August 20 configuration evidence.
+- UNCERTAIN: Whether Matteo, Mateo, and Matthew refer to the same person across the August 19 notes.
+- UNCERTAIN: Whether `Jeroen` and `Jerome` refer to the same overview-session attendee.
+- UNCERTAIN: What exact website or source powers the incoming India bilateral-contract scraper.
+- UNCERTAIN: Which VPN, proxy, or escalation path can unblock the geolocation-restricted Data Grid scraper.
+- UNCERTAIN: Whether `Orchestrate`, `IDEN`, and the PPA pricing tool names are exact.
 
 ## Sources
 
@@ -211,5 +225,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-08-07-codex-conversations.txt`
 - `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+- `sources/meetings/2026-08-19-granola-busy.md`
+- `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
+- `sources/meetings/2026-08-19-granola-backlog-grooming.md`
+- `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-20

@@ -21,11 +21,13 @@ The main durable value is reducing repeated DAG setup work while still keeping i
 - New dependency additions still require Docker image coordination in SMP Tool.
 - The August 4 AI Corner material framed the durable need as onboarding contributors through repo-specific DAG conventions without maintaining a maze of stale Confluence pages. The solution proof was a short DAG request becoming a repository-grounded, reviewable scaffold PR.
 - Matéo's beta test remains the strongest evidence: the flow reached draft-PR generation, and the failure was an external Tools/Walnut Artifactory entitlement gap rather than the agent being unable to scaffold.
+- The August 19 SMP overview said the agent has been live for about one month, with its first test in July. It is still a pilot: no production DAGs have been created through this path yet, and Mateo/Matthew remains blocked on local validation because of missing dependencies.
 
 ## Open Questions
 
 - UNCERTAIN: Final branch and PR workflow was not decided in the captured meeting.
 - UNCERTAIN: Whether `smp-japan` should align its DAG Helper instruction with `smp-india` by explicitly requiring a draft PR targeting `dev`.
+- UNCERTAIN: Whether Mateo and Matthew refer to the same beta tester in the August 19 overview note.
 
 ## Sources
 
@@ -33,5 +35,6 @@ The main durable value is reducing repeated DAG setup work while still keeping i
 - `sources/meetings/2026-06-23-1430-granola-new-dag-agent.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
+- `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-20

@@ -27,6 +27,10 @@ SMP operational discussions in late June and early July focused on production in
 - The same meeting introduced a broader alerting idea from the Prosumer simulation blockage: restore Prosumer-specific alarms if needed, but also consider account-level global alarms because the immediate root cause was shared AWS infrastructure capacity rather than a Prosumer application failure.
 - August 11 backlog grooming proposed a short spike on out-of-the-box Airflow and Grafana features not yet used by the team. Airflow assets were called out as unexplored potential low-hanging fruit; Grafana alerting could replace daily manual dashboard checks for threshold-driven cases such as power prices; and Grafana monitoring views should be mapped for operational reuse.
 - The intended spike output feeds the August 28 steering committee presentation, with findings expected by August 21 before the other speaker's August 24-30 holiday. The meeting expected two tickets: one for Grafana features and one for Airflow features.
+- August 19 notes refined the spike output into a table of feature name, description, usefulness assessment, and applicable use cases. The same notes proposed Grafana threshold alerts that users can configure themselves, plus Prometheus and Loki monitoring for SMT health, pod usage, and processing load.
+- The proposed resource-monitoring work is expected to fit Airflow and Grafana, take under five days, and provide earlier warning before failures or scaling issues.
+- The August 20 SCR-1221 Airflow spike narrowed the recommendation to five practical improvements: Airflow Assets, deadline alerts, self-service runs with Params/backfills, exception-aware retry policies, and versioned Git DAG bundles. Assets were judged useful mainly for Japan's orchestration complexity and lower-value for India today; the recommended proof was Japan OCCTO daily capacity feeding a reconciliation consumer.
+- The SCR-1221 and SCR-1222 work produced Confluence-ready tables plus private interactive demos: `https://smp-airflow-capabilities.baraluga.chatgpt.site` and `https://smp-grafana-top-five.baraluga.chatgpt.site`.
 
 ## Open Questions
 
@@ -35,7 +39,8 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the Grafana alert destination should be one shared Teams channel or separate per system still needs confirmation.
 - UNCERTAIN: Which AWS admin can create the Grafana role needed for APM CloudWatch/publish access.
 - UNCERTAIN: Whether `STSS` and `Jeka` are exact names from the July 17 technical-activities source.
-- UNCERTAIN: Whether Airflow `assets` are mature enough for the team's current DAG model; the August 11 source frames this only as a spike candidate.
+- UNCERTAIN: Whether the Japan OCCTO daily capacity to reconciliation Asset proof was built or adopted after the August 20 demo.
+- UNCERTAIN: Whether `SMT health` is the exact term from the August 19 backlog grooming note or a transcription artifact for SMP health.
 
 ## Sources
 
@@ -55,5 +60,8 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/notes/2026-07-15-ingest-handover-clarifications.md`
 - `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
+- `sources/meetings/2026-08-19-granola-busy.md`
+- `sources/meetings/2026-08-19-granola-backlog-grooming.md`
+- `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-20

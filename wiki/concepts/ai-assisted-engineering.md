@@ -27,6 +27,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - The same meeting framed model quality as a real constraint: the DAG Helper result remains under the mercy of the selected model's capability, so a capable thinking model and human review are still part of the operating model.
 - The Omniron spec-driven-development pilot used an orchestrator plus specialized agents for PO, architect, tech lead, front end, back end, and sub-agent roles. It ran end-to-end and produced a deployable web app candidate, but the team explicitly said not to adopt the approach elsewhere yet because inter-agent communication, standards size, completion checks, compliance, and token burn still need tuning.
 - The August 6 1:1 notes say Copilot/token budget was discussed as roughly 300,000 cases or credits, purchased as VP/Partner tokens, with a budget figure of EUR 5,000. The exact billing mechanics for automatic PR review remain separate and unconfirmed.
+- The August 19 SMP overview raised an idea to automate test-coverage threshold increases with a scheduled GitHub Copilot agent, because the current threshold is updated manually.
 
 ## Open Questions
 
@@ -37,6 +38,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether internal registry access for GitHub-side agent runners will be solved centrally or handled with per-run evidence handoffs.
 - UNCERTAIN: Whether automatic Copilot PR review is charged to the PR creator or another organization billing pool.
 - UNCERTAIN: Whether Omniron's spec-driven-development agent workflow will become a reusable team pattern after the planned workshop and compliance review.
+- UNCERTAIN: Whether a scheduled Copilot agent should be trusted to raise coverage thresholds automatically, or only draft reviewable PRs.
 
 ## Sources
 
@@ -55,5 +57,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
+- `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-20
