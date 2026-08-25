@@ -1,0 +1,433 @@
+# Codex Conversations - 2026-08-24
+
+## Capture Summary
+
+Source type: mixed capture / Codex conversation export.
+
+This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.
+
+Facts:
+- Capture date: `2026-08-24`
+- Generated from local session directory: `/Users/qn5792/.codex/sessions/2026/08/24`
+- Sessions found: 2
+
+Inferences:
+- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.
+
+## Preliminary Ingest Notes
+
+- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.
+- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.
+- Move this file together with the paired `2026-08-24-codex-conversations.md` index during ingest.
+- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.
+
+## Thread Index
+
+| Thread | Session | Started | Updated | Messages | CWD | Raw File |
+| --- | --- | --- | --- | ---: | --- | --- |
+| Assess maintenance sprint priorities | `01a03278-fcfb-7b12-a3ce-033289349a4e` | `2026-08-24T06:33:05.020Z` | `2026-08-24T06:36:07.973839Z` | 3 user / 4 assistant | `/Users/qn5792/repos/smp` | `/Users/qn5792/.codex/sessions/2026/08/24/rollout-2026-08-24T14-33-05-01a03278-fcfb-7b12-a3ce-033289349a4e.jsonl` |
+| Assess SCR-1210 feasibility | `01a03292-843e-7af3-b87c-9813dcc5ecc6` | `2026-08-24T07:00:58.049Z` | `2026-08-24T07:01:06.04326Z` | 2 user / 3 assistant | `/Users/qn5792/repos/smp` | `/Users/qn5792/.codex/sessions/2026/08/24/rollout-2026-08-24T15-00-58-01a03292-843e-7af3-b87c-9813dcc5ecc6.jsonl` |
+
+## Transcript
+
+## Assess maintenance sprint priorities
+
+- Session: `01a03278-fcfb-7b12-a3ce-033289349a4e`
+- Started: `2026-08-24T06:33:05.020Z`
+- Updated: `2026-08-24T06:36:07.973839Z`
+- CWD: `/Users/qn5792/repos/smp`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/24/rollout-2026-08-24T14-33-05-01a03278-fcfb-7b12-a3ce-033289349a4e.jsonl`
+
+### User - 2026-08-24T06:36:01.861Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/repos/smp
+
+<INSTRUCTIONS>
+# AGENTS.md
+
+This file provides guidance to AI coding agents working under `/Users/qn5792/repos/smp`.
+
+## Overview
+
+`/smp` is a parent directory, not a monorepo. It contains separate repositories for the **SMP (Scraper Management Platform)** and adjacent APAC scraper work. Read the repo-local `AGENTS.md` before changing files inside any child repo.
+
+## Current Repos
+
+| Repo | Purpose | Tooling |
+|---|---|---|
+| `scraper-scripts` | Raw standalone scraper scripts and behavioral references before Airflow adaptation | Python 3.13, `uv` |
+| `smp-india` | India-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-japan` | Japan-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-tool` | Airflow Docker image, Helm values, Kubernetes scripts, Okta auth, Minikube/EKS setup | Python 3.12, `uv`, Helm, Kubernetes |
+| `smp-dashboard` | Grafana dashboards and `cdh-dataset-manager` for CommonDataHub datasets | Python 3.11, `uv` |
+| `apac-tsdb-scraper` | Poetry/solaris-sfw TSDB scrapers deployed through the older Lambda/tag flow | Python 3.12, Poetry |
+
+Legacy names still appear in older docs and code comments:
+
+- `scraper-dags` is now split into `smp-india` and `smp-japan`.
+- `scraper-tool` is now `smp-tool`.
+- `scraper-dashboard` is now `smp-dashboard`.
+
+## End-to-End SMP Flow
+
+```text
+scraper-scripts  ->  smp-india / smp-japan  ->  smp-tool  ->  smp-dashboard
+(reference impl)     (Airflow DAGs)             (runtime)     (CDH + Grafana)
+```
+
+Use `scraper-scripts` as the behavioral source when porting or validating a DAG. Region-specific DAG implementation now belongs in either `smp-india` or `smp-japan`; shared Airflow/platform behavior should come from `smp-common` or `smp-tool`, not be copied between region repos.
+
+## Shared Rules
+
+- Do not commit credentials, tokens, kubeconfigs, generated local secrets, or one-off path rewrites.
+- Private dependencies come from ENGIE Artifactory. Prefer fixing local credentials over changing package indexes.
+- Keep region boundaries explicit: India DAG code in `smp-india`, Japan DAG code in `smp-japan`.
+- For Airflow DAGs, keep heavy imports out of module scope because Airflow parses DAG files frequently.
+- For dashboard work, verify the upstream parquet/S3/CDH shape before changing Grafana JSON or dataset definitions.
+- For infra changes, call out whether the change affects image build, Helm values, auth, DAG sync, runtime secrets, or Kubernetes namespaces.
+
+## Cross-Repo Workflow: Porting A Script To A DAG
+
+1. Run and observe the source script in `scraper-scripts`; capture inputs, outputs, credentials, file names, date logic, and failure behavior.
+2. Choose the DAG repo by market ownership: `smp-india` or `smp-japan`.
+3. Check whether an existing DAG for the same source should be extended before creating a new DAG.
+4. Implement under `dags/src/`, keeping task runtime scraper modules under `dags/src/scripts/`.
+5. Validate locally with `ruff`, `pytest`, and, when practical, `airflow dags test`.
+6. Coordinate deployment through the appropriate branch/environment and `smp-tool` git-sync/Helm configuration.
+7. Update `smp-dashboard` only after the DAG output is stable and visible where CDH/Grafana expects it.
+
+## Branch And Environment Notes
+
+- GitHub repos commonly use `main`; some DAG deployment flows still reference `dev`, `qa`, `master`, or region-specific branches.
+- `smp-tool` has region-aware config under `config/japan/<env>/` and `config/india/<env>/`.
+- Airflow namespaces are region-specific in current scripts, for example `smp-dev`, `smp-qa`, `smp-prod`, `smp-india-dev`, `smp-india-qa`, and `smp-india-prod`.
+- Treat any old `scraper-dags`/ADO git-sync reference as potentially stale and verify against current `smp-tool` config before editing deployment behavior.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/repos/smp</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-24</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/repos/smp</root><root>/Users/qn5792/.codex/visualizations/2026/08/24/01a03278-fcfb-7b12-a3ce-033289349a4e</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-24T06:36:01.889Z
+
+I hate what's happening with the project right now.
+
+We've transitioned to a "maintenance" phase where I'm only expected 30% of my FTE time for a given sprint, but what we're doing? I'm essentially finding solutions for problems we don't even know yet lol. You can take a look at current sprint board to get an idea.
+
+And now, I just heard that this week, I'd be focusing on creating POCs for the features of Airflow + Grafana but such POCs are not really addressing anything. This goes against how I think: keep things simple first, then only find solutions if the demand or problem is there. This fucking sucks!!!
+
+Should I just follow blindly? I think we're wasting time and resources. Worst case: we build the POCs but we don't really have any actual requests/requirements to do lol
+
+### Assistant - 2026-08-24T06:36:06.058Z
+
+I’m going to look at the current sprint board first so the advice is grounded in what’s actually being asked of you—not just the frustration of the moment. I’ll use the company-knowledge search workflow because this depends on live Jira context.
+
+### Assistant - 2026-08-24T06:36:33.928Z
+
+The board confirms your discomfort is tied to the work definition, not just mood: both spikes begin with “there may be features,” ask you to invent stakeholder use cases, and then require demos—without naming a stakeholder problem or success criterion. They’re each capped at two days, and both are already marked In Review. I’m checking the ticket history/comments now to see whether any missing rationale was added elsewhere.
+
+### Assistant - 2026-08-24T06:37:00.483Z
+
+No—you shouldn’t follow blindly. But I also wouldn’t frame it as refusing the work. I’d challenge and reshape it professionally.
+
+Your concern is supported by the sprint board:
+
+- [SCR-1221](https://tractebel-et.atlassian.net/browse/SCR-1221) and [SCR-1222](https://tractebel-et.atlassian.net/browse/SCR-1222) start from “there may be useful features,” not an observed stakeholder problem.
+- They ask you to invent possible use cases and then demo anything deemed valuable. There’s no named stakeholder, requirement, expected outcome, or adoption decision.
+- The Grafana ticket was cloned almost verbatim from the Airflow ticket—it even mistakenly says “maximize Airflow.” That strongly suggests solution-first backlog generation.
+- Meanwhile, your only problem-led item, [SCR-1215](https://tractebel-et.atlassian.net/browse/SCR-1215), is blocked.
+- Both spikes allow up to two days. In a normal two-week sprint, that could consume four days while your 30% allocation is roughly three days.
+
+So yes: this is speculative work. A spike can still be legitimate, but it should reduce a specific uncertainty. “Explore features that might be useful” is technology tourism unless somebody can state what decision the findings will inform.
+
+My recommendation:
+
+1. Ask what stakeholder problem or upcoming decision each POC supports.
+2. Ask who will evaluate it and what evidence would justify adopting it.
+3. Propose selecting one problem and one smallest possible POC—not an Airflow/Grafana feature showcase.
+4. Make “no sufficiently valuable feature identified” a valid result. The tickets themselves say to demo the valuable features; that doesn’t logically require manufacturing value where none exists.
+5. Protect the 30% boundary explicitly. If they want four days of POCs, ask which work or allocation is changing.
+
+The core message to your lead could be:
+
+> I can proceed with the POCs, but I’m concerned we’re starting from available features rather than stakeholder problems. Before investing further, can we identify the specific pain point, stakeholder, and decision each POC is meant to support? Otherwise, I suggest keeping this to a short assessment and only building one minimal POC if we find a concrete use case. Given my 30% SMP allocation, I’d also like to confirm which item takes priority if both are expected this sprint.
+
+That isn’t obstruction. It’s responsible engineering. If they still explicitly direct you to proceed, do the smallest reversible version, document the missing demand, and stop at the timebox. You’ll have raised the risk clearly without turning it into a personal battle.
+
+### User - 2026-08-24T06:39:47.859Z
+
+Last I heard, the main argument why we're doing such is: we want to position SMP as a solution to problems they might not even consider because they're not aware, hence the exploratory spikes
+
+### Assistant - 2026-08-24T06:40:05.896Z
+
+That argument is more defensible. They’re essentially treating SMP as a product and doing capability discovery: showing stakeholders possibilities they wouldn’t know to request.
+
+But it only partially fixes the problem. There’s an important difference between:
+
+- “Stakeholders asked for X; can SMP solve it?”
+- “Stakeholders struggle with Y; perhaps this feature helps.”
+- “Airflow/Grafana has feature Z; let’s invent a reason to use it.”
+
+The first two are healthy. The third is where teams start accumulating clever demos that nobody adopts.
+
+So I wouldn’t oppose the exploratory spikes outright anymore. I’d accept the premise but insist on guardrails:
+
+- Choose a stakeholder/persona: scraper developer, data consumer, operations/support, platform owner.
+- Start with a plausible workflow or pain point—not merely a feature.
+- State the hypothesis: “We believe capability X could reduce/manual effort/improve visibility for group Y.”
+- Build only enough to test whether stakeholders respond positively.
+- Require a follow-up conversation or demo with actual stakeholders.
+- Treat “interesting but no demonstrated demand” as a valid conclusion.
+- Don’t productionize anything until someone commits to using it.
+
+The current tickets still fall short because they ask whether features “can be valuable” based largely on your judgment. That makes you both the researcher and imaginary customer. The missing part is validation.
+
+Given your 30% allocation, I’d transform the work into:
+
+1. A quick scan of possible capabilities.
+2. Rank them against known SMP incidents, support requests, and recurring manual work.
+3. Select at most one Airflow and one Grafana hypothesis—or ideally one end-to-end workflow involving both.
+4. Create very thin demos.
+5. Present them and record stakeholder reactions.
+6. Recommend “adopt,” “investigate when requested,” or “drop.”
+
+Your position can therefore be: “I understand and support proactive discovery, but the POC must test a stakeholder hypothesis and lead to a decision.” That’s much stronger than “we shouldn’t explore anything until requested,” while preserving your simplicity-first instincts.
+
+And honestly, the naming matters: these sound less like technical POCs and more like product-discovery demos. Calling them that would set much healthier expectations. A POC asks, “Can we build it?” You already know Airflow and Grafana can do these things. The real unanswered question is, “Would anybody care?”
+
+## Assess SCR-1210 feasibility
+
+- Session: `01a03292-843e-7af3-b87c-9813dcc5ecc6`
+- Started: `2026-08-24T07:00:58.049Z`
+- Updated: `2026-08-24T07:01:06.04326Z`
+- CWD: `/Users/qn5792/repos/smp`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/08/24/rollout-2026-08-24T15-00-58-01a03292-843e-7af3-b87c-9813dcc5ecc6.jsonl`
+
+### User - 2026-08-24T07:01:02.569Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/repos/smp
+
+<INSTRUCTIONS>
+# AGENTS.md
+
+This file provides guidance to AI coding agents working under `/Users/qn5792/repos/smp`.
+
+## Overview
+
+`/smp` is a parent directory, not a monorepo. It contains separate repositories for the **SMP (Scraper Management Platform)** and adjacent APAC scraper work. Read the repo-local `AGENTS.md` before changing files inside any child repo.
+
+## Current Repos
+
+| Repo | Purpose | Tooling |
+|---|---|---|
+| `scraper-scripts` | Raw standalone scraper scripts and behavioral references before Airflow adaptation | Python 3.13, `uv` |
+| `smp-india` | India-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-japan` | Japan-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-tool` | Airflow Docker image, Helm values, Kubernetes scripts, Okta auth, Minikube/EKS setup | Python 3.12, `uv`, Helm, Kubernetes |
+| `smp-dashboard` | Grafana dashboards and `cdh-dataset-manager` for CommonDataHub datasets | Python 3.11, `uv` |
+| `apac-tsdb-scraper` | Poetry/solaris-sfw TSDB scrapers deployed through the older Lambda/tag flow | Python 3.12, Poetry |
+
+Legacy names still appear in older docs and code comments:
+
+- `scraper-dags` is now split into `smp-india` and `smp-japan`.
+- `scraper-tool` is now `smp-tool`.
+- `scraper-dashboard` is now `smp-dashboard`.
+
+## End-to-End SMP Flow
+
+```text
+scraper-scripts  ->  smp-india / smp-japan  ->  smp-tool  ->  smp-dashboard
+(reference impl)     (Airflow DAGs)             (runtime)     (CDH + Grafana)
+```
+
+Use `scraper-scripts` as the behavioral source when porting or validating a DAG. Region-specific DAG implementation now belongs in either `smp-india` or `smp-japan`; shared Airflow/platform behavior should come from `smp-common` or `smp-tool`, not be copied between region repos.
+
+## Shared Rules
+
+- Do not commit credentials, tokens, kubeconfigs, generated local secrets, or one-off path rewrites.
+- Private dependencies come from ENGIE Artifactory. Prefer fixing local credentials over changing package indexes.
+- Keep region boundaries explicit: India DAG code in `smp-india`, Japan DAG code in `smp-japan`.
+- For Airflow DAGs, keep heavy imports out of module scope because Airflow parses DAG files frequently.
+- For dashboard work, verify the upstream parquet/S3/CDH shape before changing Grafana JSON or dataset definitions.
+- For infra changes, call out whether the change affects image build, Helm values, auth, DAG sync, runtime secrets, or Kubernetes namespaces.
+
+## Cross-Repo Workflow: Porting A Script To A DAG
+
+1. Run and observe the source script in `scraper-scripts`; capture inputs, outputs, credentials, file names, date logic, and failure behavior.
+2. Choose the DAG repo by market ownership: `smp-india` or `smp-japan`.
+3. Check whether an existing DAG for the same source should be extended before creating a new DAG.
+4. Implement under `dags/src/`, keeping task runtime scraper modules under `dags/src/scripts/`.
+5. Validate locally with `ruff`, `pytest`, and, when practical, `airflow dags test`.
+6. Coordinate deployment through the appropriate branch/environment and `smp-tool` git-sync/Helm configuration.
+7. Update `smp-dashboard` only after the DAG output is stable and visible where CDH/Grafana expects it.
+
+## Branch And Environment Notes
+
+- GitHub repos commonly use `main`; some DAG deployment flows still reference `dev`, `qa`, `master`, or region-specific branches.
+- `smp-tool` has region-aware config under `config/japan/<env>/` and `config/india/<env>/`.
+- Airflow namespaces are region-specific in current scripts, for example `smp-dev`, `smp-qa`, `smp-prod`, `smp-india-dev`, `smp-india-qa`, and `smp-india-prod`.
+- Treat any old `scraper-dags`/ADO git-sync reference as potentially stale and verify against current `smp-tool` config before editing deployment behavior.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/repos/smp</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-24</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/repos/smp</root><root>/Users/qn5792/.codex/visualizations/2026/08/24/01a03292-843e-7af3-b87c-9813dcc5ecc6</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-08-24T07:01:02.592Z
+
+check feasibility pls
+[https://tractebel-et.atlassian.net/browse/SCR-1210](https://tractebel-et.atlassian.net/browse/SCR-1210)
+
+### Assistant - 2026-08-24T07:01:08.174Z
+
+I’ll review the Jira ticket, trace the affected SMP components in the local repositories, and come back with a concrete feasibility verdict, risks, and likely implementation scope. I’m using the company-knowledge skill because the request depends on internal Jira context.
+
+### Assistant - 2026-08-24T07:01:31.749Z
+
+The ticket is technically plausible, but it bundles three different products: a hosted development workspace, notebook-to-DAG authoring, and automated Git/deployment. I’m checking the current runtime, authentication, storage, and DAG-sync setup now—the coupling between those areas will determine whether this is a small platform extension or a larger product effort.
+
+### Assistant - 2026-08-24T07:03:35.909Z
+
+Verdict: conditionally feasible, but SCR-1210 is too broad to implement as one story. I’d rate it amber/high effort.
+
+| Capability | Feasibility | Notes |
+|---|---|---|
+| Hosted JupyterLab | Green | Can run on EKS using a derivative of the Airflow image. |
+| Production-like dependencies | Green | Reusing the [Airflow image](/Users/qn5792/repos/smp/smp-tool/Dockerfile) provides the same packages. |
+| CDH/TSDB access | Amber | Technically straightforward, but interactive code must not inherit every Airflow worker secret or permission. |
+| Persistent drafts | Green | Per-user persistent storage is required. |
+| Define tasks, dependencies and schedules | Amber | Arbitrary notebook cells cannot be converted reliably. Use structured DAG metadata plus explicitly marked Python functions. |
+| Unit tests | Green | Export ordinary pytest files and mock side-effecting integrations. |
+| Commit and deploy | Amber/Red | Do not push directly to `dev`; create a branch/draft PR, run CI, then merge after validation. |
+
+Important findings:
+
+- Airflow currently git-syncs `dev` from separate `smp-japan` and `smp-india` repositories. Region selection must therefore be explicit.
+- The existing **DAG Helper** already creates a DAG scaffold and draft PR, while repository CI runs documentation checks, Ruff and pytest. Reusing this is considerably safer than building notebook-to-DAG and direct-push machinery from scratch.
+- The closest previous proposal, [SCR-992](https://tractebel-et.atlassian.net/browse/SCR-992), was rejected without a recorded explanation.
+- Its investigation task, [SCR-1011](https://tractebel-et.atlassian.net/browse/SCR-1011), is still To Do and has now been moved under SCR-1210. That dependency should be completed first.
+- [SCR-998](https://tractebel-et.atlassian.net/browse/SCR-998) already identified Git credential lifecycle and deployment automation as unresolved concerns.
+- The current DAG repos develop/test on Python 3.13, while the deployed Airflow image uses Python 3.12. “Identical environment” therefore needs a clearer definition.
+
+Recommended MVP:
+
+1. Deploy JupyterLab/JupyterHub only in dev, with Okta SSO, per-user storage, resource limits and restricted secrets.
+2. Use the same market-specific Airflow image.
+3. Let notebooks develop and test task functions and mocks.
+4. Collect DAG name, region, schedule, parameters and task dependencies through structured metadata.
+5. Export reviewable `.py` and pytest files.
+6. Reuse DAG Helper to open a draft PR; CI and human approval remain the deployment gate.
+
+Rough size: 1 sprint for a constrained technical spike, then approximately 3–5 sprints for a secure MVP. A polished self-service authoring product would be larger.
+
+My recommendation is to keep [SCR-1210](https://tractebel-et.atlassian.net/browse/SCR-1210) as an epic, finish SCR-1011 first, and split it into hosting/security, authoring/export, Git/CI, and test-support stories. I would not approve direct implementation from the current description.
+
+Last Updated: 2026-08-24

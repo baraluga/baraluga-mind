@@ -125,6 +125,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Custom Airflow Docker images are stored in AWS ECR and built/pushed manually. The August 19 overview flagged two governance gaps: no CI/CD image rebuild path and no automated security-patch rebuild policy or vulnerability-auditing tool.
 - August 20 Codex evidence says SMP actively uses Bitnami for `bitnami/kubectl:latest` in the Airflow DAG processor `sync-perm-sidecar` across India and Japan environments, including production. `bitnamisecure/postgresql:latest` is configured broadly but disabled in checked-in dev/QA/prod configs, while the Bitnami PostgreSQL subchart is enabled only for Japan local development. This is checked-in configuration evidence, not live-cluster proof.
 - The AI DAG scaffolding agent has been live for about one month and is still a pilot. It is triggered from a structured GitHub issue, opens a draft PR, and has not yet produced production DAGs. Mateo/Matthew is blocked on local testing because of missing dependencies.
+- August 24 SCR-1210 feasibility review rated the JupyterLab-to-Airflow idea conditionally feasible but too broad for one story. It bundles hosted development workspaces, notebook-to-DAG authoring, and automated Git/deployment. The safer path is a dev-only JupyterLab/JupyterHub spike with Okta SSO, per-user storage, resource limits, restricted secrets, structured DAG metadata, export to reviewable Python and pytest files, and DAG Helper reuse for draft PRs instead of direct pushes to `dev`.
+- The same review says SCR-1210 should remain an epic until the earlier SCR-1011 investigation is completed and the work is split into hosting/security, authoring/export, Git/CI, and test-support stories. "Identical Airflow environment" also needs definition because DAG repositories develop/test on Python 3.13 while the deployed Airflow image uses Python 3.12.
 - August 19 India workload planning expected work to start on September 1 or the first week of September as time-and-materials, staffed by Brian plus one other person, covering roughly 60-80% of India demand. Two people were considered the right staffing shape; three would likely be wasteful, and geolocation/access blockers need specialist escalation rather than more developers.
 - The four incoming India tickets were bilateral-contract scraper parsing and CDH publication, three bid-stack Grafana dashboards backed by 15-minute price/volume series, generation-data benchmarking infrastructure, and a geolocation-blocked Data Grid scraper that feeds Orchestrate and IDEN/PPA pricing through existing TSDB metadata.
 
@@ -165,6 +167,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: What exact website or source powers the incoming India bilateral-contract scraper.
 - UNCERTAIN: Which VPN, proxy, or escalation path can unblock the geolocation-restricted Data Grid scraper.
 - UNCERTAIN: Whether `Orchestrate`, `IDEN`, and the PPA pricing tool names are exact.
+- UNCERTAIN: Why SCR-992 was rejected and what SCR-1011 concluded before being moved under SCR-1210.
 
 ## Sources
 
@@ -229,5 +232,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 
-Last Updated: 2026-08-20
+Last Updated: 2026-08-25

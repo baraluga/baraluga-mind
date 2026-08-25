@@ -31,6 +31,8 @@ SMP operational discussions in late June and early July focused on production in
 - The proposed resource-monitoring work is expected to fit Airflow and Grafana, take under five days, and provide earlier warning before failures or scaling issues.
 - The August 20 SCR-1221 Airflow spike narrowed the recommendation to five practical improvements: Airflow Assets, deadline alerts, self-service runs with Params/backfills, exception-aware retry policies, and versioned Git DAG bundles. Assets were judged useful mainly for Japan's orchestration complexity and lower-value for India today; the recommended proof was Japan OCCTO daily capacity feeding a reconciliation consumer.
 - The SCR-1221 and SCR-1222 work produced Confluence-ready tables plus private interactive demos: `https://smp-airflow-capabilities.baraluga.chatgpt.site` and `https://smp-grafana-top-five.baraluga.chatgpt.site`.
+- August 24 notes reframed the Airflow/Grafana spikes as product-discovery demos rather than pure technical POCs. The defensible rationale is to position SMP around stakeholder problems that users may not know to request yet, but the guardrail is to start from a named persona, workflow pain point, and adoption decision. A valid spike result can be "interesting but no demonstrated demand," and productionization should wait for stakeholder validation.
+- The same discussion flagged an allocation mismatch: Brian's SMP work had moved into a maintenance phase with about 30% FTE allocation, while two two-day exploratory spikes could exceed that timebox if both are treated as required implementation work.
 
 ## Open Questions
 
@@ -41,6 +43,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether `STSS` and `Jeka` are exact names from the July 17 technical-activities source.
 - UNCERTAIN: Whether the Japan OCCTO daily capacity to reconciliation Asset proof was built or adopted after the August 20 demo.
 - UNCERTAIN: Whether `SMT health` is the exact term from the August 19 backlog grooming note or a transcription artifact for SMP health.
+- UNCERTAIN: Which stakeholder persona and decision each exploratory Airflow/Grafana demo is meant to validate.
 
 ## Sources
 
@@ -63,5 +66,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-08-19-granola-busy.md`
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 
-Last Updated: 2026-08-20
+Last Updated: 2026-08-25

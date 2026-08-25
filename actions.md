@@ -518,9 +518,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-- [ ] Schedule the Jupyter/Airflow technical-feasibility discussion and include Eric if his prior notebook work is relevant.
+- [ ] Complete the Jupyter/Airflow technical-feasibility discussion, including SCR-1011 prior-art review before SCR-1210 is split into implementable stories.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 
 - [ ] Prepare the August steering-committee material for Japan, India, the user-empowerment/Git-push proposal, and the Airflow/Grafana feature spike.
   - Context: [[smp-platform]]
