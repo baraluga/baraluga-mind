@@ -20,7 +20,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`
 
-- [ ] Update personal and emergency-contact details in SEZAME and BIPO, then sign the Employee Consent, Confidentiality and Data Privacy Undertaking by 2026-08-23.
+- [ ] Update personal and emergency-contact details in SEZAME and BIPO.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`
 
@@ -740,6 +740,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-07-30-codex-conversations.md`; `sources/meetings/2026-07-31-1415-granola-daily-standup.md`; `sources/codex-conversations/2026-08-03-codex-conversations.txt`
 
 ### Team Operations
+
+- [x] Sign the Employee Consent, Confidentiality and Data Privacy Undertaking.
+  - Closure: Brian confirmed the signed consent form was sent to Jezebel Panado on 2026-08-25 at 14:03.
+  - Context: [[team-operations]]
+  - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`; `sources/codex-conversations/2026-08-25-codex-conversations.txt`
 
 - [x] Migrate `declic-kpicalculator`, `declic-okta-scripts`, and `DigitalizeTaxoMatchForms` into `qrm-dms`, lock their ADO source branches, and update GitHub descriptions from code evidence.
   - Closure: All three private GitHub repositories were verified with ADO-reported `main` defaults, matching Git refs, locked ADO branches, and concise implementation-grounded descriptions; pipeline work was intentionally left untouched.
