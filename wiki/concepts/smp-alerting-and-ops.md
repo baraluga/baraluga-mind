@@ -33,6 +33,7 @@ SMP operational discussions in late June and early July focused on production in
 - The SCR-1221 and SCR-1222 work produced Confluence-ready tables plus private interactive demos: `https://smp-airflow-capabilities.baraluga.chatgpt.site` and `https://smp-grafana-top-five.baraluga.chatgpt.site`.
 - August 24 notes reframed the Airflow/Grafana spikes as product-discovery demos rather than pure technical POCs. The defensible rationale is to position SMP around stakeholder problems that users may not know to request yet, but the guardrail is to start from a named persona, workflow pain point, and adoption decision. A valid spike result can be "interesting but no demonstrated demand," and productionization should wait for stakeholder validation.
 - The same discussion flagged an allocation mismatch: Brian's SMP work had moved into a maintenance phase with about 30% FTE allocation, while two two-day exploratory spikes could exceed that timebox if both are treated as required implementation work.
+- The August 27 FEDV chapter meeting positioned Splunk as the preferred production monitoring support path where 24/7 support matters, because the IS team recommends it and has internal expertise. Grafana remains useful, but lack of internal Grafana expertise was cited as a reason to convert some deployments to Splunk.
 
 ## Open Questions
 
@@ -44,6 +45,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the Japan OCCTO daily capacity to reconciliation Asset proof was built or adopted after the August 20 demo.
 - UNCERTAIN: Whether `SMT health` is the exact term from the August 19 backlog grooming note or a transcription artifact for SMP health.
 - UNCERTAIN: Which stakeholder persona and decision each exploratory Airflow/Grafana demo is meant to validate.
+- UNCERTAIN: Which production-monitoring use cases should stay in Grafana versus move to Splunk.
 
 ## Sources
 
@@ -67,5 +69,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
+- `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
-Last Updated: 2026-08-25
+Last Updated: 2026-08-27

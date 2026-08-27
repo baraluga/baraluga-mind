@@ -40,6 +40,22 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 
+- [ ] Add a Splunk placeholder page to the FEDV chapter documentation.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+
+- [ ] Reorganize the GitHub standards repository by chapter, including Angular, UX, and Python/frontend sections.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+
+- [ ] Fill in initiative details for the GitHub-to-Confluence standards pipeline.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+
+- [ ] Schedule the delayed UX/UI knowledge-sharing session.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+
 - [ ] Block November 16-20 for Fred and Christina's Philippines visit and avoid filing leave for those dates.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
@@ -342,9 +358,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 
-- [ ] Attend the Monday morning Mateo India ticket-detail call and capture source, access, and geolocation unknowns for the four incoming India tickets.
+- [ ] Prioritize the IX POA time-series and kappa-generation dashboard update, using the unchanged source ID after Mateo updates the display/name metadata.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-19-granola-backlog-grooming.md`
+  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`
+
+- [ ] Start `SCR-1229` bilateral-contract scraping while Grid India access remains blocked.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`
+
+- [ ] Clarify Grid India development access with François or others who may have solved India-region access before; if unresolved, document the blocker and deprioritize the work.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`
+
+- [ ] Raise any TSDB access or permissions requests before Mateo goes offline on 2026-09-01.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`
 
 - [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
   - Context: [[smp-platform]]
@@ -762,6 +790,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
 ### SMP Platform
+
+- [x] Attend the Mateo India ticket-detail call and capture source, access, and geolocation unknowns for the incoming India tickets.
+  - Closure: The August 27 Mateo call set the priority order: IX POA/kappa dashboard first, `SCR-1229` next, and Grid India blocked until India-region access is clarified.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-19-granola-backlog-grooming.md`; `sources/meetings/2026-08-27-granola-mateo-call.md`
 
 - [x] Complete the Airflow and Grafana feature spike, covering Airflow assets, Grafana alerting, and Grafana monitoring views.
   - Closure: The August 20 Codex transcript records Confluence-ready top-five tables for SCR-1221 and SCR-1222, plus privately published interactive demos for both spikes.

@@ -129,6 +129,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The same review says SCR-1210 should remain an epic until the earlier SCR-1011 investigation is completed and the work is split into hosting/security, authoring/export, Git/CI, and test-support stories. "Identical Airflow environment" also needs definition because DAG repositories develop/test on Python 3.13 while the deployed Airflow image uses Python 3.12.
 - August 19 India workload planning expected work to start on September 1 or the first week of September as time-and-materials, staffed by Brian plus one other person, covering roughly 60-80% of India demand. Two people were considered the right staffing shape; three would likely be wasteful, and geolocation/access blockers need specialist escalation rather than more developers.
 - The four incoming India tickets were bilateral-contract scraper parsing and CDH publication, three bid-stack Grafana dashboards backed by 15-minute price/volume series, generation-data benchmarking infrastructure, and a geolocation-blocked Data Grid scraper that feeds Orchestrate and IDEN/PPA pricing through existing TSDB metadata.
+- August 26 clarification work on `SCR-1229`, `SCR-1230`, and `SCR-1231` narrowed Mateo-facing questions to source location, scope, meaning, timing, and defaults. Brian's default position for the three stories is forward-only ingestion with no historical backfill unless the stakeholder explicitly asks for a start date.
+- Regional accessibility is a high-priority implementation risk for the India stories. Prior work had already been blocked from outside India, and the August 26 draft notes distinguish deployed proxy access from the separate need to create, test, and debug scrapers from development machines constrained by Zscaler/VPN routing.
+- The August 27 Mateo call set near-term India priorities: IX POA time-series and kappa-generation dashboard update first, `SCR-1229` bilateral-contract scraping next, and Grid India data scraping blocked until India-region access is clarified. If access cannot be resolved, Mateo said it is acceptable to deprioritize Grid India and explain the blocker.
+- Mateo planned to rename or correct the existing irradiance time series from horizontal "Irradiance" to terrain/POA irradiance without changing the ID. Brian confirmed the scraper uses the ID rather than the display name, so the expected implementation impact on Brian's side is low.
+- Mateo is offline from 2026-09-01 through 2026-09-11, with Adrian covering in his absence. TSDB access or permissions requests should be raised before Mateo leaves.
 
 ## Open Questions
 
@@ -164,8 +169,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether live SMP clusters are still running the Bitnami images shown in checked-in August 20 configuration evidence.
 - UNCERTAIN: Whether Matteo, Mateo, and Matthew refer to the same person across the August 19 notes.
 - UNCERTAIN: Whether `Jeroen` and `Jerome` refer to the same overview-session attendee.
-- UNCERTAIN: What exact website or source powers the incoming India bilateral-contract scraper.
-- UNCERTAIN: Which VPN, proxy, or escalation path can unblock the geolocation-restricted Data Grid scraper.
+- UNCERTAIN: What exact IEX and HPX pages or APIs power `SCR-1229` bilateral-contract scraping, and whether HPX is accessible outside India.
+- UNCERTAIN: Whether EMA/P-STAT is the exact provider for `SCR-1230` India Grid data, and where the old local scraper and example outputs live.
+- UNCERTAIN: Which VPN, proxy, or development-access path can unblock the geolocation-restricted Grid India scraper.
+- UNCERTAIN: Whether the IX POA/kappa dashboard item is tracked under an existing SCR ticket or a separate request.
 - UNCERTAIN: Whether `Orchestrate`, `IDEN`, and the PPA pricing tool names are exact.
 - UNCERTAIN: Why SCR-992 was rejected and what SCR-1011 concluded before being moved under SCR-1210.
 
@@ -233,5 +240,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
+- `sources/codex-conversations/2026-08-26-codex-conversations.txt`
+- `sources/meetings/2026-08-27-granola-mateo-call.md`
 
-Last Updated: 2026-08-25
+Last Updated: 2026-08-27

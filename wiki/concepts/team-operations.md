@@ -36,6 +36,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Repositories in the QRM org should be private by default, with org-wide default repository access disabled. GitHub teams provide read/write access, including a planned department-wide QRM-all team and sub-teams per QRM group.
 - The migration approach remains pragmatic: Git mirror push is the simplest scriptable path when Git history is enough; GitHub UI import is simpler but limited; `ado2gh` can preserve richer ADO metadata but needs elevated roles. Pipelines must be recreated regardless of migration method.
 - Runner selection guidance from the July 14 chapter: use GitHub-hosted runners when no NG network access is needed; use Walnut runners for workflows that need private Artifactory or internal endpoints.
+- The August 27 FEDV chapter meeting extended the GitHub-as-source-of-truth pattern to chapter standards: current standards live in an org-level `.github` repository, should be reorganized by chapter, and should sync back to Confluence through a deterministic pipeline rather than direct Confluence edits. An MCP server was mentioned as another option, but the deterministic pipeline was preferred.
+- Angular standards are being updated for Angular 22, and PrimeNG is no longer recommended because newer versions are paid. A React initiative was deprioritized because the one known React project was stalled.
+- FEDV year-end deliverables were mostly complete for documentation, standards, and final members list; initiatives remained incomplete, and a UX/UI knowledge-sharing session still needed a date.
 - The package-hosting discussion expanded to include Harbor as an alternative to JFrog/Artifactory for shared Python/npm packages, especially where project-level access or robot users may be easier than per-developer/per-component access.
 - A July 15 clarification says Walnut runner certificate pre-installation and Harbor package governance are real topics, but not current confirmation priorities.
 - July 15 SFF migration work moved from ad hoc repo selection toward a tracker-driven process. A local tracker was created from the SharePoint workbook, grouped by workbook priority, owner, owner confirmation, commit activity, and pipeline complexity.
@@ -114,6 +117,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Prométhée` is the preferred spelling for the timesheet system in durable notes; older sources spell it as `Promethe`.
 - UNCERTAIN: Whether `Sesame` in the August 11 weekly notes is the same HR/development system previously captured as `Sezane Career Explorer`.
 - UNCERTAIN: Whether `Reina`, `Carlo`, `Pear`, and `Guido` are exact names from the August 11 weekly notes.
+- UNCERTAIN: Whether `FEDV` is the preferred durable acronym/name for the chapter, and which chapter taxonomy should be used in the standards repository.
+- UNCERTAIN: Whether PrimeNG is disallowed outright or only no longer recommended for new Angular standards.
 
 ## Sources
 
@@ -163,5 +168,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-10-codex-conversations.txt`
 - `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+- `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-27

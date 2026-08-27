@@ -38,6 +38,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - August 19 India planning added a bid-stack dashboard request: publish 15-minute buy/sell volume and price across three markets, group contracts by price category, push the result as TSDB time series, and build one Grafana dashboard per market. Japan bid-stack reports were named as the reference shape.
 - The August 20 SCR-1222 Grafana spike recommended five native or official workflow improvements: data freshness and alerts, dynamic dashboards, guided drill-downs, Git Sync, and the Foundation SDK. No community plugin made the top five because native Grafana capabilities carried broader value with less maintenance and governance overhead.
 - The SCR-1222 output was a brief Confluence-ready table plus a private interactive demo at `https://smp-grafana-top-five.baraluga.chatgpt.site`.
+- The August 27 FEDV chapter meeting shifted monitoring standardization toward Splunk for 24/7 production support because the IS team recommends Splunk, has Splunk expertise, and lacks internal Grafana expertise for round-the-clock support. Existing or planned Grafana deployments may be converted to Splunk where needed.
+- Dashboard standardization was flagged as a chapter-level need after initial business stakeholder presentations showed inconsistent visual design, including random colors and unclear representations.
+- The same FEDV meeting marked Power BI MCP work as not relevant for now because usage was declining while Grafana and Synapse took over. Argos and one other Power BI project were expected to be decommissioned by year-end, although Microsoft Copilot licensing could make future Power BI agent integration possible if demand returns.
 
 ## Open Questions
 
@@ -51,6 +54,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Which old Louis-dashboard providers and metadata owners are needed before TSDB injection can proceed.
 - UNCERTAIN: Which three India bid-stack markets are in scope and whether the Japan bid-stack reference has exact reusable panel semantics.
 - UNCERTAIN: Whether the SCR-1222 Git Sync and Foundation SDK recommendations were later piloted against committed SMP dashboard JSON.
+- UNCERTAIN: Which Grafana deployments are actually being converted to Splunk, and whether SMP dashboards are in that conversion scope.
+- UNCERTAIN: Which Power BI project besides Argos is expected to be decommissioned by year-end.
 
 ## Sources
 
@@ -69,5 +74,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
+- `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
-Last Updated: 2026-08-20
+Last Updated: 2026-08-27
