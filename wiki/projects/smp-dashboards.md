@@ -41,6 +41,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - The August 27 FEDV chapter meeting shifted monitoring standardization toward Splunk for 24/7 production support because the IS team recommends Splunk, has Splunk expertise, and lacks internal Grafana expertise for round-the-clock support. Existing or planned Grafana deployments may be converted to Splunk where needed.
 - Dashboard standardization was flagged as a chapter-level need after initial business stakeholder presentations showed inconsistent visual design, including random colors and unclear representations.
 - The same FEDV meeting marked Power BI MCP work as not relevant for now because usage was declining while Grafana and Synapse took over. Argos and one other Power BI project were expected to be decommissioned by year-end, although Microsoft Copilot licensing could make future Power BI agent integration possible if demand returns.
+- August 27 `SCR-1238` work exposed a dashboard source-control convention: portable Grafana dashboard sources belong under `dashboards/india/`, while `dashboards/backups/india/` is for snapshots captured after live promotion. The portable India IEX dashboard source should retain the dashboard UID when it is meant to overwrite the existing dashboard, but datasource UIDs must be parameterized, for example with `${DS_SMP_CDH}`, so dev, QA, and production imports can bind the correct Athena datasource.
+- The same work clarified that the existing India IEX DAM/GDAM/RTM MCP and volume dashboard cannot display a raw TSDB UUID directly because it queries Athena/CDH. Khaba active generation therefore needs a CDH/Athena table sourced from the validated Khaba pipeline before the Grafana panel can be imported and tested cleanly.
+- During the `SCR-1238` migration, the dashboard query was made tolerant of overlap between a temporary rolling Khaba snapshot and the new date-based Parquet files by deduplicating rows and preferring the daily files.
 
 ## Open Questions
 
@@ -56,6 +59,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether the SCR-1222 Git Sync and Foundation SDK recommendations were later piloted against committed SMP dashboard JSON.
 - UNCERTAIN: Which Grafana deployments are actually being converted to Splunk, and whether SMP dashboards are in that conversion scope.
 - UNCERTAIN: Which Power BI project besides Argos is expected to be decommissioned by year-end.
+- UNCERTAIN: Whether the `SCR-1238` portable India IEX dashboard JSON has been imported into live QA Grafana and verified against the exact Khaba TSDB series.
 
 ## Sources
 
@@ -75,5 +79,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+- `sources/codex-conversations/2026-08-27-codex-conversations.txt`
 
-Last Updated: 2026-08-27
+Last Updated: 2026-08-29

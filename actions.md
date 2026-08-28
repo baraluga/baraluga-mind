@@ -358,9 +358,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 
-- [ ] Prioritize the IX POA time-series and kappa-generation dashboard update, using the unchanged source ID after Mateo updates the display/name metadata.
+- [ ] Validate the `SCR-1238` Khaba generation CDH/dashboard flow in QA, including the scheduled Airflow output, live Grafana import, TSDB-vs-dashboard value comparison, legacy snapshot cleanup status, and any remaining IX POA metadata change.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`
+  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/codex-conversations/2026-08-27-codex-conversations.txt`
 
 - [ ] Start `SCR-1229` bilateral-contract scraping while Grid India access remains blocked.
   - Context: [[smp-platform]]

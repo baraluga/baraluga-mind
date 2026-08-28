@@ -134,6 +134,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The August 27 Mateo call set near-term India priorities: IX POA time-series and kappa-generation dashboard update first, `SCR-1229` bilateral-contract scraping next, and Grid India data scraping blocked until India-region access is clarified. If access cannot be resolved, Mateo said it is acceptable to deprioritize Grid India and explain the blocker.
 - Mateo planned to rename or correct the existing irradiance time series from horizontal "Irradiance" to terrain/POA irradiance without changing the ID. Brian confirmed the scraper uses the ID rather than the display name, so the expected implementation impact on Brian's side is low.
 - Mateo is offline from 2026-09-01 through 2026-09-11, with Adrian covering in his absence. TSDB access or permissions requests should be raised before Mateo leaves.
+- August 27 `SCR-1238` work clarified the Khaba dashboard path: the existing India IEX dashboard queries Athena/CDH, not TSDB directly, while the story still required the displayed Khaba active-generation values to represent the exact TSDB series `c9d44ae2-2a35-5b9b-a557-cf972c48d742`.
+- The first `SCR-1238` implementation created a standalone TSDB-to-CDH bridge, but Brian identified that this duplicated the older Khaba FTP/CDH source path. The corrected design keeps the existing Khaba realtime and reconciliation DAGs as the single transformation owner: read the FTP CSV, aggregate and validate 15-minute values, publish to TSDB, verify exact TSDB readback, then write deterministic date-based CDH Parquet files for Athena/Grafana.
+- The `SCR-1238` QA-ready migration includes a guarded cleanup for the temporary legacy rolling snapshot `india_khaba_generation/latest/india_khaba_generation_latest.parquet`: the reconciliation flow should delete only that exact object, and only after date-based Parquet files cover every date contained in the legacy snapshot.
 
 ## Open Questions
 
@@ -173,6 +176,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether EMA/P-STAT is the exact provider for `SCR-1230` India Grid data, and where the old local scraper and example outputs live.
 - UNCERTAIN: Which VPN, proxy, or development-access path can unblock the geolocation-restricted Grid India scraper.
 - UNCERTAIN: Whether the IX POA/kappa dashboard item is tracked under an existing SCR ticket or a separate request.
+- UNCERTAIN: Whether "kappa generation" in the Mateo-call source means Khaba generation, or a separate India dashboard item.
+- UNCERTAIN: Whether the `SCR-1238` QA scheduled run, live QA Grafana import, and TSDB-vs-dashboard value comparison have been completed after the `dev` to `qa` branch promotion.
+- UNCERTAIN: Whether the guarded cleanup has actually deleted the legacy rolling Khaba snapshot in QA or production after daily-file coverage became complete.
 - UNCERTAIN: Whether `Orchestrate`, `IDEN`, and the PPA pricing tool names are exact.
 - UNCERTAIN: Why SCR-992 was rejected and what SCR-1011 concluded before being moved under SCR-1210.
 
@@ -242,5 +248,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-26-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-mateo-call.md`
+- `sources/codex-conversations/2026-08-27-codex-conversations.txt`
 
-Last Updated: 2026-08-27
+Last Updated: 2026-08-29

@@ -91,6 +91,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The August 11 development-plan reminder made the pre-work more concrete: update the skills page with proficiency ratings, fill in career aspirations, set geographic mobility preference, and then connect completed career goals to existing goals before the next meeting with Bong.
 - The same weekly notes captured team-calendar constraints: Philippine holidays on August 21 and August 31, one RTO workshop on August 28, a tentative Dinner and Dance on November 12, and full-force attendance requested for Fred and Christina's Philippines visit on November 16-20.
 - Second-quadrimester team-building planning targets August or September and can be a full-day non-overnight activity; volunteers were asked to send suggestions for review.
+- For the August 28 stakeholder-management workshop, Brian used SMP Japan as the exercise case. The final framing reduced stakeholders to four groups: SMP development team, SMP product owner, SMP Japan stakeholders, and everything else. SMP's purpose was stated as delivering timely data and displaying it in dashboards for end-users; the recommended presentation narrative was `Why -> Who -> Success -> Risk -> Collaboration -> Commitment`.
 
 ## Open Questions
 
@@ -119,6 +120,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Reina`, `Carlo`, `Pear`, and `Guido` are exact names from the August 11 weekly notes.
 - UNCERTAIN: Whether `FEDV` is the preferred durable acronym/name for the chapter, and which chapter taxonomy should be used in the standards repository.
 - UNCERTAIN: Whether PrimeNG is disallowed outright or only no longer recommended for new Angular standards.
+- UNCERTAIN: Whether Upper Management should stay in "Keep satisfied" for the SMP Japan stakeholder map, or move to "Manage closely" when funding, scope, or release approval is directly involved.
 
 ## Sources
 
@@ -169,5 +171,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-08-10-codex-conversations.txt`
 - `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+- `sources/codex-conversations/2026-08-28-codex-conversations.txt`
 
-Last Updated: 2026-08-27
+Last Updated: 2026-08-29
