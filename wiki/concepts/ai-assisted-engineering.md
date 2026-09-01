@@ -30,6 +30,10 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - The August 19 SMP overview raised an idea to automate test-coverage threshold increases with a scheduled GitHub Copilot agent, because the current threshold is updated manually.
 - The August 27 FEDV chapter meeting quantified one SDD/spec-driven-development demo at roughly 40K tokens, with recorded metrics attributing about 58% of consumption to grounding artifacts and standards, about 30% to generated or implemented source files, and model choice as a smaller third lever.
 - The durable SDD cost lesson from the FEDV discussion is that context size, not model choice, is the primary cost driver. The current measurement script is useful but lower-bound only because cancelled calls, cleared sessions, and orchestrator-level consumption are not fully captured.
+- The September 1 application team AI Corner demonstrated an Atlassian MCP workflow from VS Code/Copilot into Jira and Confluence. The Kiva example used it to sync repository documentation to Confluence and create Jira stories/subtasks from meeting transcripts or summaries, with workflow rules limiting where pages or tickets can be created.
+- The same meeting estimated Opus usage around 160 credits for story/subtask creation and around 15 credits per page sync. MCP-based page sync is considered redundant when a GitHub Action already syncs documentation for free.
+- A September 1 Copilot test found Jira MCP working for SCR, DEC, and DEL lookups, including identifying SMP as Jira project `SCR` and the Scrapers board. Confluence was not healthy in the same test: it first returned an HTTP 403 authentication failure, then no Confluence tools registered after URL/token changes and integration reload.
+- Kiva is being industrialized from an ABSD-specific "talk to my data" chatbot into a platform service: DMS owns infrastructure, MCP servers, authentication, deployment, and scaling, while desk teams own agent skills, context, query logic, and desk-specific reasoning. The September 1 source says the Positron MCP server is live on Kubernetes at `dms-kiva-dev.ms.myng.com`, registered with the NG MCP registry, authenticated by Okta, and visible to Copilot with 13 tools discovered.
 
 ## Open Questions
 
@@ -42,6 +46,9 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether Omniron's spec-driven-development agent workflow will become a reusable team pattern after the planned workshop and compliance review.
 - UNCERTAIN: Whether a scheduled Copilot agent should be trusted to raise coverage thresholds automatically, or only draft reviewable PRs.
 - UNCERTAIN: Whether orchestrator-level SDD credit consumption can be exposed to non-admins or must stay admin-only.
+- UNCERTAIN: Whether the September 1 Atlassian MCP Confluence failure requires a server restart, different site URL, token scope change, or separate Confluence access grant.
+- UNCERTAIN: Whether `Cos App` is the exact Okta feature name used for Kiva.
+- UNCERTAIN: Whether `Quiver` is the exact planned Kiva data-source MCP name.
 
 ## Sources
 
@@ -62,5 +69,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 - `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+- `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
+- `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
 
-Last Updated: 2026-08-27
+Last Updated: 2026-09-01

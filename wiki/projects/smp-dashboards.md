@@ -44,6 +44,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - August 27 `SCR-1238` work exposed a dashboard source-control convention: portable Grafana dashboard sources belong under `dashboards/india/`, while `dashboards/backups/india/` is for snapshots captured after live promotion. The portable India IEX dashboard source should retain the dashboard UID when it is meant to overwrite the existing dashboard, but datasource UIDs must be parameterized, for example with `${DS_SMP_CDH}`, so dev, QA, and production imports can bind the correct Athena datasource.
 - The same work clarified that the existing India IEX DAM/GDAM/RTM MCP and volume dashboard cannot display a raw TSDB UUID directly because it queries Athena/CDH. Khaba active generation therefore needs a CDH/Athena table sourced from the validated Khaba pipeline before the Grafana panel can be imported and tested cleanly.
 - During the `SCR-1238` migration, the dashboard query was made tolerant of overlap between a temporary rolling Khaba snapshot and the new date-based Parquet files by deduplicating rows and preferring the daily files.
+- September 1 sprint planning aimed for at least one mini POC for the 2026-09-09 sprint review or steering committee. Candidate themes came from the SCR-1235 epic and included Grafana or Airflow out-of-the-box features.
+- A September 1 Copilot reconnaissance ranked `SCR-1248` Grafana Drill-downs as a low-risk POC because it stays inside `smp-dashboard` JSON and can link an overview dashboard to the existing `outages_report.json` detail view without new infrastructure, plugins, credentials, DAG work, or Helm changes. Brian then chose to stay in Jira-management mode and set `SCR-1248` Story Points to 3.
+- The `SCR-1248` estimate was calibrated against actual SCR story-point anchors: 2-point tickets for bounded panel/spike work such as `SCR-1238` and `SCR-1222`, 3-point tickets for new patterns or new dashboards such as `SCR-1202` and `SCR-1243`, and 5-point tickets for new data-source or infrastructure integrations such as `SCR-1229`, `SCR-1230`, and `SCR-1171`.
 
 ## Open Questions
 
@@ -60,6 +63,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Which Grafana deployments are actually being converted to Splunk, and whether SMP dashboards are in that conversion scope.
 - UNCERTAIN: Which Power BI project besides Argos is expected to be decommissioned by year-end.
 - UNCERTAIN: Whether the `SCR-1238` portable India IEX dashboard JSON has been imported into live QA Grafana and verified against the exact Khaba TSDB series.
+- UNCERTAIN: Whether the September 9 mini POC should stay as a spike-only artifact or be promoted into production dashboard JSON.
 
 ## Sources
 
@@ -80,5 +84,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/codex-conversations/2026-08-27-codex-conversations.txt`
+- `sources/meetings/2026-09-01-granola-busy.md`
+- `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
 
-Last Updated: 2026-08-29
+Last Updated: 2026-09-01

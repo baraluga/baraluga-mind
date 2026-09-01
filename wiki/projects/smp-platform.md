@@ -137,6 +137,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - August 27 `SCR-1238` work clarified the Khaba dashboard path: the existing India IEX dashboard queries Athena/CDH, not TSDB directly, while the story still required the displayed Khaba active-generation values to represent the exact TSDB series `c9d44ae2-2a35-5b9b-a557-cf972c48d742`.
 - The first `SCR-1238` implementation created a standalone TSDB-to-CDH bridge, but Brian identified that this duplicated the older Khaba FTP/CDH source path. The corrected design keeps the existing Khaba realtime and reconciliation DAGs as the single transformation owner: read the FTP CSV, aggregate and validate 15-minute values, publish to TSDB, verify exact TSDB readback, then write deterministic date-based CDH Parquet files for Athena/Grafana.
 - The `SCR-1238` QA-ready migration includes a guarded cleanup for the temporary legacy rolling snapshot `india_khaba_generation/latest/india_khaba_generation_latest.parquet`: the reconciliation flow should delete only that exact object, and only after date-based Parquet files cover every date contained in the legacy snapshot.
+- September 1 sprint planning created a shortened sprint with roughly 6 story points allocated. Kaaba/Khaba-related child tickets 37 and 38 were placed at the top, while bid-stack versus bilateral-contract priority remained unclear because Mateo's email and Francois's understanding from Matthew conflicted.
+- The India IEX bid-stack work was split into three tickets: scraping, dashboard, and TSDB publishing. The TSDB publishing shape needs 60 time-series IDs: 3 metrics times 2 directions, buy/sell, times 10 price bands. Brian's same-day live note records the operating rule that SMP does not provision TSDB IDs unless explicitly specified, so missing IDs should be treated as a stakeholder dependency and surfaced early.
+- For India regional proxy access, the September 1 standup said the work remains blocked indefinitely pending management approval. A Japan precedent exists for a Singapore-only site proxy workaround, and Brian should check with Michael before escalating to Nilo or others.
+- `SCR-1237` POA metric work for CABA/Khaba generation and `SCR-1238` active-power panel work were ready for Francois's validation on September 1. `SCR-1238` had an active-power panel below the MCP chart on the India IEX volume trends dashboard, production dashboard JSON exported and imported to QA for testing, and JSON committed to Git.
+- The September 1 Jira MCP test found SMP under Jira project `SCR` and the Scrapers board. Jira reported SMP Sprint 28 scheduled for 2026-09-01 through 2026-09-10 but still in `Future` state at the time of the test. Visible tickets were `SCR-1238` Done, `SCR-1237` To be validated, `SCR-1231` In Progress, and `SCR-1215` In Review.
 
 ## Open Questions
 
@@ -181,6 +186,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the guarded cleanup has actually deleted the legacy rolling Khaba snapshot in QA or production after daily-file coverage became complete.
 - UNCERTAIN: Whether `Orchestrate`, `IDEN`, and the PPA pricing tool names are exact.
 - UNCERTAIN: Why SCR-992 was rejected and what SCR-1011 concluded before being moved under SCR-1210.
+- UNCERTAIN: Whether `CABA`, `Kaaba`, and `Khaba` refer to the same India generation context in the September 1 meeting source.
+- UNCERTAIN: Whether Mateo, Matthew, and Matéo refer to the same person in the September 1 sprint-priority discussion.
+- UNCERTAIN: Whether Adrian or Adrien is the preferred spelling for Mateo's September 1-11 point person.
+- UNCERTAIN: Whether `TSTV` is the exact production backfill name from the September 1 source.
 
 ## Sources
 
@@ -249,5 +258,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-08-26-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-mateo-call.md`
 - `sources/codex-conversations/2026-08-27-codex-conversations.txt`
+- `sources/meetings/2026-09-01-granola-busy.md`
+- `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
+- `inbox/2026-09-01.md`
 
-Last Updated: 2026-08-29
+Last Updated: 2026-09-01

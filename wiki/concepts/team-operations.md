@@ -92,6 +92,10 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The same weekly notes captured team-calendar constraints: Philippine holidays on August 21 and August 31, one RTO workshop on August 28, a tentative Dinner and Dance on November 12, and full-force attendance requested for Fred and Christina's Philippines visit on November 16-20.
 - Second-quadrimester team-building planning targets August or September and can be a full-day non-overnight activity; volunteers were asked to send suggestions for review.
 - For the August 28 stakeholder-management workshop, Brian used SMP Japan as the exercise case. The final framing reduced stakeholders to four groups: SMP development team, SMP product owner, SMP Japan stakeholders, and everything else. SMP's purpose was stated as delivering timely data and displaying it in dashboards for end-users; the recommended presentation narrative was `Why -> Who -> Success -> Risk -> Collaboration -> Commitment`.
+- The September 1 application team meeting flagged three end-of-year challenges: the new Synapse production-support model, AI onboarding using lessons from Kiva, and MCP for collection support connected to Synapse. DNS and `Br1JMS` discussions were still ongoing and could affect scope, but no change was confirmed.
+- Jerome Blanc is expected to leave by the end of September 2026; the meeting said he is involved in key projects and that handover with UK contacts is being arranged.
+- Development and learning reviews are due in Sesame by 2026-09-15. The meeting also said the Philippines team moved from Tempo to a new time-tracking application on 2026-09-01.
+- A November 2026 Philippines trip is planned for three weeks, including training sessions. Training priorities mentioned Kubernetes upskilling, possible Microsoft Copilot Studio training at about EUR 1,300 for 3-4 days, and Friday-morning Explorer sessions for some team members.
 
 ## Open Questions
 
@@ -121,6 +125,9 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `FEDV` is the preferred durable acronym/name for the chapter, and which chapter taxonomy should be used in the standards repository.
 - UNCERTAIN: Whether PrimeNG is disallowed outright or only no longer recommended for new Angular standards.
 - UNCERTAIN: Whether Upper Management should stay in "Keep satisfied" for the SMP Japan stakeholder map, or move to "Manage closely" when funding, scope, or release approval is directly involved.
+- UNCERTAIN: Whether `Br1JMS` is the exact system or project name from the September 1 application team meeting.
+- UNCERTAIN: Which old accounts are being deleted and who owns raising relevant items before deletion.
+- UNCERTAIN: What the replacement time-tracking application is called after the Philippines team moved away from Tempo on 2026-09-01.
 
 ## Sources
 
@@ -172,5 +179,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/codex-conversations/2026-08-28-codex-conversations.txt`
+- `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 
-Last Updated: 2026-08-29
+Last Updated: 2026-09-01
