@@ -96,6 +96,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Jerome Blanc is expected to leave by the end of September 2026; the meeting said he is involved in key projects and that handover with UK contacts is being arranged.
 - Development and learning reviews are due in Sesame by 2026-09-15. The meeting also said the Philippines team moved from Tempo to a new time-tracking application on 2026-09-01.
 - A November 2026 Philippines trip is planned for three weeks, including training sessions. Training priorities mentioned Kubernetes upskilling, possible Microsoft Copilot Studio training at about EUR 1,300 for 3-4 days, and Friday-morning Explorer sessions for some team members.
+- The September 2 daily standup announced AI Ventures training registration open until 2026-09-15. The captured shape is 12 sessions every other Friday starting in October, with beginner and advanced levels.
 
 ## Open Questions
 
@@ -128,6 +129,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Br1JMS` is the exact system or project name from the September 1 application team meeting.
 - UNCERTAIN: Which old accounts are being deleted and who owns raising relevant items before deletion.
 - UNCERTAIN: What the replacement time-tracking application is called after the Philippines team moved away from Tempo on 2026-09-01.
+- UNCERTAIN: Whether "AI Ventures" is the exact training program name and whether registration creates any commitment beyond attendance.
 
 ## Sources
 
@@ -180,5 +182,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/codex-conversations/2026-08-28-codex-conversations.txt`
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
+- `sources/meetings/2026-09-02-daily-standup.md`
 
-Last Updated: 2026-09-01
+Last Updated: 2026-09-02

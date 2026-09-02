@@ -34,6 +34,8 @@ SMP operational discussions in late June and early July focused on production in
 - August 24 notes reframed the Airflow/Grafana spikes as product-discovery demos rather than pure technical POCs. The defensible rationale is to position SMP around stakeholder problems that users may not know to request yet, but the guardrail is to start from a named persona, workflow pain point, and adoption decision. A valid spike result can be "interesting but no demonstrated demand," and productionization should wait for stakeholder validation.
 - The same discussion flagged an allocation mismatch: Brian's SMP work had moved into a maintenance phase with about 30% FTE allocation, while two two-day exploratory spikes could exceed that timebox if both are treated as required implementation work.
 - The August 27 FEDV chapter meeting positioned Splunk as the preferred production monitoring support path where 24/7 support matters, because the IS team recommends it and has internal expertise. Grafana remains useful, but lack of internal Grafana expertise was cited as a reason to convert some deployments to Splunk.
+- September 2 backlog grooming scoped SMP resource monitoring under `SCR-1254` toward Grafana-visible CPU/memory baselines and simple 95% usage alerts with manual response before autoscaling. Signups already has Loki on its cluster, and Michael was expected to coordinate a demo with Jeka when Jeka returns.
+- The same grooming discussion separated Grafana usage monitoring from Airflow usage monitoring. The Grafana usage question is who accesses which dashboards and how often, excluding internal team usage; Loki is the likely first check, with Okta logs as a secondary metadata source.
 
 ## Open Questions
 
@@ -46,6 +48,8 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether `SMT health` is the exact term from the August 19 backlog grooming note or a transcription artifact for SMP health.
 - UNCERTAIN: Which stakeholder persona and decision each exploratory Airflow/Grafana demo is meant to validate.
 - UNCERTAIN: Which production-monitoring use cases should stay in Grafana versus move to Splunk.
+- UNCERTAIN: Whether Signups' Loki setup can be reused as an SMP reference pattern without importing Signups-specific assumptions.
+- UNCERTAIN: Whether Okta logs can expose the specific dashboard/user/frequency fields needed for Grafana usage monitoring.
 
 ## Sources
 
@@ -70,5 +74,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+- `sources/meetings/2026-09-02-backlog-grooming.md`
 
-Last Updated: 2026-08-27
+Last Updated: 2026-09-02

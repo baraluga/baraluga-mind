@@ -16,6 +16,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[brian-peralta]]
   - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`; `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`; `sources/codex-conversations/2026-08-19-codex-conversations.txt`; `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 
+- [ ] Register for AI Ventures training before 2026-09-15 if Brian wants to attend the 12-session beginner/advanced track.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+
 - [ ] Clarify who owns raising relevant items from old accounts before deletion, then route or raise them.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
@@ -324,9 +328,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`; `sources/meetings/2026-07-27-1415-granola-daily-standup.md`; `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-- [ ] Prepare one mini POC from the `SCR-1235` Airflow/Grafana feature epic for the 2026-09-09 sprint review or steering committee.
+- [ ] Review the isolated `SCR-1248` Metrics Drilldown POC branch and decide whether to open a PR or use it for the 2026-09-09 sprint review.
   - Context: [[smp-dashboards]]
-  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
+  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/copilot-conversations/2026-09-01-copilot-conversations.md`; `sources/codex-conversations/2026-09-01-codex-conversations.txt`; `sources/meetings/2026-09-02-standup.md`
+
+- [ ] Spike Grafana usage monitoring with Loki and a quick Okta-log check, tracking dashboard access by user and frequency while excluding internal team usage.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
+
+- [ ] Raise with Bastian whether Grafana/Airflow usage-monitoring costs should be charged only to SMP when Synapse and Delphi share the stack.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
 
 - [ ] Improve `smp-dashboard` `cdh-register.yml` so environment comes from the branch and the short-lived CDH token is supplied as a workflow input.
   - Context: [[smp-dashboards]]
@@ -368,7 +380,27 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Ask Adrien whether India IEX bid-stack TSDB publishing should use existing or stakeholder-provided series IDs, because SMP does not provision TSDB IDs unless explicitly asked.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `inbox/2026-09-01.md`
+  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
+
+- [ ] Decide the Phoenix deployment path: skip the security audit and deploy to all environments, or wait for security graduation.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+
+- [ ] Confirm the Signups production deployment with Alfred once the ICA prerequisite is clear.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+
+- [ ] Resolve the Signups node/availability-zone mismatch before production rollout.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+
+- [ ] Attach parquet files and metric source links to the `JIRA 31` ticket for India DAG validation.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-standup.md`
+
+- [ ] Attend the bilateral-contract scraping clarification call with Matthew and Adrian, then refine ticket scope and contract-name nomenclature.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`
 
 - [ ] Check with Michael on the India regional proxy access approach before looping in Nilo or others; if unresolved, document the blocker and deprioritize Grid India work.
   - Context: [[smp-platform]]
@@ -546,9 +578,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-- [ ] Complete the Jupyter/Airflow technical-feasibility discussion, including SCR-1011 prior-art review before SCR-1210 is split into implementable stories.
+- [ ] Revisit `SCR-1210` Jupyter DAG-authoring scope with Fred and Nilo/Milo, identify must-haves versus drops, and split it into implementable stories.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`
+
+- [ ] Coordinate with Michael and Jeka on a Signups Loki demo for SMP resource monitoring after Jeka returns from holiday.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
+
+- [ ] Define the `SCR-1254` resource-monitoring baseline before implementation, starting with simple 95% resource-usage alerting and manual response.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
 
 - [ ] Prepare the August steering-committee material for Japan, India, the user-empowerment/Git-push proposal, and the Airflow/Grafana feature spike.
   - Context: [[smp-platform]]
@@ -595,6 +635,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Ask IT for an approved Zscaler bypass or split-routing policy for ChatGPT/Codex traffic while private-site access remains on Zscaler.
   - Context: [[zscaler-codex-access]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
+
+### Recruitment
+
+- [ ] Use Aldjan W. Mararac's technical interview to probe code ownership, testing discipline, compressed Git history, timezone/unit handling, and LLM answer faithfulness.
+  - Context: [[recruitment-2026]]
+  - Source: `sources/codex-conversations/2026-09-01-codex-conversations.txt`
 
 ### Thailand 2026
 
@@ -686,11 +732,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Wait for François to validate `SCR-1237` and `SCR-1238`, including POA/CABA generation values and the India IEX active-power panel in QA.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/codex-conversations/2026-08-27-codex-conversations.txt`; `sources/meetings/2026-09-01-granola-busy.md`
-
-- [ ] Wait for François and Adrian to confirm whether bid-stack work or `SCR-1229` bilateral-contract scraping has priority while Mateo is away.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`
+  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/codex-conversations/2026-08-27-codex-conversations.txt`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-daily-standup.md`
 
 - [ ] Wait for local TSDB credentials and ENGIE Artifactory connectivity, then run live read-only UAT/prod acceptance for the SMP TSDB Explorer.
   - Context: [[smp-tsdb-explorer]]
@@ -831,7 +873,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [x] Raise TSDB access or permissions requests before Mateo went offline on 2026-09-01.
   - Closure: The September 1 daily note says Adrien is now the point person while Mateo is away; remaining TSDB-ID questions are tracked separately.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `inbox/2026-09-01.md`
+  - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`
+
+- [x] Confirm whether bid-stack work or `SCR-1229` bilateral-contract scraping has priority while Mateo is away.
+  - Closure: The September 2 standup says Adrian's message confirmed bilateral-contract scraping takes priority, with bid-stack TSDB publishing moved to the next sprint.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
 
 - [x] Create the six SAP SuccessFactors achievements and one Khaba/SMP India in-progress activity with linked goals.
   - Closure: The August 6 SAP session created and verified all six completed achievement records with evidence-backed completion dates, plus a separate Khaba/SMP India in-progress activity.

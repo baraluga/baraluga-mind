@@ -31,6 +31,8 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - Interviewer assessment in the note: medium-low, not clearly senior compared with Matt, with communication often staying at obvious statements. If passing, the next step would be a panel interview with European colleagues.
 - Future technical interviews should be at least 1.5 hours to leave enough time for demo and code review.
 - August 4 application-team notes say recruitment for a Senior Software Engineer in the Philippines was still active, with multiple technical interviews underway.
+- September 1 Codex review of Aldjan W. Mararac's take-home submission found a functionally complete and well-explained artifact at commit `bb38f51`, including offline reproducibility, DuckDB storage, dashboard coverage, persisted anomaly flags, and transparent AI-assistance artifacts.
+- The same review treated Aldjan as a close-call technical-interview candidate rather than a confirmed L3 signal. Concerns to probe live were weak committed tests, no CI/lint/hooks, compressed post-hoc-looking Git history, unit/timezone assumptions, cached-data staleness, and overstated LLM faithfulness claims.
 
 ## Open Questions
 
@@ -38,6 +40,7 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - UNCERTAIN: The Granola title says "Matt Mendez" but the candidate overview says "Matt Mendeswell"; this may be a transcription/name artifact.
 - UNCERTAIN: Angelica's exact seniority signal may need calibration against Alfred's assessment and any panel feedback if the process continues.
 - UNCERTAIN: The August 4 meeting does not identify which candidates were in the active technical-interview set.
+- UNCERTAIN: Whether Aldjan's technical interview was scheduled or completed after the September 1 take-home review.
 
 ## Sources
 
@@ -49,5 +52,6 @@ The process explicitly allows AI tool use, but candidates must explain and defen
 - `sources/meetings/2026-07-09-1000-granola-tech-interview-angelica-lapastora.md`
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
 - `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
+- `sources/codex-conversations/2026-09-01-codex-conversations.txt`
 
-Last Updated: 2026-08-05
+Last Updated: 2026-09-02

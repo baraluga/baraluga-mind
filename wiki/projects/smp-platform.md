@@ -142,6 +142,13 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - For India regional proxy access, the September 1 standup said the work remains blocked indefinitely pending management approval. A Japan precedent exists for a Singapore-only site proxy workaround, and Brian should check with Michael before escalating to Nilo or others.
 - `SCR-1237` POA metric work for CABA/Khaba generation and `SCR-1238` active-power panel work were ready for Francois's validation on September 1. `SCR-1238` had an active-power panel below the MCP chart on the India IEX volume trends dashboard, production dashboard JSON exported and imported to QA for testing, and JSON committed to Git.
 - The September 1 Jira MCP test found SMP under Jira project `SCR` and the Scrapers board. Jira reported SMP Sprint 28 scheduled for 2026-09-01 through 2026-09-10 but still in `Future` state at the time of the test. Visible tickets were `SCR-1238` Done, `SCR-1237` To be validated, `SCR-1231` In Progress, and `SCR-1215` In Review.
+- September 1 Codex work implemented `SCR-1231` India IEX bid-stack collection in `smp-india`, then corrected runtime issues found by dev testing: Pendulum timezone arithmetic malformed IEX periods, and `ALL_DONE` upload leaf tasks could mask extraction failure as a successful DAG run. The final promoted upstream commit was `3b2485c`, with the dev parquets validated at 200 rows and all rows matching live IEX values.
+- The same `SCR-1231` follow-up registered the `india_iex_bid_stack/latest` CDH dataset in `smp-dashboard` at commit `64ba193`. Brian then ran the GitHub Actions registration broadly for all India datasets/environments. The workflow uploads schema parquet and submits CDH schema detection, but current India registration does not wait for crawler completion or run the post-crawler Glue/project-role refresh configured for Japan prod.
+- September 2 standup notes say `SCR-1215` was confirmed complete, with a backfill finishing in roughly 19 hours and under estimate. `SCR-1237` and `SCR-1238` remained pending validation, with the checked `1238` status described as good.
+- The same standup records that Adrian's message confirmed `SCR-1229` bilateral-contract scraping takes priority over IEX/TSDB bid-stack publishing, which moved to the next sprint. The preferred bilateral-contract approach is to scrape raw contract names/data first and defer nomenclature mapping until downstream Grafana or save-time handling.
+- September 2 backlog grooming says `SCR-1254` resource monitoring should establish a baseline before implementation because SMP and Synapse use the shared stack differently. The near-term monitoring target is simple alerting around 95% resource usage with manual response before any autoscaling.
+- The same grooming session reframed `SCR-1210` Jupyter DAG authoring as ambitious: a browser notebook connected to a dev-environment clone, inline business tests, DAG conversion, and PR creation. It should be revisited with Fred and Nilo/Milo to choose must-haves, drop nonessential pieces, and split the work into smaller stories.
+- September 2 notes also mention Kubernetes 1.35 proceeding after production 1.34, Signups having a test signup screen deployed with some deployments pending, a node/availability-zone mismatch under fix, and production Signups deployment needing Alfred/ICA confirmation.
 
 ## Open Questions
 
@@ -190,6 +197,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether Mateo, Matthew, and Matéo refer to the same person in the September 1 sprint-priority discussion.
 - UNCERTAIN: Whether Adrian or Adrien is the preferred spelling for Mateo's September 1-11 point person.
 - UNCERTAIN: Whether `TSTV` is the exact production backfill name from the September 1 source.
+- UNCERTAIN: Whether `JIRA 31` and `Chunk 31` in the September 2 standup refer to `SCR-1231`, another India ticket, or a mistranscribed ticket number.
+- UNCERTAIN: Whether `Franca` in the September 2 standup means François or another person.
+- UNCERTAIN: Whether `Damaging` in the September 2 standup is a transcription artifact for GDAM.
+- UNCERTAIN: Whether `ICA`, `Pirate monitoring`, and the Artifactory `genetic/generic repository` wording are exact terms.
+- UNCERTAIN: Whether `Nilo` and `Milo` both refer to the same `SCR-1210` stakeholder, or two different people.
 
 ## Sources
 
@@ -260,6 +272,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-08-27-codex-conversations.txt`
 - `sources/meetings/2026-09-01-granola-busy.md`
 - `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
-- `inbox/2026-09-01.md`
+- `sources/codex-conversations/2026-09-01-codex-conversations.txt`
+- `sources/meetings/2026-09-02-daily-standup.md`
+- `sources/meetings/2026-09-02-standup.md`
+- `sources/meetings/2026-09-02-backlog-grooming.md`
 
-Last Updated: 2026-09-01
+Last Updated: 2026-09-02

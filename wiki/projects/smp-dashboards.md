@@ -47,6 +47,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - September 1 sprint planning aimed for at least one mini POC for the 2026-09-09 sprint review or steering committee. Candidate themes came from the SCR-1235 epic and included Grafana or Airflow out-of-the-box features.
 - A September 1 Copilot reconnaissance ranked `SCR-1248` Grafana Drill-downs as a low-risk POC because it stays inside `smp-dashboard` JSON and can link an overview dashboard to the existing `outages_report.json` detail view without new infrastructure, plugins, credentials, DAG work, or Helm changes. Brian then chose to stay in Jira-management mode and set `SCR-1248` Story Points to 3.
 - The `SCR-1248` estimate was calibrated against actual SCR story-point anchors: 2-point tickets for bounded panel/spike work such as `SCR-1238` and `SCR-1222`, 3-point tickets for new patterns or new dashboards such as `SCR-1202` and `SCR-1243`, and 5-point tickets for new data-source or infrastructure integrations such as `SCR-1229`, `SCR-1230`, and `SCR-1171`.
+- Later September 1 Codex work corrected the `SCR-1248` interpretation: ordinary Grafana dashboard data links were the wrong product shape for the ticket, so both dashboard-link attempts were reverted from `smp-dashboard` `main`. The useful direction is Grafana's dedicated Drilldown apps/queryless exploration, which fit observability backends such as Prometheus/Mimir, Loki, Tempo, or Pyroscope rather than Athena/CDH market dashboards.
+- A fresh isolated `SCR-1248` Metrics Drilldown POC was then committed to branch `scr-1248-grafana-metrics-drilldown` at `9b1e7bf`. It uses Grafana 12.2.5, Metrics Drilldown 2.5.1, Prometheus 3.5.0, and synthetic SMP-style scraper metrics labelled by region, DAG, scraper, and status. It is intentionally not a production SMP integration.
+- September 2 backlog grooming narrowed Grafana usage monitoring to dashboard access by user and frequency, excluding internal team usage. Loki was identified as the likely first tool because it is Grafana-native and Signups already has Loki running; Okta logs may provide basic connection metadata but need a quick check.
+- The same grooming discussion noted that the shared Grafana/Airflow stack is used beyond SMP by Synapse and Delphi, so monitoring cost attribution should be clarified before SMP absorbs the whole cost.
 
 ## Open Questions
 
@@ -64,6 +68,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Which Power BI project besides Argos is expected to be decommissioned by year-end.
 - UNCERTAIN: Whether the `SCR-1238` portable India IEX dashboard JSON has been imported into live QA Grafana and verified against the exact Khaba TSDB series.
 - UNCERTAIN: Whether the September 9 mini POC should stay as a spike-only artifact or be promoted into production dashboard JSON.
+- UNCERTAIN: Whether the isolated `SCR-1248` Metrics Drilldown branch should become a PR, remain a demo artifact, or be superseded by a different SCR-1235 POC.
+- UNCERTAIN: Whether Loki's default logs expose enough dashboard-access detail for the intended Grafana usage-monitoring scope.
+- UNCERTAIN: Whether Okta logs are accessible and useful enough for dashboard usage metadata.
+- UNCERTAIN: Whether Bastian or another owner decides cost attribution for shared Grafana/Airflow monitoring across SMP, Synapse, and Delphi.
 
 ## Sources
 
@@ -86,5 +94,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-08-27-codex-conversations.txt`
 - `sources/meetings/2026-09-01-granola-busy.md`
 - `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
+- `sources/codex-conversations/2026-09-01-codex-conversations.txt`
+- `sources/meetings/2026-09-02-backlog-grooming.md`
+- `sources/meetings/2026-09-02-standup.md`
 
-Last Updated: 2026-09-01
+Last Updated: 2026-09-02
