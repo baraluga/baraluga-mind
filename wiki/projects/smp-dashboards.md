@@ -51,6 +51,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - A fresh isolated `SCR-1248` Metrics Drilldown POC was then committed to branch `scr-1248-grafana-metrics-drilldown` at `9b1e7bf`. It uses Grafana 12.2.5, Metrics Drilldown 2.5.1, Prometheus 3.5.0, and synthetic SMP-style scraper metrics labelled by region, DAG, scraper, and status. It is intentionally not a production SMP integration.
 - September 2 backlog grooming narrowed Grafana usage monitoring to dashboard access by user and frequency, excluding internal team usage. Loki was identified as the likely first tool because it is Grafana-native and Signups already has Loki running; Okta logs may provide basic connection metadata but need a quick check.
 - The same grooming discussion noted that the shared Grafana/Airflow stack is used beyond SMP by Synapse and Delphi, so monitoring cost attribution should be clarified before SMP absorbs the whole cost.
+- September 2 Codex review of `SCR-1252` found that Grafana Usage Insights fits the requested per-user, per-dashboard view-frequency data, but SMP appeared to be running Grafana OSS rather than Enterprise/Cloud. A licensed Enterprise path would be straightforward; otherwise the likely alternatives are Okta login data, Loki logs, or another lightweight usage baseline.
+- `SCR-1255` changed the existing India IEX volume trends dashboard rather than creating a new dashboard: panel 18 in `IEX - DAM/GDAM/RTM MCP & Volume Trends` was renamed `Khaba Generation vs Forecast` and configured to show actual generation, Manikaran day-ahead forecast, and Manikaran intraday forecast in one graph.
+- The Khaba/Manikaran dashboard work reused the existing `india_khaba_generation` CDH dataset by adding new `metric` values rather than creating a new datasource. Follow-up debugging showed non-empty schema samples can leak into Athena/Grafana, so dashboard queries now need to prefer legitimate pipeline output files over registration artifacts when the table can scan both.
+- `SCR-1257` delivered data availability and example Athena/Grafana queries for India IEX heatmap-style analysis, not a committed heatmap panel. The open product choice is whether the heatmap should remain an ad hoc Explore/query artifact, become a panel in an existing India IEX dashboard, or become a separate dashboard.
 
 ## Open Questions
 
@@ -72,6 +76,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether Loki's default logs expose enough dashboard-access detail for the intended Grafana usage-monitoring scope.
 - UNCERTAIN: Whether Okta logs are accessible and useful enough for dashboard usage metadata.
 - UNCERTAIN: Whether Bastian or another owner decides cost attribution for shared Grafana/Airflow monitoring across SMP, Synapse, and Delphi.
+- UNCERTAIN: Whether SMP has or can obtain Grafana Enterprise/Cloud entitlement for `SCR-1252` Usage Insights, or must implement usage reporting through Okta/Loki instead.
+- UNCERTAIN: Whether the India IEX two-year heatmap should be added to an existing dashboard, created as a separate dashboard, or left out of scope until Adrien explicitly asks for the visualization.
+- UNCERTAIN: Whether the latest production India IEX dashboard JSON has been re-imported after the stronger schema-artifact query filters.
 
 ## Sources
 
@@ -97,5 +104,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-01-codex-conversations.txt`
 - `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/meetings/2026-09-02-standup.md`
+- `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-Last Updated: 2026-09-02
+Last Updated: 2026-09-03

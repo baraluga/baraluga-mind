@@ -580,7 +580,27 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Revisit `SCR-1210` Jupyter DAG-authoring scope with Fred and Nilo/Milo, identify must-haves versus drops, and split it into implementable stories.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Remove paused production DAGs from automatic trigger/orchestrator configuration only after confirming owners, consumers, and stale queued-run handling.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Close out `SCR-1255` by re-importing the latest production India IEX dashboard JSON if needed, verifying the schema-artifact filters, attaching QA/production evidence, and asking Adrien whether Manikaran forecast backfill is wanted.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Run the `SCR-1256` production cleanup dry-run for India IEX schema-sample objects, verify the exact keys, and request explicit approval before any production `execute=true`.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Promote `SCR-1257` India IEX historical dataset to production after QA cleanup dry-runs pass and the dashboard placement decision is settled.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Decide whether the India IEX two-year history belongs in an existing dashboard, a new dashboard, or remains an example query until Adrien explicitly asks for a heatmap.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
 - [ ] Coordinate with Michael and Jeka on a Signups Loki demo for SMP resource monitoring after Jeka returns from holiday.
   - Context: [[smp-platform]]
@@ -588,7 +608,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Define the `SCR-1254` resource-monitoring baseline before implementation, starting with simple 95% resource-usage alerting and manual response.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Confirm whether `SCR-1252` can use Grafana Enterprise Usage Insights; if not, choose the Okta/Loki usage-baseline path.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Review and merge the `SCR-1247` data freshness POC from the detached `smp-dashboard-scr-1247` worktree, then run live non-production Grafana/Athena validation.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
 - [ ] Prepare the August steering-committee material for Japan, India, the user-empowerment/Git-push proposal, and the Airflow/Grafana feature spike.
   - Context: [[smp-platform]]
@@ -1152,9 +1180,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`; `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 
 - [x] Create the manually invoked BIPO Clock In/Out skill.
-  - Closure: A personal skill was created and validated for explicit one-punch clock-in or clock-out requests, with timestamp verification and no stored credentials.
+  - Closure: A personal skill was created and validated for explicit one-punch clock-in or clock-out requests, with timestamp verification and no stored credentials. A September 2 browser recording later refined the SSO path and History-entry verification rule.
   - Context: [[team-operations]]
-  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-08-06-codex-conversations.txt`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
 - [x] Improve loop-in process for ticket updates and stakeholder messages.
   - Context: [[brian-peralta]]

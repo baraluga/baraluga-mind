@@ -149,6 +149,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - September 2 backlog grooming says `SCR-1254` resource monitoring should establish a baseline before implementation because SMP and Synapse use the shared stack differently. The near-term monitoring target is simple alerting around 95% resource usage with manual response before any autoscaling.
 - The same grooming session reframed `SCR-1210` Jupyter DAG authoring as ambitious: a browser notebook connected to a dev-environment clone, inline business tests, DAG conversion, and PR creation. It should be revisited with Fred and Nilo/Milo to choose must-haves, drop nonessential pieces, and split the work into smaller stories.
 - September 2 notes also mention Kubernetes 1.35 proceeding after production 1.34, Signups having a test signup screen deployed with some deployments pending, a node/availability-zone mismatch under fix, and production Signups deployment needing Alfred/ICA confirmation.
+- September 2 Codex work reframed the `SCR-1210` pain point more precisely: contributors need a trustworthy, fast pre-deployment feedback loop with platform dependencies, network reachability, Airflow variables/connections, and safe dev service access. The notebook/DAG-conversion idea is one proposed delivery mechanism, but the durable need is a centrally managed development runtime.
+- September 2 Jira organization created `SCR-1255` for Khaba generation versus Manikaran forecasts, `SCR-1256` for India IEX stale DAM row cleanup, and `SCR-1257` for previous-plus-current-calendar-year India IEX national price history. `SCR-1256` was estimated at 2 points, `SCR-1257` at 3 points, and `SCR-1255` was eventually calibrated to 2 points because it extends an existing DAG/CDH/Grafana path rather than creating a new DAG.
+- `SCR-1255` was implemented in `smp-india` and `smp-dashboard`, promoted through QA and production for the pipeline, and verified in QA with actual generation plus Manikaran day-ahead and intraday forecast lines. The production dashboard import remained a manual Grafana overwrite step because production Grafana was not reachable from the Codex session.
+- `SCR-1256` and `SCR-1257` exposed a CDH registration hazard: one-row schema sample Parquet files can be scanned by Athena and appear in Grafana as business data. The fix was to enforce zero-row schema Parquet samples for the relevant IEX stages and harden cleanup to delete only verified synthetic schema-sample input objects.
+- `SCR-1257` added a dedicated historical India IEX national total-price dataset for DAM, GDAM, and RTM, using previous-calendar-year through current-year coverage with UTC storage and Asia/Kolkata conversion for heatmap-style queries. QA validation showed DAM/GDAM starting at 2025-01-01 00:00 IST, with Grafana displaying 02:30 in Asia/Manila because of timezone conversion.
 
 ## Open Questions
 
@@ -202,6 +207,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Damaging` in the September 2 standup is a transcription artifact for GDAM.
 - UNCERTAIN: Whether `ICA`, `Pirate monitoring`, and the Artifactory `genetic/generic repository` wording are exact terms.
 - UNCERTAIN: Whether `Nilo` and `Milo` both refer to the same `SCR-1210` stakeholder, or two different people.
+- UNCERTAIN: Whether Manikaran forecast backfill is wanted for `SCR-1255`, and if so whether historical forecasts should use originally issued values or latest revision per delivery interval.
+- UNCERTAIN: Whether `SCR-1257` has been promoted to production after QA validation, and whether production cleanup deleted any verified CDH schema-sample input objects.
 
 ## Sources
 
@@ -276,5 +283,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-02-daily-standup.md`
 - `sources/meetings/2026-09-02-standup.md`
 - `sources/meetings/2026-09-02-backlog-grooming.md`
+- `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-Last Updated: 2026-09-02
+Last Updated: 2026-09-03

@@ -97,6 +97,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - Development and learning reviews are due in Sesame by 2026-09-15. The meeting also said the Philippines team moved from Tempo to a new time-tracking application on 2026-09-01.
 - A November 2026 Philippines trip is planned for three weeks, including training sessions. Training priorities mentioned Kubernetes upskilling, possible Microsoft Copilot Studio training at about EUR 1,300 for 3-4 days, and Friday-morning Explorer sessions for some team members.
 - The September 2 daily standup announced AI Ventures training registration open until 2026-09-15. The captured shape is 12 sessions every other Friday starting in October, with beginner and advanced levels.
+- September 2 Codex consultation recommended Scrumban for SMP rather than strict Scrum or pure Kanban. The reasoning was that SMP still benefits from a two-week stakeholder/demo/budget cadence, but delivery is dominated by external blockers, variable support demand, changing priorities, and independently releasable work. The suggested trial uses continuous pull, explicit WIP limits, visible `Waiting` state, service classes, and cycle-time/blocked-time metrics instead of velocity as the primary signal.
 
 ## Open Questions
 
@@ -130,6 +131,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Which old accounts are being deleted and who owns raising relevant items before deletion.
 - UNCERTAIN: What the replacement time-tracking application is called after the Philippines team moved away from Tempo on 2026-09-01.
 - UNCERTAIN: Whether "AI Ventures" is the exact training program name and whether registration creates any commitment beyond attendance.
+- UNCERTAIN: Whether SMP stakeholders want to formalize the Scrumban operating model or treat it only as Brian's working recommendation.
 
 ## Sources
 
@@ -183,5 +185,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-08-28-codex-conversations.txt`
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-09-02-daily-standup.md`
+- `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-Last Updated: 2026-09-02
+Last Updated: 2026-09-03

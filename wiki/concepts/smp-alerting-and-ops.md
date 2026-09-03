@@ -36,6 +36,7 @@ SMP operational discussions in late June and early July focused on production in
 - The August 27 FEDV chapter meeting positioned Splunk as the preferred production monitoring support path where 24/7 support matters, because the IS team recommends it and has internal expertise. Grafana remains useful, but lack of internal Grafana expertise was cited as a reason to convert some deployments to Splunk.
 - September 2 backlog grooming scoped SMP resource monitoring under `SCR-1254` toward Grafana-visible CPU/memory baselines and simple 95% usage alerts with manual response before autoscaling. Signups already has Loki on its cluster, and Michael was expected to coordinate a demo with Jeka when Jeka returns.
 - The same grooming discussion separated Grafana usage monitoring from Airflow usage monitoring. The Grafana usage question is who accesses which dashboards and how often, excluding internal team usage; Loki is the likely first check, with Okta logs as a secondary metadata source.
+- September 2 Codex review of queued production DAGs concluded that paused DAGs receiving queued external runs are evidence of a stale trigger/orchestrator configuration, not proof that every paused DAG is obsolete. The safer lifecycle is to stop new automatic triggers first, identify owners/consumers and stale queued runs, then unpause only required production DAGs through controlled single runs or retire no-owner/no-consumer DAGs after observation.
 
 ## Open Questions
 
@@ -50,6 +51,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Which production-monitoring use cases should stay in Grafana versus move to Splunk.
 - UNCERTAIN: Whether Signups' Loki setup can be reused as an SMP reference pattern without importing Signups-specific assumptions.
 - UNCERTAIN: Whether Okta logs can expose the specific dashboard/user/frequency fields needed for Grafana usage monitoring.
+- UNCERTAIN: Which production orchestrator or allow-list is still triggering paused SMP DAGs, and which paused DAGs are manual/diagnostic versus obsolete.
 
 ## Sources
 
@@ -75,5 +77,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/meetings/2026-09-02-backlog-grooming.md`
+- `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-Last Updated: 2026-09-02
+Last Updated: 2026-09-03

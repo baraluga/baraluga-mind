@@ -34,6 +34,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - The same meeting estimated Opus usage around 160 credits for story/subtask creation and around 15 credits per page sync. MCP-based page sync is considered redundant when a GitHub Action already syncs documentation for free.
 - A September 1 Copilot test found Jira MCP working for SCR, DEC, and DEL lookups, including identifying SMP as Jira project `SCR` and the Scrapers board. Confluence was not healthy in the same test: it first returned an HTTP 403 authentication failure, then no Confluence tools registered after URL/token changes and integration reload.
 - Kiva is being industrialized from an ABSD-specific "talk to my data" chatbot into a platform service: DMS owns infrastructure, MCP servers, authentication, deployment, and scaling, while desk teams own agent skills, context, query logic, and desk-specific reasoning. The September 1 source says the Positron MCP server is live on Kubernetes at `dms-kiva-dev.ms.myng.com`, registered with the NG MCP registry, authenticated by Okta, and visible to Copilot with 13 tools discovered.
+- On September 2, Brian demonstrated a BIPO browser workflow through Record & Replay. Codex updated the existing `$bipo-clock-in-out` skill instead of creating a duplicate, adding the SSO login path, navigation to Clock In/Out, explicit Clock In versus Clock Out selection, verification through the History entry, and safeguards around duplicate punches and credentials.
 
 ## Open Questions
 
@@ -49,6 +50,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether the September 1 Atlassian MCP Confluence failure requires a server restart, different site URL, token scope change, or separate Confluence access grant.
 - UNCERTAIN: Whether `Cos App` is the exact Okta feature name used for Kiva.
 - UNCERTAIN: Whether `Quiver` is the exact planned Kiva data-source MCP name.
+- UNCERTAIN: The BIPO recording ended before a post-click History update, so the capture did not prove the demonstrated Clock Out punch was recorded successfully.
 
 ## Sources
 
@@ -71,5 +73,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 - `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
+- `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-Last Updated: 2026-09-01
+Last Updated: 2026-09-03
