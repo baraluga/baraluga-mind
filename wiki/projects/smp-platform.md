@@ -154,6 +154,13 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `SCR-1255` was implemented in `smp-india` and `smp-dashboard`, promoted through QA and production for the pipeline, and verified in QA with actual generation plus Manikaran day-ahead and intraday forecast lines. The production dashboard import remained a manual Grafana overwrite step because production Grafana was not reachable from the Codex session.
 - `SCR-1256` and `SCR-1257` exposed a CDH registration hazard: one-row schema sample Parquet files can be scanned by Athena and appear in Grafana as business data. The fix was to enforce zero-row schema Parquet samples for the relevant IEX stages and harden cleanup to delete only verified synthetic schema-sample input objects.
 - `SCR-1257` added a dedicated historical India IEX national total-price dataset for DAM, GDAM, and RTM, using previous-calendar-year through current-year coverage with UTC storage and Asia/Kolkata conversion for heatmap-style queries. QA validation showed DAM/GDAM starting at 2025-01-01 00:00 IST, with Grafana displaying 02:30 in Asia/Manila because of timezone conversion.
+- September 3 Codex work found that QA cleanup for India IEX schema-sample objects had actually deleted the contaminated S3 objects, but the verifier falsely failed because it compared S3 deletion results in order. The unordered check was fixed in `smp-india` commit `3cc837f`; the `SCR-1257` production promotion commit was `4398f2c`, with local and GitHub CI passing. No production Airflow DAGs or cleanup executions were run during that promotion.
+- The September 3 India Khaba QA outage was not an SMP code regression. The QA role could be assumed and CDH-side remediation was performed, including Lake Formation activation, revoking/resharing to `ENGIE_INDIA_NOPROD`, attaching the shared production `Khaba_generation` dataset to the QA project, and refreshing the QA role. Fresh QA credentials still failed on `s3:GetObject` for `KHABA/FTP_DATA03-09-2026.csv` because AWS Organizations Service Control Policy `p-w922chmk` explicitly denied the request. The equivalent production role could read the same object.
+- The Khaba QA evidence suggests non-production-to-production S3 access is now blocked above CDH/IAM/Lake Formation. CDH support contact Roua said no intentional CDH policy change was known and asked for project/dataset details; the remaining durable question is whether SCP `p-w922chmk` is intended to block this access path or changed recently.
+- The September 4 standup reported a separate KAVA scraper issue: Dev and QA AWS accounts lost cross-account access to the KAVA S3 bucket while production remained unaffected. The bucket lives in the fraud account and was provisioned by Mateo and Adrian. Root cause was still unknown; the immediate plan was to disable both KAVA DAGs in QA and create an OpEx India maintenance ticket.
+- The same standup confirmed the Airflow asset-based orchestration POC as a likely replacement for Japan/AJKS fixed-schedule orchestrator DAGs when budget allows. Producers would keep their own schedules, consumers would run on asset updates, and an operator exists to wait for multiple assets before downstream triggering.
+- Bilateral-contract scraping was working in Dev on September 4. The source data arrives later in bulk than the current 18:00 India schedule, so the working plan is to push the DAG 1-2 hours later. Downstream usage is unresolved: the notes mention storage in CDH, no confirmed TSDB plan, no dashboard spec, and a request to split the name column into trade-nature subcolumns for filtering.
+- India grid-data permissions remained blocked on September 4. A proxy access request unexpectedly escalated to the head of Singapore infrastructure and power infrastructure, with Nilo looped in so Brian is not handling the discussion alone.
 
 ## Open Questions
 
@@ -208,7 +215,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `ICA`, `Pirate monitoring`, and the Artifactory `genetic/generic repository` wording are exact terms.
 - UNCERTAIN: Whether `Nilo` and `Milo` both refer to the same `SCR-1210` stakeholder, or two different people.
 - UNCERTAIN: Whether Manikaran forecast backfill is wanted for `SCR-1255`, and if so whether historical forecasts should use originally issued values or latest revision per delivery interval.
-- UNCERTAIN: Whether `SCR-1257` has been promoted to production after QA validation, and whether production cleanup deleted any verified CDH schema-sample input objects.
+- UNCERTAIN: Whether `SCR-1257` production Airflow execution has run after the `smp-india` production branch promotion, and whether production cleanup deleted any verified CDH schema-sample input objects.
+- UNCERTAIN: Whether AWS Organizations SCP `p-w922chmk` intentionally blocks non-production-to-production CDH/S3 access or changed recently.
+- UNCERTAIN: Exact root cause of the KAVA Dev/QA cross-account S3 access loss.
+- UNCERTAIN: Whether `Lua Amar` is the exact person/name from the September 4 standup source.
+- UNCERTAIN: Whether the bilateral-contract data should remain CDH-only, later feed a dashboard, or require another downstream consumer.
+- UNCERTAIN: Mateo's return is expected around 2026-09-11, but Adrian's return date was unclear in the September 4 standup.
 
 ## Sources
 
@@ -284,5 +296,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-02-standup.md`
 - `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-03-codex-conversations.txt`
+- `sources/meetings/2026-09-04-daily-standup.md`
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-05

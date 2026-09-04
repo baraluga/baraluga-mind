@@ -382,6 +382,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
 
+- [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-04-daily-standup.md`
+
+- [ ] Ping Bong on `SCR-1239` Airflow Assets mini-POC validation and next-step timing, then discuss the Japan/AJKS asset-migration path when budget allows.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-04-daily-standup.md`
+
 - [ ] Decide the Phoenix deployment path: skip the security audit and deploy to all environments, or wait for security graduation.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-02-daily-standup.md`
@@ -398,13 +406,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-02-standup.md`
 
-- [ ] Attend the bilateral-contract scraping clarification call with Matthew and Adrian, then refine ticket scope and contract-name nomenclature.
+- [ ] Confirm the bilateral-contract scraping schedule shift and name-column split with Mateo and Adrian when they return, then refine ticket scope and contract-name nomenclature.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`
+  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/meetings/2026-09-04-daily-standup.md`
 
 - [ ] Check with Michael on the India regional proxy access approach before looping in Nilo or others; if unresolved, document the blocker and deprioritize Grid India work.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-04-daily-standup.md`
 
 - [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
   - Context: [[smp-platform]]
@@ -594,13 +602,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-- [ ] Promote `SCR-1257` India IEX historical dataset to production after QA cleanup dry-runs pass and the dashboard placement decision is settled.
+- [ ] Run the `SCR-1257` India IEX historical DAG in production, import the updated heatmap dashboard JSON, and verify production Athena/Grafana after the `smp-india` prod branch promotion.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
-
-- [ ] Decide whether the India IEX two-year history belongs in an existing dashboard, a new dashboard, or remains an example query until Adrien explicitly asks for a heatmap.
-  - Context: [[smp-dashboards]]
-  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
 - [ ] Coordinate with Michael and Jeka on a Signups Loki demo for SMP resource monitoring after Jeka returns from holiday.
   - Context: [[smp-platform]]
@@ -684,6 +688,12 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[thailand-2026]]
   - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
+### Personal Infrastructure
+
+- [ ] Confirm whether the Globe modem actually committed LAN4 bridge mode, then monitor whether the 13:00-15:00 no-internet drop still happens.
+  - Context: [[home-network]]
+  - Source: `sources/codex-conversations/2026-09-04-codex-conversations.txt`
+
 ## Waiting
 
 ### Recruitment
@@ -757,6 +767,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for Matéo to confirm the India generation TSDB production side is healthy, then close ticket 9.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
+- [ ] Wait for CDH/AWS governance to confirm whether SCP `p-w922chmk` intentionally blocks non-production access to production-owned CDH/S3 datasets.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
 - [ ] Wait for François to validate `SCR-1237` and `SCR-1238`, including POA/CABA generation values and the India IEX active-power panel in QA.
   - Context: [[smp-platform]]
@@ -907,6 +921,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: The September 2 standup says Adrian's message confirmed bilateral-contract scraping takes priority, with bid-stack TSDB publishing moved to the next sprint.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
+
+- [x] Decide where the India IEX two-year history heatmap belongs.
+  - Closure: Brian chose to add the `SCR-1257` historical MCP heatmap to the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard rather than leave it only in Explore or create a separate dashboard.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
 - [x] Create the six SAP SuccessFactors achievements and one Khaba/SMP India in-progress activity with linked goals.
   - Closure: The August 6 SAP session created and verified all six completed achievement records with evidence-backed completion dates, plus a separate Khaba/SMP India in-progress activity.

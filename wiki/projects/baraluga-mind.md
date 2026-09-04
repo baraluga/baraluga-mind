@@ -22,6 +22,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The daily Codex conversation capture automation was confirmed active on July 9. It writes the paired `.md` index and `.txt` transcript to `inbox/` and explicitly stays export-only until a separate ingest pass.
 - On July 30, the Codex exporter was changed to scan continuing sessions across the local session tree and include only messages whose timestamps fall on the capture date in `Asia/Manila`. This allows one long-lived pinned Daily Dump task to be captured correctly across multiple days instead of relying on the task's creation-date folder. The automation now runs at 00:10 and explicitly exports the previous Asia/Manila calendar day so messages sent between 23:00 and midnight are included.
 - On July 31, the Codex exporter was changed to skip writing inbox capture files when no sessions have user/assistant messages for the target local date. Empty days should be visible in automation logs as `sessions=0` and `skipped=no-sessions`, not preserved as empty source evidence.
+- On September 4, the capture automation schedule was aligned so Codex, GitHub Copilot, and Granola captures all run at 00:10 Asia/Manila for the complete previous local day, while the Baraluga Mind ingest runs at 00:30. The prior Codex-only 00:10 schedule was intentional because it avoided losing messages sent between 23:00 and midnight; the new alignment keeps that full-day coverage for all capture tasks.
 - A global `dump` skill now provides a chat-first, note-visible capture path without requiring a pinned task. Explicit `$dump` invocation or clear capture signals such as `dump:` create or update `inbox/YYYY-MM-DD.md` immediately. The note maintains provisional task state, completion annotations, notes, and an immutable raw timeline; ingestion later reconciles it with `actions.md` and preserves it under `sources/notes/`.
 - GitHub Copilot conversations can also be exported from local Copilot CLI state under `/Users/qn5792/.copilot/session-state` and VS Code Copilot Chat workspace storage. The July 9 capture found ten local Copilot sessions and followed the same inbox-first ingest path.
 - By July 12, Codex, GitHub Copilot, and Granola capture automations were all operating as inbox-only exporters. The July 12 captures contained six Codex sessions, two Copilot sessions, and a Granola status recording that the connector returned no meetings.
@@ -102,5 +103,6 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/codex-conversations/2026-07-26-codex-conversations.md`
 - `sources/copilot-conversations/2026-07-26-copilot-conversations.md`
 - `sources/meetings/2026-07-26-granola-meeting-notes-status.md`
+- `sources/codex-conversations/2026-09-04-codex-conversations.txt`
 
-Last Updated: 2026-07-31
+Last Updated: 2026-09-05

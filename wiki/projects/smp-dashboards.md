@@ -55,6 +55,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `SCR-1255` changed the existing India IEX volume trends dashboard rather than creating a new dashboard: panel 18 in `IEX - DAM/GDAM/RTM MCP & Volume Trends` was renamed `Khaba Generation vs Forecast` and configured to show actual generation, Manikaran day-ahead forecast, and Manikaran intraday forecast in one graph.
 - The Khaba/Manikaran dashboard work reused the existing `india_khaba_generation` CDH dataset by adding new `metric` values rather than creating a new datasource. Follow-up debugging showed non-empty schema samples can leak into Athena/Grafana, so dashboard queries now need to prefer legitimate pipeline output files over registration artifacts when the table can scan both.
 - `SCR-1257` delivered data availability and example Athena/Grafana queries for India IEX heatmap-style analysis, not a committed heatmap panel. The open product choice is whether the heatmap should remain an ad hoc Explore/query artifact, become a panel in an existing India IEX dashboard, or become a separate dashboard.
+- On September 3, Brian decided to include the `SCR-1257` historical MCP heatmap in the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard so Adrien could see the intended query and visualization. The final `smp-dashboard/main` heatmap fix was commit `590f9ff`, leaving future/null cells blank while preserving a 0-10 rupees/kWh color gradient for real DAM/GDAM/RTM values.
+- India Prod then hit the same CDH symptom previously seen in Japan Prod: registration was green but the new `india_iex_tsdb_expanded_historical` table was not visible to the project. A read-only crawler-status refresh changed the crawler from `RUNNING` to `DELETED`, the table became available, and a manual `SMP_INDIA_CDH_PROD` project-role refresh at 2026-09-03 16:43 GMT+8 made the table visible in CDH SQL Lab.
+- The permanent India Prod workflow fix was committed to `smp-dashboard/main` as `154cec1 fix: refresh India production CDH project role`. It adds the India Prod `project_role_refresh` mapping so future CDH registrations wait for crawler completion and refresh `SMP_INDIA_CDH_PROD` before reporting green.
 
 ## Open Questions
 
@@ -77,8 +80,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether Okta logs are accessible and useful enough for dashboard usage metadata.
 - UNCERTAIN: Whether Bastian or another owner decides cost attribution for shared Grafana/Airflow monitoring across SMP, Synapse, and Delphi.
 - UNCERTAIN: Whether SMP has or can obtain Grafana Enterprise/Cloud entitlement for `SCR-1252` Usage Insights, or must implement usage reporting through Okta/Loki instead.
-- UNCERTAIN: Whether the India IEX two-year heatmap should be added to an existing dashboard, created as a separate dashboard, or left out of scope until Adrien explicitly asks for the visualization.
-- UNCERTAIN: Whether the latest production India IEX dashboard JSON has been re-imported after the stronger schema-artifact query filters.
+- UNCERTAIN: Whether the latest production India IEX dashboard JSON, including the `SCR-1257` heatmap and stronger schema-artifact query filters, has been imported into production Grafana.
 
 ## Sources
 
@@ -105,5 +107,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/meetings/2026-09-02-standup.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-05
