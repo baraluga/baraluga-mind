@@ -1,0 +1,2252 @@
+# Codex Conversations - 2026-09-08
+
+## Capture Summary
+
+Source type: mixed capture / Codex conversation export.
+
+This raw text companion preserves filtered user/assistant transcript text from local Codex session JSONL files. Tool calls, tool outputs, system prompts, developer prompts, and reasoning records are intentionally excluded from the transcript sections below.
+
+Facts:
+- Capture date: `2026-09-08`
+- Generated from local session directory: `/Users/qn5792/.codex/sessions/2026/09/08`
+- Sessions found: 8
+
+Inferences:
+- These are the Codex sessions stored locally under the date directory. They may not include conversations that were not synced or not present on this machine.
+
+## Preliminary Ingest Notes
+
+- Review for actions, decisions, open questions, durable project context, and names/acronyms needing confirmation.
+- Do not treat this preliminary capture as canonical action tracking until an ingest pass updates `actions.md`.
+- Move this file together with the paired `2026-09-08-codex-conversations.md` index during ingest.
+- Keep this file as `.txt`; large Markdown transcripts can crash Obsidian during indexing.
+
+## Thread Index
+
+| Thread | Session | Started | Updated | Messages | CWD | Raw File |
+| --- | --- | --- | --- | ---: | --- | --- |
+| Daily GitHub Copilot Conversation Capture | `01a07ca4-6913-7443-a212-a20cde4904c2` | `2026-09-07T16:12:24.800Z` | `2026-09-07T16:12:26.161679Z` | 1 user / 9 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-6913-7443-a212-a20cde4904c2.jsonl` |
+| Daily Granola Meeting Notes Capture | `01a07ca4-6913-7443-a212-a218624bee2a` | `2026-09-07T16:12:24.800Z` | `2026-09-07T16:12:26.637048Z` | 1 user / 7 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-6913-7443-a212-a218624bee2a.jsonl` |
+| Daily Codex Conversation Capture | `01a07ca4-697f-76b0-ae0d-8affcfaa1122` | `2026-09-07T16:12:24.883Z` | `2026-09-07T16:12:25.634846Z` | 1 user / 9 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-697f-76b0-ae0d-8affcfaa1122.jsonl` |
+| Daily Baraluga Mind Ingest | `01a07cb5-4ddb-71e3-8ea2-8f403ba17b52` | `2026-09-07T16:30:51.893Z` | `2026-09-07T16:30:52.533438Z` | 1 user / 7 assistant | `/Users/qn5792/baraluga-mind` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-30-51-01a07cb5-4ddb-71e3-8ea2-8f403ba17b52.jsonl` |
+| Fix India IEX RTM rollover gaps | `01a07f44-936d-79d2-97fc-8dc0d5bb9382` | `2026-09-08T04:26:35.759Z` | `2026-09-08T04:26:36.408672Z` | 1 user / 29 assistant | `/Users/qn5792/repos/smp` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T12-26-35-01a07f44-936d-79d2-97fc-8dc0d5bb9382.jsonl` |
+| Assess Dash app code quality | `01a08034-b8b9-7341-9664-160109c07881` | `2026-09-08T08:48:53.953Z` | `2026-09-08T08:51:45.348025Z` | 5 user / 5 assistant | `/Users/qn5792/Documents/Codex/2026-09-08/inter` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T16-48-53-01a08034-b8b9-7341-9664-160109c07881.jsonl` |
+| Update SMP sprint review slides | `01a08070-467c-7182-95b5-e2a44133c750` | `2026-09-08T09:53:56.863Z` | `2026-09-08T09:57:24.692732Z` | 8 user / 21 assistant | `/Users/qn5792/repos/smp` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T17-53-56-01a08070-467c-7182-95b5-e2a44133c750.jsonl` |
+| Find Promethee context | `01a0807f-98b6-7d01-88cc-61017bd5b64a` | `2026-09-08T10:10:40.952Z` | `2026-09-08T10:11:02.924619Z` | 2 user / 2 assistant | `/Users/qn5792/repos/smp` | `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T18-10-40-01a0807f-98b6-7d01-88cc-61017bd5b64a.jsonl` |
+
+## Transcript
+
+## Daily GitHub Copilot Conversation Capture
+
+- Session: `01a07ca4-6913-7443-a212-a20cde4904c2`
+- Started: `2026-09-07T16:12:24.800Z`
+- Updated: `2026-09-07T16:12:26.161679Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-6913-7443-a212-a20cde4904c2.jsonl`
+
+### User - 2026-09-07T16:12:30.066Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Apply an ingest-value gate before moving or editing anything:
+   - Scheduled-automation transcripts, empty/zero-session exports, capture bookkeeping, and repeated status-only records are not ingest-worthy.
+   - A conversation capture is ingest-worthy only when it contains at least one user-initiated exchange that adds a durable fact, decision, action, open question, or reusable project/person/concept context.
+   - If every inbox item fails this gate, make no source, wiki, action, commit, or push changes. Leave pre-existing raw inputs untouched and report a no-op.
+3. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+4. Update existing pages when possible.
+5. Create new pages only when the topic is likely to matter again.
+6. Add or update captured action items in `actions.md`.
+7. Add a short `Sources` section with the source filename or path.
+8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+9. Add a short `Last Updated` date using `YYYY-MM-DD`.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root><root>/Users/qn5792/.codex/automations/daily-github-copilot-conversation-capture</root><root>/Users/qn5792/baraluga-mind/.git</root><root>/Users/qn5792/.codex/visualizations/2026/09/07/01a07ca4-6913-7443-a212-a20cde4904c2</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### Assistant - 2026-09-07T17:04:55.805Z
+
+I’ll run the capture for the previous Asia/Manila day, first checking the automation memory and repo instructions so I don’t duplicate or overwrite prior output.
+
+### Assistant - 2026-09-07T17:05:04.710Z
+
+The prior run captured `2026-09-06`; today’s target is the complete previous Asia/Manila day, `2026-09-07`. I’m checking for an existing output before running the exporter.
+
+### Assistant - 2026-09-07T17:05:11.189Z
+
+The expected `inbox/2026-09-07-copilot-conversations.md` file does not already exist, so it is safe to run the exporter. Because any emitted file would land in `inbox/`, I’m reading the nested inbox instructions first.
+
+### Assistant - 2026-09-07T17:05:18.848Z
+
+The exporter emitted one session to the expected inbox file. I’m inspecting that transcript now to decide whether it passes the durable-context value gate.
+
+### Assistant - 2026-09-07T17:05:27.654Z
+
+The transcript passes the value gate: it contains a user-requested Philippine news briefing with dated events, source URLs, caveats, and national-impact analysis. I’m leaving the emitted inbox file in place and only updating the automation memory.
+
+### Assistant - 2026-09-07T17:05:32.701Z
+
+The repo status check rejected the automation memory path because it lives outside the git repository; that’s expected. I’ll update that memory file directly, then verify only the repo files that matter.
+
+### Assistant - 2026-09-07T17:05:39.290Z
+
+I’m recording this run in the automation memory: target date, emitted file, session count, value-gate decision, and the fact that no ingest, commit, or push was performed.
+
+### Assistant - 2026-09-07T17:05:53.115Z
+
+The memory entry is updated. I’m doing a final repo check to confirm the only new workspace artifact from this run is the capture file.
+
+### Assistant - 2026-09-07T17:06:02.366Z
+
+Captured the previous Asia/Manila day, `2026-09-07`.
+
+Output kept: [`/Users/qn5792/baraluga-mind/inbox/2026-09-07-copilot-conversations.md`](/Users/qn5792/baraluga-mind/inbox/2026-09-07-copilot-conversations.md)
+
+It contains 1 Copilot CLI session, `Latest Philippine news`, and passes the value gate because the user-initiated exchange produced a durable Philippine news briefing with dated events, source URLs, caveats, and impact analysis. I did not ingest, edit wiki/actions, commit, or push. Automation memory was updated.
+
+Existing unrelated untracked items remain: [`/Users/qn5792/baraluga-mind/2026-08-05.md`](/Users/qn5792/baraluga-mind/2026-08-05.md), [`/Users/qn5792/baraluga-mind/output/`](/Users/qn5792/baraluga-mind/output/), [`/Users/qn5792/baraluga-mind/outputs/`](/Users/qn5792/baraluga-mind/outputs/).
+
+::inbox-item{title="Copilot news capture kept" summary="One durable 2026-09-07 session ready for later ingest"}
+
+## Daily Granola Meeting Notes Capture
+
+- Session: `01a07ca4-6913-7443-a212-a218624bee2a`
+- Started: `2026-09-07T16:12:24.800Z`
+- Updated: `2026-09-07T16:12:26.637048Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-6913-7443-a212-a218624bee2a.jsonl`
+
+### User - 2026-09-07T16:12:30.142Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Apply an ingest-value gate before moving or editing anything:
+   - Scheduled-automation transcripts, empty/zero-session exports, capture bookkeeping, and repeated status-only records are not ingest-worthy.
+   - A conversation capture is ingest-worthy only when it contains at least one user-initiated exchange that adds a durable fact, decision, action, open question, or reusable project/person/concept context.
+   - If every inbox item fails this gate, make no source, wiki, action, commit, or push changes. Leave pre-existing raw inputs untouched and report a no-op.
+3. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+4. Update existing pages when possible.
+5. Create new pages only when the topic is likely to matter again.
+6. Add or update captured action items in `actions.md`.
+7. Add a short `Sources` section with the source filename or path.
+8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+9. Add a short `Last Updated` date using `YYYY-MM-DD`.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root><root>/Users/qn5792/.codex/automations/daily-granola-meeting-notes-capture</root><root>/Users/qn5792/baraluga-mind/.git</root><root>/Users/qn5792/.codex/visualizations/2026/09/07/01a07ca4-6913-7443-a212-a218624bee2a</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### Assistant - 2026-09-07T17:05:00.237Z
+
+I’ll run the daily Granola capture for the previous Asia/Manila day, then only write inbox captures for meetings that pass the durable-value gate. First I’m checking the repo instructions and automation memory so this run doesn’t duplicate prior work.
+
+### Assistant - 2026-09-07T17:05:06.857Z
+
+Yesterday in the automation’s timezone is `2026-09-07`. Prior runs show Granola’s exact timestamp filter has been unreliable, so I’m going to use the broader meeting list and filter locally by Asia/Manila date, with a range query only as a cross-check.
+
+### Assistant - 2026-09-07T17:05:12.205Z
+
+Granola tools are available. I’m listing recent meetings now, then I’ll fetch details for only the `2026-09-07` matches and write captures with collision-safe filenames.
+
+### Assistant - 2026-09-07T17:05:23.040Z
+
+The current-week Granola list returned no meetings. Since this automation has previously needed a broader query to avoid false negatives, I’m checking `last_30_days` and the exact date range before deciding whether this is a clean no-op.
+
+### Assistant - 2026-09-07T17:05:34.664Z
+
+Both checks found no Granola meetings on `2026-09-07`; the custom range still returns `INVALID_ARGUMENT`, consistent with prior runs. This is a clean no-op for the mind palace, and I’m only updating the automation memory as required.
+
+### Assistant - 2026-09-07T17:05:40.191Z
+
+I’m writing the run summary into the automation memory now: no useful meetings, no inbox files created, and the connector’s exact-date range issue persisted.
+
+### Assistant - 2026-09-07T17:05:56.946Z
+
+Daily Granola capture completed for `2026-09-07` Asia/Manila.
+
+Useful meetings captured: 0.  
+Skipped after date filtering: 0.  
+Files written to `/Users/qn5792/baraluga-mind/inbox`: none.  
+Errors: the exact custom Granola date range still returned `INVALID_ARGUMENT`, but the broader `last_30_days` cross-check found no Sep 7 meetings.
+
+I updated the automation memory at [/Users/qn5792/.codex/automations/daily-granola-meeting-notes-capture/memory.md](/Users/qn5792/.codex/automations/daily-granola-meeting-notes-capture/memory.md).
+
+::inbox-item{title="No Sep 7 Granola notes" summary="Clean no-op; no useful meetings found"}
+
+## Daily Codex Conversation Capture
+
+- Session: `01a07ca4-697f-76b0-ae0d-8affcfaa1122`
+- Started: `2026-09-07T16:12:24.883Z`
+- Updated: `2026-09-07T16:12:25.634846Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-12-24-01a07ca4-697f-76b0-ae0d-8affcfaa1122.jsonl`
+
+### User - 2026-09-07T16:12:29.581Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Apply an ingest-value gate before moving or editing anything:
+   - Scheduled-automation transcripts, empty/zero-session exports, capture bookkeeping, and repeated status-only records are not ingest-worthy.
+   - A conversation capture is ingest-worthy only when it contains at least one user-initiated exchange that adds a durable fact, decision, action, open question, or reusable project/person/concept context.
+   - If every inbox item fails this gate, make no source, wiki, action, commit, or push changes. Leave pre-existing raw inputs untouched and report a no-op.
+3. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+4. Update existing pages when possible.
+5. Create new pages only when the topic is likely to matter again.
+6. Add or update captured action items in `actions.md`.
+7. Add a short `Sources` section with the source filename or path.
+8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+9. Add a short `Last Updated` date using `YYYY-MM-DD`.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root><root>/Users/qn5792/.codex/automations/daily-codex-conversation-capture</root><root>/Users/qn5792/baraluga-mind/.git</root><root>/Users/qn5792/.codex/visualizations/2026/09/07/01a07ca4-697f-76b0-ae0d-8affcfaa1122</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### Assistant - 2026-09-07T17:04:56.598Z
+
+I’ll run the daily capture exactly as configured: check prior automation memory and repo instructions first, then export only yesterday’s Asia/Manila user-initiated Codex conversations if they have durable value.
+
+### Assistant - 2026-09-07T17:05:01.783Z
+
+The prior two runs were clean no-ops because they found no meaningful user sessions. I’m checking nested instructions under the workspace before touching today’s capture paths.
+
+### Assistant - 2026-09-07T17:05:11.232Z
+
+The capture output, if created, will land in `inbox/`, so I’m reading that folder’s nested instructions and checking whether the 2026-09-07 output already exists.
+
+### Assistant - 2026-09-07T17:05:16.014Z
+
+No existing 2026-09-07 capture pair is present. There are unrelated untracked files already in the worktree, so I’ll leave those alone and run the exporter.
+
+### Assistant - 2026-09-07T17:05:28.127Z
+
+The exporter emitted four included sessions and no exclusions. I’m checking the generated index and transcript now to make sure it passes the semantic value gate and keeps the transcript only in `.txt`.
+
+### Assistant - 2026-09-07T17:05:37.833Z
+
+The generated transcript fails the automation’s capture rules: all four included sessions are scheduled daily automation runs, not useful user-initiated conversations. I’m removing only the two derivatives created in this run and leaving the original Codex session files untouched.
+
+### Assistant - 2026-09-07T17:05:43.362Z
+
+The generated files are gone. I’m recording the no-op decision in the automation memory now, including why the exporter output was discarded.
+
+### Assistant - 2026-09-07T17:05:49.617Z
+
+I’m adding a concise memory entry; this is the only persistent update needed for the automation itself.
+
+### Assistant - 2026-09-07T17:06:14.345Z
+
+Daily capture for `2026-09-07` was a clean no-op after semantic review.
+
+The exporter initially emitted `/Users/qn5792/baraluga-mind/inbox/2026-09-07-codex-conversations.md` and `.txt` with `sessions=4`, but all four sessions were scheduled automation runs. I removed only those newly generated derivatives, left the original Codex JSONL session files untouched, and made no wiki, `actions.md`, source-folder, commit, or push changes.
+
+Automation memory was updated at [`/Users/qn5792/.codex/automations/daily-codex-conversation-capture/memory.md`](/Users/qn5792/.codex/automations/daily-codex-conversation-capture/memory.md).
+
+::inbox-item{title="Codex capture skipped" summary="Only scheduled runs found; no transcript kept"}
+
+## Daily Baraluga Mind Ingest
+
+- Session: `01a07cb5-4ddb-71e3-8ea2-8f403ba17b52`
+- Started: `2026-09-07T16:30:51.893Z`
+- Updated: `2026-09-07T16:30:52.533438Z`
+- CWD: `/Users/qn5792/baraluga-mind`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T00-30-51-01a07cb5-4ddb-71e3-8ea2-8f403ba17b52.jsonl`
+
+### User - 2026-09-07T16:30:55.280Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/baraluga-mind
+
+<INSTRUCTIONS>
+# Baraluga Mind Agent Instructions
+
+You are maintaining a local markdown second brain.
+
+Your job is to turn raw captures into durable, useful wiki pages without inventing facts.
+
+## Core Rules
+
+- Read any nested `AGENTS.md` files that apply to the files being processed or edited.
+- Preserve source material during ingest.
+- Do not delete raw inputs unless explicitly asked.
+- After processing an `inbox/` file, move it to the appropriate `sources/` folder when it remains useful as evidence.
+- Leave an `inbox/` file in place when it still needs follow-up, review, or clarification.
+- Do not fabricate details, links, names, dates, or decisions.
+- Distinguish facts from inferences.
+- Prefer small updates to existing wiki pages over creating duplicate notes.
+- Link related wiki pages using Obsidian-style links like `[[concept-name]]`.
+- Keep prose direct, dense, and useful.
+- Use `UNCERTAIN:` when a claim needs verification.
+- If source material is ambiguous, say so in the page.
+
+## Actions
+
+`actions.md` is the canonical register for follow-up work.
+
+- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
+- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
+- Add newly captured actions to `Open` by default.
+- Use `Today` only when the user explicitly selects or prioritizes work for today.
+- Use `Waiting` for actions blocked on another person, external answer, access, or event.
+- Do not bury active TODOs inside wiki pages.
+- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
+- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
+- Do not duplicate an existing open action; update it only when the new source adds material context.
+- Move completed actions to `Done` instead of deleting them.
+- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
+- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+
+## File Naming
+
+Use lowercase kebab-case for all new files and directories.
+
+Good:
+
+- `wiki/concepts/second-brain.md`
+- `wiki/projects/baraluga-mind.md`
+- `wiki/decisions/2026-07-04-use-markdown-wiki.md`
+- `inbox/2026-07-04-team-sync.md`
+
+Avoid:
+
+- `Second Brain.md`
+- `second_brain.md`
+- `Team Sync.md`
+- `2026_07_04_notes.md`
+
+## Process Improvement
+
+Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+
+If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
+
+Use this format:
+
+```markdown
+### YYYY-MM-DD
+
+- Observation: ...
+- Suggested rule: ...
+- Example: ...
+```
+
+Instruction files should stay small and scoped. Prefer one local, source-specific instruction over expanding the root file when a rule applies only to one folder or content type.
+
+## Ingest Behavior
+
+When processing files from `inbox/` or `sources/`:
+
+1. Identify the source type: article, meeting, voice note, PDF, pasted note, or mixed capture.
+2. Apply an ingest-value gate before moving or editing anything:
+   - Scheduled-automation transcripts, empty/zero-session exports, capture bookkeeping, and repeated status-only records are not ingest-worthy.
+   - A conversation capture is ingest-worthy only when it contains at least one user-initiated exchange that adds a durable fact, decision, action, open question, or reusable project/person/concept context.
+   - If every inbox item fails this gate, make no source, wiki, action, commit, or push changes. Leave pre-existing raw inputs untouched and report a no-op.
+3. Extract durable entities:
+   - people
+   - projects
+   - concepts
+   - decisions
+   - open questions
+   - action items
+4. Update existing pages when possible.
+5. Create new pages only when the topic is likely to matter again.
+6. Add or update captured action items in `actions.md`.
+7. Add a short `Sources` section with the source filename or path.
+8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
+   - `sources/articles/` for articles, links, and reading notes
+   - `sources/meetings/` for meeting transcripts, agendas, and summaries
+   - `sources/voice/` for voice-note transcripts and dictated thoughts
+   - `sources/pdfs/` for PDFs and extracted PDF notes
+   - `sources/notes/` for manual or AI-maintained daily notes
+   - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
+   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
+9. Add a short `Last Updated` date using `YYYY-MM-DD`.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
+
+## Wiki Page Shape
+
+Use this structure when creating a new durable page:
+
+```markdown
+# Page Title
+
+## Summary
+
+One to three paragraphs explaining the durable point of the page.
+
+## Details
+
+Concrete facts, context, links, tradeoffs, and examples.
+
+## Open Questions
+
+- UNCERTAIN: ...
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+If a section is not useful, omit it.
+
+## Decision Page Shape
+
+Use `wiki/decisions/YYYY-MM-DD-short-decision.md`.
+
+```markdown
+# Decision: Short Decision
+
+## Decision
+
+State the decision plainly.
+
+## Context
+
+Why this came up.
+
+## Rationale
+
+Why this option was chosen.
+
+## Tradeoffs
+
+What this makes easier or harder.
+
+## Sources
+
+- `sources/...`
+
+Last Updated: YYYY-MM-DD
+```
+
+## Review Output
+
+After an ingest pass, report:
+
+- pages created
+- pages updated
+- actions added or updated in `actions.md`
+- source files processed
+- uncertain claims
+- new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
+- suggested next cleanup
+
+Also include a consolidated handover section titled `Needs Confirmation`.
+
+`Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
+
+- all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
+
+Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
+
+Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
+
+For each item, include:
+
+- the exact term or claim to confirm;
+- why confirmation is needed;
+- the source path or related wiki page.
+
+Keep `Needs Confirmation` concise enough to work through manually. Exclude items that are merely low-priority, already resolved, or not currently worth asking the user about.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/baraluga-mind</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/baraluga-mind</root><root>/Users/qn5792/.codex/automations/daily-baraluga-mind-ingest</root><root>/Users/qn5792/baraluga-mind/.git</root><root>/Users/qn5792/.codex/visualizations/2026/09/07/01a07cb5-4ddb-71e3-8ea2-8f403ba17b52</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### Assistant - 2026-09-07T16:31:09.078Z
+
+I’ll run the ingest pass from the repo rules and the automation memory first, then only touch files if an inbox item passes the durable-value gate.
+
+### Assistant - 2026-09-07T17:21:25.509Z
+
+The automation memory path came through with `$CODEX_HOME` unset in the shell, so I’m switching to the explicit Codex home path and then sampling each inbox candidate for the value gate. The worktree already has unrelated untracked files outside `inbox/`; I’ll leave those alone.
+
+### Assistant - 2026-09-07T17:21:39.379Z
+
+The memory says all five current inbox files were rejected in recent runs, including the September 6 Copilot briefing. I’m still verifying the candidates directly before deciding this run is a no-op.
+
+### Assistant - 2026-09-07T17:21:55.121Z
+
+The Copilot files are exactly the same kind of daily news briefings described in memory: useful at the time, but not durable second-brain material under this repo’s gate. I’m checking the older Codex exports for duplicate/sensitive-source handling before I conclude.
+
+### Assistant - 2026-09-07T17:22:13.154Z
+
+The older August 6 unredacted file has a tracked sanitized counterpart in `sources/codex-conversations/`, and existing `actions.md` already references that sanitized source for the durable SCR/Artifactory items. That leaves the inbox copy as sensitive duplicate evidence, so I’m not promoting it.
+
+### Assistant - 2026-09-07T17:22:18.453Z
+
+All five candidates fail the value gate, and `HEAD` matches `origin/main` at `3edcb45`. I’m recording this run in the automation memory now; no repository files will be edited, moved, staged, committed, or pushed.
+
+### Assistant - 2026-09-07T17:22:45.130Z
+
+Daily ingest completed as a clean no-op.
+
+Value gate rejected all five inbox candidates:
+- `2026-08-06-codex-conversations-unredacted-sensitive.txt`: sensitive duplicate; sanitized source already exists.
+- `2026-08-18-codex-conversations.txt`: scheduled capture/automation bookkeeping only.
+- `2026-09-04/05/06-copilot-conversations.md`: time-sensitive Philippine news briefings, no durable personal/project/action delta.
+
+No pages, sources, or `actions.md` entries changed. No commit or push was made. `HEAD` still matches `origin/main` at `3edcb45`; pre-existing untracked root items remain untouched: `2026-08-05.md`, `output/`, `outputs/`.
+
+Updated automation memory: [memory.md](/Users/qn5792/.codex/automations/daily-baraluga-mind-ingest/memory.md)
+
+**Needs Confirmation**
+None.
+
+::inbox-item{title="Mind ingest no-op" summary="All inbox candidates rejected; no repo changes made"}
+
+## Fix India IEX RTM rollover gaps
+
+- Session: `01a07f44-936d-79d2-97fc-8dc0d5bb9382`
+- Started: `2026-09-08T04:26:35.759Z`
+- Updated: `2026-09-08T04:26:36.408672Z`
+- CWD: `/Users/qn5792/repos/smp`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T12-26-35-01a07f44-936d-79d2-97fc-8dc0d5bb9382.jsonl`
+
+### User - 2026-09-08T04:26:39.260Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/repos/smp
+
+<INSTRUCTIONS>
+# AGENTS.md
+
+This file provides guidance to AI coding agents working under `/Users/qn5792/repos/smp`.
+
+## Overview
+
+`/smp` is a parent directory, not a monorepo. It contains separate repositories for the **SMP (Scraper Management Platform)** and adjacent APAC scraper work. Read the repo-local `AGENTS.md` before changing files inside any child repo.
+
+## Current Repos
+
+| Repo | Purpose | Tooling |
+|---|---|---|
+| `scraper-scripts` | Raw standalone scraper scripts and behavioral references before Airflow adaptation | Python 3.13, `uv` |
+| `smp-india` | India-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-japan` | Japan-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-tool` | Airflow Docker image, Helm values, Kubernetes scripts, Okta auth, Minikube/EKS setup | Python 3.12, `uv`, Helm, Kubernetes |
+| `smp-dashboard` | Grafana dashboards and `cdh-dataset-manager` for CommonDataHub datasets | Python 3.11, `uv` |
+| `apac-tsdb-scraper` | Poetry/solaris-sfw TSDB scrapers deployed through the older Lambda/tag flow | Python 3.12, Poetry |
+
+Legacy names still appear in older docs and code comments:
+
+- `scraper-dags` is now split into `smp-india` and `smp-japan`.
+- `scraper-tool` is now `smp-tool`.
+- `scraper-dashboard` is now `smp-dashboard`.
+
+## End-to-End SMP Flow
+
+```text
+scraper-scripts  ->  smp-india / smp-japan  ->  smp-tool  ->  smp-dashboard
+(reference impl)     (Airflow DAGs)             (runtime)     (CDH + Grafana)
+```
+
+Use `scraper-scripts` as the behavioral source when porting or validating a DAG. Region-specific DAG implementation now belongs in either `smp-india` or `smp-japan`; shared Airflow/platform behavior should come from `smp-common` or `smp-tool`, not be copied between region repos.
+
+## Shared Rules
+
+- Do not commit credentials, tokens, kubeconfigs, generated local secrets, or one-off path rewrites.
+- Private dependencies come from ENGIE Artifactory. Prefer fixing local credentials over changing package indexes.
+- Keep region boundaries explicit: India DAG code in `smp-india`, Japan DAG code in `smp-japan`.
+- For Airflow DAGs, keep heavy imports out of module scope because Airflow parses DAG files frequently.
+- For dashboard work, verify the upstream parquet/S3/CDH shape before changing Grafana JSON or dataset definitions.
+- For infra changes, call out whether the change affects image build, Helm values, auth, DAG sync, runtime secrets, or Kubernetes namespaces.
+
+## Cross-Repo Workflow: Porting A Script To A DAG
+
+1. Run and observe the source script in `scraper-scripts`; capture inputs, outputs, credentials, file names, date logic, and failure behavior.
+2. Choose the DAG repo by market ownership: `smp-india` or `smp-japan`.
+3. Check whether an existing DAG for the same source should be extended before creating a new DAG.
+4. Implement under `dags/src/`, keeping task runtime scraper modules under `dags/src/scripts/`.
+5. Validate locally with `ruff`, `pytest`, and, when practical, `airflow dags test`.
+6. Coordinate deployment through the appropriate branch/environment and `smp-tool` git-sync/Helm configuration.
+7. Update `smp-dashboard` only after the DAG output is stable and visible where CDH/Grafana expects it.
+
+## Branch And Environment Notes
+
+- GitHub repos commonly use `main`; some DAG deployment flows still reference `dev`, `qa`, `master`, or region-specific branches.
+- `smp-tool` has region-aware config under `config/japan/<env>/` and `config/india/<env>/`.
+- Airflow namespaces are region-specific in current scripts, for example `smp-dev`, `smp-qa`, `smp-prod`, `smp-india-dev`, `smp-india-qa`, and `smp-india-prod`.
+- Treat any old `scraper-dags`/ADO git-sync reference as potentially stale and verify against current `smp-tool` config before editing deployment behavior.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/repos/smp</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/repos/smp</root><root>/Users/qn5792/.codex/visualizations/2026/09/08/01a07f44-936d-79d2-97fc-8dc0d5bb9382</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### Assistant - 2026-09-08T04:26:43.007Z
+
+I’ll inspect the scraper’s retrieval and deployment paths, then implement and test the rollover fix before using the supported release and recovery workflows. I’m using the commit-hygiene skill for the authorized commit.
+
+### Assistant - 2026-09-08T04:27:17.583Z
+
+The code confirms two boundary problems: late-evening windows can request tokens above 96, and post-midnight runs switch entirely to the new delivery date. I also found that the active production deployment uses the repository’s SFW code-upload workflow; the tag pipeline only publishes the package.
+
+### Assistant - 2026-09-08T04:29:49.156Z
+
+The fix now freezes delivery dates and token ranges in each task, preserves the existing four-block overlap, and retries the previous day’s closing blocks during the first 90 minutes after midnight. The replay command will create one explicitly bounded task and use the production framework writer. Git authentication is currently blocking remote synchronization; local tests are available through the existing virtual environment.
+
+### Assistant - 2026-09-08T04:32:48.609Z
+
+The 30 focused tests pass, including every minute across a year boundary and a source-response replay of tokens 95–96. Production access is also blocked: AWS credentials have expired, and the DAC refresh cannot resolve the internal ENGIE API hostname. I’ve reported both access blockers to the origin task and am finishing the operational tests and recovery instructions.
+
+### Assistant - 2026-09-08T04:35:41.392Z
+
+The production DAG code confirms two separate refreshes: the RTM DAG rebuilds the rolling parquet, while the historical DAG independently rebuilds its snapshot from TSDB. Neither accepts a date/token run override. I’ve added a runbook with the bounded replay command, required TSDB readback, DAG order, and exact Athena verification query.
+
+### Assistant - 2026-09-08T04:36:37.895Z
+
+The fix is committed on local `main` as `a50a155`. All 156 repository tests pass, and lint passes for every changed Python file; full-repository lint still reports 139 issues outside this change. Remote authentication and expired production credentials remain unresolved, so neither production promotion nor the one-time recovery has occurred.
+
+### Assistant - 2026-09-08T04:38:01.599Z
+
+Implemented and committed on local `main`: `a50a155`, `7b8485c`.
+
+- Date-aware rollover fix and bounded source-backed replay added.
+- All 156 tests pass; changed-file lint passes.
+- Push blocked by Azure authentication.
+- Deployment/recovery blocked by expired AWS credentials and unavailable ENGIE DNS.
+- Tokens 95–96 have **not** been recovered.
+
+[Recovery runbook and exact Airflow steps](/Users/qn5792/repos/smp/apac-tsdb-scraper/scripts/RTM_RECOVERY.md)
+
+Reported the blockers and complete handoff to the origin task.
+
+### Assistant - 2026-09-08T06:03:24.591Z
+
+I’ll resume from the two local commits, verify remote synchronization and credentials, then proceed through UAT, production deployment, and the bounded replay with TSDB readback.
+
+### Assistant - 2026-09-08T06:04:40.845Z
+
+Both commits are now pushed to `main`, with no remote divergence. I’m checking the UAT credentials and deployed SFW resource paths before uploading and validating the same code there.
+
+### Assistant - 2026-09-08T06:06:03.682Z
+
+Production AWS access works, and the commits are pushed. UAT needs a separate browser sign-in for the `solaris-boy` DAC profile; its first refresh timed out, so I’ve requested that authentication and retried it. Meanwhile, I’m checking the live source and the existing TSDB points without writing data.
+
+### Assistant - 2026-09-08T06:07:37.554Z
+
+The UAT sign-in timed out again. The TSDB readback also cannot yet initialize authentication, so I’m checking that connection separately. Production remains unchanged while I resolve these validation prerequisites.
+
+### Assistant - 2026-09-08T06:08:37.205Z
+
+The direct IEX API fetch succeeded: delivery date September 7 returns tokens 95 and 96, both with a national clearing price of 10000. The new bounded parser accepts the actual response. I’m still waiting on UAT authentication and internal TSDB connectivity before deployment and replay.
+
+### Assistant - 2026-09-08T06:10:05.107Z
+
+The live production archive matches the repository apart from the two RTM files, after accounting for line endings. That confirms the code release is narrowly scoped. Internal DNS is still unavailable, and UAT authentication has not completed, so I can’t safely finish the required UAT validation or actual TSDB readback yet.
+
+### Assistant - 2026-09-08T06:10:39.290Z
+
+Both commits are now pushed to `main`. The live IEX API confirms tokens 95–96 at 10000 each.
+
+Deployment and replay remain blocked: UAT browser authentication timed out twice, and internal DNS cannot resolve the DAC/TSDB hosts. Production is unchanged; recovery is not yet executed.
+
+Reported the precise blockers and next steps to the origin task. [Recovery runbook](/Users/qn5792/repos/smp/apac-tsdb-scraper/scripts/RTM_RECOVERY.md)
+
+### Assistant - 2026-09-08T06:27:48.364Z
+
+I’ll verify the uploaded UAT code and runtime, then switch back to production, deploy through the direct SFW path, and run the bounded replay with actual TSDB readback.
+
+### Assistant - 2026-09-08T06:29:13.491Z
+
+The UAT Lambda points to the newly uploaded archive, and both RTM files match the committed code exactly. I’m validating a single bounded UAT task through its existing Step Function using the console writer, so this check exercises fetching and parsing without writing TSDB observations.
+
+### Assistant - 2026-09-08T06:30:21.910Z
+
+The UAT run exposed a deployment detail: the warm Lambda was still using the old module, despite the new S3 archive. I’ll refresh the Lambda configuration while preserving its environment, then rerun the same validation task.
+
+### Assistant - 2026-09-08T06:32:16.797Z
+
+Updating the unchanged environment did not reload the cached module. I’m adding a code-revision marker to force a new UAT runtime while keeping the scraper list and all existing settings intact, then checking a fresh validation task.
+
+### Assistant - 2026-09-08T06:33:13.103Z
+
+UAT validation passed: the Step Function succeeded and the bounded task reached `Completed`. The revision marker resolved the stale-runtime issue. I’m now switching back to production credentials and will apply the same verified code while preserving the live scraper list.
+
+### Assistant - 2026-09-08T06:34:51.184Z
+
+UAT is complete. Production credential refresh is failing again on the internal DAC hostname, so I’ve asked the origin task to refresh it from the working terminal. I also updated the runbook with the verified runtime-refresh step and the direct deployment command that avoids activating unrelated scrapers.
+
+### Assistant - 2026-09-08T06:37:27.084Z
+
+The verified UAT result is recorded, and the obsolete failed validation task has been stopped. The remaining blocker is the production credential refresh from the working terminal; the saved production profiles are still expired here. No production code or TSDB data has been changed.
+
+### Assistant - 2026-09-08T06:38:03.725Z
+
+UAT validation passed: workflow `SUCCEEDED`, task `Completed`. The required Lambda runtime-refresh procedure is documented and pushed in `9fbc719`.
+
+Production remains blocked by expired credentials and internal DNS failure during refresh. No production deployment or replay occurred.
+
+Reported the exact remaining steps to the origin task. [Recovery runbook](/Users/qn5792/repos/smp/apac-tsdb-scraper/scripts/RTM_RECOVERY.md)
+
+### Assistant - 2026-09-08T07:26:28.608Z
+
+I’ll verify the refreshed production account, deploy the tested code, refresh the runtime without changing the scraper list, and execute the bounded replay.
+
+### Assistant - 2026-09-08T07:27:07.599Z
+
+The production account is verified. The SFW CLI tried to refresh a separate expired named profile and hit the DNS issue, so I’ll call the same SFW deployment implementation with the already-validated default AWS session.
+
+### Assistant - 2026-09-08T07:28:12.610Z
+
+Production deployment is complete. The uploaded RTM files and config match the repository, and the runtime now carries revision `9fbc719` with the original scraper list preserved. The bounded replay is running through the production Step Function.
+
+### Assistant - 2026-09-08T07:29:24.440Z
+
+The production replay succeeded and the task is `Completed`. Its logs show eight source-backed observations across four national series sent through the normal TSDB writer. The only remaining check is actual TSDB ingestion; I’ve sent the origin task the read-only command to run from its working terminal.
+
+### Assistant - 2026-09-08T07:31:27.508Z
+
+I’ve saved the deployment and replay evidence in the recovery artifact folder. The TSDB readback is still pending from the origin terminal. The Airflow refresh instructions are ready; a fresh fetch of the India repository was denied, so those instructions remain based on the previously inspected local production reference.
+
+### Assistant - 2026-09-08T07:32:18.013Z
+
+The actual TSDB readback is verified. Both missing timestamps—18:00 and 18:15 UTC on September 7—now contain 10000, matching the freshly fetched IEX source. Their publication and insertion timestamps match this replay. No further replay is needed; the remaining user action is to refresh the production Airflow parquets.
+
+### Assistant - 2026-09-08T07:33:03.064Z
+
+Completed: fix deployed to production, replay succeeded, and both missing TSDB prices are verified at **10000**.
+
+Next, in India production, trigger with `{}`:
+
+1. `india_iex_tsdb_expanded_rtm_dag`
+2. `india_iex_tsdb_expanded_historical_dag`
+
+Then verify Athena/Grafana. The single completed handoff has already been sent to the origin task.
+
+[Verification evidence](/Users/qn5792/repos/smp/apac-tsdb-scraper/_dump/rtm-recovery-20260907/STATUS.md)
+
+## Assess Dash app code quality
+
+- Session: `01a08034-b8b9-7341-9664-160109c07881`
+- Started: `2026-09-08T08:48:53.953Z`
+- Updated: `2026-09-08T08:51:45.348025Z`
+- CWD: `/Users/qn5792/Documents/Codex/2026-09-08/inter`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T16-48-53-01a08034-b8b9-7341-9664-160109c07881.jsonl`
+
+### User - 2026-09-08T08:51:39.795Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+<environment_context>
+  <cwd>/Users/qn5792/Documents/Codex/2026-09-08/inter</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/Documents/Codex</root><root>/Users/qn5792/Documents/Codex/2026-09-08/inter</root><root>/Users/qn5792/.codex/visualizations/2026/09/08/01a08034-b8b9-7341-9664-160109c07881</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-09-08T08:51:39.867Z
+
+interesting demand incoming... One of our POs, Francois Caffont, vibe-coded a dashboard web app using Dash Framework. It looks very good!&#x20;
+
+His concern is, since he purely vibe-coded it, he's worried that the code might be shitty so he's looking in the team to have some sort of "stamp of approval" made by actual human software engineers (us) lol.&#x20;
+
+While I do find the premise funny, I kinda get where he's getting.&#x20;
+
+How do you think we should approach? Stirking a balance of: have the confidence that the current code is good enough for actual development + still give him the reins of continuing development as PO with 1 software engineer acting as consultant only.
+
+### Assistant - 2026-09-08T08:52:17.026Z
+
+I’d approach this as **establishing a safe way for him to keep building**, with a bounded engineering review to get there. His concern is reasonable: a polished dashboard makes the happy path visible, but tells you little about what happens when data is wrong, permissions differ, or something fails.
+
+The first question is **what “good enough” needs to mean for this app**. An internal dashboard with read-only data has a different bar from one exposing customer data or triggering operational actions. Agree on the intended users, data sensitivity, decisions it supports, and consequences of incorrect results before reviewing the code.
+
+Then I’d split the work into three parts:
+
+1. **A timeboxed baseline review.** Have one engineer run it locally, trace a few important flows from source data to displayed result, and inspect access controls, secrets, dependencies, deployment, and error handling. Assess whether someone else can understand and change it. For a dashboard, checking that the numbers mean what users think they mean matters as much as code quality.
+
+2. **A small hardening pass.** Classify findings as “must fix before the agreed use,” “fix soon,” or “fine for now.” Focus on consequential issues and the minimum foundations: reproducible setup, meaningful checks for critical calculations and access boundaries, useful error reporting, and a way to roll back. Resist turning stylistic preferences into a rewrite.
+
+3. **An explicit working agreement.** François stays the primary builder. The engineer helps establish the foundations, holds a regular consultation slot, and reviews changes that cross agreed risk boundaries.
+
+For that ongoing arrangement, I’d make the boundaries concrete:
+
+| François can usually progress independently | Bring in the engineer |
+|---|---|
+| Layout, styling, explanatory text | Authentication, permissions, secrets |
+| Charts using established data and calculation patterns | New data sources, sensitive data, database writes |
+| Small features within reviewed patterns | Shared state, caching, background processing |
+| Changes covered by existing checks | Deployment changes or consequential business calculations |
+
+The goal is to make ordinary changes cheap while making risky changes recognizable. Put those rules in the repo, alongside a short guide explaining the app’s structure and how to validate a change. That also gives his coding agent useful constraints.
+
+One thing I’d be explicit about: **“consultant only” needs a separate answer for operational ownership.** Who deploys, responds when it breaks, and decides whether a result is trustworthy? If those responsibilities silently fall to the engineer, they’ve become the maintainer regardless of the title. Give the consultation role an actual time allocation and a trigger for revisiting it if the app grows.
+
+The review outcome could be something like: *“Suitable for internal read-only use with these data sources, after these three fixes; reassess before broader access or write operations.”* That gives François actionable confidence, and gives the team a clear scope for its judgment. Approval applies to the reviewed version and intended use; the ongoing guardrails help him preserve that confidence as he builds.
+
+### User - 2026-09-08T08:52:40.250Z
+
+what, if any, do we setup in the codebase? AGENTS md?
+
+### Assistant - 2026-09-08T08:52:45.368Z
+
+I’ll use the OpenAI docs skill to check the `AGENTS.md` guidance, then suggest a lightweight setup for this team.
+
+### Assistant - 2026-09-08T08:53:32.923Z
+
+Yes—**a short `AGENTS.md`, backed by automated checks and clear review boundaries.** That would be a useful first deliverable from the consulting engineer after reviewing the app.
+
+I’d start with this:
+
+| Setup | What it accomplishes |
+|---|---|
+| `README.md` | Exact setup/run/test commands, required configuration, deployment and rollback instructions. |
+| `AGENTS.md` | Gives his coding agent the project’s conventions, constraints, verification steps, and escalation rules. |
+| A small test suite | Protects important calculations and a few critical user flows, including empty or invalid data. |
+| CI with required checks | Runs tests, linting, and checks for committed secrets on every PR. |
+| PR template + repository protections | Records what changed and how it was verified; requires engineer review for agreed sensitive areas. |
+
+**`AGENTS.md` is where you capture the engineer’s judgment in reusable form.** Codex reads it as project guidance; if François uses another tool, verify how that tool loads repository instructions. [Official guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+
+Keep it specific to the actual app. Useful contents would be:
+
+- **Code map:** where layouts, callbacks, calculations, data access, and configuration live.
+- **Established patterns:** which existing feature to copy when adding a chart, filter, or data query.
+- **Constraints:** preserve metric definitions; keep credentials out of code; use the established data-access and authorization paths.
+- **Verification:** exact commands to run, plus any manual checks needed for UI changes.
+- **Consultation triggers:** authentication, permissions, new data sources, writes, deployment, or changes to consequential calculations.
+- **Completion expectations:** describe the behavior changed, checks performed, and unresolved issues.
+
+Avoid generic instructions like “write clean code” or “follow best practices.” Something like *“Revenue calculations belong in the calculation module, with examples covering missing values and currency conversion”* gives the agent a usable decision rule—assuming that matches the reviewed architecture.
+
+**The automated checks are what make this sustainable.** An instruction to run tests can be missed; a required CI check blocks a failing change. Similarly, engineer review requirements should live in repository settings where enforceable. Include changes to CI and the review rules themselves in the protected scope.
+
+I’d also have François and the engineer agree on a few small datasets with known expected dashboard results. François supplies the business meaning; the engineer turns those examples into regression tests. That’s particularly valuable here: a dashboard can look excellent while calculating the wrong thing.
+
+For the working model you described, François should be able to merge ordinary changes once checks pass. Reserve required engineer review for the agreed risk boundaries, so consultation stays manageable. Start with these foundations and expand them when an actual failure or recurring question shows what’s missing.
+
+### User - 2026-09-08T09:08:51.589Z
+
+do you think we should establish a fleet of agents (PO, dev, qa, architect, etc.) for this case? Or overkill?
+
+### Assistant - 2026-09-08T09:09:13.029Z
+
+**A standing fleet of PO/dev/QA/architect agents feels like overkill for this case.** I’d start with François, one coding agent, and the consulting engineer—with an independent agent review before merging meaningful changes.
+
+The important distinction is between **having different checks** and **creating permanent agent roles**. You want implementation, verification, and architectural judgment covered. Each doesn’t need its own agent.
+
+My suggested setup:
+
+- **François defines the outcome and accepts the behavior.** He supplies examples of what the dashboard should show and decides whether it solves the business problem.
+- **One coding agent implements and runs checks**, following the repo guidance.
+- **A separate reviewer session examines the diff**, looking for incorrect calculations, regressions, data exposure, and missing tests. Give it the requirements and code, so it can assess the implementation independently.
+- **The engineer handles the initial baseline and consequential decisions**, plus findings François can’t confidently resolve.
+
+That reviewer can be invoked when needed; it doesn’t need to be a permanent QA persona. Its findings are inputs to a decision, and its approval shouldn’t replace required human review.
+
+I’d especially avoid a “PO agent” here: François already owns that role. An agent can help him sharpen acceptance criteria, but he should remain the source of business intent. Likewise, I’d keep architectural decisions with the consulting engineer until there are clear, repeatable decisions worth automating.
+
+The risk with a fleet is that **several agents agreeing can feel like stronger assurance than it actually is**. They can share mistaken assumptions, while adding handoffs, conflicting instructions, and more output for François to assess.
+
+Start with **one builder, an independent review pass, and reliable CI**. Add specialized agents only when you see a recurring gap—for example, UI regressions that justify a dedicated browser-testing workflow. Let actual failures determine the additional machinery.
+
+### User - 2026-09-08T09:20:20.871Z
+
+In practice, how does this change Francois' way of working?
+
+### Assistant - 2026-09-08T09:20:43.486Z
+
+**He can keep building conversationally with AI. The main change is that “it looks right” becomes the start of verification, before a change goes live.**
+
+A typical feature would look like this:
+
+1. **Describe the change with an expected result.**  
+   Instead of just “add a regional revenue filter,” François adds: “Selecting France should update every chart and the total. No matching data should show an empty state.” His agent can help clarify these criteria.
+
+2. **Let the coding agent implement it on a branch.**  
+   The agent follows `AGENTS.md`, uses existing patterns, and runs the checks. If the request crosses an agreed boundary—such as adding a data source or changing permissions—it flags that for engineer consultation.
+
+3. **Try it in a local or preview environment.**  
+   François checks the experience and business meaning: do the filters behave correctly, and do the numbers match a known example? This is where his judgment matters most.
+
+4. **Get an independent agent review.**  
+   A separate session reviews the requirements and diff. The coding agent addresses valid findings and reruns checks. Unclear or consequential findings go to the engineer; François shouldn’t have to adjudicate technical disputes between agents.
+
+5. **Merge and release through the agreed process.**  
+   Routine changes can proceed once checks pass and François accepts the result. Changes involving the agreed sensitive areas require engineer review.
+
+**He shouldn’t have to manually orchestrate all of that every time.** The engineer’s setup work should make commands like “implement this feature” and “prepare this for review” reliably trigger the right steps. CI runs automatically, and the PR template captures the evidence.
+
+The engineer’s involvement would then look like:
+
+| Situation | Engineer involvement |
+|---|---|
+| Adjust a chart or add a filter using existing data | Usually none |
+| CI fails and the agent can’t resolve it | Help unblock |
+| Add a data source or change a critical calculation | Consult before implementation; review before merge |
+| Change permissions or deployment | Required review |
+| Recurring maintenance problems | Periodic consultation to address the underlying issue |
+
+There **is** some additional friction: smaller changes, explicit acceptance criteria, and a review step. In exchange, he gets a repeatable way to answer “can I safely ship this?” without asking an engineer to inspect everything.
+
+His responsibility remains deciding **what the app should do and whether it does it correctly**. The engineer makes the development process dependable enough for him to keep owning that work.
+
+## Update SMP sprint review slides
+
+- Session: `01a08070-467c-7182-95b5-e2a44133c750`
+- Started: `2026-09-08T09:53:56.863Z`
+- Updated: `2026-09-08T09:57:24.692732Z`
+- CWD: `/Users/qn5792/repos/smp`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T17-53-56-01a08070-467c-7182-95b5-e2a44133c750.jsonl`
+
+### User - 2026-09-08T09:57:21.006Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/repos/smp
+
+<INSTRUCTIONS>
+# AGENTS.md
+
+This file provides guidance to AI coding agents working under `/Users/qn5792/repos/smp`.
+
+## Overview
+
+`/smp` is a parent directory, not a monorepo. It contains separate repositories for the **SMP (Scraper Management Platform)** and adjacent APAC scraper work. Read the repo-local `AGENTS.md` before changing files inside any child repo.
+
+## Current Repos
+
+| Repo | Purpose | Tooling |
+|---|---|---|
+| `scraper-scripts` | Raw standalone scraper scripts and behavioral references before Airflow adaptation | Python 3.13, `uv` |
+| `smp-india` | India-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-japan` | Japan-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-tool` | Airflow Docker image, Helm values, Kubernetes scripts, Okta auth, Minikube/EKS setup | Python 3.12, `uv`, Helm, Kubernetes |
+| `smp-dashboard` | Grafana dashboards and `cdh-dataset-manager` for CommonDataHub datasets | Python 3.11, `uv` |
+| `apac-tsdb-scraper` | Poetry/solaris-sfw TSDB scrapers deployed through the older Lambda/tag flow | Python 3.12, Poetry |
+
+Legacy names still appear in older docs and code comments:
+
+- `scraper-dags` is now split into `smp-india` and `smp-japan`.
+- `scraper-tool` is now `smp-tool`.
+- `scraper-dashboard` is now `smp-dashboard`.
+
+## End-to-End SMP Flow
+
+```text
+scraper-scripts  ->  smp-india / smp-japan  ->  smp-tool  ->  smp-dashboard
+(reference impl)     (Airflow DAGs)             (runtime)     (CDH + Grafana)
+```
+
+Use `scraper-scripts` as the behavioral source when porting or validating a DAG. Region-specific DAG implementation now belongs in either `smp-india` or `smp-japan`; shared Airflow/platform behavior should come from `smp-common` or `smp-tool`, not be copied between region repos.
+
+## Shared Rules
+
+- Do not commit credentials, tokens, kubeconfigs, generated local secrets, or one-off path rewrites.
+- Private dependencies come from ENGIE Artifactory. Prefer fixing local credentials over changing package indexes.
+- Keep region boundaries explicit: India DAG code in `smp-india`, Japan DAG code in `smp-japan`.
+- For Airflow DAGs, keep heavy imports out of module scope because Airflow parses DAG files frequently.
+- For dashboard work, verify the upstream parquet/S3/CDH shape before changing Grafana JSON or dataset definitions.
+- For infra changes, call out whether the change affects image build, Helm values, auth, DAG sync, runtime secrets, or Kubernetes namespaces.
+
+## Cross-Repo Workflow: Porting A Script To A DAG
+
+1. Run and observe the source script in `scraper-scripts`; capture inputs, outputs, credentials, file names, date logic, and failure behavior.
+2. Choose the DAG repo by market ownership: `smp-india` or `smp-japan`.
+3. Check whether an existing DAG for the same source should be extended before creating a new DAG.
+4. Implement under `dags/src/`, keeping task runtime scraper modules under `dags/src/scripts/`.
+5. Validate locally with `ruff`, `pytest`, and, when practical, `airflow dags test`.
+6. Coordinate deployment through the appropriate branch/environment and `smp-tool` git-sync/Helm configuration.
+7. Update `smp-dashboard` only after the DAG output is stable and visible where CDH/Grafana expects it.
+
+## Branch And Environment Notes
+
+- GitHub repos commonly use `main`; some DAG deployment flows still reference `dev`, `qa`, `master`, or region-specific branches.
+- `smp-tool` has region-aware config under `config/japan/<env>/` and `config/india/<env>/`.
+- Airflow namespaces are region-specific in current scripts, for example `smp-dev`, `smp-qa`, `smp-prod`, `smp-india-dev`, `smp-india-qa`, and `smp-india-prod`.
+- Treat any old `scraper-dags`/ADO git-sync reference as potentially stale and verify against current `smp-tool` config before editing deployment behavior.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/repos/smp</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/repos/smp</root><root>/Users/qn5792/.codex/visualizations/2026/09/08/01a08070-467c-7182-95b5-e2a44133c750</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-09-08T09:57:21.067Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+GPT mah dude, can you help me prep the slides for tomorrow's review? Basically, the slides I have opened in the tab is the slides we're using for tomorrow. Bong already did most of slides and asking us to update for SMP Japan and SMP India section.&#x20;
+
+Run through the current sprint and identify each and every ticket, consolidate if it makes sense, and then put in the slides. If you want any screenshots from me, lemme know. Makes sense?&#x20;
+
+In addition, remember, these slides are only meant for very high level visual aid for the stakeholders. We're not really expected to run through each ticket in detail. Just enough for them to know what we achieved this sprint.
+
+### Assistant - 2026-09-08T09:57:25.192Z
+
+I’ll review the deck and current sprint, group the Japan and India work into stakeholder-level outcomes, and update those sections. I’m using the presentation, browser, and Brian voice skills to match the deck and keep the wording concise.
+
+### User - 2026-09-08T09:57:44.920Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+Sorry mispressed. Pls!
+
+### Assistant - 2026-09-08T09:57:51.365Z
+
+No worries—I’ll pick up from the deck and sprint review.
+
+### Assistant - 2026-09-08T09:58:55.481Z
+
+The sprint’s main outcomes are Japan interconnector data in TSDB and expanded India market and generation data. I also found India bilateral-contract scraping still marked “In Review,” so I’ll keep that status clear instead of presenting it as completed.
+
+### Assistant - 2026-09-08T10:00:20.475Z
+
+I found eight regional tickets: one for Japan and seven for India. I’m grouping India’s work into market data, price history and data quality, and Khaba generation visibility. The regional slides still contain older sprint content, including Japan’s now-completed metadata dependency, which needs updating.
+
+### Assistant - 2026-09-08T10:03:10.266Z
+
+The India dashboard link isn’t resolving from here, so I can’t capture the chart yet. The slide text is moving ahead; a screenshot of the Khaba actual-versus-forecast chart would give that section a useful visual.
+
+### User - 2026-09-08T10:03:32.186Z
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_3TrGmi787w0qXe5pDR0TWZFB\",0]","question":"The best visual for India is the Khaba chart with actual generation plus Manikaran Day-Ahead and Intraday forecasts. Is that dashboard currently accessible to you? I’ll try the live dashboard while finishing the slide text.","answer":"yea, I'll get a screenshot after. Prep a placeholder and shit pls"}]
+</send_user_message_question_reply>
+
+### Assistant - 2026-09-08T10:03:41.703Z
+
+Yep—I’ll leave a labelled placeholder for the Khaba chart so you can drop the screenshot in later.
+
+### Assistant - 2026-09-08T10:06:15.999Z
+
+The regional content now fits into three outcome slides. I’m also including the sprint’s shared Airflow Assets proof of concept as a short preview, clearly marked as awaiting validation, and removing the outdated Japan content from the presentation flow.
+
+### Assistant - 2026-09-08T10:10:38.653Z
+
+The Khaba screenshot placeholder is in place. I’m finishing the ticket references in the speaker notes and checking the slides for stale text and layout issues.
+
+### Assistant - 2026-09-08T10:13:54.720Z
+
+Done, dude—updated the live deck with all nine sprint tickets grouped into four high-level slides. Ticket links are in the speaker notes, and pending work is clearly labelled.
+
+Slide 8 has the Khaba screenshot placeholder ready.
+
+One heads-up: the capacity and steering slides still reference August dates.
+
+### User - 2026-09-08T10:17:21.490Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+Ye. Let Bong handle the other slides. We're only focus on SMP Japan and India.
+
+For SMP Japan, delete all slides (do not carry over anything) EXCEPT for TSDB enablement in production (scr-1215, iirc)
+
+Then for the share platform, create a dedicated SMP Common transition slide please. Put it after SMP India and Japan so the order is...
+
+SMP India
+SMP Japan
+SMP Common
+
+### Assistant - 2026-09-08T10:17:27.073Z
+
+I’ll put the sections in India → Japan → Common order, keep Japan to SCR-1215 only, and add an SMP Common divider before the Airflow preview. Bong’s other slides will stay as they are.
+
+### Assistant - 2026-09-08T10:19:04.624Z
+
+The old Japan slide is deleted. I’m moving the India slides as a group and matching the existing divider style for SMP Common.
+
+### Assistant - 2026-09-08T10:21:08.643Z
+
+PowerPoint’s clipboard blocked the section move. I’m restoring the India slides from the content we just prepared, then using direct slide reordering to finish the layout.
+
+### Assistant - 2026-09-08T10:25:31.094Z
+
+The India content and screenshot placeholder are restored. I’m finishing the section order and making the Japan slide explicitly about SCR-1215’s production TSDB enablement, with no old chart carried over.
+
+### Assistant - 2026-09-08T10:29:52.711Z
+
+The order is now India → Japan → Common. Japan has just the SCR-1215 production TSDB slide, and the Airflow preview sits behind its own SMP Common divider. I’m checking the final saved slides now.
+
+### Assistant - 2026-09-08T10:30:35.537Z
+
+Done—saved in India → Japan → Common order.
+
+- Japan now contains only SCR-1215 production TSDB enablement.
+- Deleted the old Japan slide and carried-over chart.
+- Added a dedicated SMP Common divider before the Airflow preview.
+- Khaba screenshot placeholder is now on slide 4.
+
+Bong’s other slides are unchanged.
+
+### User - 2026-09-08T10:34:56.815Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+Thanks. Run me through the slides you added pls. I saw you consolidated some, can u tell me how and why pls
+
+### Assistant - 2026-09-08T10:35:15.703Z
+
+Yep. I grouped the **nine sprint tickets into four content slides**, with a divider for each section. The grouping follows what stakeholders can now do or access.
+
+| Slide | What it covers | Tickets | Why grouped this way |
+|---|---|---|---|
+| **4 — India: Market data and generation visibility** | IEX bid-stack data across DAM/GDAM/RTM; Khaba actual generation versus Manikaran forecasts; added POA solar telemetry | SCR-1231, SCR-1237, SCR-1238, SCR-1255 | Two related outcomes: better visibility into the market and the asset. The three Khaba tickets form one story about monitoring generation and comparing it with forecasts. Your screenshot goes here. |
+| **5 — India: Price history and contract coverage** | National price history from January 2025, stale DAM data cleanup, and bilateral-contract ingestion | SCR-1257, SCR-1256, SCR-1229 | History and cleanup together support reliable longer-term analysis. Bilateral contracts extend market coverage, but have a separate **“In review”** callout so we don’t imply completion. |
+| **7 — Japan: TSDB enablement in production** | Operational-capacity series in TSDB and backfilled interconnector history | SCR-1215 | One delivery with two parts: the additional capacity data and its historical coverage. It stands alone, with the old Japan material removed. |
+| **9 — Shared platform: Airflow Assets preview** | The Airflow Assets proof of concept | SCR-1239 | This applies across regions, so it sits behind the new **SMP Common** divider. It’s explicitly **awaiting validation**. |
+
+The dividers are **slide 3: India, slide 6: Japan, and slide 8: Common**.
+
+Ticket links are in the speaker notes. The slides give you the headline and a few talking points, while the notes keep every ticket traceable if someone asks for detail.
+
+### User - 2026-09-08T10:38:31.337Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+what screenshots I should put? do I put in each of the slide you added?
+
+### Assistant - 2026-09-08T10:38:49.601Z
+
+No need for a screenshot on every slide. I’d use **two main screenshots**, plus an optional one for the Common preview:
+
+| Slide | Screenshot to use |
+|---|---|
+| **4 — India market data and generation** | **Khaba actual generation alongside Manikaran Day-Ahead and Intraday forecasts.** Pick a day where all three lines are visible. Keep the legend, time axis and units. This goes in the existing placeholder. |
+| **5 — India price history and contracts** | **An IEX national-price chart spanning January 2025 to the latest available date.** A monthly view will read better than dense 15-minute data. If you don’t have that chart ready, leave this slide text-only. |
+| **7 — Japan TSDB production** | **A production TSDB chart showing interconnector operational capacity over a historical period.** Keep the series name and date range visible so it demonstrates the delivered data and backfill. |
+| **9 — Airflow Assets preview** | **Optional:** the Assets view or dependency graph from the POC. Bong can supply this if he’s presenting it. Keep the “awaiting validation” label. |
+
+**No screenshots on the section dividers.** Crop out browser chrome and unrelated panels, and make each chart large enough to read. One clear visual per slide is plenty.
+
+### User - 2026-09-08T10:52:43.397Z
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://engie.sharepoint.com/:p:/r/sites/ScraperTeam/_layouts/15/doc2.aspx?sourcedoc=%7B5E869D10-94F9-4CBE-94D7-9840674C4AF5%7D&file=Scraper-SprintReview%20-%20Period%203%20-%20Sprint%201.pptx&action=edit&mobileredirect=true
+</in-app-browser-context>
+
+## My request:
+Added the screenshots! And rearranged to my liking.
+
+
+
+- Not 100% on the airflow assets slide. Can you rephrase it better? Maybe overview what Airflow Assets are, how it can be valuable for SMP platform as a whole. Concisely of course!
+- "Sprint at a Glance" slide sucks monkey balls. Very amateur looking lol. Can we improve this please? If it also makes sense, by all means paraphrase it based on actual sprint backlog.
+
+### Assistant - 2026-09-08T10:52:52.863Z
+
+I’ll review your updated layout, make the Airflow Assets slide explain its value to SMP, and turn “Sprint at a Glance” into a concise summary of what the sprint delivered.
+
+### Assistant - 2026-09-08T10:56:32.699Z
+
+The Assets slide now explains the concept and its platform value, while keeping the proof of concept’s validation status clear. For the overview, I’m grouping the sprint into India, Japan, and Common outcomes so stakeholders can scan it quickly.
+
+### Assistant - 2026-09-08T10:58:15.950Z
+
+The backlog still shows seven completed tickets, with bilateral contracts in review and the Assets proof of concept awaiting validation. The overview now leads with the outcomes in each area and makes those two pending items explicit.
+
+### Assistant - 2026-09-08T10:59:12.504Z
+
+Updated both in the deck:
+
+- **Airflow Assets:** concise definition, value to SMP, and clear “awaiting validation” status above your screenshot.
+- **Sprint at a Glance:** cleaner spacing, stronger headings, and three outcome summaries—India, Japan, Common—checked against the sprint backlog.
+
+Kept the pending work clearly labelled. Your screenshots and slide order are preserved.
+
+## Find Promethee context
+
+- Session: `01a0807f-98b6-7d01-88cc-61017bd5b64a`
+- Started: `2026-09-08T10:10:40.952Z`
+- Updated: `2026-09-08T10:11:02.924619Z`
+- CWD: `/Users/qn5792/repos/smp`
+- Raw File: `/Users/qn5792/.codex/sessions/2026/09/08/rollout-2026-09-08T18-10-40-01a0807f-98b6-7d01-88cc-61017bd5b64a.jsonl`
+
+### User - 2026-09-08T10:10:59.384Z
+
+<recommended_plugins>
+Here is a list of plugins that are available but not installed.
+
+- Airtable (airtable@openai-curated-remote)
+- Alpaca (alpaca@openai-curated-remote)
+- Apollo.io (apollo@openai-curated-remote)
+- Spotify (app-68de829bf7648191acd70a907364c67c@openai-curated-remote)
+- Apple Music (app-6938a94a61d881918ef32cb999ff937c@openai-curated-remote)
+- LONA Trading Assistant (app-694336b0c0948191a4ad234f9942885b@openai-curated-remote)
+- SciSpace (app-69439d715a7c8191aed9e2f6649e105f@openai-curated-remote)
+- Tarot (app-6943a2c078b0819188de39e4fe168d9b@openai-curated-remote)
+- Todoist: To Do List & Calendar (app-6943b73823548191a9f9216c6790c453@openai-curated-remote)
+- Consensus (app-6943e6f4a928819195962de16fb9ffe4@openai-curated-remote)
+- Sider Scholar (app-6948b485f5bc8191adb4df13f369cec7@openai-curated-remote)
+- True Sky (app-69490a4a06148191a0dd78606a3dbf1f@openai-curated-remote)
+- Bigdata.com (app-69491eceef3c8191beb70788b7840429@openai-curated-remote)
+- Gamma (app-698a098735908191989f5788d7ee317e@openai-curated-remote)
+- Tredict (app-69aef5b699a0819184512d57743fc1cd@openai-curated-remote)
+- Maersk (app-69b2b5a768d4819190d3a86c5f12e6d9@openai-curated-remote)
+- Dropbox (app-69b31dc2110c8191b8b47dc98fe5a052@openai-curated-remote)
+- Parqet (app-69b68652f0308191a27d7c7096cab4f6@openai-curated-remote)
+- Interactive Brokers (IBKR) (app-69bc11db874881918718abaca20b68ce@openai-curated-remote)
+- Financial Datasets (app-69cacd9394a88191ba6564e1bb0430fa@openai-curated-remote)
+- Fathom (app-69d88b99c5c481918e8da9225737e1e9@openai-curated-remote)
+- vidIQ (app-69dd11f3e50c8191b1ca48d03cf7e2ad@openai-curated-remote)
+- TickTick:To-Do List & Calendar (app-69ddbaba3fb48191a825f22c21b0599d@openai-curated-remote)
+- Plaud (app-69f3c30d68288191bbd428a394a78407@openai-curated-remote)
+- Wolfram (app-69fe0bf66c8481919c513d799406436e@openai-curated-remote)
+- Runway (app-6a05e3b201788191be12b590b43e6ce3@openai-curated-remote)
+- Caliber (app-6a05e8f22d408191b13ba3897157f6df@openai-curated-remote)
+- COROS (app-6a0694cbb2608191bbefb74ba810ab68@openai-curated-remote)
+- TradingCursor (app-6a0d835ff1dc8191972eeabd14967446@openai-curated-remote)
+- CoinMarketCap (app-6a172fe86f5481919f73cbc3bc3ad5bb@openai-curated-remote)
+- Trello (app-6a20b18a639081918c1b438f8381b27e@openai-curated-remote)
+- Longbridge (app-6a2baf2fad748191812393c3e00308ef@openai-curated-remote)
+- freddy (app-6a322b52a82c8191b7fb653f9e9f7891@openai-curated-remote)
+- Higgsfield (app-6a3293e129088191abf0875820e839da@openai-curated-remote)
+- Stocktwits (app-6a427a19b1f481919c5db13838af00c2@openai-curated-remote)
+- CoinGecko (app-6a4f02d735388191959c8328877e0bbd@openai-curated-remote)
+- Asana (asana@openai-curated-remote)
+- Base44 (base44@openai-curated-remote)
+- Binance (binance@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Canva (canva@openai-curated-remote)
+- ClickUp (clickup@openai-curated-remote)
+- Cloudflare (cloudflare@openai-curated-remote)
+- Codex Security (codex-security@openai-curated-remote)
+- Figma (figma@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+</recommended_plugins>
+# AGENTS.md instructions for /Users/qn5792/repos/smp
+
+<INSTRUCTIONS>
+# AGENTS.md
+
+This file provides guidance to AI coding agents working under `/Users/qn5792/repos/smp`.
+
+## Overview
+
+`/smp` is a parent directory, not a monorepo. It contains separate repositories for the **SMP (Scraper Management Platform)** and adjacent APAC scraper work. Read the repo-local `AGENTS.md` before changing files inside any child repo.
+
+## Current Repos
+
+| Repo | Purpose | Tooling |
+|---|---|---|
+| `scraper-scripts` | Raw standalone scraper scripts and behavioral references before Airflow adaptation | Python 3.13, `uv` |
+| `smp-india` | India-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-japan` | Japan-owned Airflow DAGs split from the former `scraper-dags` repo | Python 3.13, Airflow 3.x, `uv` |
+| `smp-tool` | Airflow Docker image, Helm values, Kubernetes scripts, Okta auth, Minikube/EKS setup | Python 3.12, `uv`, Helm, Kubernetes |
+| `smp-dashboard` | Grafana dashboards and `cdh-dataset-manager` for CommonDataHub datasets | Python 3.11, `uv` |
+| `apac-tsdb-scraper` | Poetry/solaris-sfw TSDB scrapers deployed through the older Lambda/tag flow | Python 3.12, Poetry |
+
+Legacy names still appear in older docs and code comments:
+
+- `scraper-dags` is now split into `smp-india` and `smp-japan`.
+- `scraper-tool` is now `smp-tool`.
+- `scraper-dashboard` is now `smp-dashboard`.
+
+## End-to-End SMP Flow
+
+```text
+scraper-scripts  ->  smp-india / smp-japan  ->  smp-tool  ->  smp-dashboard
+(reference impl)     (Airflow DAGs)             (runtime)     (CDH + Grafana)
+```
+
+Use `scraper-scripts` as the behavioral source when porting or validating a DAG. Region-specific DAG implementation now belongs in either `smp-india` or `smp-japan`; shared Airflow/platform behavior should come from `smp-common` or `smp-tool`, not be copied between region repos.
+
+## Shared Rules
+
+- Do not commit credentials, tokens, kubeconfigs, generated local secrets, or one-off path rewrites.
+- Private dependencies come from ENGIE Artifactory. Prefer fixing local credentials over changing package indexes.
+- Keep region boundaries explicit: India DAG code in `smp-india`, Japan DAG code in `smp-japan`.
+- For Airflow DAGs, keep heavy imports out of module scope because Airflow parses DAG files frequently.
+- For dashboard work, verify the upstream parquet/S3/CDH shape before changing Grafana JSON or dataset definitions.
+- For infra changes, call out whether the change affects image build, Helm values, auth, DAG sync, runtime secrets, or Kubernetes namespaces.
+
+## Cross-Repo Workflow: Porting A Script To A DAG
+
+1. Run and observe the source script in `scraper-scripts`; capture inputs, outputs, credentials, file names, date logic, and failure behavior.
+2. Choose the DAG repo by market ownership: `smp-india` or `smp-japan`.
+3. Check whether an existing DAG for the same source should be extended before creating a new DAG.
+4. Implement under `dags/src/`, keeping task runtime scraper modules under `dags/src/scripts/`.
+5. Validate locally with `ruff`, `pytest`, and, when practical, `airflow dags test`.
+6. Coordinate deployment through the appropriate branch/environment and `smp-tool` git-sync/Helm configuration.
+7. Update `smp-dashboard` only after the DAG output is stable and visible where CDH/Grafana expects it.
+
+## Branch And Environment Notes
+
+- GitHub repos commonly use `main`; some DAG deployment flows still reference `dev`, `qa`, `master`, or region-specific branches.
+- `smp-tool` has region-aware config under `config/japan/<env>/` and `config/india/<env>/`.
+- Airflow namespaces are region-specific in current scripts, for example `smp-dev`, `smp-qa`, `smp-prod`, `smp-india-dev`, `smp-india-qa`, and `smp-india-prod`.
+- Treat any old `scraper-dags`/ADO git-sync reference as potentially stale and verify against current `smp-tool` config before editing deployment behavior.
+
+</INSTRUCTIONS>
+<environment_context>
+  <cwd>/Users/qn5792/repos/smp</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-09-08</current_date>
+  <timezone>Asia/Manila</timezone>
+  <filesystem><workspace_roots><root>/Users/qn5792/repos/smp</root><root>/Users/qn5792/.codex/visualizations/2026/09/08/01a0807f-98b6-7d01-88cc-61017bd5b64a</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
+
+### User - 2026-09-08T10:10:59.436Z
+
+Promethee time! You remember what that is no?
+
+### Assistant - 2026-09-08T10:11:03.109Z
+
+I’ll check the mind palace for Promethee using the consult-mind-palace skill.
+
+### Assistant - 2026-09-08T10:11:33.752Z
+
+Yep—Prométhée, your ENGIE timesheet. Our routine is to preserve existing meeting entries, split the remaining time across SMP Japan/India/Common using the sprint active for that week, and make each full working day total **1**, in **0.125-day increments**.
+
+Then **explicitly Save and reload to verify**—we learned that one last time 😅 Final submission only when you ask. [Saved context](/Users/qn5792/baraluga-mind/wiki/concepts/team-operations.md:87)
+
+Which dates are we filling this time?
+
+Last Updated: 2026-09-08

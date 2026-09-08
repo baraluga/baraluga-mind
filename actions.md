@@ -56,6 +56,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
+- [ ] Set up Atlas Dash engineering guardrails with the governance curator, Dash-specific standards and agent, focused checks, and a baseline code audit using tier zero.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+
 - [ ] Fill in initiative details for the GitHub-to-Confluence standards pipeline.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
@@ -204,9 +208,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[sff-walnut-migration]]
   - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
-- [ ] Secure approved GitHub-accessible GAMS installers and licence custody, then migrate Data Types before the downstream Limma package; handle OR Common independently once its GAMS gate is ready.
+- [ ] Secure an approved GitHub-accessible GAMS installer and licence path, including checking with Stefan Kaminski why GAMS was added to Artifactory and asking GAMS support for an official pipeline-friendly download option before choosing Artifactory or internal S3.
   - Context: [[sff-walnut-migration]]
-  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`
+  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`; `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`
 
 - [ ] Double-check the development token and stage-scoped variable configuration before further pipeline conversions.
   - Context: [[sff-walnut-migration]]
@@ -382,6 +386,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
 
+- [ ] Run the production Airflow refresh after the September 8 India IEX RTM TSDB replay, then verify Athena/Grafana show the recovered September 7 RTM prices.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+
 - [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-04-daily-standup.md`
@@ -417,10 +425,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
-
-- [ ] Prepare Brian's Japan and India sprint-review slides before Francois presents them.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 
 - [ ] Validate carried-over sprint tickets `SCR-1208` and `SCR-1058`, with Matéo leading the validation process where applicable.
   - Context: [[smp-platform]]
@@ -726,6 +730,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 
+- [ ] Wait for Francois to commit, push, and share the Atlas repository link before Brian starts the Dash standards/audit work.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`
+
 - [ ] Wait for `baraluga` GitHub authorization with `delete_repo` scope, then delete only the accidental private `baraluga/ado-ios` mirror and reverify `QN5792_engieco/ado-ios`.
   - Context: [[ado-ios]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
@@ -926,6 +934,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Brian chose to add the `SCR-1257` historical MCP heatmap to the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard rather than leave it only in Explore or create a separate dashboard.
   - Context: [[smp-dashboards]]
   - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/codex-conversations/2026-09-03-codex-conversations.txt`
+
+- [x] Prepare Brian's Japan and India sprint-review slides before Francois presents them.
+  - Closure: The September 8 Codex session updated the deck in India -> Japan -> Common order, kept Japan to `SCR-1215`, added the SMP Common divider and Airflow Assets preview, preserved Bong's other slides, and incorporated Brian's screenshots.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-19-granola-backlog-grooming.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 
 - [x] Create the six SAP SuccessFactors achievements and one Khaba/SMP India in-progress activity with linked goals.
   - Closure: The August 6 SAP session created and verified all six completed achievement records with evidence-backed completion dates, plus a separate Khaba/SMP India in-progress activity.

@@ -35,6 +35,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - A September 1 Copilot test found Jira MCP working for SCR, DEC, and DEL lookups, including identifying SMP as Jira project `SCR` and the Scrapers board. Confluence was not healthy in the same test: it first returned an HTTP 403 authentication failure, then no Confluence tools registered after URL/token changes and integration reload.
 - Kiva is being industrialized from an ABSD-specific "talk to my data" chatbot into a platform service: DMS owns infrastructure, MCP servers, authentication, deployment, and scaling, while desk teams own agent skills, context, query logic, and desk-specific reasoning. The September 1 source says the Positron MCP server is live on Kubernetes at `dms-kiva-dev.ms.myng.com`, registered with the NG MCP registry, authenticated by Okta, and visible to Copilot with 13 tools discovered.
 - On September 2, Brian demonstrated a BIPO browser workflow through Record & Replay. Codex updated the existing `$bipo-clock-in-out` skill instead of creating a duplicate, adding the SSO login path, navigation to Clock In/Out, explicit Clock In versus Clock Out selection, verification through the History entry, and safeguards around duplicate punches and credentials.
+- The September 8 [[atlas-dashboard]] discussion chose a lean AI-assisted development model for a PO-built Dash app: project-specific `AGENTS.md`, focused automated checks, a single coding agent, independent review when needed, and human engineering consultation for sensitive boundaries. A standing PO/dev/QA/architect agent fleet was considered overkill for the initial Atlas scope.
 
 ## Open Questions
 
@@ -51,6 +52,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether `Cos App` is the exact Okta feature name used for Kiva.
 - UNCERTAIN: Whether `Quiver` is the exact planned Kiva data-source MCP name.
 - UNCERTAIN: The BIPO recording ended before a post-click History update, so the capture did not prove the demonstrated Clock Out punch was recorded successfully.
+- UNCERTAIN: Whether Atlas becomes a reusable pattern for PO-owned internal dashboard apps or remains a one-off consulting setup.
 
 ## Sources
 
@@ -74,5 +76,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 - `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+- `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`
+- `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-09

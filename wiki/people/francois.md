@@ -12,11 +12,13 @@ Francois appears in the captures as Brian's SMP counterpart or lead for validati
 - Francois was preparing sprint backlog and sprint review in the June 29 standup notes.
 - Francois was expected to provide TSDB time series IDs for interconnector data.
 - Francois was at 40% allocation and personally wanted to reduce to 20% or lower according to the June 30 feedback notes.
+- A September 8 Atlas discussion identifies him as Francois Caffont and records a PO-owned development model where he continues building a Dash app while a software engineer provides baseline review, guardrails, and consultation for sensitive changes.
 
 ## Sources
 
 - `sources/meetings/2026-06-30-1504-granola-feedback-from-francois.md`
 - `sources/meetings/2026-06-29-1415-granola-standup.md`
 - `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
+- `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`
 
-Last Updated: 2026-07-04
+Last Updated: 2026-09-09

@@ -161,6 +161,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The same standup confirmed the Airflow asset-based orchestration POC as a likely replacement for Japan/AJKS fixed-schedule orchestrator DAGs when budget allows. Producers would keep their own schedules, consumers would run on asset updates, and an operator exists to wait for multiple assets before downstream triggering.
 - Bilateral-contract scraping was working in Dev on September 4. The source data arrives later in bulk than the current 18:00 India schedule, so the working plan is to push the DAG 1-2 hours later. Downstream usage is unresolved: the notes mention storage in CDH, no confirmed TSDB plan, no dashboard spec, and a request to split the name column into trade-nature subcolumns for filtering.
 - India grid-data permissions remained blocked on September 4. A proxy access request unexpectedly escalated to the head of Singapore infrastructure and power infrastructure, with Nilo looped in so Brian is not handling the discussion alone.
+- September 8 Codex work fixed and deployed the India IEX RTM rollover gap in `apac-tsdb-scraper`. The missing September 7 18:00 and 18:15 UTC prices were replayed to TSDB and verified at 10000 from the live IEX source; the remaining operating step was to trigger the production `india_iex_tsdb_expanded_rtm_dag` and then `india_iex_tsdb_expanded_historical_dag` so Airflow parquet snapshots, Athena, and Grafana reflect the repaired TSDB data.
+- The September 8 sprint-review deck was updated for the 2026-09-09 review in India -> Japan -> Common order. India work was grouped around IEX bid-stack data, Khaba/Manikaran generation visibility, historical price coverage, stale-row cleanup, and bilateral-contract coverage; Japan was narrowed to `SCR-1215` production TSDB enablement; Common covered the `SCR-1239` Airflow Assets preview as awaiting validation.
 
 ## Open Questions
 
@@ -221,6 +223,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Lua Amar` is the exact person/name from the September 4 standup source.
 - UNCERTAIN: Whether the bilateral-contract data should remain CDH-only, later feed a dashboard, or require another downstream consumer.
 - UNCERTAIN: Mateo's return is expected around 2026-09-11, but Adrian's return date was unclear in the September 4 standup.
+- UNCERTAIN: Whether the India production Airflow refresh after the September 8 RTM TSDB replay has been run and validated in Athena/Grafana.
 
 ## Sources
 
@@ -298,5 +301,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 - `sources/meetings/2026-09-04-daily-standup.md`
+- `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 
-Last Updated: 2026-09-05
+Last Updated: 2026-09-09

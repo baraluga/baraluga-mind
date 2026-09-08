@@ -58,6 +58,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - On September 3, Brian decided to include the `SCR-1257` historical MCP heatmap in the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard so Adrien could see the intended query and visualization. The final `smp-dashboard/main` heatmap fix was commit `590f9ff`, leaving future/null cells blank while preserving a 0-10 rupees/kWh color gradient for real DAM/GDAM/RTM values.
 - India Prod then hit the same CDH symptom previously seen in Japan Prod: registration was green but the new `india_iex_tsdb_expanded_historical` table was not visible to the project. A read-only crawler-status refresh changed the crawler from `RUNNING` to `DELETED`, the table became available, and a manual `SMP_INDIA_CDH_PROD` project-role refresh at 2026-09-03 16:43 GMT+8 made the table visible in CDH SQL Lab.
 - The permanent India Prod workflow fix was committed to `smp-dashboard/main` as `154cec1 fix: refresh India production CDH project role`. It adds the India Prod `project_role_refresh` mapping so future CDH registrations wait for crawler completion and refresh `SMP_INDIA_CDH_PROD` before reporting green.
+- The September 8 sprint-review slide work treated dashboard screenshots as evidence, not decoration: use one clear Khaba actual-versus-Manikaran forecast chart, one IEX historical national-price chart if available, and one Japan production TSDB interconnector-capacity chart. Section dividers should stay screenshot-free, and the Airflow Assets preview screenshot is optional while validation is pending.
 
 ## Open Questions
 
@@ -81,6 +82,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether Bastian or another owner decides cost attribution for shared Grafana/Airflow monitoring across SMP, Synapse, and Delphi.
 - UNCERTAIN: Whether SMP has or can obtain Grafana Enterprise/Cloud entitlement for `SCR-1252` Usage Insights, or must implement usage reporting through Okta/Loki instead.
 - UNCERTAIN: Whether the latest production India IEX dashboard JSON, including the `SCR-1257` heatmap and stronger schema-artifact query filters, has been imported into production Grafana.
+- UNCERTAIN: Whether the sprint-review screenshots were later reflected back into checked-in Grafana/dashboard source or only added to the SharePoint deck.
 
 ## Sources
 
@@ -108,5 +110,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-09-02-standup.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 
-Last Updated: 2026-09-05
+Last Updated: 2026-09-09

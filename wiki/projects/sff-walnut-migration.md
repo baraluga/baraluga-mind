@@ -30,6 +30,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `data_common` was recovered from active Azure repository `SFF/_git/data_common`, migrated to private `qrm-dms/sff-lib-data-common`, and published after preserving its Python 3.11/3.13 tests and fixing an sdist fixture omission.
 - `sff-ms-computing-kernel` later published `computing_kernel==6.5.2` after its dependency readiness and release workflow were corrected.
 - GAMS-dependent `sff-data-types` and `sff-tool-or-common` remain blocked on approved installer and licence custody. `sff-fw-limma` remains downstream-blocked until `python-datatypes` is available from Artifactory.
+- The September 8 GAMS discussion clarified the blocker: the old direct S3 download now returns 403, likely because GAMS distribution moved behind CloudFront. An executable copy exists in Artifactory, but the team is concerned that storing a third-party commercial binary internally may create licensing/distribution and ongoing maintenance obligations. Preferred direction is still an official public or vendor-supported download path if one exists; fallback options include a mathematician-managed internal S3 bucket or a generic JFrog repository for executables.
 
 ## Shared CI Contracts
 
@@ -67,6 +68,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - UNCERTAIN: Whether all seven Azure-only pipelines should migrate in the current program or remain until their owners establish readiness.
 - UNCERTAIN: Whether `sff-ai-halo` should pin its MCP dependency before adding CI, or keep the Git-only mirror unchanged until Steffen has access.
 - UNCERTAIN: Whether non-Python packages, generic binaries, production promotion, retention, and cross-team `expose` access should follow Walnut Artifactory, another package platform, or separate governance.
+- UNCERTAIN: Whether GAMS permits the current or proposed internal redistribution path for installers used by GitHub pipelines.
 
 ## Sources
 
@@ -83,5 +85,6 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-06-codex-conversations.txt`
+- `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`
 
-Last Updated: 2026-08-07
+Last Updated: 2026-09-09
