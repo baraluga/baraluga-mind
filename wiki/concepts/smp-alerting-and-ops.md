@@ -37,6 +37,10 @@ SMP operational discussions in late June and early July focused on production in
 - September 2 backlog grooming scoped SMP resource monitoring under `SCR-1254` toward Grafana-visible CPU/memory baselines and simple 95% usage alerts with manual response before autoscaling. Signups already has Loki on its cluster, and Michael was expected to coordinate a demo with Jeka when Jeka returns.
 - The same grooming discussion separated Grafana usage monitoring from Airflow usage monitoring. The Grafana usage question is who accesses which dashboards and how often, excluding internal team usage; Loki is the likely first check, with Okta logs as a secondary metadata source.
 - September 2 Codex review of queued production DAGs concluded that paused DAGs receiving queued external runs are evidence of a stale trigger/orchestrator configuration, not proof that every paused DAG is obsolete. The safer lifecycle is to stop new automatic triggers first, identify owners/consumers and stale queued runs, then unpause only required production DAGs through controlled single runs or retire no-owner/no-consumer DAGs after observation.
+- September 10 `SCR-1244` Grafana alerting work clarified that alert rules are not imported through the normal dashboard JSON import screen. The simplest POC path is an authenticated HTTP API payload for one QA rule, with a paused-then-enable flow and a separate firing/recovery test.
+- The same work recorded that SMP Grafana instances are VPN-only, so offline preparation can build payloads and scripts, but live query, contact point, and delivery checks require a VPN-connected session or someone with cluster access.
+- India QA Grafana authenticated successfully with `GRAFANA_TOKEN_INDIA_QA`, returned Grafana 12.3.1, and queried `SMP_INDIA_CDH_QA`; the alert data side returned `price_inr_kwh = 10` for the POC query. Email delivery failed because Grafana SMTP was not configured.
+- Airflow's India QA configuration uses `mailhost.infrasys16.com:25` for SMTP, while Teams notifications use Microsoft Graph. Grafana and Airflow are separate Helm releases in the same namespace according to checked-in deployment design, not the same pod. The next operational check is whether Grafana's QA pod can reach the SMTP relay and what sender/TLS/auth rules apply.
 
 ## Open Questions
 
@@ -52,6 +56,8 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether Signups' Loki setup can be reused as an SMP reference pattern without importing Signups-specific assumptions.
 - UNCERTAIN: Whether Okta logs can expose the specific dashboard/user/frequency fields needed for Grafana usage monitoring.
 - UNCERTAIN: Which production orchestrator or allow-list is still triggering paused SMP DAGs, and which paused DAGs are manual/diagnostic versus obsolete.
+- UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay and sender configuration for `SCR-1244` alert delivery.
+- UNCERTAIN: Whether the checked-in separate-Helm-release deployment design matches the live India QA cluster layout.
 
 ## Sources
 
@@ -78,5 +84,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-11

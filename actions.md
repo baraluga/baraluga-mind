@@ -56,9 +56,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
-- [ ] Set up Atlas Dash engineering guardrails with the governance curator, Dash-specific standards and agent, focused checks, and a baseline code audit using tier zero.
+- [ ] Continue Atlas Dash engineering guardrails after the initial test/CI/Ruff baseline, including Dash-specific standards, agent guidance, baseline audit, and deployment package readiness.
   - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+
+- [ ] Review and release the shared `configure-engie-ca-bundle` action in `qrm-dms/sff-actions` if it should become part of the protected `v1` contract.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [ ] Fill in initiative details for the GitHub-to-Confluence standards pipeline.
   - Context: [[team-operations]]
@@ -208,9 +212,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[sff-walnut-migration]]
   - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
 
-- [ ] Secure an approved GitHub-accessible GAMS installer and licence path, including checking with Stefan Kaminski why GAMS was added to Artifactory and asking GAMS support for an official pipeline-friendly download option before choosing Artifactory or internal S3.
+- [ ] Secure an approved GitHub-accessible GAMS installer and licence path, including version custody, licence-server alignment, Artifactory traffic-cost checks, and fallback options such as internal S3.
   - Context: [[sff-walnut-migration]]
-  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`; `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`
+  - Source: `sources/codex-conversations/2026-07-23-codex-conversations.md`; `sources/codex-conversations/2026-07-24-codex-conversations.md`; `sources/codex-conversations/2026-07-25-codex-conversations.md`; `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`; `sources/meetings/2026-09-09-1600-granola-supporting-gams-in-our-walnut-artifactory.md`
 
 - [ ] Double-check the development token and stage-scoped variable configuration before further pipeline conversions.
   - Context: [[sff-walnut-migration]]
@@ -386,17 +390,25 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
 
-- [ ] Run the production Airflow refresh after the September 8 India IEX RTM TSDB replay, then verify Athena/Grafana show the recovered September 7 RTM prices.
+- [ ] Trigger and verify the India production RTM latest and historical Airflow DAGs after the source-backed TSDB replays, then confirm Athena/Grafana show the recovered RTM data.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`
+
+- [ ] Review and commit the uncommitted `SCR-1258` RTM sliding-reconciliation change if its 28-block bounded retry design is accepted.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-04-daily-standup.md`
 
-- [ ] Ping Bong on `SCR-1239` Airflow Assets mini-POC validation and next-step timing, then discuss the Japan/AJKS asset-migration path when budget allows.
+- [ ] Close `SCR-1239` after the Airflow Assets demo/validation, then discuss the Japan/AJKS asset-migration path when budget allows.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-04-daily-standup.md`
+  - Source: `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-09-1531-granola-smp-sprint-retro.md`; `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
+
+- [ ] Review the sprint budget logging file and apply the requested strict-budget logging adjustments.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-09-1531-granola-smp-sprint-retro.md`
 
 - [ ] Decide the Phoenix deployment path: skip the security audit and deploy to all environments, or wait for security graduation.
   - Context: [[smp-platform]]
@@ -414,13 +426,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-02-standup.md`
 
-- [ ] Confirm the bilateral-contract scraping schedule shift and name-column split with Mateo and Adrian when they return, then refine ticket scope and contract-name nomenclature.
+- [ ] Decide the downstream path for validated bilateral-contract data in CDH, including dashboard versus TSDB, schedule timing, and contract-name/trade-nature filtering.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/meetings/2026-09-04-daily-standup.md`
+  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
 
 - [ ] Check with Michael on the India regional proxy access approach before looping in Nilo or others; if unresolved, document the blocker and deprioritize Grid India work.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-04-daily-standup.md`
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
   - Context: [[smp-platform]]
@@ -730,10 +742,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 
-- [ ] Wait for Francois to commit, push, and share the Atlas repository link before Brian starts the Dash standards/audit work.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`
-
 - [ ] Wait for `baraluga` GitHub authorization with `delete_repo` scope, then delete only the accidental private `baraluga/ado-ios` mirror and reverify `QN5792_engieco/ado-ios`.
   - Context: [[ado-ios]]
   - Source: `sources/codex-conversations/2026-07-13-codex-conversations.md`
@@ -770,6 +778,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
+- [ ] Wait for authorized Atlas DEV DAC/INTACT credentials, CDH project URI, and role ARN to be configured directly in GitHub before testing credential retrieval or deployment.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+
+- [ ] Wait for Nilo or Walnut support to confirm whether large GAMS installer downloads incur extra Artifactory storage or transfer charges.
+  - Context: [[sff-walnut-migration]]
+  - Source: `sources/meetings/2026-09-09-1600-granola-supporting-gams-in-our-walnut-artifactory.md`
+
 ### SMP Platform
 
 - [ ] Wait for Matéo to confirm the India generation TSDB production side is healthy, then close ticket 9.
@@ -787,6 +803,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for local TSDB credentials and ENGIE Artifactory connectivity, then run live read-only UAT/prod acceptance for the SMP TSDB Explorer.
   - Context: [[smp-tsdb-explorer]]
   - Source: `sources/codex-conversations/2026-08-07-codex-conversations.txt`
+
+- [ ] Wait for Michael to run the Grafana QA SMTP relay check and confirm sender/TLS/auth requirements before configuring alert email delivery for `SCR-1244`.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [ ] Wait for Matthew and Adrian to confirm the Gen-A `Go Anywhere` endpoint, machine-to-machine credentials, access rights, and geo-blocking constraints.
   - Context: [[smp-platform]]
@@ -1157,6 +1177,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### AI Assisted Engineering
+
+- [x] Wait for Francois to commit, push, and share the Atlas repository link before Brian starts the Dash standards/audit work.
+  - Closure: The September 9-10 Codex captures show Atlas work proceeding in `qrm-dms/atlas-dash-frontend`, including test/CI/Ruff guardrails and `dm-898` branch work.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [x] Decide how Pipeline Modernizer handoffs should handle private Walnut registry access.
   - Closure: The Pipeline Modernizer and its offline handoff prompt were decommissioned after reusable `sff-actions` contracts and tested human-facing recipes replaced the agent as the primary migration interface.

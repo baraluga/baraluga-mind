@@ -59,6 +59,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - India Prod then hit the same CDH symptom previously seen in Japan Prod: registration was green but the new `india_iex_tsdb_expanded_historical` table was not visible to the project. A read-only crawler-status refresh changed the crawler from `RUNNING` to `DELETED`, the table became available, and a manual `SMP_INDIA_CDH_PROD` project-role refresh at 2026-09-03 16:43 GMT+8 made the table visible in CDH SQL Lab.
 - The permanent India Prod workflow fix was committed to `smp-dashboard/main` as `154cec1 fix: refresh India production CDH project role`. It adds the India Prod `project_role_refresh` mapping so future CDH registrations wait for crawler completion and refresh `SMP_INDIA_CDH_PROD` before reporting green.
 - The September 8 sprint-review slide work treated dashboard screenshots as evidence, not decoration: use one clear Khaba actual-versus-Manikaran forecast chart, one IEX historical national-price chart if available, and one Japan production TSDB interconnector-capacity chart. Section dividers should stay screenshot-free, and the Airflow Assets preview screenshot is optional while validation is pending.
+- September 10 `SCR-1244` work prepared a QA-only Grafana alert POC for the India `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard. The chosen first alert was RTM MCP above INR 8/kWh, using the `SMP_INDIA_CDH_QA` Athena datasource and HTTP API setup rather than dashboard JSON import.
+- The POC created a dedicated `SCR-1244 POC` folder and `SCR-1244 QA email` contact point for `brian.peralta@engie.com` without enabling the alert. A live QA query returned `price_inr_kwh = 10`, so Grafana-to-Athena access and the threshold query worked.
+- Notification delivery remained blocked because Grafana QA reported SMTP was not configured. Checked-in Airflow QA config uses `mailhost.infrasys16.com:25`, so the recommended path is to test whether Grafana's QA pod can reach that relay and then configure SMTP, rather than introducing a separate Teams workflow first.
 
 ## Open Questions
 
@@ -83,6 +86,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether SMP has or can obtain Grafana Enterprise/Cloud entitlement for `SCR-1252` Usage Insights, or must implement usage reporting through Okta/Loki instead.
 - UNCERTAIN: Whether the latest production India IEX dashboard JSON, including the `SCR-1257` heatmap and stronger schema-artifact query filters, has been imported into production Grafana.
 - UNCERTAIN: Whether the sprint-review screenshots were later reflected back into checked-in Grafana/dashboard source or only added to the SharePoint deck.
+- UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay `mailhost.infrasys16.com:25`, and which sender/TLS/auth requirements apply.
+- UNCERTAIN: Whether `SCR-1244` should prove email notification only, or later add a Teams contact point after the threshold/firing/recovery behavior is accepted.
 
 ## Sources
 
@@ -111,5 +116,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
-Last Updated: 2026-09-09
+Last Updated: 2026-09-11

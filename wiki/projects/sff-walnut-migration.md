@@ -31,6 +31,8 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sff-ms-computing-kernel` later published `computing_kernel==6.5.2` after its dependency readiness and release workflow were corrected.
 - GAMS-dependent `sff-data-types` and `sff-tool-or-common` remain blocked on approved installer and licence custody. `sff-fw-limma` remains downstream-blocked until `python-datatypes` is available from Artifactory.
 - The September 8 GAMS discussion clarified the blocker: the old direct S3 download now returns 403, likely because GAMS distribution moved behind CloudFront. An executable copy exists in Artifactory, but the team is concerned that storing a third-party commercial binary internally may create licensing/distribution and ongoing maintenance obligations. Preferred direction is still an official public or vendor-supported download path if one exists; fallback options include a mathematician-managed internal S3 bucket or a generic JFrog repository for executables.
+- The September 9 GAMS/Walnut discussion refined the likely internal path: Michael had already aligned with Stefan and Nicole that versioning can be handled temporarily until the GAMS license server is finalized. If Artifactory has no extra large-binary transfer cost, a single generic Artifactory repository should serve projects using GAMS, rather than one repository per project. S3 remains a fallback if Artifactory costs or publishing constraints are unacceptable.
+- The Artifactory cost question is mainly transfer, not storage: the meeting example treated a 138 MB installer as roughly 1 GB of transfer after 10 builds. The note cites `Enterprise X`, 125 GB base consumption, and about USD 59.50/month, but flags the pricing as likely needing verification.
 
 ## Shared CI Contracts
 
@@ -41,6 +43,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - The organization-wide closeout found no honest reason for further whole-job centralization. Repositories with different coverage, sdist, deployment, or publication behavior keep composed shared actions rather than being forced into one reusable workflow.
 - On August 6, Guido's Artifactory question exposed a discoverability gap rather than a missing Python capability. `sff-actions` already standardized Python package consumption with `configure-artifactory-python@v1` and publication through tested artifacts plus authenticated readback; the new work added a task-oriented recipe for "I depend on package `abc` in Artifactory" and linked it from the organization `.github` documentation.
 - The durable split remains: `.github` is the policy and starting-point layer, while `sff-actions` owns executable actions, reusable workflows, and copy-paste implementation recipes. A broader universal Artifactory consumption standard should be a contract across repository naming, environment semantics, authentication, trust, verification, failure behavior, ownership, and local development; ecosystem-specific adapters should be added only after repeated real consumers prove the same boundary.
+- September 10 Atlas work produced a reusable certificate-bundle candidate in `qrm-dms/sff-actions`: `configure-engie-ca-bundle` validates the installed ENGIE root, known intermediate fingerprints, certificate validity, and signatures, then exports temporary CA-bundle environment variables for Python/Requests/curl/pip and cleanup. It was proven in shared CI and in Atlas diagnostics from the internal `ubuntu` runner, but was only usable by exact commit SHA at the end of the capture; protected `v1` was not moved.
 
 ## Agent Lifecycle
 
@@ -69,6 +72,8 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - UNCERTAIN: Whether `sff-ai-halo` should pin its MCP dependency before adding CI, or keep the Git-only mirror unchanged until Steffen has access.
 - UNCERTAIN: Whether non-Python packages, generic binaries, production promotion, retention, and cross-team `expose` access should follow Walnut Artifactory, another package platform, or separate governance.
 - UNCERTAIN: Whether GAMS permits the current or proposed internal redistribution path for installers used by GitHub pipelines.
+- UNCERTAIN: Whether large GAMS installer downloads incur extra Artifactory transfer charges under the current Walnut/JFrog plan.
+- UNCERTAIN: Whether the shared `configure-engie-ca-bundle` action should be promoted into `sff-actions@v1` or remain SHA-pinned until more consumers prove the contract.
 
 ## Sources
 
@@ -86,5 +91,7 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 - `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`
+- `sources/meetings/2026-09-09-1600-granola-supporting-gams-in-our-walnut-artifactory.md`
+- `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
-Last Updated: 2026-09-09
+Last Updated: 2026-09-11

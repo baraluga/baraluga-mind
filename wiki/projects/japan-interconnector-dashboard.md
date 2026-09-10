@@ -105,6 +105,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - For the next engagement period, the source split Japan next steps by budget: support mode means no proactive next steps; full budget would push old operational-capacity data to TSDB. The team also wanted Japan stakeholders to surface future needs because next-period visibility was low.
 - August 11 backlog grooming described the new interconnector metadata ticket as blocked, with old-dashboard time-series tickets waiting on Louis's team to push to TSDB. The practical unblock path is to check whether providers already exist, identify provider owners, and schedule injection so dashboards are not disrupted.
 - An August 11 code search found no current or historical SMP DAG scraping `setsuden.nw.tohoku-epco.co.jp/download.html` or its `setsuden` / `tohoku-epco` domain. Existing adjacent Tohoku coverage comes from other sources: Tesla residual-demand and solar forecasts, JEPX day-ahead prices, OCCTO actual flow and capacity for Hokkaido-Tohoku / Tohoku-Tokyo, and HJKS unit-status or outage data.
+- The September 9 sprint review says TSDB production publishing was finalized for interconnector time series covering available capacity across all IC regions, operational capacity, actual flow, and JPX prices. Historical data from 2021 to date was confirmed available, and the TSDB provider was recorded as `interconnector`, owned by Carlos and Lona.
+- The same review says FY27 interconnector data had been updated and reflected in the dashboard promptly, with the business goal of reducing manual weekend data gathering for Hiromi.
 
 ## Open Questions
 
@@ -126,6 +128,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether the production CDH registration workflow should block until each requested stage refresh has completed, or at least surface crawler-already-running outcomes as an explicit follow-up.
 - UNCERTAIN: Whether `port activation` in the August 11 standup is the exact TSDB/Japan term.
 - UNCERTAIN: Whether the Singapore user's requested Tohoku historical demand/supply-demand actuals should become a new SMP DAG scope.
+- UNCERTAIN: Whether the September 9 statement that interconnector TSDB production publishing is finalized closes all older `SCR-1171` production approval/open-action threads, or only the subset presented in the sprint review.
 
 ## Sources
 
@@ -179,5 +182,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-11-codex-conversations.txt`
+- `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
 
-Last Updated: 2026-08-13
+Last Updated: 2026-09-11

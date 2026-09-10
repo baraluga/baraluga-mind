@@ -163,6 +163,13 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - India grid-data permissions remained blocked on September 4. A proxy access request unexpectedly escalated to the head of Singapore infrastructure and power infrastructure, with Nilo looped in so Brian is not handling the discussion alone.
 - September 8 Codex work fixed and deployed the India IEX RTM rollover gap in `apac-tsdb-scraper`. The missing September 7 18:00 and 18:15 UTC prices were replayed to TSDB and verified at 10000 from the live IEX source; the remaining operating step was to trigger the production `india_iex_tsdb_expanded_rtm_dag` and then `india_iex_tsdb_expanded_historical_dag` so Airflow parquet snapshots, Athena, and Grafana reflect the repaired TSDB data.
 - The September 8 sprint-review deck was updated for the 2026-09-09 review in India -> Japan -> Common order. India work was grouped around IEX bid-stack data, Khaba/Manikaran generation visibility, historical price coverage, stale-row cleanup, and bilateral-contract coverage; Japan was narrowed to `SCR-1215` production TSDB enablement; Common covered the `SCR-1239` Airflow Assets preview as awaiting validation.
+- September 9 Codex work completed a second source-backed India IEX RTM production recovery. Commit `98f27b5` was deployed, eight Sep 9 replay ranges succeeded, TSDB readback showed Sep 8 complete and Sep 9 complete through token 64, and 320 comparable price/cleared-volume points matched the fresh IEX source exactly. Tokens 65-96 were excluded because IEX had not published them yet. The remaining order was to trigger the India production latest RTM DAG, then the historical DAG, and verify Athena/Grafana.
+- September 10 `SCR-1258` work prepared a follow-up RTM sliding-reconciliation change without committing it: keep the four-block current publication window, add a 24-block trailing six-hour retrieval split by IST delivery date, cap scheduled retrieval at 28 unique blocks per run, and skip non-finite delayed values while keeping explicit replay strict.
+- September 9 sprint retro notes recorded a process decision to cap India SMP POC attempts at five; if there is no traction after that, the team should pivot toward monitoring, especially with Iberia and UK expansion in view. Direct access to India was approved with no PO intermediary, and planning should stay lightweight/Kanban-style rather than heavy sprint planning.
+- The same retro recorded tighter budget monitoring: Japan OpEx had 8 hours allocated, next-week work was expected to consume roughly 3-4 days or about half the week, and Brian had a follow-up to adjust logging entries from a sent file.
+- September 10 Grid India access testing strongly supported geo-blocking: regional probes in Mumbai, Bengaluru, and Hyderabad returned HTTP 200, while Singapore, Los Angeles, and Manila saw connection resets similar to Brian's local result. This does not prove report-list or download access, and the old "two weeks ago" behavior was not available for comparison.
+- September 9 sprint review said IEX bid-stack implementation was underway, the Khaba generation dashboard had day-ahead and intraday forecasts beside actual generation, price-history coverage had expanded across day-ahead, G-DAM, and real-time markets, and bilateral-contract data was scraped, validated by Francois, and present in CDH. The next decision is whether those contracts need a new dashboard, TSDB publication, or CDH-only handling.
+- Airflow Assets were presented as a Common platform improvement: upstream assets should trigger dependent DAGs only after data is produced, reducing arbitrary schedule offsets. Japan HGKS scrapers were named as a strong candidate because several consumers share base nuclear datasets.
 
 ## Open Questions
 
@@ -224,6 +231,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the bilateral-contract data should remain CDH-only, later feed a dashboard, or require another downstream consumer.
 - UNCERTAIN: Mateo's return is expected around 2026-09-11, but Adrian's return date was unclear in the September 4 standup.
 - UNCERTAIN: Whether the India production Airflow refresh after the September 8 RTM TSDB replay has been run and validated in Athena/Grafana.
+- UNCERTAIN: Whether the Sep 9 India RTM DAG and historical DAG refreshes have since been triggered and verified in Athena/Grafana.
+- UNCERTAIN: Whether `Belarial` is the exact bilateral-contract data name or a transcript artifact.
+- UNCERTAIN: Whether `Borzilla` is the exact scraper/source name mentioned for Portugal and Spain, or a transcript artifact.
+- UNCERTAIN: Whether the Grid India site allows report-list and file downloads from India once the top-level page loads.
 
 ## Sources
 
@@ -302,5 +313,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 - `sources/meetings/2026-09-04-daily-standup.md`
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+- `sources/meetings/2026-09-09-1531-granola-smp-sprint-retro.md`
+- `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
+- `sources/codex-conversations/2026-09-09-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
-Last Updated: 2026-09-09
+Last Updated: 2026-09-11
