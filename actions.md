@@ -398,6 +398,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
+- [ ] Review, commit, and promote the local `SCR-1260` Khavda implementation, then run live CDH/Athena/Grafana validation for the new dashboard and dataset stages.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+
 - [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-04-daily-standup.md`
@@ -432,7 +436,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Check with Michael on the India regional proxy access approach before looping in Nilo or others; if unresolved, document the blocker and deprioritize Grid India work.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/meetings/2026-09-14-1415-granola-standup.md`
 
 - [ ] Contact `Fluid` to confirm old-dashboard metadata collection progress.
   - Context: [[smp-platform]]
@@ -613,6 +617,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Close out `SCR-1255` by re-importing the latest production India IEX dashboard JSON if needed, verifying the schema-artifact filters, attaching QA/production evidence, and asking Adrien whether Manikaran forecast backfill is wanted.
   - Context: [[smp-dashboards]]
   - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+
+- [ ] Coordinate the `SCR-1244` Grafana alert redeploy with Michael after the manual contact-point and threshold POC configuration.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`
+
+- [ ] Keep monitoring the Grafana gaps bug through cobweb freshness checks and decide whether the raised 1-point ticket should use five-minute polling or a real-time approach.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`
 
 - [ ] Run the `SCR-1256` production cleanup dry-run for India IEX schema-sample objects, verify the exact keys, and request explicit approval before any production `execute=true`.
   - Context: [[smp-platform]]
@@ -796,6 +808,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
+- [ ] Wait for Adrien and Mateo to confirm the `SCR-1259` KHABA freshness semantics: whether 09:15 means the 09:15-09:29 average, the block ending at 09:15, or an individual reading, and whether five-minute polling is sufficient.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+
+- [ ] Wait for Darwin and Manikaran source timestamp/unit semantics before enabling `SCR-1260` comparison analytics.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+
 - [ ] Wait for François to validate `SCR-1237` and `SCR-1238`, including POA/CABA generation values and the India IEX active-power panel in QA.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/codex-conversations/2026-08-27-codex-conversations.txt`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-daily-standup.md`
@@ -803,10 +823,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for local TSDB credentials and ENGIE Artifactory connectivity, then run live read-only UAT/prod acceptance for the SMP TSDB Explorer.
   - Context: [[smp-tsdb-explorer]]
   - Source: `sources/codex-conversations/2026-08-07-codex-conversations.txt`
-
-- [ ] Wait for Michael to run the Grafana QA SMTP relay check and confirm sender/TLS/auth requirements before configuring alert email delivery for `SCR-1244`.
-  - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 
 - [ ] Wait for Matthew and Adrian to confirm the Gen-A `Go Anywhere` endpoint, machine-to-machine credentials, access rights, and geo-blocking constraints.
   - Context: [[smp-platform]]
@@ -939,6 +955,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: The August 6 standup says the ticket was set to done; Matéo will not hit the described issue because of separate GitHub groups, and the Artifactory workaround had already been communicated.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
+
+- [x] Wait for Michael to run the Grafana QA SMTP relay check before configuring `SCR-1244` alert delivery.
+  - Closure: The September 14 standup says manual Grafana alerting worked, with a contact point configured and corporate email plus SMS triggered; the remaining work shifted to redeploying the Grafana configuration.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/meetings/2026-09-14-1415-granola-standup.md`
 
 - [x] Raise TSDB access or permissions requests before Mateo went offline on 2026-09-01.
   - Closure: The September 1 daily note says Adrien is now the point person while Mateo is away; remaining TSDB-ID questions are tracked separately.

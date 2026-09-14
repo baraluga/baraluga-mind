@@ -170,6 +170,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - September 10 Grid India access testing strongly supported geo-blocking: regional probes in Mumbai, Bengaluru, and Hyderabad returned HTTP 200, while Singapore, Los Angeles, and Manila saw connection resets similar to Brian's local result. This does not prove report-list or download access, and the old "two weeks ago" behavior was not available for comparison.
 - September 9 sprint review said IEX bid-stack implementation was underway, the Khaba generation dashboard had day-ahead and intraday forecasts beside actual generation, price-history coverage had expanded across day-ahead, G-DAM, and real-time markets, and bilateral-contract data was scraped, validated by Francois, and present in CDH. The next decision is whether those contracts need a new dashboard, TSDB publication, or CDH-only handling.
 - Airflow Assets were presented as a Common platform improvement: upstream assets should trigger dependent DAGs only after data is produced, reducing arbitrary schedule offsets. Japan HGKS scrapers were named as a strong candidate because several consumers share base nuclear datasets.
+- September 14 Codex work created `SCR-1259` for Adrien's KHABA freshness request as an SMP-India story estimated at 2 points. The implementation review found the current KHABA code averages minute readings into 15-minute blocks and labels the block by its start time, so a value labelled 09:15 currently means 09:15-09:29. The July 30 Mateo discussion confirms 15-minute averaging, but not start-label versus end-label semantics. The proposed stakeholder message asks Adrien whether five-minute polling is enough and asks Mateo to confirm the timestamp convention.
+- The same September 14 work created `SCR-1260` for adding Khavda generation and Manikaran forecasts to Adrien's R&F assets dashboard, with an aggressive 2-point estimate and safe 3-point estimate. The delegated implementation added a new Khavda TSDB-to-CDH path, `india_khavda_generation` CDH stages, a Grafana dashboard row with six Khavda panels, documentation, and tests, but it remained local and uncommitted. Analytics stayed disabled pending confirmation of Darwin and forecast timestamp/unit semantics; no live CDH, Athena, Grafana, or source-semantics validation was performed.
+- The September 14 standup records continuing India/Singapore proxy work: VPN was raised as an access method if a scraper is used, no India scraper exists yet, Singapore has a tagging solution, Adrian should be looped in, and Singapore IT or Indian IT may need to handle the proxy solution within SMP. This reinforces the existing Grid India access blocker rather than resolving it.
 
 ## Open Questions
 
@@ -235,6 +238,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Belarial` is the exact bilateral-contract data name or a transcript artifact.
 - UNCERTAIN: Whether `Borzilla` is the exact scraper/source name mentioned for Portugal and Spain, or a transcript artifact.
 - UNCERTAIN: Whether the Grid India site allows report-list and file downloads from India once the top-level page loads.
+- UNCERTAIN: For `SCR-1259`, whether Adrien's "09:15 value by 09:30" means the 09:15-09:29 average, the block ending at 09:15, or an individual 09:15 reading.
+- UNCERTAIN: Whether five-minute KHABA polling is enough for Adrien if the strict 09:30 visibility target cannot be guaranteed from source availability alone.
+- UNCERTAIN: For `SCR-1260`, whether Darwin actual generation is interval-average power and whether Darwin plus both Manikaran forecasts use timestamp conventions compatible with the proposed duration-weighted comparison.
+- UNCERTAIN: Whether the local `SCR-1260` implementation has since been committed, promoted, registered in CDH, and validated against live TSDB/Athena/Grafana.
 
 ## Sources
 
@@ -317,5 +324,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
 - `sources/codex-conversations/2026-09-09-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+- `sources/meetings/2026-09-14-1415-granola-standup.md`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-09-15

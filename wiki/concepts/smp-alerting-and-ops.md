@@ -41,6 +41,8 @@ SMP operational discussions in late June and early July focused on production in
 - The same work recorded that SMP Grafana instances are VPN-only, so offline preparation can build payloads and scripts, but live query, contact point, and delivery checks require a VPN-connected session or someone with cluster access.
 - India QA Grafana authenticated successfully with `GRAFANA_TOKEN_INDIA_QA`, returned Grafana 12.3.1, and queried `SMP_INDIA_CDH_QA`; the alert data side returned `price_inr_kwh = 10` for the POC query. Email delivery failed because Grafana SMTP was not configured.
 - Airflow's India QA configuration uses `mailhost.infrasys16.com:25` for SMTP, while Teams notifications use Microsoft Graph. Grafana and Airflow are separate Helm releases in the same namespace according to checked-in deployment design, not the same pod. The next operational check is whether Grafana's QA pod can reach the SMTP relay and what sender/TLS/auth rules apply.
+- September 14 standup says Grafana alerting worked through manual testing: a Grafana contact point was configured using the terminal email address, corporate email and SMS were triggered, a POC chart fired at a 10K threshold, and alerting reused the same namespace/configuration pattern as Airflow. The remaining operational step was a redeploy after Grafana reconfiguration, with Michael involved through Git.
+- The same standup records cobweb/freshness monitoring running every 15 minutes. A brute-force five-minute check and a more graceful real-time approach were discussed. A 1-point ticket had been raised at 12:59, the prior gaps bug was not visible in Grafana at the time of the meeting, and the team planned to keep monitoring.
 
 ## Open Questions
 
@@ -58,6 +60,8 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Which production orchestrator or allow-list is still triggering paused SMP DAGs, and which paused DAGs are manual/diagnostic versus obsolete.
 - UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay and sender configuration for `SCR-1244` alert delivery.
 - UNCERTAIN: Whether the checked-in separate-Helm-release deployment design matches the live India QA cluster layout.
+- UNCERTAIN: Whether the September 14 manual alerting success fully resolves the earlier Grafana SMTP-relay question or only proves one configured contact point.
+- UNCERTAIN: Whether the cobweb/freshness ticket should use five-minute polling, a real-time design, or a narrower monitor-only scope.
 
 ## Sources
 
@@ -85,5 +89,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+- `sources/meetings/2026-09-14-1415-granola-standup.md`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-09-15
