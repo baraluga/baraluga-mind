@@ -36,6 +36,9 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - Kiva is being industrialized from an ABSD-specific "talk to my data" chatbot into a platform service: DMS owns infrastructure, MCP servers, authentication, deployment, and scaling, while desk teams own agent skills, context, query logic, and desk-specific reasoning. The September 1 source says the Positron MCP server is live on Kubernetes at `dms-kiva-dev.ms.myng.com`, registered with the NG MCP registry, authenticated by Okta, and visible to Copilot with 13 tools discovered.
 - On September 2, Brian demonstrated a BIPO browser workflow through Record & Replay. Codex updated the existing `$bipo-clock-in-out` skill instead of creating a duplicate, adding the SSO login path, navigation to Clock In/Out, explicit Clock In versus Clock Out selection, verification through the History entry, and safeguards around duplicate punches and credentials.
 - The September 8 [[atlas-dashboard]] discussion chose a lean AI-assisted development model for a PO-built Dash app: project-specific `AGENTS.md`, focused automated checks, a single coding agent, independent review when needed, and human engineering consultation for sensitive boundaries. A standing PO/dev/QA/architect agent fleet was considered overkill for the initial Atlas scope.
+- September 15 Codex work created Brian's reusable `$user-story` skill so Jira and other backlog items use a consistent hybrid format: user goal, acceptance rules, and BDD scenarios where concrete examples clarify behavior.
+- September 15 Khiva repository inspection found `dev` acting as the real integration branch while `master` remained an initial scaffold/release branch. The review treated the branch count as weaker evidence than the disconnected default branch and a possible release-trigger gap where a workflow creates a tag from `master` but did not declare a tag-push trigger.
+- The September 15 weekly team meeting said QRM MCP definition was moving at chapter/task-force level, with Stefan leading chapter-level definition and Yannick co-leading the MCP task force. A separate MCP deployment update said 2 of 5 servers were deployed while broader Kiva/ATAS governance was still pending.
 
 ## Open Questions
 
@@ -53,6 +56,8 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether `Quiver` is the exact planned Kiva data-source MCP name.
 - UNCERTAIN: The BIPO recording ended before a post-click History update, so the capture did not prove the demonstrated Clock Out punch was recorded successfully.
 - UNCERTAIN: Whether Atlas becomes a reusable pattern for PO-owned internal dashboard apps or remains a one-off consulting setup.
+- UNCERTAIN: Whether the Khiva repository's release-trigger gap is intentional, already fixed outside the captured branch, or an actual workflow defect.
+- UNCERTAIN: Whether `ATAS` is the exact name of the centralized MCP creation platform mentioned in the September 15 team meeting.
 
 ## Sources
 
@@ -78,5 +83,8 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
+- `sources/meetings/2026-09-15-weekly-team-meeting.md`
+- `sources/meetings/2026-09-15-qrm-all.md`
+- `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
-Last Updated: 2026-09-09
+Last Updated: 2026-09-16

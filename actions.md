@@ -58,7 +58,23 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Continue Atlas Dash engineering guardrails after the initial test/CI/Ruff baseline, including Dash-specific standards, agent guidance, baseline audit, and deployment package readiness.
   - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/meetings/2026-09-15-1-1-bong.md`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+
+- [ ] Complete the Atlas production-readiness audit, document findings with remediation estimates, and share recommendations with the architecture committee.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-15-1-1-bong.md`
+
+- [ ] Share an Atlas audit update at the Technical Leads meeting on 2026-09-17.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-15-1-1-bong.md`
+
+- [ ] Set up an Atlas alignment call with Guido before proceeding to next steps after the audit.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-15-1-1-bong.md`
+
+- [ ] Simplify the Atlas handover and branch-based deployment documentation before merging `dm-898` to `main`.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
 - [ ] Review and release the shared `configure-engie-ca-bundle` action in `qrm-dms/sff-actions` if it should become part of the protected `v1` contract.
   - Context: [[sff-walnut-migration]]
@@ -71,6 +87,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Schedule the delayed UX/UI knowledge-sharing session.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
+
+- [ ] Volunteer or find a volunteer to choose the restaurant/menu for the team trip, then coordinate with purchasing.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-15-weekly-team-meeting.md`
+
+- [ ] Confirm the team contact who should manage ScienceDirect and Scopus access after the license expansion to 10 users.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-15-qrm-all.md`
 
 - [ ] Block November 16-20 for Fred and Christina's Philippines visit and avoid filing leave for those dates.
   - Context: [[team-operations]]
@@ -401,6 +425,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Review, commit, and promote the local `SCR-1260` Khavda implementation, then run live CDH/Athena/Grafana validation for the new dashboard and dataset stages.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+
+- [ ] Implement `SCR-1259` by publishing Khaba one-minute readings to the five new TSDB series alongside the existing 15-minute scraper, with no dashboard change.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+
+- [ ] Raise the Singapore scraper proxy/networking issue with IT/IS because the dev team cannot resolve the VPN/proxy routing directly.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-15-weekly-team-meeting.md`
 
 - [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
   - Context: [[smp-platform]]
@@ -790,9 +822,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
-- [ ] Wait for authorized Atlas DEV DAC/INTACT credentials, CDH project URI, and role ARN to be configured directly in GitHub before testing credential retrieval or deployment.
+- [ ] Wait for Francois's real Atlas production Intact service-client ID/secret and production runtime target values before completing PROD CDH binding and first PROD deployment.
   - Context: [[atlas-dashboard]]
-  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+
+- [ ] Wait for the MCP governance and Kiva stakeholder sync update before deciding the centralized MCP platform ownership path.
+  - Context: [[ai-assisted-engineering]]
+  - Source: `sources/meetings/2026-09-15-weekly-team-meeting.md`
 
 - [ ] Wait for Nilo or Walnut support to confirm whether large GAMS installer downloads incur extra Artifactory storage or transfer charges.
   - Context: [[sff-walnut-migration]]
@@ -808,13 +844,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 
-- [ ] Wait for Adrien and Mateo to confirm the `SCR-1259` KHABA freshness semantics: whether 09:15 means the 09:15-09:29 average, the block ending at 09:15, or an individual reading, and whether five-minute polling is sufficient.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
-
 - [ ] Wait for Darwin and Manikaran source timestamp/unit semantics before enabling `SCR-1260` comparison analytics.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
+
+- [ ] Wait for Mateo's Darwin API walkthrough before implementing `SCR-1261`, especially authentication, parameter identifiers, units, timestamp semantics, update frequency, and missed-reading behavior.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
 - [ ] Wait for François to validate `SCR-1237` and `SCR-1238`, including POA/CABA generation values and the India IEX active-power panel in QA.
   - Context: [[smp-platform]]
@@ -1198,6 +1234,16 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### AI Assisted Engineering
+
+- [x] Wait for authorized Atlas DEV DAC/INTACT credentials, CDH project URI, and role ARN to be configured directly in GitHub before testing credential retrieval or deployment.
+  - Closure: September 15 Codex evidence says Atlas DEV's CDH client binding was saved, service credentials were verified, and GitHub Actions deployed successfully with live ECS, ALB, health, and dashboard-login checks.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+
+- [x] Wait for Adrien and Mateo to confirm the `SCR-1259` KHABA freshness semantics.
+  - Closure: Mateo clarified that the existing 15-minute scraper and dashboard should remain, the new one-minute datasets should be published separately for operational needs, no new dashboard panel is needed, and Brian confirmed the cadence expectation as source-limited "as fast as possible."
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
 - [x] Wait for Francois to commit, push, and share the Atlas repository link before Brian starts the Dash standards/audit work.
   - Closure: The September 9-10 Codex captures show Atlas work proceeding in `qrm-dms/atlas-dash-frontend`, including test/CI/Ruff guardrails and `dm-898` branch work.

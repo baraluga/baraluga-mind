@@ -21,14 +21,19 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - The `ubuntu` runner can run Atlas diagnostics and reach internal resources. DAC package index access, DAC-Tools installation, and DEV dashboard health eventually passed from the runner.
 - The DEV dashboard initially failed TLS verification because the server did not supply two intermediate certificates. The existing `install-engie-ca` action installed the ENGIE root correctly, but the runner also needed a bundle containing `GSES Intermediate CA 1` and `GEM HQ Issuing CA1`.
 - The temporary Atlas-specific certificate bundle was replaced by a shared `qrm-dms/sff-actions` action, `configure-engie-ca-bundle`, pinned from Atlas to exact commit `7c4c73c` through Atlas commit `9d236e9`. Shared CI and Atlas diagnostic/CI all passed. The shared action had not been released through protected `v1` at the end of the capture.
-- Deployment remains blocked on authorized DEV DAC/INTACT credentials, CDH project URI, and role ARN being configured directly in GitHub, plus a reproducible deployment package/data path. No deployment occurred in the captured work.
+- September 15 Codex work established the Intact/CDH binding model for Atlas deployment: create an Intact service application, subscribe it to `api.cdh`, then add the service application's client ID to the CDH project tag `gem_okta_client_id`. Atlas DEV initially had no such tag, while the working SMP comparison project did.
+- Atlas DEV end-to-end deployment was proven through GitHub Actions after the CDH client binding and GitHub secrets/variables were configured. The captured evidence says service credentials were verified, 68 tests passed, live workbooks were preserved and smoke-tested, ECS rollout and ALB targets were healthy, and the dashboard loaded after authenticated Okta login. The recorded green run was `https://github.com/qrm-dms/atlas-dash-frontend/actions/runs/34951067529`.
+- PROD remains incomplete because its real Intact service-client ID/secret and runtime target values were not available. The CDH trust and policies were observed as ready, but the GitHub PROD service-client ID still used a placeholder in the capture.
+- Brian and Francois agreed that Atlas continuous deployment should run only from `dev` and `prod` branches. `main` is the development branch, while pushes to `dev` or `prod` are release requests for the matching environment; pull requests and other branches validate without deployment.
+- A September 15 handover audit found that the repository foundation was sufficient for ordinary fixes and feature work, but the contributor documentation still needed simplification around current deployment behavior and platform-specific setup commands before handoff.
 
 ## Open Questions
 
 - UNCERTAIN: Whether S3 via Digital Acceleration tooling is the final production deployment path or only the current draft deployment path.
 - UNCERTAIN: Which users, data sensitivity level, and operational decisions define the exact approval bar for Atlas.
-- UNCERTAIN: Which DEV DAC/INTACT client, CDH project URI, and role ARN should be used for the first non-production Atlas deployment proof.
 - UNCERTAIN: Whether `configure-engie-ca-bundle` should be promoted into the protected `sff-actions@v1` contract or remain pinned by SHA while it matures.
+- UNCERTAIN: Which real Intact PROD service-client ID/secret and runtime target values Francois will provide for the first production Atlas deployment.
+- UNCERTAIN: Whether the September 15 handover-documentation cleanup has been fully committed and merged into the eventual `main` handoff branch.
 
 ## Sources
 
@@ -36,5 +41,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-09-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+- `sources/meetings/2026-09-15-1-1-bong.md`
+- `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-09-16

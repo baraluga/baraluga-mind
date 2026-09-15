@@ -98,6 +98,10 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - A November 2026 Philippines trip is planned for three weeks, including training sessions. Training priorities mentioned Kubernetes upskilling, possible Microsoft Copilot Studio training at about EUR 1,300 for 3-4 days, and Friday-morning Explorer sessions for some team members.
 - The September 2 daily standup announced AI Ventures training registration open until 2026-09-15. The captured shape is 12 sessions every other Friday starting in October, with beginner and advanced levels.
 - September 2 Codex consultation recommended Scrumban for SMP rather than strict Scrum or pure Kanban. The reasoning was that SMP still benefits from a two-week stakeholder/demo/budget cadence, but delivery is dominated by external blockers, variable support demand, changing priorities, and independently releasable work. The suggested trial uses continuous pull, explicit WIP limits, visible `Waiting` state, service classes, and cycle-time/blocked-time metrics instead of velocity as the primary signal.
+- The September 15 weekly team meeting recorded operational reminders: leave carry-over is capped at 5 days and valid only until June of the following year; bonus details were still pending, with at least one extra bonus expected around the 30th; a new project was kicking off the following week with Miss Reina, Miss Joy, JB, Florine, and Brian; and team-trip restaurant/menu volunteers were still needed.
+- The September 15 QRM All meeting said the SharePoint for data and models was live, ScienceDirect and Scopus licenses had expanded to 10 with one access contact expected per team, the onboarding Confluence page led by FX was pending review, and chapter objectives had been finalized into member/core-team/chapter-lead tiers.
+- The same QRM All meeting reported a EUR 7.65M commercial pipeline, a EUR 1.52M gap to objective, and EUR 2.2M in sales pipeline. Newly signed or continuing work included Best optimization support in the US, Atlas continuation for Bertrand Fauchet's portfolio team, Onset Energy Platform, and Besalgo platform phase 2.
+- QRM All also captured hackathon follow-through: 40+ participants across Philippines and Europe innovation hubs, 12 topics, and 90%+ ROTI. Durable next-hackathon lessons were to add sponsor pitches, hold sponsor/team briefings before the event, provide flat-file data to avoid access issues, use a more interactive sponsor-present debrief, and consider targeted domain sessions alongside the main event.
 
 ## Open Questions
 
@@ -132,6 +136,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: What the replacement time-tracking application is called after the Philippines team moved away from Tempo on 2026-09-01.
 - UNCERTAIN: Whether "AI Ventures" is the exact training program name and whether registration creates any commitment beyond attendance.
 - UNCERTAIN: Whether SMP stakeholders want to formalize the Scrumban operating model or treat it only as Brian's working recommendation.
+- UNCERTAIN: Whether `Run.io`, `Promethee`, `FX`, `Best optimization`, `Onset Energy Platform`, and `Besalgo` are exact names from the September 15 QRM All source.
+- UNCERTAIN: Whether `Kaseb`, `Massimi Lisa`, `Rest Hydro`, and the people names in the QRM All people-news section are exact spellings.
 
 ## Sources
 
@@ -186,5 +192,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-09-02-daily-standup.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+- `sources/meetings/2026-09-15-weekly-team-meeting.md`
+- `sources/meetings/2026-09-15-qrm-all.md`
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-16

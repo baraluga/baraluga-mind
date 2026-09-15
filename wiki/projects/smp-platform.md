@@ -173,6 +173,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - September 14 Codex work created `SCR-1259` for Adrien's KHABA freshness request as an SMP-India story estimated at 2 points. The implementation review found the current KHABA code averages minute readings into 15-minute blocks and labels the block by its start time, so a value labelled 09:15 currently means 09:15-09:29. The July 30 Mateo discussion confirms 15-minute averaging, but not start-label versus end-label semantics. The proposed stakeholder message asks Adrien whether five-minute polling is enough and asks Mateo to confirm the timestamp convention.
 - The same September 14 work created `SCR-1260` for adding Khavda generation and Manikaran forecasts to Adrien's R&F assets dashboard, with an aggressive 2-point estimate and safe 3-point estimate. The delegated implementation added a new Khavda TSDB-to-CDH path, `india_khavda_generation` CDH stages, a Grafana dashboard row with six Khavda panels, documentation, and tests, but it remained local and uncommitted. Analytics stayed disabled pending confirmation of Darwin and forecast timestamp/unit semantics; no live CDH, Athena, Grafana, or source-semantics validation was performed.
 - The September 14 standup records continuing India/Singapore proxy work: VPN was raised as an access method if a scraper is used, no India scraper exists yet, Singapore has a tagging solution, Adrian should be looped in, and Singapore IT or Indian IT may need to handle the proxy solution within SMP. This reinforces the existing Grid India access blocker rather than resolving it.
+- The September 15 weekly team meeting records a Singapore scraper access issue tied to proxy configuration. The proxy is meant to provide a Singapore exit node, but traffic was observed as exiting from Ireland/US rather than Asia; India was suggested as the next candidate to test, and IT/IS should handle the networking/proxy resolution rather than the dev team.
+- The same weekly meeting says 2 of 5 MCP servers had been deployed and the third was in progress. SSH/IT access was blocked through the same ticket as Joyce, SSO access was still needed, and governance remained unsettled: DMS cannot own MCPs under the captured global Kiva direction, while ATAS was described as moving toward a centralized MCP creation platform co-owned with the UK across roughly 4-5 platforms.
+- September 15 Codex work re-scoped `SCR-1259`: Mateo clarified that the existing 15-minute Khaba scraper, TSDB output, and dashboard panel should remain unchanged. The new work is a parallel one-minute TSDB publication path for operational needs, with no new dashboard panel and delivery as fast as source/file availability allows.
+- Mateo supplied five new one-minute Khaba TSDB series IDs: `b2400835-9bf3-5bfd-b31c-7ee08849f0a8` for Active Power average MFM-OUT, `be54b3cd-0331-5ce5-9662-e70332ab9d21` for GHI_W, `5ba7c4c3-3747-52e9-8713-0d276bb9453d` for Module SurfaceTemperature, `7f61e45f-1745-5cd4-873e-2f53f39f1300` for AmbientTemperature, and `ea31f916-a494-5e64-b9a8-bfa9b0a33b18` for tilted irradiance. The ticket estimate was updated to 2 points because both 15-minute and one-minute paths must be preserved and regression-tested.
+- The same Codex work created `SCR-1261` for Tuticorin live-data ingestion through the Darwin API, estimated at 3 points pending the API walkthrough. The target realtime parameters are wind speed in m/s, wind direction in degrees, and generation in MW; Mateo planned to create the corresponding TSDB entries after the walkthrough.
 
 ## Open Questions
 
@@ -238,10 +243,12 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Belarial` is the exact bilateral-contract data name or a transcript artifact.
 - UNCERTAIN: Whether `Borzilla` is the exact scraper/source name mentioned for Portugal and Spain, or a transcript artifact.
 - UNCERTAIN: Whether the Grid India site allows report-list and file downloads from India once the top-level page loads.
-- UNCERTAIN: For `SCR-1259`, whether Adrien's "09:15 value by 09:30" means the 09:15-09:29 average, the block ending at 09:15, or an individual 09:15 reading.
-- UNCERTAIN: Whether five-minute KHABA polling is enough for Adrien if the strict 09:30 visibility target cannot be guaranteed from source availability alone.
 - UNCERTAIN: For `SCR-1260`, whether Darwin actual generation is interval-average power and whether Darwin plus both Manikaran forecasts use timestamp conventions compatible with the proposed duration-weighted comparison.
 - UNCERTAIN: Whether the local `SCR-1260` implementation has since been committed, promoted, registered in CDH, and validated against live TSDB/Athena/Grafana.
+- UNCERTAIN: Whether the one-minute Khaba "tilted irradiance" series maps exactly to the existing `POA` source column.
+- UNCERTAIN: Whether `SCR-1261` Darwin API access supports the needed authentication model, stable asset/parameter identifiers, timestamp semantics, update frequency, backfill, and correction behavior.
+- UNCERTAIN: Which IT/IS group owns the Singapore proxy routing issue, and whether India testing is intended to validate the same access pattern or a separate one.
+- UNCERTAIN: Whether `ATAS` is the exact system/team name for the centralized MCP creation platform.
 
 ## Sources
 
@@ -326,5 +333,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-14-codex-conversations.txt`
 - `sources/meetings/2026-09-14-1415-granola-standup.md`
+- `sources/meetings/2026-09-15-weekly-team-meeting.md`
+- `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 
-Last Updated: 2026-09-15
+Last Updated: 2026-09-16
