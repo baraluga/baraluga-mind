@@ -102,6 +102,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The September 15 QRM All meeting said the SharePoint for data and models was live, ScienceDirect and Scopus licenses had expanded to 10 with one access contact expected per team, the onboarding Confluence page led by FX was pending review, and chapter objectives had been finalized into member/core-team/chapter-lead tiers.
 - The same QRM All meeting reported a EUR 7.65M commercial pipeline, a EUR 1.52M gap to objective, and EUR 2.2M in sales pipeline. Newly signed or continuing work included Best optimization support in the US, Atlas continuation for Bertrand Fauchet's portfolio team, Onset Energy Platform, and Besalgo platform phase 2.
 - QRM All also captured hackathon follow-through: 40+ participants across Philippines and Europe innovation hubs, 12 topics, and 90%+ ROTI. Durable next-hackathon lessons were to add sponsor pitches, hold sponsor/team briefings before the event, provide flat-file data to avoid access issues, use a more interactive sponsor-present debrief, and consider targeted domain sessions alongside the main event.
+- The September 17 Tech Lead Roundtable reiterated certificate-handling policy: private keys must not be shared in Jira, repositories, or email; Vault should be used for secure file transfer. A longer-term internal certificate process with Pierre should be proposed.
+- The roundtable also said the architecture committee validates security design and best practices, not only alert hygiene. Tech lead roles and responsibilities had been published on Confluence, a new Sentry server was set up with alerting configuration still in progress, and IT requests should use the dedicated IT request channel by tagging IT admin rather than DMS One chat.
 
 ## Open Questions
 
@@ -138,6 +140,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether SMP stakeholders want to formalize the Scrumban operating model or treat it only as Brian's working recommendation.
 - UNCERTAIN: Whether `Run.io`, `Promethee`, `FX`, `Best optimization`, `Onset Energy Platform`, and `Besalgo` are exact names from the September 15 QRM All source.
 - UNCERTAIN: Whether `Kaseb`, `Massimi Lisa`, `Rest Hydro`, and the people names in the QRM All people-news section are exact spellings.
+- UNCERTAIN: Whether `Vault`, `Pierre`, and the exact Sentry rollout ownership from the September 17 roundtable need more precise internal references.
 
 ## Sources
 
@@ -194,5 +197,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/meetings/2026-09-15-qrm-all.md`
+- `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 
-Last Updated: 2026-09-16
+Last Updated: 2026-09-18

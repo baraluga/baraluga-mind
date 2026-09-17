@@ -26,6 +26,11 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - PROD remains incomplete because its real Intact service-client ID/secret and runtime target values were not available. The CDH trust and policies were observed as ready, but the GitHub PROD service-client ID still used a placeholder in the capture.
 - Brian and Francois agreed that Atlas continuous deployment should run only from `dev` and `prod` branches. `main` is the development branch, while pushes to `dev` or `prod` are release requests for the matching environment; pull requests and other branches validate without deployment.
 - A September 15 handover audit found that the repository foundation was sufficient for ordinary fixes and feature work, but the contributor documentation still needed simplification around current deployment behavior and platform-specific setup commands before handoff.
+- On September 17, the Atlas release design shifted from branch-triggered deployment to a manual GitHub Actions workflow. The workflow asks for target environment and release type, with data refreshes using the code already deployed in that environment. This keeps code release and data refresh explicit while avoiding dummy commits for workbook-only changes.
+- Atlas data refresh now expects monthly paired CDH stages from `masterupstream` and `masterdownstream`; the app needs upstream for generation/capacity and downstream for sales/PPA figures. Francois confirmed he uploads downstream separately for the same month.
+- The initial GitHub runner access probe for the Atlas service credentials passed, and the release preflight correctly stopped before deployment while old daily stages still existed. Later work added a default dry-run mode through a `Deploy after validation` checkbox and a GitHub run summary that reports collected stages, row counts, validation, smoke checks, and outcome without exposing raw business data.
+- `dm-898` was merged and pushed to `main` on September 17 with CI passing, making **Deploy Atlas -> Run workflow** visible. No deployment was triggered during the merge; Francois still needed to clean CDH stages before trying `DEV -> data-only`.
+- The September 17 Tech Lead Roundtable framed Brian's Atlas role as consultation rather than feature ownership. DMS is not taking on Dash skills or ongoing deployment accountability; the near-term objective is to make Francois more autonomous through CI/CD enablement and repository guardrails.
 
 ## Open Questions
 
@@ -33,7 +38,8 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - UNCERTAIN: Which users, data sensitivity level, and operational decisions define the exact approval bar for Atlas.
 - UNCERTAIN: Whether `configure-engie-ca-bundle` should be promoted into the protected `sff-actions@v1` contract or remain pinned by SHA while it matures.
 - UNCERTAIN: Which real Intact PROD service-client ID/secret and runtime target values Francois will provide for the first production Atlas deployment.
-- UNCERTAIN: Whether the September 15 handover-documentation cleanup has been fully committed and merged into the eventual `main` handoff branch.
+- UNCERTAIN: Whether Francois has completed CDH cleanup so only monthly paired upstream/downstream stages remain for DEV data-only validation.
+- UNCERTAIN: Whether the Dash Expert agent has been tested after the September 17 merge; Brian's API credits were exhausted at the Atlas checkpoint.
 
 ## Sources
 
@@ -43,5 +49,8 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/meetings/2026-09-15-1-1-bong.md`
 - `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+- `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`
+- `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+- `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
-Last Updated: 2026-09-16
+Last Updated: 2026-09-18

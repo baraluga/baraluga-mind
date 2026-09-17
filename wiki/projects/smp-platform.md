@@ -178,6 +178,13 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - September 15 Codex work re-scoped `SCR-1259`: Mateo clarified that the existing 15-minute Khaba scraper, TSDB output, and dashboard panel should remain unchanged. The new work is a parallel one-minute TSDB publication path for operational needs, with no new dashboard panel and delivery as fast as source/file availability allows.
 - Mateo supplied five new one-minute Khaba TSDB series IDs: `b2400835-9bf3-5bfd-b31c-7ee08849f0a8` for Active Power average MFM-OUT, `be54b3cd-0331-5ce5-9662-e70332ab9d21` for GHI_W, `5ba7c4c3-3747-52e9-8713-0d276bb9453d` for Module SurfaceTemperature, `7f61e45f-1745-5cd4-873e-2f53f39f1300` for AmbientTemperature, and `ea31f916-a494-5e64-b9a8-bfa9b0a33b18` for tilted irradiance. The ticket estimate was updated to 2 points because both 15-minute and one-minute paths must be preserved and regression-tested.
 - The same Codex work created `SCR-1261` for Tuticorin live-data ingestion through the Darwin API, estimated at 3 points pending the API walkthrough. The target realtime parameters are wind speed in m/s, wind direction in degrees, and generation in MW; Mateo planned to create the corresponding TSDB entries after the walkthrough.
+- September 17 Codex work implemented `SCR-1259` as a parallel one-minute Khaba TSDB publication path and promoted it to QA at commit `c5dfdd1`. The existing 15-minute DAGs and Grafana panel were intended to continue unchanged. The implementation added new DAG targets named `india_khaba_generation_minute` and `india_khaba_generation_minute_reconciliation`, with stakeholder validation still the next step.
+- The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
+- The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
+- For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
+- Omniland is moving Docker image publication to ECR through an ADO-to-GitHub pipeline, EventBridge, Step Functions, and OmniRun API notification. Its auth flow is shifting to a backend-for-frontend pattern after a pentest found browser-stored access tokens; the Lambda authorizer will accept both session cookies and machine-to-machine Okta tokens.
+- Onset Energy received internal green light; kickoff and onboarding were expected the week after the roundtable. The captured stack is Angular, FastAPI, CDK, full serverless, and agentic integration with a DNV third party.
+- Kiba MCP should not store data; access keys are provided by the user at runtime. Post-deploy work adds auditing and rate limiting, and the team is aligning with Yatin Badra's SEM AI Engineering team on common MCP architecture.
 
 ## Open Questions
 
@@ -249,6 +256,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `SCR-1261` Darwin API access supports the needed authentication model, stable asset/parameter identifiers, timestamp semantics, update frequency, backfill, and correction behavior.
 - UNCERTAIN: Which IT/IS group owns the Singapore proxy routing issue, and whether India testing is intended to validate the same access pattern or a separate one.
 - UNCERTAIN: Whether `ATAS` is the exact system/team name for the centralized MCP creation platform.
+- UNCERTAIN: Whether `Extruder`, `The Click`, `DayClick`, `declick.myengi.com`, `Nika`, and `Reina` are exact names from the September 17 roundtable source.
+- UNCERTAIN: Whether the new Khaba one-minute QA deployment has passed live TSDB, Airflow, and stakeholder validation after promotion.
 
 ## Sources
 
@@ -335,5 +344,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-14-1415-granola-standup.md`
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+- `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+- `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
-Last Updated: 2026-09-16
+Last Updated: 2026-09-18

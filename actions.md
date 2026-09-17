@@ -56,25 +56,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 
-- [ ] Continue Atlas Dash engineering guardrails after the initial test/CI/Ruff baseline, including Dash-specific standards, agent guidance, baseline audit, and deployment package readiness.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/meetings/2026-09-15-1-1-bong.md`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`
-
-- [ ] Complete the Atlas production-readiness audit, document findings with remediation estimates, and share recommendations with the architecture committee.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-15-1-1-bong.md`
-
-- [ ] Share an Atlas audit update at the Technical Leads meeting on 2026-09-17.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/meetings/2026-09-15-1-1-bong.md`
-
 - [ ] Set up an Atlas alignment call with Guido before proceeding to next steps after the audit.
   - Context: [[atlas-dashboard]]
   - Source: `sources/meetings/2026-09-15-1-1-bong.md`
 
-- [ ] Simplify the Atlas handover and branch-based deployment documentation before merging `dm-898` to `main`.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+- [ ] Evaluate Better Codex as a cross-project Kanban board for active Codex tasks, checking existing-task attachment, exact task reopening, and workflow fit.
+  - Context: [[ai-assisted-engineering]]
+  - Source: `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
 - [ ] Review and release the shared `configure-engie-ca-bundle` action in `qrm-dms/sff-actions` if it should become part of the protected `v1` contract.
   - Context: [[sff-walnut-migration]]
@@ -426,9 +414,29 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
 
-- [ ] Implement `SCR-1259` by publishing Khaba one-minute readings to the five new TSDB series alongside the existing 15-minute scraper, with no dashboard change.
+- [ ] Validate `SCR-1259` in QA and move it through stakeholder validation for the new one-minute Khaba TSDB publication path.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+
+- [ ] Create a report for Lambdas that lack VPC binding across projects, including the no-prod non-compliant projects noted in the roundtable.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+
+- [ ] Nilo to resolve CrowdStrike proxy port 8080 access for GMR and Prosumer after checking the chat thread.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+
+- [ ] Request `declick.myengi.com` from NGIT and point it to the DayClick production load balancer with the DigiCert certificate setup.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+
+- [ ] Present Omniland's BFF session-based auth flow to the architecture committee.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+
+- [ ] Nilo to publish the Kubernetes security and governance PowerPoint covering security context, Kyverno policies, image labels, and cluster node sizing.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 
 - [ ] Raise the Singapore scraper proxy/networking issue with IT/IS because the dev team cannot resolve the VPN/proxy routing directly.
   - Context: [[smp-platform]]
@@ -824,7 +832,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Wait for Francois's real Atlas production Intact service-client ID/secret and production runtime target values before completing PROD CDH binding and first PROD deployment.
   - Context: [[atlas-dashboard]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`
+
+- [ ] Wait for Francois to clean Atlas CDH stages to monthly paired upstream/downstream datasets, then run DEV data-only dry run and deployment verification.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+
+- [ ] Wait for API credits to become available, then test the Atlas Dash Expert agent after the September 17 merge.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`
 
 - [ ] Wait for the MCP governance and Kiva stakeholder sync update before deciding the centralized MCP platform ownership path.
   - Context: [[ai-assisted-engineering]]
@@ -966,6 +982,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
 ### SMP Platform
+
+- [x] Implement `SCR-1259` by publishing Khaba one-minute readings to the five new TSDB series alongside the existing 15-minute scraper, with no dashboard change.
+  - Closure: September 17 Codex evidence records the one-minute implementation, regression test pass, QA promotion at `c5dfdd1`, and the existing 15-minute DAGs/Grafana panel remaining unchanged.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
 - [x] Attend the Mateo India ticket-detail call and capture source, access, and geolocation unknowns for the incoming India tickets.
   - Closure: The August 27 Mateo call set the priority order: IX POA/kappa dashboard first, `SCR-1229` next, and Grid India blocked until India-region access is clarified.
@@ -1234,6 +1255,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 
 ### AI Assisted Engineering
+
+- [x] Continue Atlas Dash engineering guardrails after the initial test/CI/Ruff baseline, including Dash-specific standards, agent guidance, baseline audit, and deployment package readiness.
+  - Closure: September 17 evidence shows the manual deployment workflow, dry-run default, stage summary, data refresh contract, docs, merge to `main`, and passing CI were completed for `dm-898`.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`; `sources/meetings/2026-09-15-1-1-bong.md`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+
+- [x] Complete the Atlas production-readiness audit, document findings with remediation estimates, and share recommendations with the architecture committee or tech-lead audience.
+  - Closure: The September 17 Tech Lead Roundtable and Codex deck work captured the consultation story, CD enablement, proven DEV path, ownership boundary, and next steps.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/meetings/2026-09-15-1-1-bong.md`; `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+
+- [x] Simplify the Atlas handover and branch-based deployment documentation before merging `dm-898` to `main`.
+  - Closure: Documentation was updated for manual releases, data-only refresh, stage summaries, dry-run limits, and `dm-898` was merged to `main` with GitHub CI passing.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
 - [x] Wait for authorized Atlas DEV DAC/INTACT credentials, CDH project URI, and role ARN to be configured directly in GitHub before testing credential retrieval or deployment.
   - Closure: September 15 Codex evidence says Atlas DEV's CDH client binding was saved, service credentials were verified, and GitHub Actions deployed successfully with live ECS, ALB, health, and dashboard-login checks.

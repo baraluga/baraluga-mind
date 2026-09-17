@@ -62,6 +62,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - September 10 `SCR-1244` work prepared a QA-only Grafana alert POC for the India `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard. The chosen first alert was RTM MCP above INR 8/kWh, using the `SMP_INDIA_CDH_QA` Athena datasource and HTTP API setup rather than dashboard JSON import.
 - The POC created a dedicated `SCR-1244 POC` folder and `SCR-1244 QA email` contact point for `brian.peralta@engie.com` without enabling the alert. A live QA query returned `price_inr_kwh = 10`, so Grafana-to-Athena access and the threshold query worked.
 - Notification delivery remained blocked because Grafana QA reported SMTP was not configured. Checked-in Airflow QA config uses `mailhost.infrasys16.com:25`, so the recommended path is to test whether Grafana's QA pod can reach that relay and then configure SMTP, rather than introducing a separate Teams workflow first.
+- September 17 `SCR-1259` work deliberately avoided changing the existing Khaba Grafana panel. The one-minute Khaba readings are being published for operational use alongside the current 15-minute scraper and dashboard behavior.
 
 ## Open Questions
 
@@ -88,6 +89,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether the sprint-review screenshots were later reflected back into checked-in Grafana/dashboard source or only added to the SharePoint deck.
 - UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay `mailhost.infrasys16.com:25`, and which sender/TLS/auth requirements apply.
 - UNCERTAIN: Whether `SCR-1244` should prove email notification only, or later add a Teams contact point after the threshold/firing/recovery behavior is accepted.
+- UNCERTAIN: Whether the one-minute Khaba TSDB series should later receive dashboard panels or remain operational-only as currently scoped.
 
 ## Sources
 
@@ -117,5 +119,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-09-18

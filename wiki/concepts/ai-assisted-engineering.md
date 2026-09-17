@@ -39,6 +39,9 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - September 15 Codex work created Brian's reusable `$user-story` skill so Jira and other backlog items use a consistent hybrid format: user goal, acceptance rules, and BDD scenarios where concrete examples clarify behavior.
 - September 15 Khiva repository inspection found `dev` acting as the real integration branch while `master` remained an initial scaffold/release branch. The review treated the branch count as weaker evidence than the disconnected default branch and a possible release-trigger gap where a workflow creates a tag from `master` but did not declare a tag-push trigger.
 - The September 15 weekly team meeting said QRM MCP definition was moving at chapter/task-force level, with Stefan leading chapter-level definition and Yannick co-leading the MCP task force. A separate MCP deployment update said 2 of 5 servers were deployed while broader Kiva/ATAS governance was still pending.
+- On September 17, Brian asked for a cross-project Kanban-style view of active Codex chats because most of his work runs through Codex. The research recommendation was to trial Better Codex first, with native sidebar sections as a lower-friction fallback and a custom board as the build option if third-party tools cannot preserve links back to existing Codex tasks.
+- The same day, Brian created a `$parallel-when-useful` skill. Its rule is explicit permission to consider subagents only when independent, bounded work justifies coordination cost; using zero subagents remains a valid outcome.
+- Atlas work on September 17 applied the lean AI-assisted pattern: repository instructions, hooks, CI, manual dry-run deployment, and optional Dash Expert support, while avoiding a full SDD agent fleet for Francois's current solo-developer workflow.
 
 ## Open Questions
 
@@ -58,6 +61,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether Atlas becomes a reusable pattern for PO-owned internal dashboard apps or remains a one-off consulting setup.
 - UNCERTAIN: Whether the Khiva repository's release-trigger gap is intentional, already fixed outside the captured branch, or an actual workflow defect.
 - UNCERTAIN: Whether `ATAS` is the exact name of the centralized MCP creation platform mentioned in the September 15 team meeting.
+- UNCERTAIN: Whether Better Codex or another board tool actually fits Brian's current Codex task workflow after local compatibility testing.
 
 ## Sources
 
@@ -86,5 +90,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/meetings/2026-09-15-qrm-all.md`
 - `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 
-Last Updated: 2026-09-16
+Last Updated: 2026-09-18
