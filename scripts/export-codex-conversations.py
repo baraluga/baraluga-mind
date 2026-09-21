@@ -46,6 +46,7 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
         session_id = None
         cwd = None
         started = None
+        thread_source = None
         messages: list[dict[str, str | None]] = []
 
         with path.open() as handle:
@@ -60,6 +61,7 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
                     session_id = payload.get("id") or payload.get("session_id") or session_id
                     cwd = payload.get("cwd") or cwd
                     started = payload.get("timestamp") or started
+                    thread_source = payload.get("thread_source") or thread_source
                     continue
 
                 if event.get("type") != "response_item":
@@ -97,6 +99,7 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
                     "started": started,
                     "updated": updated.get(session_id or ""),
                     "cwd": cwd,
+                    "thread_source": thread_source,
                     "messages": messages,
                 }
             )
@@ -106,6 +109,9 @@ def extract_sessions(codex_home: Path, capture_date: str) -> list[dict]:
 
 def is_scheduled_automation(session: dict) -> bool:
     """Return whether a session is a Codex scheduled-automation run."""
+    if session.get("thread_source") == "automation":
+        return True
+
     user_text = "\n".join(
         str(message.get("text") or "")
         for message in session.get("messages") or []
