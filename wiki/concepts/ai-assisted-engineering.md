@@ -42,6 +42,8 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - On September 17, Brian asked for a cross-project Kanban-style view of active Codex chats because most of his work runs through Codex. The research recommendation was to trial Better Codex first, with native sidebar sections as a lower-friction fallback and a custom board as the build option if third-party tools cannot preserve links back to existing Codex tasks.
 - The same day, Brian created a `$parallel-when-useful` skill. Its rule is explicit permission to consider subagents only when independent, bounded work justifies coordination cost; using zero subagents remains a valid outcome.
 - Atlas work on September 17 applied the lean AI-assisted pattern: repository instructions, hooks, CI, manual dry-run deployment, and optional Dash Expert support, while avoiding a full SDD agent fleet for Francois's current solo-developer workflow.
+- September 18 Atlas work created Brian's reusable `$estimate-project-time` skill for stakeholder effort questions. The method uses Codex logs and Git evidence, treats collaboration-session time as the headline, deduplicates parallel work, reports recorded runtime and 15/30/60-minute cutoff sensitivity, and converts hours to person-days with an explicit eight-hour-day assumption.
+- The September 18 AMA GenAI session captured leadership's current stance: AI decouples output production from junior-skill formation, but there is no clear timeline or role model yet for structural changes. Dimitri committed to direct communication before structural announcements, using productivity gains for backlog/additional tasks before headcount reductions, and preserving junior career paths. Mental-health concerns from AI-driven purpose loss, isolation, and responsibility creep were acknowledged, with Employee Assistance Program resources cited.
 
 ## Open Questions
 
@@ -62,6 +64,8 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether the Khiva repository's release-trigger gap is intentional, already fixed outside the captured branch, or an actual workflow defect.
 - UNCERTAIN: Whether `ATAS` is the exact name of the centralized MCP creation platform mentioned in the September 15 team meeting.
 - UNCERTAIN: Whether Better Codex or another board tool actually fits Brian's current Codex task workflow after local compatibility testing.
+- UNCERTAIN: Whether the `$estimate-project-time` method should become the default evidence standard for project-effort questions beyond Atlas.
+- UNCERTAIN: What formal change-management or reskilling program will follow the GenAI job-family impact mapping.
 
 ## Sources
 
@@ -91,5 +95,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/meetings/2026-09-15-qrm-all.md`
 - `sources/codex-conversations/2026-09-15-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-18-codex-conversations.txt`
+- `sources/meetings/2026-09-18-1500-granola-ama-genai.md`
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-19

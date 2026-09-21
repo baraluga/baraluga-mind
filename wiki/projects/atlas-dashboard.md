@@ -31,6 +31,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - The initial GitHub runner access probe for the Atlas service credentials passed, and the release preflight correctly stopped before deployment while old daily stages still existed. Later work added a default dry-run mode through a `Deploy after validation` checkbox and a GitHub run summary that reports collected stages, row counts, validation, smoke checks, and outcome without exposing raw business data.
 - `dm-898` was merged and pushed to `main` on September 17 with CI passing, making **Deploy Atlas -> Run workflow** visible. No deployment was triggered during the merge; Francois still needed to clean CDH stages before trying `DEV -> data-only`.
 - The September 17 Tech Lead Roundtable framed Brian's Atlas role as consultation rather than feature ownership. DMS is not taking on Dash skills or ongoing deployment accountability; the near-term objective is to make Francois more autonomous through CI/CD enablement and repository guardrails.
+- September 18 Codex evidence produced an objective Atlas effort estimate for stakeholder questions: approximately 20 hours, or 2.5 person-days at eight hours per day, based on recorded Codex collaboration sessions from September 8-18 with a 30-minute inactivity cutoff. Recorded runtime was about 7.5 hours, while 15/30/60-minute session cutoffs gave roughly 14.9/19.7/24.5 hours; the estimate excludes meetings, offline work, conversations outside local logs, and Francois's development effort.
 
 ## Open Questions
 
@@ -40,6 +41,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - UNCERTAIN: Which real Intact PROD service-client ID/secret and runtime target values Francois will provide for the first production Atlas deployment.
 - UNCERTAIN: Whether Francois has completed CDH cleanup so only monthly paired upstream/downstream stages remain for DEV data-only validation.
 - UNCERTAIN: Whether the Dash Expert agent has been tested after the September 17 merge; Brian's API credits were exhausted at the Atlas checkpoint.
+- UNCERTAIN: Whether future stakeholder estimates should keep using the 30-minute collaboration-session cutoff as the headline, or report only recorded runtime for narrower auditability.
 
 ## Sources
 
@@ -52,5 +54,6 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-19

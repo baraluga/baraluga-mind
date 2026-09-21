@@ -40,6 +40,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`
 
+- [ ] Finalize the official SMP handover if the September 18 final-feedback target did not close.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
+
+- [ ] Raise Rancher access for Abram's Piri production-monitoring request.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
+
 - [ ] If using remote-access or admin tools in the Singapore environment, declare and justify them because WinSCP was classified as `Non Legit`.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`
@@ -400,7 +408,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Ask Adrien whether India IEX bid-stack TSDB publishing should use existing or stakeholder-provided series IDs, because SMP does not provision TSDB IDs unless explicitly asked.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
+  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 
 - [ ] Trigger and verify the India production RTM latest and historical Airflow DAGs after the source-backed TSDB replays, then confirm Athena/Grafana show the recovered RTM data.
   - Context: [[smp-platform]]
@@ -416,7 +424,23 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Validate `SCR-1259` in QA and move it through stakeholder validation for the new one-minute Khaba TSDB publication path.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-17-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`
+
+- [ ] Validate `SCR-1229` production bilateral-contract data through CDH format checks and spot-checked data points.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
+
+- [ ] Ask Mateo/Darwin to confirm `SCR-1261` entity and tag mappings, TSDB IDs, minute-level history/replay behavior, and whether Bong's Prometheus suggestion means an existing proven Darwin source or a destination change.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+
+- [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, then finalize and promote to production.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+
+- [ ] Investigate `SCR-1243` bid-stack missing blocks in Airflow/source history, including DAM/GDAM on 2026-09-17 00:45-01:30 IST and the later RTM gaps.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-21-codex-conversations.txt`
 
 - [ ] Create a report for Lambdas that lack VPC binding across projects, including the no-prod non-compliant projects noted in the roundtable.
   - Context: [[smp-platform]]
@@ -446,6 +470,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-04-daily-standup.md`
 
+- [ ] Align with Mateo on the Khaba/Kava production missing-file backoff strategy, including failure threshold and reconciliation behavior after delayed CSV recovery.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
+
 - [ ] Close `SCR-1239` after the Airflow Assets demo/validation, then discuss the Japan/AJKS asset-migration path when budget allows.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-09-1531-granola-smp-sprint-retro.md`; `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
@@ -460,11 +488,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Confirm the Signups production deployment with Alfred once the ICA prerequisite is clear.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`; `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 
 - [ ] Resolve the Signups node/availability-zone mismatch before production rollout.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-daily-standup.md`
+  - Source: `sources/meetings/2026-09-02-daily-standup.md`; `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 
 - [ ] Attach parquet files and metric source links to the `JIRA 31` ticket for India DAG validation.
   - Context: [[smp-platform]]
@@ -632,7 +660,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Pair with Joyce or Michael on `SCR-507` to automate SMP Docker image build and push to AWS ECR.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 
 - [ ] Define a Docker image rebuild and security-patching policy for SMP custom Airflow images.
   - Context: [[smp-platform]]
@@ -648,7 +676,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Revisit `SCR-1210` Jupyter DAG-authoring scope with Fred and Nilo/Milo, identify must-haves versus drops, and split it into implementable stories.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 
 - [ ] Remove paused production DAGs from automatic trigger/orchestrator configuration only after confirming owners, consumers, and stale queued-run handling.
   - Context: [[smp-alerting-and-ops]]
@@ -660,11 +688,15 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Coordinate the `SCR-1244` Grafana alert redeploy with Michael after the manual contact-point and threshold POC configuration.
   - Context: [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`
+  - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
 
 - [ ] Keep monitoring the Grafana gaps bug through cobweb freshness checks and decide whether the raised 1-point ticket should use five-minute polling or a real-time approach.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`
+
+- [ ] Test and finish ticket 544 black-box exporter implementation.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 
 - [ ] Run the `SCR-1256` production cleanup dry-run for India IEX schema-sample objects, verify the exact keys, and request explicit approval before any production `execute=true`.
   - Context: [[smp-platform]]
@@ -856,17 +888,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-08-06-1415-granola-daily-standup.md`
 
-- [ ] Wait for CDH/AWS governance to confirm whether SCP `p-w922chmk` intentionally blocks non-production access to production-owned CDH/S3 datasets.
+- [ ] Wait for CDH/AWS governance to confirm whether SCPs `p-w922chmk` / `p-p10um4ti` intentionally block non-production access to production-owned CDH/S3 datasets.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-03-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-03-codex-conversations.txt`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
 
 - [ ] Wait for Darwin and Manikaran source timestamp/unit semantics before enabling `SCR-1260` comparison analytics.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
 
-- [ ] Wait for Mateo's Darwin API walkthrough before implementing `SCR-1261`, especially authentication, parameter identifiers, units, timestamp semantics, update frequency, and missed-reading behavior.
+- [ ] Wait for Mateo/Darwin to provision Brian's exploratory Darwin API access and the SMP machine-to-machine Darwin application account with Tuticorin asset permissions.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
 
 - [ ] Wait for François to validate `SCR-1237` and `SCR-1238`, including POA/CABA generation values and the India IEX active-power panel in QA.
   - Context: [[smp-platform]]
@@ -1280,6 +1312,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: Mateo clarified that the existing 15-minute scraper and dashboard should remain, the new one-minute datasets should be published separately for operational needs, no new dashboard panel is needed, and Brian confirmed the cadence expectation as source-limited "as fast as possible."
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`; `sources/codex-conversations/2026-09-15-codex-conversations.txt`
+
+- [x] Wait for Mateo's Darwin API walkthrough before implementing `SCR-1261`.
+  - Closure: The September 18 Codex capture reviewed the Darwin meeting notes, Mateo's supplied PDFs/API docs/video/Postman collection, and Bruno personal-login attempt; remaining work is now tracked as API access provisioning and source-contract clarification.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 
 - [x] Wait for Francois to commit, push, and share the Atlas repository link before Brian starts the Dash standards/audit work.
   - Closure: The September 9-10 Codex captures show Atlas work proceeding in `qrm-dms/atlas-dash-frontend`, including test/CI/Ruff guardrails and `dm-898` branch work.

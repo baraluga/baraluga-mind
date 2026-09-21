@@ -104,6 +104,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - QRM All also captured hackathon follow-through: 40+ participants across Philippines and Europe innovation hubs, 12 topics, and 90%+ ROTI. Durable next-hackathon lessons were to add sponsor pitches, hold sponsor/team briefings before the event, provide flat-file data to avoid access issues, use a more interactive sponsor-present debrief, and consider targeted domain sessions alongside the main event.
 - The September 17 Tech Lead Roundtable reiterated certificate-handling policy: private keys must not be shared in Jira, repositories, or email; Vault should be used for secure file transfer. A longer-term internal certificate process with Pierre should be proposed.
 - The roundtable also said the architecture committee validates security design and best practices, not only alert hygiene. Tech lead roles and responsibilities had been published on Confluence, a new Sentry server was set up with alerting configuration still in progress, and IT requests should use the dedicated IT request channel by tagging IT admin rather than DMS One chat.
+- The September 18 daily standup moved Signups/Dolphy toward an urgent production-readiness window: production deployment was requested for September 19 or September 21-22 if simple, with October 9 as a main progress milestone. Signups stubbing was flagged as urgent, a longer-term domain-error/runbook fix was preferred over multiple patches, and the team noted that Key Vault was readable from inside the cluster if migration became necessary.
+- The same standup said Brian's official SMP handover was in final feedback, targeting completion on September 18 if all went well, and noted that an Abram/Piri production-monitoring request needed a Rancher access request.
 
 ## Open Questions
 
@@ -128,6 +130,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Centiment` is the exact migration name from the August 4 meeting source; it may be a transcript artifact.
 - UNCERTAIN: Whether `Rudy`, `Hook`, `Joyce`, `Nico`, and `Sezane` are exact spellings from the August 4 meeting source.
 - UNCERTAIN: Whether `Prométhée` is the preferred spelling for the timesheet system in durable notes; older sources spell it as `Promethe`.
+- UNCERTAIN: Whether the September 18 SMP handover actually finalized by end of day.
+- UNCERTAIN: Whether the Signups/Dolphy September production-readiness request became a quick production deployment, slipped to the following week, or moved to the October 9 milestone.
 - UNCERTAIN: Whether `Sesame` in the August 11 weekly notes is the same HR/development system previously captured as `Sezane Career Explorer`.
 - UNCERTAIN: Whether `Reina`, `Carlo`, `Pear`, and `Guido` are exact names from the August 11 weekly notes.
 - UNCERTAIN: Whether `FEDV` is the preferred durable acronym/name for the chapter, and which chapter taxonomy should be used in the standards repository.
@@ -198,5 +202,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/meetings/2026-09-15-qrm-all.md`
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
+- `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-19

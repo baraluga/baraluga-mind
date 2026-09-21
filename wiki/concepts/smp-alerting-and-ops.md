@@ -43,6 +43,10 @@ SMP operational discussions in late June and early July focused on production in
 - Airflow's India QA configuration uses `mailhost.infrasys16.com:25` for SMTP, while Teams notifications use Microsoft Graph. Grafana and Airflow are separate Helm releases in the same namespace according to checked-in deployment design, not the same pod. The next operational check is whether Grafana's QA pod can reach the SMTP relay and what sender/TLS/auth rules apply.
 - September 14 standup says Grafana alerting worked through manual testing: a Grafana contact point was configured using the terminal email address, corporate email and SMS were triggered, a POC chart fired at a 10K threshold, and alerting reused the same namespace/configuration pattern as Airflow. The remaining operational step was a redeploy after Grafana reconfiguration, with Michael involved through Git.
 - The same standup records cobweb/freshness monitoring running every 15 minutes. A brute-force five-minute check and a more graceful real-time approach were discussed. A 1-point ticket had been raised at 12:59, the prior gaps bug was not visible in Grafana at the time of the meeting, and the team planned to keep monitoring.
+- September 18 standup said Grafana native alerts were working in QA and were safe to push to production in the sprint. Alerts fire on both threshold breach and recovery, programmatically created alerts are read-only in the UI, and end-user-created alerts work normally. A Confluence page on end-user alert setup had been drafted.
+- The September 18 daily standup also put ticket 544, the black-box exporter implementation, at high priority for the day; alert implementation had started but was not yet tested.
+- September 21 standup said the Grafana alerting POC for ticket 1260 was done in QA only, which was acceptable for the current stage. Dev had a configuration issue suspected to come from QA-only config; if alerting is approved, the QA config needs to be backpropagated to dev.
+- September 21 Darwin consultation said Prometheus is already running in the SMP cluster and Grafana dashboards are active for namespace metrics. The Synapse team was building full Prometheus/alerting integration with a target production release in one to two weeks, so the recommendation was to wait before building separate monitoring for a new Darwin collector pod. Nilo still needed to double-check cluster coverage, and Jeka was named as the current SMP monitoring owner.
 
 ## Open Questions
 
@@ -62,6 +66,9 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the checked-in separate-Helm-release deployment design matches the live India QA cluster layout.
 - UNCERTAIN: Whether the September 14 manual alerting success fully resolves the earlier Grafana SMTP-relay question or only proves one configured contact point.
 - UNCERTAIN: Whether the cobweb/freshness ticket should use five-minute polling, a real-time design, or a narrower monitor-only scope.
+- UNCERTAIN: Whether ticket 544 black-box exporter implementation has passed testing after the September 18 priority push.
+- UNCERTAIN: Whether ticket 1260 alerting should be promoted beyond QA, and exactly which QA Grafana alerting config must be backpropagated to dev.
+- UNCERTAIN: Whether Synapse Prometheus/alerting integration actually covers the SMP AWS cluster and the future Darwin collector pod.
 
 ## Sources
 
@@ -90,5 +97,9 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/meetings/2026-09-14-1415-granola-standup.md`
+- `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
+- `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
+- `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
+- `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 
-Last Updated: 2026-09-15
+Last Updated: 2026-09-22
