@@ -63,6 +63,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - The POC created a dedicated `SCR-1244 POC` folder and `SCR-1244 QA email` contact point for `brian.peralta@engie.com` without enabling the alert. A live QA query returned `price_inr_kwh = 10`, so Grafana-to-Athena access and the threshold query worked.
 - Notification delivery remained blocked because Grafana QA reported SMTP was not configured. Checked-in Airflow QA config uses `mailhost.infrasys16.com:25`, so the recommended path is to test whether Grafana's QA pod can reach that relay and then configure SMTP, rather than introducing a separate Teams workflow first.
 - September 17 `SCR-1259` work deliberately avoided changing the existing Khaba Grafana panel. The one-minute Khaba readings are being published for operational use alongside the current 15-minute scraper and dashboard behavior.
+- September 22 Codex evidence captured `SCR-1243` QA feedback: Mateo wanted the IEX bid-stack curves to be easier to compare and asked for the buy/sell crossing point to be highlighted. The recommended dashboard response was independent BUY and SELL Y-axis scales because the source values were already cumulative, plus an estimated crossing marker and guide lines rather than stacking values and double-counting volume. A later same-day test pass updated `tests/test_iex_bid_stack_dashboard.py`, but QA promotion was not proven in this source because the QA Grafana URL was unreachable by DNS in the earlier run.
+- The same September 22 Codex export records that Adrien and another user were added to the Intact `editor` group for the QA environment, while Grafana's admin dashboard still showed their roles as `Viewer`; the suggested operational check was to log out and back into Grafana so group-derived permissions could refresh.
 
 ## Open Questions
 
@@ -90,6 +92,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay `mailhost.infrasys16.com:25`, and which sender/TLS/auth requirements apply.
 - UNCERTAIN: Whether `SCR-1244` should prove email notification only, or later add a Teams contact point after the threshold/firing/recovery behavior is accepted.
 - UNCERTAIN: Whether the one-minute Khaba TSDB series should later receive dashboard panels or remain operational-only as currently scoped.
+- UNCERTAIN: Whether Mateo accepts independent BUY/SELL axes as satisfying his "cumulative graph" feedback, or whether he specifically wants derived per-band stacked contributions.
+- UNCERTAIN: Whether the `SCR-1243` crossing marker changes were promoted to live QA after the DNS failure.
+- UNCERTAIN: Whether Adrien's QA Grafana edit rights refreshed after logging out and back in.
 
 ## Sources
 
@@ -120,5 +125,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-08-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-23

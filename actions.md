@@ -48,6 +48,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 
+- [ ] Complete the APE clinic preference form with preferred clinic and planned dates if it was not already submitted on 2026-09-22.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
+
 - [ ] If using remote-access or admin tools in the Singapore environment, declare and justify them because WinSCP was classified as `Non Legit`.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-08-19-codex-conversations.txt`
@@ -434,13 +438,17 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
 
-- [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, then finalize and promote to production.
+- [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, implement the independent-scale/intersection feedback from Mateo, then finalize and promote to production once QA is reachable.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
 - [ ] Investigate `SCR-1243` bid-stack missing blocks in Airflow/source history, including DAM/GDAM on 2026-09-17 00:45-01:30 IST and the later RTM gaps.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+
+- [ ] Confirm ABS-CBS TSDB business rules with Francesco/Jorge before the Friday 2026-09-25 TSDB-team meeting.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
 
 - [ ] Create a report for Lambdas that lack VPC binding across projects, including the no-prod non-compliant projects noted in the roundtable.
   - Context: [[smp-platform]]
@@ -869,6 +877,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for Francois to clean Atlas CDH stages to monthly paired upstream/downstream datasets, then run DEV data-only dry run and deployment verification.
   - Context: [[atlas-dashboard]]
   - Source: `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
+
+- [ ] Wait for Walnut/GitHub Actions internal runner restoration, then retry or recheck the queued Atlas DEV deployment if still needed.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
 - [ ] Wait for API credits to become available, then test the Atlas Dash Expert agent after the September 17 merge.
   - Context: [[atlas-dashboard]]

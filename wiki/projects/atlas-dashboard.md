@@ -32,6 +32,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `dm-898` was merged and pushed to `main` on September 17 with CI passing, making **Deploy Atlas -> Run workflow** visible. No deployment was triggered during the merge; Francois still needed to clean CDH stages before trying `DEV -> data-only`.
 - The September 17 Tech Lead Roundtable framed Brian's Atlas role as consultation rather than feature ownership. DMS is not taking on Dash skills or ongoing deployment accountability; the near-term objective is to make Francois more autonomous through CI/CD enablement and repository guardrails.
 - September 18 Codex evidence produced an objective Atlas effort estimate for stakeholder questions: approximately 20 hours, or 2.5 person-days at eight hours per day, based on recorded Codex collaboration sessions from September 8-18 with a 30-minute inactivity cutoff. Recorded runtime was about 7.5 hours, while 15/30/60-minute session cutoffs gave roughly 14.9/19.7/24.5 hours; the estimate excludes meetings, offline work, conversations outside local logs, and Francois's development effort.
+- September 22 Codex evidence diagnosed a queued Atlas DEV deployment as blocked before deployment steps started: validation/package jobs had passed, but the deployment job was waiting for an internal `ubuntu` runner with no runner assigned. A Walnut incident notice said Artifactory cybersecurity remediation was also affecting GitHub Actions, Walnut billing, Walnut Jira Service Management, and Claude Code, making the corporate outage the most likely cause rather than an Atlas code issue. Restoration needs both runner availability and Artifactory access because the deployment installs DAC tooling from corporate Artifactory.
 
 ## Open Questions
 
@@ -42,6 +43,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - UNCERTAIN: Whether Francois has completed CDH cleanup so only monthly paired upstream/downstream stages remain for DEV data-only validation.
 - UNCERTAIN: Whether the Dash Expert agent has been tested after the September 17 merge; Brian's API credits were exhausted at the Atlas checkpoint.
 - UNCERTAIN: Whether future stakeholder estimates should keep using the 30-minute collaboration-session cutoff as the headline, or report only recorded runtime for narrower auditability.
+- UNCERTAIN: Whether the September 22 queued Atlas DEV deployment cleared after Walnut/GitHub Actions service restoration.
 
 ## Sources
 
@@ -55,5 +57,6 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-18-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
-Last Updated: 2026-09-19
+Last Updated: 2026-09-23

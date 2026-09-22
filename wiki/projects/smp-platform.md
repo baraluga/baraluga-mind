@@ -195,6 +195,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - Omniland is moving Docker image publication to ECR through an ADO-to-GitHub pipeline, EventBridge, Step Functions, and OmniRun API notification. Its auth flow is shifting to a backend-for-frontend pattern after a pentest found browser-stored access tokens; the Lambda authorizer will accept both session cookies and machine-to-machine Okta tokens.
 - Onset Energy received internal green light; kickoff and onboarding were expected the week after the roundtable. The captured stack is Angular, FastAPI, CDK, full serverless, and agentic integration with a DNV third party.
 - Kiba MCP should not store data; access keys are provided by the user at runtime. Post-deploy work adds auditing and rate limiting, and the team is aligning with Yatin Badra's SEM AI Engineering team on common MCP architecture.
+- The September 22 weekly team meeting said the consumer backend had migrated to GitHub, while integration testing was still blocked on front-end/back-end integration for deployment. Michael was waiting on Artifactory and the Sabina team for migration/web-hosting service work, and was checking Nikola-flagged dependencies including an unfamiliar project captured as `coins`.
+- The same meeting framed a CrowdStrike / CloudStack issue as tenant/configuration related: the URL was in a US tenant and blocked, Europe tenant was affected, and the recorded root cause was customer ID configuration pointing to the US rather than Europe Connect. The note says this still needed reconfirmation with the relevant team, Prosumer, and GMR.
+- The ABS-CBS TSDB blocker was production-impacting: approval could not proceed when TSDB metadata had not been pre-created. A placeholder Friday 2026-09-25 meeting was created for the TSDB team and internal team to discuss a new provider and ABS-CBS business rules. UAT had two possible approval paths, either broad approval or approval by a user with metadata-admin rights.
+- The same meeting said the team could not deploy via pipeline for DB-instance/GMR tickets because of Artifactory dependency, and Yanik's ticket was also blocked there. A workaround provisioned a new DB instance for a user on Bastion Prod, but DB Manager was blocked by an RDS client security issue; a new network interface limited to five security groups was created, and the temporary path used the original IP to create the DB instance.
 
 ## Open Questions
 
@@ -277,6 +281,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the `SCR-1243` source price bands are accepted by India users as the final business categories, and whether the missing bid-stack blocks should trigger a separate repair/backfill ticket.
 - UNCERTAIN: Whether Darwin can recover historical/previous-minute values from the API, and how the collector should coordinate during Kubernetes redeploys to prevent two active pollers.
 - UNCERTAIN: Whether the exact people/names `Frederik`, `Alexander`, `Jeka`, and `Eric` from the September 21 Darwin consultation are spelled correctly.
+- UNCERTAIN: Whether `Sabina`, `coins`, `Payvin`, `JMR`, `CloudStack`, `ABS-CBS`, `Europe Connect`, `Francesco`, `Jorge`, and `Yanik` are exact names from the September 22 weekly meeting source.
+- UNCERTAIN: Whether the ABS-CBS metadata-admin approval path or broad UAT approval path is the intended operating rule.
+- UNCERTAIN: Whether the DB Manager / RDS client security workaround on Bastion Prod is temporary only, and what permanent Artifactory/pipeline fix is expected.
 
 ## Sources
 
@@ -372,5 +379,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 - `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 - `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+- `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
+- `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
-Last Updated: 2026-09-22
+Last Updated: 2026-09-23

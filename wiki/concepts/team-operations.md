@@ -106,6 +106,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The roundtable also said the architecture committee validates security design and best practices, not only alert hygiene. Tech lead roles and responsibilities had been published on Confluence, a new Sentry server was set up with alerting configuration still in progress, and IT requests should use the dedicated IT request channel by tagging IT admin rather than DMS One chat.
 - The September 18 daily standup moved Signups/Dolphy toward an urgent production-readiness window: production deployment was requested for September 19 or September 21-22 if simple, with October 9 as a main progress milestone. Signups stubbing was flagged as urgent, a longer-term domain-error/runbook fix was preferred over multiple patches, and the team noted that Key Vault was readable from inside the cluster if migration became necessary.
 - The same standup said Brian's official SMP handover was in final feedback, targeting completion on September 18 if all went well, and noted that an Abram/Piri production-monitoring request needed a Rancher access request.
+- The September 22 weekly team meeting captured several operational reminders: APE clinic preferences were due by end of day with preferred clinic and planned dates, Alfred was exempted, and the top-choice clinic would be prioritized. It also said Fred/Sebastian were expected on Monday, Wednesday, and Saturday, with possible office lunch/activities, team members encouraged to showcase work, and support-week RTO/standby handling allowed to reflect 24/7 duty.
+- The September 22 Walnut incident notice said Artifactory cybersecurity remediation temporarily affected GitHub Actions, Walnut billing, Walnut Jira Service Management, and Claude Code. For internal deployments, this means a queued workflow can be a platform-runner/service issue even when repository validation jobs have passed.
 
 ## Open Questions
 
@@ -145,6 +147,8 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Run.io`, `Promethee`, `FX`, `Best optimization`, `Onset Energy Platform`, and `Besalgo` are exact names from the September 15 QRM All source.
 - UNCERTAIN: Whether `Kaseb`, `Massimi Lisa`, `Rest Hydro`, and the people names in the QRM All people-news section are exact spellings.
 - UNCERTAIN: Whether `Vault`, `Pierre`, and the exact Sentry rollout ownership from the September 17 roundtable need more precise internal references.
+- UNCERTAIN: Whether `Fred/Sebastian` in the September 22 weekly meeting refers to the same visit previously captured as Fred and Christina's Philippines visit, or a separate visit.
+- UNCERTAIN: Whether `Palanetto` is the exact name of the online word-guessing game mentioned in the September 22 weekly meeting.
 
 ## Sources
 
@@ -203,5 +207,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-09-15-qrm-all.md`
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 - `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
+- `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
+- `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 
-Last Updated: 2026-09-19
+Last Updated: 2026-09-23
