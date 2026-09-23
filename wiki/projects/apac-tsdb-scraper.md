@@ -26,12 +26,16 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
 - Mateo's report that all scrapers stopped on April 26 initially suggested a shared RestKafka/topic failure, but he later clarified that the other scrapers recovered while Darwin remained broken. The task-creation screenshot proved discovery and task creation only, leaving execution, Athena, and TSDB write stages as the relevant failure boundary.
 - The Darwin workgroup correction and local-test documentation were committed and pushed to `origin/main` as `5258e66 fix: use prod Athena workgroup for Darwin` and `5c3c081 docs: document local test commands`. The captured validation reports 119 passing tests.
 - July 24 standup says the Darwin root cause was accepted and Mateo committed to perform the backfill. Brian confirmed on July 27 that Mateo fixed the issue and completed the follow-up.
+- September 23 IEX incident probing found that all 12 national IEX series had metadata updates on September 22 around 14:33:52-14:34:15 IST and now resolve under `iex_api`; the unchanged Lambda scraper still searched `iex`, so its catalog lookup returned no national series and stopped publishing. Mateo confirmed the catalog change was intended, so Brian changed the national lookup to `iex_api`, added validation for missing/duplicate/invalid destination IDs, added bounded DAM/GDAM replay support, and pushed commits `60588d2` and `c0bf1f9` to `apac-tsdb-scraper` `main`. Local evidence reports 232 passing tests and a live-source check mapping 2,136 observations; production deployment and backfill were still pending because deployment credentials needed VPN refresh.
+- The same September 23 investigation separated upstream TSDB publication failure from downstream `smp-india` Airflow failures: the Lambda fix can restore source-backed TSDB prices/bid/cleared-volume publication, but separate scheduled-volume TSDB IDs were returning catalog-object 404s in Airflow and require a separate SMP India reader-side repair.
 
 ## Open Questions
 
 - UNCERTAIN: Whether Mateo's future Aurora templates will stay structurally compatible enough for the new discovery checks.
 - UNCERTAIN: Whether the payload extraction slice was completed and committed after the July 15 capture ended.
 - UNCERTAIN: Whether a read-only UAT catalog lookup was later run for the catalog refactor; dry run does not exercise TSDB catalog resolution.
+- UNCERTAIN: Whether the September 22 IEX scheduled-volume catalog-object 404s share the same root cause as the intended `iex_api` catalog reclassification.
+- UNCERTAIN: Whether `apac-tsdb-scraper` production deployment/backfill completed after the September 23 commits.
 
 ## Sources
 
@@ -39,5 +43,6 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
 - `sources/codex-conversations/2026-07-23-codex-conversations.md`
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
+- `sources/codex-conversations/2026-09-23-codex-conversations.txt`
 
-Last Updated: 2026-07-27
+Last Updated: 2026-09-24

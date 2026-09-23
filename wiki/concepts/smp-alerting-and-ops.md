@@ -47,6 +47,7 @@ SMP operational discussions in late June and early July focused on production in
 - The September 18 daily standup also put ticket 544, the black-box exporter implementation, at high priority for the day; alert implementation had started but was not yet tested.
 - September 21 standup said the Grafana alerting POC for ticket 1260 was done in QA only, which was acceptable for the current stage. Dev had a configuration issue suspected to come from QA-only config; if alerting is approved, the QA config needs to be backpropagated to dev.
 - September 21 Darwin consultation said Prometheus is already running in the SMP cluster and Grafana dashboards are active for namespace metrics. The Synapse team was building full Prometheus/alerting integration with a target production release in one to two weeks, so the recommendation was to wait before building separate monitoring for a new Darwin collector pod. Nilo still needed to double-check cluster coverage, and Jeka was named as the current SMP monitoring owner.
+- The September 23 sprint review says the IEX RTM 10,000-threshold Grafana email-alert proof of concept works in QA; Francois independently confirmed alerting by creating his own alert. Production rollout was expected within the following days, with documentation already prepared and to be shared after rollout. Email-to-mailbox delivery can support Teams notifications; Airflow already uses that pattern for DAG errors, and Mateo wanted to confirm trader demand before extending it beyond internal use.
 
 ## Open Questions
 
@@ -69,6 +70,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether ticket 544 black-box exporter implementation has passed testing after the September 18 priority push.
 - UNCERTAIN: Whether ticket 1260 alerting should be promoted beyond QA, and exactly which QA Grafana alerting config must be backpropagated to dev.
 - UNCERTAIN: Whether Synapse Prometheus/alerting integration actually covers the SMP AWS cluster and the future Darwin collector pod.
+- UNCERTAIN: Whether the September 23 "coming days" production rollout of Grafana email alerts has completed and whether trader-facing Teams/email-to-mailbox notification demand was confirmed.
 
 ## Sources
 
@@ -101,5 +103,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
 - `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 - `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
+- `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
 
-Last Updated: 2026-09-22
+Last Updated: 2026-09-24
