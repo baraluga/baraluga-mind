@@ -410,10 +410,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-30-1500-granola-sprint-planning.md`; `sources/notes/2026-07-31-ingest-handover-clarifications.md`; `sources/meetings/2026-08-06-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1415-granola-daily-standup.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 
-- [ ] Ask Adrien whether India IEX bid-stack TSDB publishing should use existing or stakeholder-provided series IDs, because SMP does not provision TSDB IDs unless explicitly asked.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
-
 - [ ] Trigger and verify the India production RTM/DAM/GDAM Airflow DAGs after the `SCR-1258` IEX catalog repair, scheduled-volume Airflow fix, and source-backed TSDB replays, then confirm Athena/Grafana show the recovered IEX data.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-08-codex-conversations.txt`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-23-codex-conversations.txt`
@@ -449,6 +445,18 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Implement the `smp-india` IEX degraded-read repair for confirmed scheduled-volume catalog-object 404s, preserving diagnostics and failing empty degraded snapshots.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-23-codex-conversations.txt`
+
+- [ ] Confirm `SCR-1264` IEX website-category mappings with India before repairing and backfilling legacy Green DAM publication.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+
+- [ ] Use QA evidence from `SCR-1253` bid-stack TSDB publishing to decide whether the India-local bulk reader should move into `smp-common`.
+  - Context: [[smp-platform]]; [[tsdb-bulk-read-probing]]
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+
+- [ ] Promote and enable `SCR-1253` bid-stack TSDB publishing in production after QA read/write evidence is accepted.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 
 - [ ] Confirm ABS-CBS TSDB business rules with Francesco/Jorge before the Friday 2026-09-25 TSDB-team meeting.
   - Context: [[smp-platform]]
@@ -874,10 +882,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/codex-conversations/2026-07-20-codex-conversations.md`
 
-- [ ] Wait for Francois's real Atlas production Intact service-client ID/secret and production runtime target values before completing PROD CDH binding and first PROD deployment.
-  - Context: [[atlas-dashboard]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`
-
 - [ ] Wait for Francois to clean Atlas CDH stages to monthly paired upstream/downstream datasets, then run DEV data-only dry run and deployment verification.
   - Context: [[atlas-dashboard]]
   - Source: `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`; `sources/codex-conversations/2026-09-17-codex-conversations.txt`
@@ -885,6 +889,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Wait for Walnut/GitHub Actions internal runner restoration, then retry or recheck the queued Atlas DEV deployment if still needed.
   - Context: [[atlas-dashboard]]
   - Source: `sources/codex-conversations/2026-09-22-codex-conversations.txt`
+
+- [ ] Wait for Atlas PROD rollout and browser acceptance checks after the successful PROD dry run.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 
 - [ ] Wait for API credits to become available, then test the Atlas Dash Expert agent after the September 17 merge.
   - Context: [[atlas-dashboard]]
@@ -1079,6 +1087,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: The September 2 standup says Adrian's message confirmed bilateral-contract scraping takes priority, with bid-stack TSDB publishing moved to the next sprint.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-08-26-codex-conversations.txt`; `sources/meetings/2026-08-27-granola-mateo-call.md`; `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`
+
+- [x] Ask Adrien whether India IEX bid-stack TSDB publishing should use existing or stakeholder-provided series IDs.
+  - Closure: September 24 Codex work confirmed Mateo's supplied 60-ID bid-stack mapping was complete, unique, matched DAM/GDAM/RTM buy/sell price-band coverage, and existed in both UAT and Prod with MW units and 15-minute frequency.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 
 - [x] Decide where the India IEX two-year history heatmap belongs.
   - Closure: Brian chose to add the `SCR-1257` historical MCP heatmap to the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard rather than leave it only in Explore or create a separate dashboard.
@@ -1342,6 +1355,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Closure: The September 9-10 Codex captures show Atlas work proceeding in `qrm-dms/atlas-dash-frontend`, including test/CI/Ruff guardrails and `dm-898` branch work.
   - Context: [[atlas-dashboard]]
   - Source: `sources/meetings/2026-09-08-1630-granola-atlas-discussion.md`; `sources/codex-conversations/2026-09-09-codex-conversations.txt`; `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+
+- [x] Wait for Francois's real Atlas production Intact service-client ID/secret and production runtime target values before completing PROD CDH binding and first PROD deployment.
+  - Closure: September 24 Codex work verified the PROD service credentials, added the approved CDH client binding, configured the seven PROD GitHub target variables, passed the PROD probe, and passed a non-deploying PROD dry run.
+  - Context: [[atlas-dashboard]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/meetings/2026-09-17-1630-granola-atlas-checkpoint.md`; `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 
 - [x] Decide how Pipeline Modernizer handoffs should handle private Walnut registry access.
   - Closure: The Pipeline Modernizer and its offline handoff prompt were decommissioned after reusable `sff-actions` contracts and tested human-facing recipes replaced the agent as the primary migration interface.

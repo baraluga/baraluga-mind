@@ -15,9 +15,14 @@ Brian explicitly requested on September 21, 2026: **always prefer bulk reads for
 
 The five-series, 43-day KHABA audit completed in seven SDK calls, with approximately **53.5 seconds total query time** in Brian's supplied run. This is observed evidence, not a universal latency guarantee. Earlier serial day/series probing was slow enough that Brian aborted it.
 
+September 24 bid-stack TSDB publishing work exposed the same pattern in production-style publication and verification, not only ad hoc audits. The shared publisher read each series sequentially before publishing and again during verification, so RTM used 20 read calls per task and DAM/GDAM used 40. Brian observed roughly 5-minute RTM and 9-minute DAM/GDAM runs before discussing optimization.
+
+For shared publication helpers, prove an optimization locally before changing common code: trial a bulk reader at the regional layer, keep write behavior and exact verification unchanged, record read/write durations and SDK call counts, then promote to `smp-common` only if the measured gains justify a shared contract change.
+
 ## Sources
 
 - `sources/notes/2026-09-21-tsdb-bulk-read-preference.md`
+- `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 - [TSDB data-read and parallel-load guidance](https://pages.github.tools.digital.engie.com/Tsdb/engie-tsdb/data_read.html#parallel-load)
 
-Last Updated: 2026-09-21
+Last Updated: 2026-09-25

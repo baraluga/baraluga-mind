@@ -33,17 +33,20 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - The September 17 Tech Lead Roundtable framed Brian's Atlas role as consultation rather than feature ownership. DMS is not taking on Dash skills or ongoing deployment accountability; the near-term objective is to make Francois more autonomous through CI/CD enablement and repository guardrails.
 - September 18 Codex evidence produced an objective Atlas effort estimate for stakeholder questions: approximately 20 hours, or 2.5 person-days at eight hours per day, based on recorded Codex collaboration sessions from September 8-18 with a 30-minute inactivity cutoff. Recorded runtime was about 7.5 hours, while 15/30/60-minute session cutoffs gave roughly 14.9/19.7/24.5 hours; the estimate excludes meetings, offline work, conversations outside local logs, and Francois's development effort.
 - September 22 Codex evidence diagnosed a queued Atlas DEV deployment as blocked before deployment steps started: validation/package jobs had passed, but the deployment job was waiting for an internal `ubuntu` runner with no runner assigned. A Walnut incident notice said Artifactory cybersecurity remediation was also affecting GitHub Actions, Walnut billing, Walnut Jira Service Management, and Claude Code, making the corporate outage the most likely cause rather than an Atlas code issue. Restoration needs both runner availability and Artifactory access because the deployment installs DAC tooling from corporate Artifactory.
+- September 24 Codex work completed Atlas PROD deployment preparation. PROD CDH already referenced the same Master Upstream and Master Downstream datasets and CSV paths as DEV, and the probe verified DEV and PROD could read identical June CSVs with matching hashes. PROD kept separate service credentials, AWS account, application bucket, ECS service, and runtime configuration.
+- The missing PROD CDH service-client binding was added with Brian's explicit approval. After that, PROD credential acquisition, shared CSV access, runtime discovery, ALB target health, and HTTPS `/health` passed. Seven verified PROD GitHub target variables were configured, and a PROD dry run passed backup, candidate preparation, and smoke tests without deploying or restarting the live application.
+- The next Atlas PROD step is the actual GitHub Actions rollout with `main`, `prod`, `code-and-data`, and `Deploy after validation` checked, followed by browser acceptance checks for login, charts, filters, and exports.
 
 ## Open Questions
 
 - UNCERTAIN: Whether S3 via Digital Acceleration tooling is the final production deployment path or only the current draft deployment path.
 - UNCERTAIN: Which users, data sensitivity level, and operational decisions define the exact approval bar for Atlas.
 - UNCERTAIN: Whether `configure-engie-ca-bundle` should be promoted into the protected `sff-actions@v1` contract or remain pinned by SHA while it matures.
-- UNCERTAIN: Which real Intact PROD service-client ID/secret and runtime target values Francois will provide for the first production Atlas deployment.
 - UNCERTAIN: Whether Francois has completed CDH cleanup so only monthly paired upstream/downstream stages remain for DEV data-only validation.
 - UNCERTAIN: Whether the Dash Expert agent has been tested after the September 17 merge; Brian's API credits were exhausted at the Atlas checkpoint.
 - UNCERTAIN: Whether future stakeholder estimates should keep using the 30-minute collaboration-session cutoff as the headline, or report only recorded runtime for narrower auditability.
-- UNCERTAIN: Whether the September 22 queued Atlas DEV deployment cleared after Walnut/GitHub Actions service restoration.
+- UNCERTAIN: Whether sharing the same source CSV datasets across Atlas DEV and PROD is the intended long-term operating model, even though the September 24 dry run proved it works technically.
+- UNCERTAIN: Whether the actual Atlas PROD rollout and browser acceptance checks have been completed after the successful September 24 dry run.
 
 ## Sources
 
@@ -58,5 +61,6 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 
-Last Updated: 2026-09-23
+Last Updated: 2026-09-25
