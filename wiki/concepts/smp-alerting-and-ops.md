@@ -48,6 +48,9 @@ SMP operational discussions in late June and early July focused on production in
 - September 21 standup said the Grafana alerting POC for ticket 1260 was done in QA only, which was acceptable for the current stage. Dev had a configuration issue suspected to come from QA-only config; if alerting is approved, the QA config needs to be backpropagated to dev.
 - September 21 Darwin consultation said Prometheus is already running in the SMP cluster and Grafana dashboards are active for namespace metrics. The Synapse team was building full Prometheus/alerting integration with a target production release in one to two weeks, so the recommendation was to wait before building separate monitoring for a new Darwin collector pod. Nilo still needed to double-check cluster coverage, and Jeka was named as the current SMP monitoring owner.
 - The September 23 sprint review says the IEX RTM 10,000-threshold Grafana email-alert proof of concept works in QA; Francois independently confirmed alerting by creating his own alert. Production rollout was expected within the following days, with documentation already prepared and to be shared after rollout. Email-to-mailbox delivery can support Teams notifications; Airflow already uses that pattern for DAG errors, and Mateo wanted to confirm trader demand before extending it beyond internal use.
+- September 25 Codex work clarified the Teams-notification path for Grafana alerts: Airflow already sends DAG-failure alerts to Teams by emailing a channel through Microsoft Graph, with SMTP fallback for support recipients when Graph delivery fails. Grafana can probably reuse the channel-email destination concept, but the transport differs because Grafana alerting would send through SMTP unless the native Teams contact-point path is proven.
+- `SCR-1267` was created as a spike for Grafana alerts via Teams for SMP Japan and India. The intended shape is dedicated regional Teams channels/contact points for business/data alerts, separate from Airflow operational-failure alerts, with delivery feasibility, firing/recovery tests, channel ownership, and implementation recommendations in scope.
+- `SCR-1268` was created for Darwin collector monitoring: confirm whether existing Prometheus can monitor the collector, expose availability/freshness/backlog signals, configure operational alerts, verify stopped-collector / failed-poll / stalled-publication scenarios in QA, and document the pattern for future realtime collectors.
 
 ## Open Questions
 
@@ -71,6 +74,9 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether ticket 1260 alerting should be promoted beyond QA, and exactly which QA Grafana alerting config must be backpropagated to dev.
 - UNCERTAIN: Whether Synapse Prometheus/alerting integration actually covers the SMP AWS cluster and the future Darwin collector pod.
 - UNCERTAIN: Whether the September 23 "coming days" production rollout of Grafana email alerts has completed and whether trader-facing Teams/email-to-mailbox notification demand was confirmed.
+- UNCERTAIN: Whether ENGIE allows Teams channel email from Grafana's SMTP sender, or whether the native Grafana Teams contact-point path is required.
+- UNCERTAIN: Who should own and receive the proposed SMP Japan and SMP India Teams alert channels for Grafana business/data alerts.
+- UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
 
 ## Sources
 
@@ -104,5 +110,7 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 - `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 - `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
+- `sources/codex-conversations/2026-09-25-codex-conversations.txt`
+- `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
-Last Updated: 2026-09-24
+Last Updated: 2026-09-26

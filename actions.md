@@ -432,7 +432,7 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Ask Mateo/Darwin to confirm `SCR-1261` entity and tag mappings, TSDB IDs, minute-level history/replay behavior, and whether Bong's Prometheus suggestion means an existing proven Darwin source or a destination change.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
 - [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, implement the independent-scale/intersection feedback from Mateo, then finalize and promote to production once QA is reachable.
   - Context: [[smp-platform]]
@@ -446,17 +446,21 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-23-codex-conversations.txt`
 
-- [ ] Confirm `SCR-1264` IEX website-category mappings with India before repairing and backfilling legacy Green DAM publication.
+- [ ] Confirm `SCR-1264` IEX website-category mappings with India and follow up with Mateo on the required time-series creation before repairing and backfilling legacy Green DAM publication.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
-- [ ] Use QA evidence from `SCR-1253` bid-stack TSDB publishing to decide whether the India-local bulk reader should move into `smp-common`.
+- [ ] Use QA evidence from `SCR-1253` bid-stack TSDB publishing, including September 25 bulk-reader timings and the DAM/GDAM retry, to decide whether the India-local bulk reader should move into `smp-common`.
   - Context: [[smp-platform]]; [[tsdb-bulk-read-probing]]
-  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
 - [ ] Promote and enable `SCR-1253` bid-stack TSDB publishing in production after QA read/write evidence is accepted.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+
+- [ ] Monitor `SCR-1265` Kaba over the weekend production runs and mark it done on Monday 2026-09-28 if stable.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
 - [ ] Confirm ABS-CBS TSDB business rules with Francesco/Jorge before the Friday 2026-09-25 TSDB-team meeting.
   - Context: [[smp-platform]]
@@ -709,6 +713,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 - [ ] Coordinate the `SCR-1244` Grafana alert production rollout with Michael, share the prepared documentation afterward, and confirm whether Mateo/traders want Teams email-to-mailbox notifications.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/meetings/2026-09-14-1415-granola-standup.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
+
+- [ ] Complete `SCR-1267` by proving Grafana alert delivery to Teams for SMP Japan and India, confirming regional channel owners/recipients, and recommending the contact-point setup.
+  - Context: [[smp-alerting-and-ops]]
+  - Source: `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+
+- [ ] Implement `SCR-1268` Darwin collector monitoring with Prometheus discovery first, then health, freshness, backlog, and operational alert verification for QA.
+  - Context: [[smp-alerting-and-ops]]; [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
 - [ ] Keep monitoring the Grafana gaps bug through cobweb freshness checks and decide whether the raised 1-point ticket should use five-minute polling or a real-time approach.
   - Context: [[smp-alerting-and-ops]]
