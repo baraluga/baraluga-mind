@@ -372,6 +372,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
 
+- [ ] Explore the Grafana map-dashboard dynamic JSON approach, including Plotly versus geomap tradeoffs and the correct material-request time series.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+
+- [ ] Loop Nilo into the Grafana + JupyterLab integration plan, using Signups as the reference while defining PR review and environment escalation.
+  - Context: [[smp-dashboards]]
+  - Source: `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+
 - [ ] Improve `smp-dashboard` `cdh-register.yml` so environment comes from the branch and the short-lived CDH token is supplied as a workflow input.
   - Context: [[smp-dashboards]]
   - Source: `sources/codex-conversations/2026-07-17-codex-conversations.md`
@@ -430,9 +438,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
 
-- [ ] Ask Mateo/Darwin to confirm `SCR-1261` entity and tag mappings, TSDB IDs, minute-level history/replay behavior, and whether Bong's Prometheus suggestion means an existing proven Darwin source or a destination change.
+- [ ] Validate the `SCR-1261` adaptive Darwin collector after the September 28 fake-TSDB trials, including M2M authentication, controlled UAT publication/read-back, request-rate assumptions, and selected one-sample-per-source-minute behavior.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 
 - [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, implement the independent-scale/intersection feedback from Mateo, then finalize and promote to production once QA is reachable.
   - Context: [[smp-platform]]
@@ -446,21 +454,25 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-23-codex-conversations.txt`
 
-- [ ] Confirm `SCR-1264` IEX website-category mappings with India and follow up with Mateo on the required time-series creation before repairing and backfilling legacy Green DAM publication.
+- [ ] Finish `SCR-1264` by reviewing, committing, deploying, and validating the `apac-tsdb-scraper` Green DAM fix, then run controlled TSDB publish/read-back and backfill from July 8.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 
-- [ ] Use QA evidence from `SCR-1253` bid-stack TSDB publishing, including September 25 bulk-reader timings and the DAM/GDAM retry, to decide whether the India-local bulk reader should move into `smp-common`.
+- [ ] Use QA evidence from `SCR-1253` bid-stack TSDB publishing, including September 25 bulk-reader timings, the DAM/GDAM retry, and Francois's September 28 Grafana/TSDV cross-check, to decide whether the India-local bulk reader should move into `smp-common`.
   - Context: [[smp-platform]]; [[tsdb-bulk-read-probing]]
-  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+  - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 
 - [ ] Promote and enable `SCR-1253` bid-stack TSDB publishing in production after QA read/write evidence is accepted.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
-- [ ] Monitor `SCR-1265` Kaba over the weekend production runs and mark it done on Monday 2026-09-28 if stable.
+- [ ] Confirm whether Francois closed `SCR-1265` after the September 28 no-error Teams/Kaba realtime validation signal and Matteo meeting.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+  - Source: `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+
+- [ ] Share the Matteo meeting outcome with Francois for the September 28 SMP follow-up.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 
 - [ ] Confirm ABS-CBS TSDB business rules with Francesco/Jorge before the Friday 2026-09-25 TSDB-team meeting.
   - Context: [[smp-platform]]

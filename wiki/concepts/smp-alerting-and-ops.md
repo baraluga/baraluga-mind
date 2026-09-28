@@ -51,6 +51,7 @@ SMP operational discussions in late June and early July focused on production in
 - September 25 Codex work clarified the Teams-notification path for Grafana alerts: Airflow already sends DAG-failure alerts to Teams by emailing a channel through Microsoft Graph, with SMTP fallback for support recipients when Graph delivery fails. Grafana can probably reuse the channel-email destination concept, but the transport differs because Grafana alerting would send through SMTP unless the native Teams contact-point path is proven.
 - `SCR-1267` was created as a spike for Grafana alerts via Teams for SMP Japan and India. The intended shape is dedicated regional Teams channels/contact points for business/data alerts, separate from Airflow operational-failure alerts, with delivery feasibility, firing/recovery tests, channel ownership, and implementation recommendations in scope.
 - `SCR-1268` was created for Darwin collector monitoring: confirm whether existing Prometheus can monitor the collector, expose availability/freshness/backlog signals, configure operational alerts, verify stopped-collector / failed-poll / stalled-publication scenarios in QA, and document the pattern for future realtime collectors.
+- September 28 Darwin trial evidence sharpened the collector-monitoring need: the first one-minute trial showed successful polls can still miss a source-minute bucket, while 15-second polling captured complete windows in a local fake-TSDB trial. Monitoring should therefore distinguish request success from per-entity/tag source-minute freshness and backlog.
 
 ## Open Questions
 
@@ -77,6 +78,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether ENGIE allows Teams channel email from Grafana's SMTP sender, or whether the native Grafana Teams contact-point path is required.
 - UNCERTAIN: Who should own and receive the proposed SMP Japan and SMP India Teams alert channels for Grafana business/data alerts.
 - UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
+- UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
 
 ## Sources
 
@@ -112,5 +114,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
 - `sources/codex-conversations/2026-09-25-codex-conversations.txt`
 - `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+- `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 
-Last Updated: 2026-09-26
+Last Updated: 2026-09-29

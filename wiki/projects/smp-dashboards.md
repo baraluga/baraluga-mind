@@ -65,6 +65,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - September 17 `SCR-1259` work deliberately avoided changing the existing Khaba Grafana panel. The one-minute Khaba readings are being published for operational use alongside the current 15-minute scraper and dashboard behavior.
 - September 22 Codex evidence captured `SCR-1243` QA feedback: Mateo wanted the IEX bid-stack curves to be easier to compare and asked for the buy/sell crossing point to be highlighted. The recommended dashboard response was independent BUY and SELL Y-axis scales because the source values were already cumulative, plus an estimated crossing marker and guide lines rather than stacking values and double-counting volume. A later same-day test pass updated `tests/test_iex_bid_stack_dashboard.py`, but QA promotion was not proven in this source because the QA Grafana URL was unreachable by DNS in the earlier run.
 - The same September 22 Codex export records that Adrien and another user were added to the Intact `editor` group for the QA environment, while Grafana's admin dashboard still showed their roles as `Viewer`; the suggested operational check was to log out and back into Grafana so group-derived permissions could refresh.
+- The September 28 SMP standup captured two Grafana map-dashboard approaches: a Plotly file hosted in the Runfra Grafana folder, and Grafana geomap. Plotly worked but used a non-standard format; geomap fit Grafana better but was limited to static JSON with hardcoded colors. A ticket was created to explore dynamic JSON activation and connect the correct time series for material requests.
+- The same standup said the Grafana + JupyterLab integration direction should mirror Signups' setup, with a PR review layer and an environment escalation path still needed before next-period readiness. Nilo was expected to be looped in.
 
 ## Open Questions
 
@@ -95,6 +97,9 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether Mateo accepts independent BUY/SELL axes as satisfying his "cumulative graph" feedback, or whether he specifically wants derived per-band stacked contributions.
 - UNCERTAIN: Whether the `SCR-1243` crossing marker changes were promoted to live QA after the DNS failure.
 - UNCERTAIN: Whether Adrien's QA Grafana edit rights refreshed after logging out and back in.
+- UNCERTAIN: Whether `Runfra` is the exact Grafana folder/system name from the September 28 standup.
+- UNCERTAIN: Which "material requests" time series the dynamic Grafana map ticket should connect to.
+- UNCERTAIN: Whether Signups' JupyterLab integration pattern can be reused directly for SMP or only as a reference shape.
 
 ## Sources
 
@@ -126,5 +131,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
+- `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 
-Last Updated: 2026-09-23
+Last Updated: 2026-09-29

@@ -201,6 +201,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The September 25 SMP standup said sprint work had formally started. `SCR-1261` was still waiting for access, `SCR-1264` was waiting on Mateo because Adrien confirmed new time-series creation is needed, `SCR-1266` had been confirmed fixed by Louis and marked done, and `SCR-1253` had a working QA solution with cleanup continuing across SMP India and SMP Common.
 - The same standup framed `SCR-1265` as a Kaba cross-region CDH issue: CDH resources and AWS credentials are in Ireland (`eu-west-1`) while Kaba production is in Mumbai. Production works differently from no-prod outside Mumbai; Brian's own `eu-west-1` dataset test was accessible from QA, no-prod, and prod, so the team still needs CDH support to distinguish intended design from misconfiguration. Nilor may need to be looped in if support needs additional push.
 - September 25 Codex work kept the `SCR-1261` Darwin architecture as a standalone one-minute Python collector with an EFS handoff buffer and five-minute Airflow TSDB publication. It then created `SCR-1268` to monitor Darwin collector health and data freshness, starting with Prometheus discovery and covering availability, last successful poll, source-data freshness, backlog, operational alerts, QA failure/recovery tests, and reusable notes for future realtime collectors.
+- September 28 `SCR-1264` work established that IEX's Green DAM old categories do not map one-to-one to the revised categories. The old Solar/Non-Solar/Hydro category series should remain historical, while the revised Wind/Hydro/DRE/Other RE breakdown uses 12 newly provisioned MW series plus a new MW Total scheduled series. The parser fix stayed in `apac-tsdb-scraper` as the lowest-blast path, with a standalone tested parser, explicit UUID mapping to avoid variable-group collisions, read-only preview evidence for July 8-9, and no TSDB publication, deployment, or backfill yet.
+- The September 28 SMP standup said `SCR-1253` bid-stack backfilling can be skipped for now after Mateo's validation, with Francois still cross-checking TSDV values against Grafana. It also said `SCR-1265` had no Teams error and Kaba realtime validation on September 28 counted as the validation signal before Francois's Matteo meeting.
+- September 28 Darwin work for `SCR-1261` moved from architecture into live fake-TSDB trials. A one-minute polling trial missed one INSE4 source minute, while a 15-second trial captured every source minute for INSE3 and INSE4 across two complete quarter-hours and verified all 12 aggregates. The follow-up implementation uses adaptive first-valid-sample-per-source-minute collection, preserving exact source timestamps and using selected samples consistently for minute and quarter-hour outputs. This remains fake-TSDB/local evidence only; no live TSDB writes or production deployment occurred.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -274,8 +277,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Kavda`, `Kaba`, `Khaba`, and `Khavda` are distinct durable asset names or source/transcript variants that should be normalized.
 - UNCERTAIN: Whether Fred's India index-access escalation to the IS team in Europe has been sent and whether it resolves the S&P infrastructure blocker.
 - UNCERTAIN: Whether the `smp-india` degraded-read fix for IEX scheduled-volume catalog-object 404s was implemented after the September 23 review notes.
-- UNCERTAIN: For `SCR-1264`, which old Green DAM categories should retire, be replaced, or map into Hydro/Wind/Other RE/DRE after IEX's July 2026 category revision.
-- UNCERTAIN: Whether 7 July 2026 is part of the `SCR-1264` missing-data scope or the final known-good delivery date before the Green DAM layout change.
 - UNCERTAIN: Whether the India-local `SCR-1253` bulk-reader trial produced enough runtime improvement to justify moving the pattern into `smp-common`.
 - UNCERTAIN: Whether the `SCR-1253` DAM/GDAM first-verification failure was transient TSDB visibility, a timing issue, or something the rollout needs to harden before production enablement.
 - UNCERTAIN: Whether `Lua Amar` is the exact person/name from the September 4 standup source.
@@ -303,6 +304,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether Darwin can recover historical/previous-minute values from the API, and how the collector should coordinate during Kubernetes redeploys to prevent two active pollers.
 - UNCERTAIN: Whether the existing Prometheus setup can scrape the future Darwin collector pod directly, or whether the first implementation needs a heartbeat/Airflow-check fallback.
 - UNCERTAIN: Whether the exact people/names `Frederik`, `Alexander`, `Jeka`, and `Eric` from the September 21 Darwin consultation are spelled correctly.
+- UNCERTAIN: Whether the 15-second Darwin trial is enough evidence for Darwin-supported request rate and production reliability.
+- UNCERTAIN: Whether the `SCR-1264` Solaris fix has passed controlled TSDB publish/read-back validation, deployment, and backfill after the September 28 preview evidence.
+- UNCERTAIN: Whether `TSDV`, `Runfra`, and `Matteo` are exact terms/names from the September 28 standup source.
 - UNCERTAIN: Whether `Sabina`, `coins`, `Payvin`, `JMR`, `CloudStack`, `ABS-CBS`, `Europe Connect`, `Francesco`, `Jorge`, and `Yanik` are exact names from the September 22 weekly meeting source.
 - UNCERTAIN: Whether the ABS-CBS metadata-admin approval path or broad UAT approval path is the intended operating rule.
 - UNCERTAIN: Whether the DB Manager / RDS client security workaround on Bastion Prod is temporary only, and what permanent Artifactory/pipeline fix is expected.
@@ -408,5 +412,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-25-codex-conversations.txt`
 - `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+- `sources/codex-conversations/2026-09-28-codex-conversations.txt`
+- `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 
-Last Updated: 2026-09-26
+Last Updated: 2026-09-29
