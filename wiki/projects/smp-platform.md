@@ -204,6 +204,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - September 28 `SCR-1264` work established that IEX's Green DAM old categories do not map one-to-one to the revised categories. The old Solar/Non-Solar/Hydro category series should remain historical, while the revised Wind/Hydro/DRE/Other RE breakdown uses 12 newly provisioned MW series plus a new MW Total scheduled series. The parser fix stayed in `apac-tsdb-scraper` as the lowest-blast path, with a standalone tested parser, explicit UUID mapping to avoid variable-group collisions, read-only preview evidence for July 8-9, and no TSDB publication, deployment, or backfill yet.
 - The September 28 SMP standup said `SCR-1253` bid-stack backfilling can be skipped for now after Mateo's validation, with Francois still cross-checking TSDV values against Grafana. It also said `SCR-1265` had no Teams error and Kaba realtime validation on September 28 counted as the validation signal before Francois's Matteo meeting.
 - September 28 Darwin work for `SCR-1261` moved from architecture into live fake-TSDB trials. A one-minute polling trial missed one INSE4 source minute, while a 15-second trial captured every source minute for INSE3 and INSE4 across two complete quarter-hours and verified all 12 aggregates. The follow-up implementation uses adaptive first-valid-sample-per-source-minute collection, preserving exact source timestamps and using selected samples consistently for minute and quarter-hour outputs. This remains fake-TSDB/local evidence only; no live TSDB writes or production deployment occurred.
+- September 29 Grafana troubleshooting found that Mateo's SMP India production dashboard error matched the earlier Japan Athena `GetWorkGroup` throttling symptom: `ThrottlingException: Rate exceeded`. The live India Athena datasource used AWS SDK Default credentials to assume CDH role `cdh_smpcdhindiaprod_53443` in AWS account `046847230914`, region `eu-west-1`; CDH identified that account as the shared GEM Production environment with non-SMP workloads. The working theory is a short-lived burst of Athena API calls in that shared account, with SMP India caught in rate limiting, but the project role lacked CloudTrail lookup and Service Quotas access, so the responsible caller was not proven.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -307,6 +308,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the 15-second Darwin trial is enough evidence for Darwin-supported request rate and production reliability.
 - UNCERTAIN: Whether the `SCR-1264` Solaris fix has passed controlled TSDB publish/read-back validation, deployment, and backfill after the September 28 preview evidence.
 - UNCERTAIN: Whether `TSDV`, `Runfra`, and `Matteo` are exact terms/names from the September 28 standup source.
+- UNCERTAIN: Which workload or caller caused the September 29 SMP India Athena `GetWorkGroup` throttling; shared GEM Production account evidence proves a contention boundary, not a culprit.
 - UNCERTAIN: Whether `Sabina`, `coins`, `Payvin`, `JMR`, `CloudStack`, `ABS-CBS`, `Europe Connect`, `Francesco`, `Jorge`, and `Yanik` are exact names from the September 22 weekly meeting source.
 - UNCERTAIN: Whether the ABS-CBS metadata-admin approval path or broad UAT approval path is the intended operating rule.
 - UNCERTAIN: Whether the DB Manager / RDS client security workaround on Bastion Prod is temporary only, and what permanent Artifactory/pipeline fix is expected.
@@ -414,5 +416,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 - `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 - `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+- `sources/codex-conversations/2026-09-29-codex-conversations.txt`
 
-Last Updated: 2026-09-29
+Last Updated: 2026-09-30

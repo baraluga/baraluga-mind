@@ -52,6 +52,7 @@ SMP operational discussions in late June and early July focused on production in
 - `SCR-1267` was created as a spike for Grafana alerts via Teams for SMP Japan and India. The intended shape is dedicated regional Teams channels/contact points for business/data alerts, separate from Airflow operational-failure alerts, with delivery feasibility, firing/recovery tests, channel ownership, and implementation recommendations in scope.
 - `SCR-1268` was created for Darwin collector monitoring: confirm whether existing Prometheus can monitor the collector, expose availability/freshness/backlog signals, configure operational alerts, verify stopped-collector / failed-poll / stalled-publication scenarios in QA, and document the pattern for future realtime collectors.
 - September 28 Darwin trial evidence sharpened the collector-monitoring need: the first one-minute trial showed successful polls can still miss a source-minute bucket, while 15-second polling captured complete windows in a local fake-TSDB trial. Monitoring should therefore distinguish request success from per-entity/tag source-minute freshness and backlog.
+- September 29 SMP India Grafana troubleshooting showed a recurring operational pattern: transient Athena `GetWorkGroup` throttling can self-clear before investigation, as also happened in a previous SMP Japan Grafana incident. The practical recurrence evidence to collect is dashboard name, approximate time and timezone, request ID if visible, Athena account/role/region, and whether the role has CloudTrail or Service Quotas read access.
 
 ## Open Questions
 
@@ -79,6 +80,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Who should own and receive the proposed SMP Japan and SMP India Teams alert channels for Grafana business/data alerts.
 - UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
 - UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
+- UNCERTAIN: Whether recurring SMP Grafana Athena throttling should become a formal monitor, or remain a note-and-watch operational hiccup until recurrence frequency increases.
 
 ## Sources
 
@@ -115,5 +117,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-09-25-codex-conversations.txt`
 - `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 - `sources/codex-conversations/2026-09-28-codex-conversations.txt`
+- `sources/codex-conversations/2026-09-29-codex-conversations.txt`
 
-Last Updated: 2026-09-29
+Last Updated: 2026-09-30

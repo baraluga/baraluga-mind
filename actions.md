@@ -368,6 +368,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
 
+- [ ] If SMP Grafana Athena `GetWorkGroup` throttling recurs, capture the dashboard, incident time/timezone, request ID if visible, and CDH role/account/region before asking CDH/AWS owners for CloudTrail evidence.
+  - Context: [[smp-alerting-and-ops]]; [[smp-dashboards]]
+  - Source: `sources/codex-conversations/2026-09-29-codex-conversations.txt`
+
 - [ ] Raise with Bastian whether Grafana/Airflow usage-monitoring costs should be charged only to SMP when Synapse and Delphi share the stack.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
