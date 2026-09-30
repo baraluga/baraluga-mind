@@ -53,6 +53,7 @@ SMP operational discussions in late June and early July focused on production in
 - `SCR-1268` was created for Darwin collector monitoring: confirm whether existing Prometheus can monitor the collector, expose availability/freshness/backlog signals, configure operational alerts, verify stopped-collector / failed-poll / stalled-publication scenarios in QA, and document the pattern for future realtime collectors.
 - September 28 Darwin trial evidence sharpened the collector-monitoring need: the first one-minute trial showed successful polls can still miss a source-minute bucket, while 15-second polling captured complete windows in a local fake-TSDB trial. Monitoring should therefore distinguish request success from per-entity/tag source-minute freshness and backlog.
 - September 29 SMP India Grafana troubleshooting showed a recurring operational pattern: transient Athena `GetWorkGroup` throttling can self-clear before investigation, as also happened in a previous SMP Japan Grafana incident. The practical recurrence evidence to collect is dashboard name, approximate time and timezone, request ID if visible, Athena account/role/region, and whether the role has CloudTrail or Service Quotas read access.
+- September 30 grooming reframed `SCR-1254` resource observability around concrete user pain points instead of copying another stack wholesale. The first subtasks should cover Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors, while Grafana usage monitoring should start from low-effort Okta or user-activity evidence before deeper interaction tracking.
 
 ## Open Questions
 
@@ -81,6 +82,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
 - UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
 - UNCERTAIN: Whether recurring SMP Grafana Athena throttling should become a formal monitor, or remain a note-and-watch operational hiccup until recurrence frequency increases.
+- UNCERTAIN: Whether the Grafana dashboard access errors reported by Matteo are related to the September 29 Athena throttling pattern, permissions, datasource behavior, or a separate dashboard issue.
 
 ## Sources
 
@@ -118,5 +120,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 - `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-29-codex-conversations.txt`
+- `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 
-Last Updated: 2026-09-30
+Last Updated: 2026-10-01

@@ -20,6 +20,14 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-09-02-daily-standup.md`
 
+- [ ] Submit Q3 actuals after the September 19 projected inputs, if the end-of-month close was not already completed.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-30-0945-granola-morning-standup.md`
+
+- [ ] Complete the annual NGME survey.
+  - Context: [[team-operations]]
+  - Source: `sources/meetings/2026-09-30-0945-granola-morning-standup.md`
+
 - [ ] Clarify who owns raising relevant items from old accounts before deletion, then route or raise them.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
@@ -364,9 +372,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-09-01-granola-busy.md`; `sources/copilot-conversations/2026-09-01-copilot-conversations.md`; `sources/codex-conversations/2026-09-01-codex-conversations.txt`; `sources/meetings/2026-09-02-standup.md`
 
-- [ ] Spike Grafana usage monitoring with Loki and a quick Okta-log check, tracking dashboard access by user and frequency while excluding internal team usage.
+- [ ] Spike `SCR-1252` Grafana usage monitoring with the lowest-effort path first: Grafana organization-user `lastSeenAt` or Okta connection logs for active-user counts, then Loki or Enterprise Usage Insights only if dashboard-level activity is required.
   - Context: [[smp-dashboards]]
-  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
+  - Source: `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 
 - [ ] If SMP Grafana Athena `GetWorkGroup` throttling recurs, capture the dashboard, incident time/timezone, request ID if visible, and CDH role/account/region before asking CDH/AWS owners for CloudTrail evidence.
   - Context: [[smp-alerting-and-ops]]; [[smp-dashboards]]
@@ -376,9 +384,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-dashboards]]
   - Source: `sources/meetings/2026-09-02-backlog-grooming.md`
 
-- [ ] Explore the Grafana map-dashboard dynamic JSON approach, including Plotly versus geomap tradeoffs and the correct material-request time series.
+- [ ] Assess Grafana native geomap versus Plotly for India clearing-zone maps, including dynamic GeoJSON coloring, correct regional time series, region-name joins, and fixed color-scale bounds with Matteo.
   - Context: [[smp-dashboards]]
-  - Source: `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+  - Source: `sources/meetings/2026-09-28-1415-granola-smp-standup.md`; `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 
 - [ ] Loop Nilo into the Grafana + JupyterLab integration plan, using Signups as the reference while defining PR review and environment escalation.
   - Context: [[smp-dashboards]]
@@ -442,9 +450,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
 
-- [ ] Validate the `SCR-1261` adaptive Darwin collector after the September 28 fake-TSDB trials, including M2M authentication, controlled UAT publication/read-back, request-rate assumptions, and selected one-sample-per-source-minute behavior.
+- [ ] Deploy and validate the `SCR-1261` adaptive Darwin collector in the India dev cluster, then enable the DAG to publish EFS-collected values to TSDB and run controlled read-back/validation.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`; `sources/meetings/2026-09-30-0945-granola-morning-standup.md`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
 
 - [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, implement the independent-scale/intersection feedback from Mateo, then finalize and promote to production once QA is reachable.
   - Context: [[smp-platform]]
@@ -470,9 +478,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-24-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
 
-- [ ] Confirm whether Francois closed `SCR-1265` after the September 28 no-error Teams/Kaba realtime validation signal and Matteo meeting.
+- [ ] Confirm `SCR-1265` Sakaba/Kaba production stability and closure after the self-resolved Monday failure and September 28 no-error validation signal.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+  - Source: `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-09-28-1415-granola-smp-standup.md`; `sources/meetings/2026-09-30-0945-granola-morning-standup.md`
 
 - [ ] Share the Matteo meeting outcome with Francois for the September 28 SMP follow-up.
   - Context: [[smp-platform]]
@@ -506,9 +514,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-15-weekly-team-meeting.md`
 
-- [ ] Disable both KAVA DAGs in QA and open an OpEx India maintenance ticket for the Dev/QA cross-account S3 access loss.
+- [ ] Re-enable the Kaba DAGs in Airflow QA, verify the CDH cross-region SCP fix, and backfill TSDB UAT from the point of lost contact.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-04-daily-standup.md`
+  - Source: `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
 
 - [ ] Align with Mateo on the Khaba/Kava production missing-file backoff strategy, including failure threshold and reconciliation behavior after delayed CSV recovery.
   - Context: [[smp-platform]]
@@ -538,9 +546,29 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-02-standup.md`
 
-- [ ] Decide the downstream path for validated bilateral-contract data in CDH, including dashboard versus TSDB, schedule timing, and contract-name/trade-nature filtering.
+- [ ] Deliver `SCR-1275` bilateral-contract dashboard only after validating dashboard-required fields against CDH and source reports, including missing HPX TAM rows, IEX GTAM volume units, contract time-window semantics, and N/A versus discovered-price display.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
+  - Source: `sources/meetings/2026-09-02-standup.md`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/meetings/2026-09-04-daily-standup.md`; `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`; `sources/codex-conversations/2026-09-30-codex-conversations.txt`
+
+- [ ] Scope `SCR-1273` Darwin asset expansion from the confirmed accessible entities, including farm-level aggregation rules, observed irradiance freshness gaps, missing-minute handling, and whether there is a seventh site beyond the six explicitly identified entities.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
+
+- [ ] Continue `SCR-1274` HPX national DAM/GDAM/RTM preparation by checking worker-network access, TSDB catalog mappings, publication-readiness behavior, and zero-price/zero-volume semantics for the 12 national series.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`
+
+- [ ] Clarify TSDB catalogue `Insertion Date` versus `Publication Date` semantics for latency analysis, using the September 24 example plus a fresh-arrival probe and Airflow log comparison.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
+
+- [ ] Contact Matthew and Andrea to define the remaining Darwin-linked site tickets for the next backlog.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
+
+- [ ] Follow up with the new Japan contact to schedule the pending meeting.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
 
 - [ ] Check with Michael on the India regional proxy access approach before looping in Nilo or others; if unresolved, document the blocker and deprioritize Grid India work.
   - Context: [[smp-platform]]
@@ -762,10 +790,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 
-- [ ] Confirm whether `SCR-1252` can use Grafana Enterprise Usage Insights; if not, choose the Okta/Loki usage-baseline path.
-  - Context: [[smp-dashboards]]
-  - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
-
 - [ ] Review and merge the `SCR-1247` data freshness POC from the detached `smp-dashboard-scr-1247` worktree, then run live non-production Grafana/Athena validation.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/codex-conversations/2026-09-02-codex-conversations.txt`
@@ -948,10 +972,6 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-14-codex-conversations.txt`
 
-- [ ] Wait for Mateo/Darwin to provision Brian's exploratory Darwin API access and the SMP machine-to-machine Darwin application account with Tuticorin asset permissions.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`
-
 - [ ] Wait for Fred to escalate the India S&P index-access infrastructure issue to the IS team in Europe.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
@@ -1070,6 +1090,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
 ### SMP Platform
+
+- [x] Wait for Mateo/Darwin to provision Brian's exploratory Darwin API access and the SMP machine-to-machine Darwin application account with Tuticorin asset permissions.
+  - Closure: September 30 standups record the Darwin ticket as unblocked, with machine-to-machine client ID and secret obtained and tested locally; remaining work moved to dev-cluster deployment and live validation.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-09-15-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-30-0945-granola-morning-standup.md`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`
 
 - [x] Implement `SCR-1259` by publishing Khaba one-minute readings to the five new TSDB series alongside the existing 15-minute scraper, with no dashboard change.
   - Closure: September 17 Codex evidence records the one-minute implementation, regression test pass, QA promotion at `c5dfdd1`, and the existing 15-minute DAGs/Grafana panel remaining unchanged.

@@ -67,6 +67,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - The same September 22 Codex export records that Adrien and another user were added to the Intact `editor` group for the QA environment, while Grafana's admin dashboard still showed their roles as `Viewer`; the suggested operational check was to log out and back into Grafana so group-derived permissions could refresh.
 - The September 28 SMP standup captured two Grafana map-dashboard approaches: a Plotly file hosted in the Runfra Grafana folder, and Grafana geomap. Plotly worked but used a non-standard format; geomap fit Grafana better but was limited to static JSON with hardcoded colors. A ticket was created to explore dynamic JSON activation and connect the correct time series for material requests.
 - The same standup said the Grafana + JupyterLab integration direction should mirror Signups' setup, with a PR review layer and an environment escalation path still needed before next-period readiness. Nilo was expected to be looped in.
+- September 30 `SCR-1252` feasibility narrowed the lowest-effort Grafana usage question to active-user counting before deeper dashboard analytics. Grafana's organization-users API exposes `lastSeenAt`, which may answer "how many users are using Grafana" without Enterprise Usage Insights; Okta connection logs remain a lightweight alternative. Dashboard-level views, edits, and refresh/zoom behavior still depend on license/features, Loki logs, or deeper instrumentation.
+- September 30 grooming split `SCR-1254` observability into user/pain-point-driven work instead of copying Synapse's stack wholesale: monitor Airflow CPU pressure, monitor Airflow memory pressure, and investigate Grafana dashboard access errors reported by Matteo. Grafana usage monitoring should start with Okta connection logs and only go deeper if the simple connection signal shows enough users to justify more detailed tracking.
+- September 30 grooming sharpened the India clearing-zone map request: three time-series sets from Matteo should drive three separate maps, joined by region names such as `N1`, `N2`, and `N3`. Plotly already has a working prototype but needs code/source review; native Grafana geomap dynamic GeoJSON coloring may be version-limited or require activation. The color scale must use fixed min/max thresholds agreed with Matteo rather than autoscaling per snapshot.
+- September 30 `SCR-1275` dashboard review found the bilateral-contract dashboard should display source differences explicitly: average/lowest/highest prices are contract-level for IEX GTAM, while IEX TAM and HPX monthly reports provide discovered price instead. HPX market-summary statistics should not be reused as per-contract values, and split delivery windows make a single start/end pair unsafe for some contract names.
 
 ## Open Questions
 
@@ -100,6 +104,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether `Runfra` is the exact Grafana folder/system name from the September 28 standup.
 - UNCERTAIN: Which "material requests" time series the dynamic Grafana map ticket should connect to.
 - UNCERTAIN: Whether Signups' JupyterLab integration pattern can be reused directly for SMP or only as a reference shape.
+- UNCERTAIN: Whether SMP Grafana exposes enough organization-user `lastSeenAt` or Okta data to answer `SCR-1252` without Enterprise Usage Insights or Loki.
+- UNCERTAIN: Whether the current Grafana version can dynamically color GeoJSON regions for India clearing zones without falling back to Plotly.
+- UNCERTAIN: Which fixed min/max thresholds Matteo expects for the India clearing-zone heatmap color scales.
+- UNCERTAIN: Whether `SCR-1275` should represent split delivery windows with multiple intervals rather than a single start/end time.
 
 ## Sources
 
@@ -132,5 +140,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 - `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
+- `sources/codex-conversations/2026-09-30-codex-conversations.txt`
+- `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 
-Last Updated: 2026-09-29
+Last Updated: 2026-10-01
