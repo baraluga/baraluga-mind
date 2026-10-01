@@ -71,6 +71,10 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - September 30 grooming split `SCR-1254` observability into user/pain-point-driven work instead of copying Synapse's stack wholesale: monitor Airflow CPU pressure, monitor Airflow memory pressure, and investigate Grafana dashboard access errors reported by Matteo. Grafana usage monitoring should start with Okta connection logs and only go deeper if the simple connection signal shows enough users to justify more detailed tracking.
 - September 30 grooming sharpened the India clearing-zone map request: three time-series sets from Matteo should drive three separate maps, joined by region names such as `N1`, `N2`, and `N3`. Plotly already has a working prototype but needs code/source review; native Grafana geomap dynamic GeoJSON coloring may be version-limited or require activation. The color scale must use fixed min/max thresholds agreed with Matteo rather than autoscaling per snapshot.
 - September 30 `SCR-1275` dashboard review found the bilateral-contract dashboard should display source differences explicitly: average/lowest/highest prices are contract-level for IEX GTAM, while IEX TAM and HPX monthly reports provide discovered price instead. HPX market-summary statistics should not be reused as per-contract values, and split delivery windows make a single start/end pair unsafe for some contract names.
+- October 1 backlog grooming confirmed the India clearing-map dashboard should go straight to Plotly as a quick win: three maps, reusable panels, yellow-to-red colors because India prices have no negative values, price bounds from 0 to 10,000, and volume bounds from last year's historical data plus 10%. Each map panel needs a freshness indicator showing the oldest latest date across the panel's time series, similar to existing last-collected/last-push indicators.
+- October 1 notes kept the Grafana + JupyterLab integration behind an update from Nilo. Matteo's KPI dashboard was accepted as end-of-year/not urgent and should probably wait until Jupyter integration is clearer. If the dashboard shape is unknown, a flat CDH dump is preferred; if Matteo confirms the desired dashboard structure, a normalized schema may be better.
+- October 1 Codex discussion captured a reusable Grafana pattern for dashboards that need multiple async endpoint calls: if scheduled refresh is acceptable, use a backend aggregator/orchestrator that resolves calls and polling, writes completed outputs to CDH, and lets Grafana keep querying Athena. If dashboard filters must trigger fresh API jobs interactively, a direct backend API datasource or custom Grafana backend plugin is a different, heavier requirement.
+- October 1 Codex work says `SCR-1278` now owns bilateral-contract ingestion, normalization, replay, migration, and the CDH interface that blocks `SCR-1275`; the Grafana ticket should consume validated table names, schema, example queries, freshness joins, and documented limitations rather than correcting scraper behavior inside dashboard code.
 
 ## Open Questions
 
@@ -108,6 +112,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether the current Grafana version can dynamically color GeoJSON regions for India clearing zones without falling back to Plotly.
 - UNCERTAIN: Which fixed min/max thresholds Matteo expects for the India clearing-zone heatmap color scales.
 - UNCERTAIN: Whether `SCR-1275` should represent split delivery windows with multiple intervals rather than a single start/end time.
+- UNCERTAIN: Whether the October 1 price and volume bounds for India clearing maps are final acceptance criteria or current meeting guidance.
+- UNCERTAIN: Whether the async multi-endpoint dashboard use case can use scheduled CDH/Athena refresh or requires interactive dashboard-triggered computation.
 
 ## Sources
 
@@ -142,5 +148,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 - `sources/codex-conversations/2026-09-30-codex-conversations.txt`
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
+- `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
+- `sources/codex-conversations/2026-10-01-codex-conversations.txt`
 
-Last Updated: 2026-10-01
+Last Updated: 2026-10-02
