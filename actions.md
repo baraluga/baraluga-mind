@@ -878,9 +878,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ### Personal Infrastructure
 
-- [ ] Confirm whether the Globe modem actually committed LAN4 bridge mode, then monitor whether the 13:00-15:00 no-internet drop still happens.
+- [ ] Confirm whether the Globe modem actually committed LAN4 bridge mode, then monitor whether intermittent partial connectivity still happens and whether stale Microsoft/Zscaler routes recur after Wi-Fi switching.
   - Context: [[home-network]]
-  - Source: `sources/codex-conversations/2026-09-04-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-09-04-codex-conversations.txt`; `sources/codex-conversations/2026-10-02-codex-conversations.txt`
 
 ## Waiting
 

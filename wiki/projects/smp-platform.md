@@ -217,6 +217,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - October 1 `SCR-1274` Codex work moved beyond feasibility into local implementation evidence: the HPX national collection runtime and fixtures were developed with TDD, with collection tests passing locally. Remaining delivery still needs DAG/publication integration, Mateo's TSDB IDs and units, worker-network access verification, and controlled UAT publication/read-back before writes are enabled.
 - October 1 backlog grooming said H. India national-level website scraping should mirror the regional approach but is blocked by Zscaler 403 responses. The site worked in the office and outside Zscaler, and the same blocker had caused an earlier HPX scraper ticket to be rejected. The planned unblocker is a security whitelist ticket with James Snow.
 - October 1 backlog grooming framed Matteo's KPI dashboard as an Airflow preprocessing flow that collects TSDB time series, runs calculations, pushes results to CDH, and then feeds Grafana. Matteo wants to pair on it so he can understand and replicate the process. It is not urgent and may wait until after the Jupyter integration; the schema choice depends on whether Matteo can provide a concrete dashboard shape.
+- October 2 Khaba QA notification context: `india_khaba_generation_realtime` in India QA showed a latest failed run because the source object `s3://cdh-indiaassetsgeneration-337381/KHABA/FTP_DATA02-10-2026.csv` was missing for the 2026-10-02 delivery date. Brian's intended explanation to François was that QA and Prod both failed during the same source-file outage, QA was paused because it is only for testing, and Prod later recovered once the source file appeared, so later successful Prod runs buried the earlier failures.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -445,5 +446,6 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-10-01-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
 - `sources/codex-conversations/2026-10-01-codex-conversations.txt`
+- `sources/codex-conversations/2026-10-02-codex-conversations.txt`
 
-Last Updated: 2026-10-02
+Last Updated: 2026-10-03
