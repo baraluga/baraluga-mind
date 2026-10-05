@@ -218,6 +218,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - October 1 backlog grooming said H. India national-level website scraping should mirror the regional approach but is blocked by Zscaler 403 responses. The site worked in the office and outside Zscaler, and the same blocker had caused an earlier HPX scraper ticket to be rejected. The planned unblocker is a security whitelist ticket with James Snow.
 - October 1 backlog grooming framed Matteo's KPI dashboard as an Airflow preprocessing flow that collects TSDB time series, runs calculations, pushes results to CDH, and then feeds Grafana. Matteo wants to pair on it so he can understand and replicate the process. It is not urgent and may wait until after the Jupyter integration; the schema choice depends on whether Matteo can provide a concrete dashboard shape.
 - October 2 Khaba QA notification context: `india_khaba_generation_realtime` in India QA showed a latest failed run because the source object `s3://cdh-indiaassetsgeneration-337381/KHABA/FTP_DATA02-10-2026.csv` was missing for the 2026-10-02 delivery date. Brian's intended explanation to François was that QA and Prod both failed during the same source-file outage, QA was paused because it is only for testing, and Prod later recovered once the source file appeared, so later successful Prod runs buried the earlier failures.
+- October 5 SMP standup notes say two Darwin-related tickets were blocked by a proxy issue while waiting on IT after Michael's request. Grid India remained blocked enough to merit an IT call; a proposed path was one or two static IPs for routing traffic to India, while Zscaler enablement for Grid India may not be legally permitted. HDX local-machine access was working and lower priority.
+- The same standup says `SCR-1274` was blocked on TSDB IDs while Matteo was away and Adrien was the escalation path. The captured clarification was that the request was for three time series with a two-day forward view, not five separate series: day-ahead market today/next day, GTAM today/next day, and RTM.
+- October 5 presentation planning framed the trading data platform as moving from ad hoc scripts toward the NG data ecosystem: TSDB, Common Data Hub, Airflow, and Grafana. The proposed architecture slide is `Airflow -> TSDB -> Orchid Edge -> Airflow -> CDH -> Grafana`, and the demo should focus on a few production Grafana dashboards rather than a full inventory.
+- The next-period JupyterLab work is expected from late October through late November or early December. The goal is to integrate Synapse's JupyterLab pattern with QA and production environments so Matteo, Adrien, and Lou can create new DAGs more independently. Brian still needs a demo with Michael, likely from Eric, before the period begins; Bong and Fred need an explicit workload tradeoff between JupyterLab integration and regular delivery.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -331,6 +335,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether HPX missing September 19 TAM rows in production CDH are caused by failed collection, late publication, filtering, or another ingestion issue.
 - UNCERTAIN: Whether IEX GTAM traded volume should be stored/displayed as MWh, MU, or a differently normalized unit in `SCR-1275`.
 - UNCERTAIN: Which TSDB processing stage the catalogue displays as `Insertion Date`, and whether it can safely represent TSDB-side latency.
+- UNCERTAIN: Whether the October 5 source's "ticket 41274" is the same as `SCR-1274`.
+- UNCERTAIN: Whether `Orchid Edge` is the exact platform/component name in the presentation architecture path.
+- UNCERTAIN: Whether Eric is the confirmed JupyterLab demo owner, or only the likely presenter.
 - UNCERTAIN: Whether `Sabina`, `coins`, `Payvin`, `JMR`, `CloudStack`, `ABS-CBS`, `Europe Connect`, `Francesco`, `Jorge`, and `Yanik` are exact names from the September 22 weekly meeting source.
 - UNCERTAIN: Whether the ABS-CBS metadata-admin approval path or broad UAT approval path is the intended operating rule.
 - UNCERTAIN: Whether the DB Manager / RDS client security workaround on Bastion Prod is temporary only, and what permanent Artifactory/pipeline fix is expected.
@@ -447,5 +454,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
 - `sources/codex-conversations/2026-10-01-codex-conversations.txt`
 - `sources/codex-conversations/2026-10-02-codex-conversations.txt`
+- `sources/meetings/2026-10-05-granola-smp-standup.md`
+- `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 
-Last Updated: 2026-10-03
+Last Updated: 2026-10-06

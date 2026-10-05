@@ -75,6 +75,8 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - October 1 notes kept the Grafana + JupyterLab integration behind an update from Nilo. Matteo's KPI dashboard was accepted as end-of-year/not urgent and should probably wait until Jupyter integration is clearer. If the dashboard shape is unknown, a flat CDH dump is preferred; if Matteo confirms the desired dashboard structure, a normalized schema may be better.
 - October 1 Codex discussion captured a reusable Grafana pattern for dashboards that need multiple async endpoint calls: if scheduled refresh is acceptable, use a backend aggregator/orchestrator that resolves calls and polling, writes completed outputs to CDH, and lets Grafana keep querying Athena. If dashboard filters must trigger fresh API jobs interactively, a direct backend API datasource or custom Grafana backend plugin is a different, heavier requirement.
 - October 1 Codex work says `SCR-1278` now owns bilateral-contract ingestion, normalization, replay, migration, and the CDH interface that blocks `SCR-1275`; the Grafana ticket should consume validated table names, schema, example queries, freshness joins, and documented limitations rather than correcting scraper behavior inside dashboard code.
+- October 5 presentation planning recommended demoing one or two production Grafana dashboards in depth, briefly enumerating the available graphs, and choosing examples that show different visual types, such as Bitstack stacked area, bilateral-contract concepts, and KABA/KAFDA. The alerting feature should be mentioned as email-capable with Teams chat integration under testing.
+- The same planning notes say the bilateral-contract dashboard had a dashboard comment, screenshot, and upcoming Adrien validation session. KABA and KAFDA site generation were described as running every five minutes with one-minute granularity and flowing through TSDB.
 
 ## Open Questions
 
@@ -114,6 +116,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether `SCR-1275` should represent split delivery windows with multiple intervals rather than a single start/end time.
 - UNCERTAIN: Whether the October 1 price and volume bounds for India clearing maps are final acceptance criteria or current meeting guidance.
 - UNCERTAIN: Whether the async multi-endpoint dashboard use case can use scheduled CDH/Athena refresh or requires interactive dashboard-triggered computation.
+- UNCERTAIN: Whether KABA/KAFDA are the exact site names and how they relate to existing Kaba/Khaba/Khavda naming variants.
 
 ## Sources
 
@@ -150,5 +153,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 - `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
 - `sources/codex-conversations/2026-10-01-codex-conversations.txt`
+- `sources/meetings/2026-10-05-granola-smp-standup.md`
+- `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 
-Last Updated: 2026-10-02
+Last Updated: 2026-10-06

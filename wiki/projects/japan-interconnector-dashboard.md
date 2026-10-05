@@ -107,6 +107,8 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - An August 11 code search found no current or historical SMP DAG scraping `setsuden.nw.tohoku-epco.co.jp/download.html` or its `setsuden` / `tohoku-epco` domain. Existing adjacent Tohoku coverage comes from other sources: Tesla residual-demand and solar forecasts, JEPX day-ahead prices, OCCTO actual flow and capacity for Hokkaido-Tohoku / Tohoku-Tokyo, and HJKS unit-status or outage data.
 - The September 9 sprint review says TSDB production publishing was finalized for interconnector time series covering available capacity across all IC regions, operational capacity, actual flow, and JPX prices. Historical data from 2021 to date was confirmed available, and the TSDB provider was recorded as `interconnector`, owned by Carlos and Lona.
 - The same review says FY27 interconnector data had been updated and reflected in the dashboard promptly, with the business goal of reducing manual weekend data gathering for Hiromi.
+- October 5 Codex evidence answered Carlos's question about OCCTO interconnector sources: SMP pulls from OCCTO's public system information service over HTTP using the website's JSON and CSV endpoints, not SFTP or credentialed API access. Published TSDB series cover available capacity, operating capacity, and actual flow; planned flows, margins, and `広域調整枠` are present in the source but not currently exposed as TSDB series.
+- The same evidence treated `広域調整枠`, a wide-area adjustment allocation for frequency balancing, as the closest OCCTO source-field match for "adjustment reserve", with margin also relevant. The caveat is that these fields describe reserved interconnector capacity, not procured or available generation balancing reserve.
 
 ## Open Questions
 
@@ -129,6 +131,7 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - UNCERTAIN: Whether `port activation` in the August 11 standup is the exact TSDB/Japan term.
 - UNCERTAIN: Whether the Singapore user's requested Tohoku historical demand/supply-demand actuals should become a new SMP DAG scope.
 - UNCERTAIN: Whether the September 9 statement that interconnector TSDB production publishing is finalized closes all older `SCR-1171` production approval/open-action threads, or only the subset presented in the sprint review.
+- UNCERTAIN: Whether Carlos means reserved interconnector capacity or generation balancing reserve when asking about "adjustment reserve".
 
 ## Sources
 
@@ -183,5 +186,6 @@ The notes describe an early Grafana dashboard for daily average spread across in
 - `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-11-codex-conversations.txt`
 - `sources/meetings/2026-09-09-1630-granola-smp-sprint-review.md`
+- `sources/codex-conversations/2026-10-05-codex-conversations.txt`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-10-06

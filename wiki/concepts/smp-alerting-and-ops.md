@@ -54,6 +54,8 @@ SMP operational discussions in late June and early July focused on production in
 - September 28 Darwin trial evidence sharpened the collector-monitoring need: the first one-minute trial showed successful polls can still miss a source-minute bucket, while 15-second polling captured complete windows in a local fake-TSDB trial. Monitoring should therefore distinguish request success from per-entity/tag source-minute freshness and backlog.
 - September 29 SMP India Grafana troubleshooting showed a recurring operational pattern: transient Athena `GetWorkGroup` throttling can self-clear before investigation, as also happened in a previous SMP Japan Grafana incident. The practical recurrence evidence to collect is dashboard name, approximate time and timezone, request ID if visible, Athena account/role/region, and whether the role has CloudTrail or Service Quotas read access.
 - September 30 grooming reframed `SCR-1254` resource observability around concrete user pain points instead of copying another stack wholesale. The first subtasks should cover Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors, while Grafana usage monitoring should start from low-effort Okta or user-activity evidence before deeper interaction tracking.
+- October 5 standup notes say `SCR-1267` can use Teams channel email addresses without a new IT request: users create the Teams channel, allow external senders, and add the channel address as a Grafana Email contact point. This keeps business/data alert channels user-owned and separate from SMP operational alerting channels.
+- October 5 Codex evidence says the `SCR-1267` Confluence guide was published as `SCR-1267 -- Send Grafana alerts to a Microsoft Teams channel` beside the original `SCR-1244` email-alert setup guide under SMP India. The guide stops at creating/testing the Teams email contact point, then links to the `SCR-1244` guide for alert rules and routing; the TL;DR was later moved into a blue info banner.
 
 ## Open Questions
 
@@ -77,7 +79,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether ticket 1260 alerting should be promoted beyond QA, and exactly which QA Grafana alerting config must be backpropagated to dev.
 - UNCERTAIN: Whether Synapse Prometheus/alerting integration actually covers the SMP AWS cluster and the future Darwin collector pod.
 - UNCERTAIN: Whether the September 23 "coming days" production rollout of Grafana email alerts has completed and whether trader-facing Teams/email-to-mailbox notification demand was confirmed.
-- UNCERTAIN: Whether ENGIE allows Teams channel email from Grafana's SMTP sender, or whether the native Grafana Teams contact-point path is required.
+- UNCERTAIN: Whether ENGIE allows Teams channel email from Grafana's SMTP sender outside the tested India QA path, or whether some instances still need the native Grafana Teams contact-point path.
 - UNCERTAIN: Who should own and receive the proposed SMP Japan and SMP India Teams alert channels for Grafana business/data alerts.
 - UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
 - UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
@@ -121,5 +123,7 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-29-codex-conversations.txt`
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
+- `sources/meetings/2026-10-05-granola-smp-standup.md`
+- `sources/codex-conversations/2026-10-05-codex-conversations.txt`
 
-Last Updated: 2026-10-01
+Last Updated: 2026-10-06
