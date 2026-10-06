@@ -77,6 +77,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - October 1 Codex work says `SCR-1278` now owns bilateral-contract ingestion, normalization, replay, migration, and the CDH interface that blocks `SCR-1275`; the Grafana ticket should consume validated table names, schema, example queries, freshness joins, and documented limitations rather than correcting scraper behavior inside dashboard code.
 - October 5 presentation planning recommended demoing one or two production Grafana dashboards in depth, briefly enumerating the available graphs, and choosing examples that show different visual types, such as Bitstack stacked area, bilateral-contract concepts, and KABA/KAFDA. The alerting feature should be mentioned as email-capable with Teams chat integration under testing.
 - The same planning notes say the bilateral-contract dashboard had a dashboard comment, screenshot, and upcoming Adrien validation session. KABA and KAFDA site generation were described as running every five minutes with one-minute granularity and flowing through TSDB.
+- October 6 standup notes say the Geomap dashboard was built in QA against live IEX data. The same dashboard JSON imported successfully into production, which confirmed color configuration can live in dashboard settings rather than inside the GeoJSON file. Matteo expects three maps; the source says all three are feasible, and reusable panels are not a near-term priority because copy-pasting the query is acceptable for now.
 
 ## Open Questions
 
@@ -117,6 +118,7 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - UNCERTAIN: Whether the October 1 price and volume bounds for India clearing maps are final acceptance criteria or current meeting guidance.
 - UNCERTAIN: Whether the async multi-endpoint dashboard use case can use scheduled CDH/Athena refresh or requires interactive dashboard-triggered computation.
 - UNCERTAIN: Whether KABA/KAFDA are the exact site names and how they relate to existing Kaba/Khaba/Khavda naming variants.
+- UNCERTAIN: Whether production Grafana allows uploading a new GeoJSON country-map file to the public folder without special rights.
 
 ## Sources
 
@@ -155,5 +157,6 @@ Dashboard delivery was moving quickly, while infrastructure work was slower and 
 - `sources/codex-conversations/2026-10-01-codex-conversations.txt`
 - `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
+- `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 
-Last Updated: 2026-10-06
+Last Updated: 2026-10-07

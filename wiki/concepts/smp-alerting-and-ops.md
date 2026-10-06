@@ -56,6 +56,7 @@ SMP operational discussions in late June and early July focused on production in
 - September 30 grooming reframed `SCR-1254` resource observability around concrete user pain points instead of copying another stack wholesale. The first subtasks should cover Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors, while Grafana usage monitoring should start from low-effort Okta or user-activity evidence before deeper interaction tracking.
 - October 5 standup notes say `SCR-1267` can use Teams channel email addresses without a new IT request: users create the Teams channel, allow external senders, and add the channel address as a Grafana Email contact point. This keeps business/data alert channels user-owned and separate from SMP operational alerting channels.
 - October 5 Codex evidence says the `SCR-1267` Confluence guide was published as `SCR-1267 -- Send Grafana alerts to a Microsoft Teams channel` beside the original `SCR-1244` email-alert setup guide under SMP India. The guide stops at creating/testing the Teams email contact point, then links to the `SCR-1244` guide for alert rules and routing; the TL;DR was later moved into a blue info banner.
+- October 6 standup notes say Grafana Teams alert tickets `1267` and `1269` were proven working, that Teams channel setup is out of scope for the implementation, and that the Confluence guide covers the Teams-side setup while referencing the existing Grafana guide. The remaining step is validation after review.
 
 ## Open Questions
 
@@ -85,6 +86,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
 - UNCERTAIN: Whether recurring SMP Grafana Athena throttling should become a formal monitor, or remain a note-and-watch operational hiccup until recurrence frequency increases.
 - UNCERTAIN: Whether the Grafana dashboard access errors reported by Matteo are related to the September 29 Athena throttling pattern, permissions, datasource behavior, or a separate dashboard issue.
+- UNCERTAIN: Whether ticket `1269` is a second Grafana Teams alert ticket paired with `SCR-1267`, or whether the meeting source compressed two related ticket references.
 
 ## Sources
 
@@ -125,5 +127,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 - `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/codex-conversations/2026-10-05-codex-conversations.txt`
+- `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 
-Last Updated: 2026-10-06
+Last Updated: 2026-10-07

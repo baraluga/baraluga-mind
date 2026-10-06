@@ -39,6 +39,7 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - The July 25 capture set contained fourteen Codex sessions, zero Copilot sessions, and a no-meetings Granola status. Durable outcomes included organization-wide SFF CI closeout, GAMS readiness documentation, Pipeline Modernizer decommissioning, DeCliC migration work, and the installed Buddy v2 Codex pet.
 - The July 26 capture set contained six Codex sessions, zero Copilot sessions, and a no-meetings Granola status. Durable outcomes included DeCliC deployment-runway validation and the Pipeline Customs Broker proof of concept.
 - `consult-mind-palace` is a global Codex skill under `/Users/qn5792/.codex/skills/consult-mind-palace/`. It treats this repository as a read-only "mind palace" from any working directory, searches durable wiki pages before action/source evidence, and returns source-backed synthesis for tasks such as Confluence drafting.
+- On October 6, Brian chose to try a Notion pilot for Baraluga Mind after comparing options. The repo remains canonical during the trial, while a private Notion snapshot was created with SMP Platform and Japan Interconnector notes, a related decision, complete Markdown originals attached to note pages, and sample actions/views. The pilot page recorded in the source is `https://app.notion.com/p/3f0d7305ac1481b8b6deecf67b3e08eb`.
 
 ## Open Questions
 
@@ -104,5 +105,6 @@ The current ingest convention is that captured material lands in `inbox/` first.
 - `sources/copilot-conversations/2026-07-26-copilot-conversations.md`
 - `sources/meetings/2026-07-26-granola-meeting-notes-status.md`
 - `sources/codex-conversations/2026-09-04-codex-conversations.txt`
+- `sources/codex-conversations/2026-10-06-codex-conversations.txt`
 
-Last Updated: 2026-09-05
+Last Updated: 2026-10-07
