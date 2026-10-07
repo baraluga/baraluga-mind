@@ -108,6 +108,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - The same standup said Brian's official SMP handover was in final feedback, targeting completion on September 18 if all went well, and noted that an Abram/Piri production-monitoring request needed a Rancher access request.
 - The September 22 weekly team meeting captured several operational reminders: APE clinic preferences were due by end of day with preferred clinic and planned dates, Alfred was exempted, and the top-choice clinic would be prioritized. It also said Fred/Sebastian were expected on Monday, Wednesday, and Saturday, with possible office lunch/activities, team members encouraged to showcase work, and support-week RTO/standby handling allowed to reflect 24/7 duty.
 - The September 22 Walnut incident notice said Artifactory cybersecurity remediation temporarily affected GitHub Actions, Walnut billing, Walnut Jira Service Management, and Claude Code. For internal deployments, this means a queued workflow can be a platform-runner/service issue even when repository validation jobs have passed.
+- October 7 morning standup notes captured a lightweight process for AI credit increases: first email Fred and the requester with the new business need, current AI usage in the workflow, and planned additional-credit usage, then submit the ticket. Angie and one other person had completed this flow, while one unresolved case might be a system error.
 
 ## Open Questions
 
@@ -149,6 +150,7 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - UNCERTAIN: Whether `Vault`, `Pierre`, and the exact Sentry rollout ownership from the September 17 roundtable need more precise internal references.
 - UNCERTAIN: Whether `Fred/Sebastian` in the September 22 weekly meeting refers to the same visit previously captured as Fred and Christina's Philippines visit, or a separate visit.
 - UNCERTAIN: Whether `Palanetto` is the exact name of the online word-guessing game mentioned in the September 22 weekly meeting.
+- UNCERTAIN: Who the October 7 source calls "the speaker" in the AI credit request process, and whether Angie is the exact spelling.
 
 ## Sources
 
@@ -209,5 +211,6 @@ Team operations notes from late June and early July 2026 covered recruitment, of
 - `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 - `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
+- `sources/meetings/2026-10-07-granola-morning-standup.md`
 
-Last Updated: 2026-09-23
+Last Updated: 2026-10-08

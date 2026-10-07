@@ -222,9 +222,16 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The same standup says `SCR-1274` was blocked on TSDB IDs while Matteo was away and Adrien was the escalation path. The captured clarification was that the request was for three time series with a two-day forward view, not five separate series: day-ahead market today/next day, GTAM today/next day, and RTM.
 - October 5 presentation planning framed the trading data platform as moving from ad hoc scripts toward the NG data ecosystem: TSDB, Common Data Hub, Airflow, and Grafana. The proposed architecture slide is `Airflow -> TSDB -> Orchid Edge -> Airflow -> CDH -> Grafana`, and the demo should focus on a few production Grafana dashboards rather than a full inventory.
 - The next-period JupyterLab work is expected from late October through late November or early December. The goal is to integrate Synapse's JupyterLab pattern with QA and production environments so Matteo, Adrien, and Lou can create new DAGs more independently. Brian still needs a demo with Michael, likely from Eric, before the period begins; Bong and Fred need an explicit workload tradeoff between JupyterLab integration and regular delivery.
+- October 7 JupyterLab discussion made the near-term architecture more concrete and simpler than the Synapse model: start with JupyterHub in SMP dev only, restrict access to developers, give each user persistent local storage, mirror Airflow's image/network/credentials, and keep Git/PR review as the control point before Airflow reads any DAG changes. The source explicitly advises against replicating Synapse's save-to-DB audit trail, per-save commit machinery, or per-developer Airflow environments unless later evidence proves they are needed.
+- The same JupyterLab discussion treated direct Jupyter writes into the live DAG path as unsafe because a duplicate DAG ID could immediately trigger real external-service execution. A VS Code remote session into a cluster container was floated as a lighter alternative if visual notebook output is not required.
 - October 6 standup notes say the trading-data-platform demo moved to Friday using a slot borrowed from Catherine McGregor's team weekly meeting, with Francois expected to lead and Brian available.
 - Lou Dubuisson is taking over Matteo's close-colleague / point-of-contact role for this SMP area, but is not fully onboarded yet. The handover need is for Brian and Michael to walk Lou through the India DAGs, their documentation, and a clear data-flow overview so Lou can diagnose issues independently.
 - Sprint close context for the September 24 to October 7 period: Brian and Michael need to report man-hours via Promethe or by direct message to Francois, while an S&P / Synapse integration discussion with Eric Martin was added to produce a rough sprint estimate for steering-committee communication.
+- October 7 morning notes say Darwin API availability was still unresolved from the IT side: a ticket was marked done despite the issue being flagged as legacy and not actually available. Mateo and another Darwin contact were out of office, so escalation to Gregory was planned if the clarification path stayed blocked.
+- The same morning notes captured SMP hygiene work: DAG bundle details were still insufficient in infra documentation, Eric's file had more than 90 differences to cross-check, read-only Intac access was planned across environments, subfile configuration was updated but not yet deployed to production, and the production database had not yet been updated.
+- October 7 sprint review says Sprint 3 delivered the legacy scraper fix, Bitstack data pushed to TSDB, India geomap in Grafana, bilateral-contract dashboard, Grafana alerting documentation, and a small Japan interconnector backfill/bug fix. Darwin access remained a blocker for pushing ready data to TSDB, while Grid India depended first on legal approval for VPN/scraping access and then on a separate WBS portal approval.
+- Budget status at the October 7 sprint review was about EUR 45,000 total for the period, roughly 60% spent after 1.5 to 2 months, projected to close around 80%, with about 20% expected surplus. Next-period priorities included Darwin data fetch after access resolution, Jupyter integration, Docker image push automation, observability stack work, Lou onboarding/knowledge transfer, and Matteo dashboard support after leave.
+- The October 7 sprint review set steering-committee preparation work: define next-period topics by Monday, review the long-term plan, include Jayant and Lou in a prep session, use Matteo input if available, and prepare Microsoft Forms survey questions before the Friday demo.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -341,6 +348,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether the October 5 source's "ticket 41274" is the same as `SCR-1274`.
 - UNCERTAIN: Whether `Orchid Edge` is the exact platform/component name in the presentation architecture path.
 - UNCERTAIN: Whether Eric is the confirmed JupyterLab demo owner, or only the likely presenter.
+- UNCERTAIN: Whether Gregory is the right escalation owner for the unresolved Darwin API ticket, and which IT/Darwin side owns the version/Swagger or legacy-classification mismatch.
+- UNCERTAIN: Whether the source term `Intac` is exact and what system/group it refers to for read-only access.
+- UNCERTAIN: Which `subfile` configuration was updated, whether production change means environments 6-7, and what database update must precede deployment.
+- UNCERTAIN: Whether the Grid India legal approval path and WBS portal approval are both mandatory for production scraping, or only for the current access workaround.
+- UNCERTAIN: Whether `Jayant` is the exact spelling and required attendee for the Friday demo and steering-committee preparation.
 - UNCERTAIN: Whether `Sabina`, `coins`, `Payvin`, `JMR`, `CloudStack`, `ABS-CBS`, `Europe Connect`, `Francesco`, `Jorge`, and `Yanik` are exact names from the September 22 weekly meeting source.
 - UNCERTAIN: Whether the ABS-CBS metadata-admin approval path or broad UAT approval path is the intended operating rule.
 - UNCERTAIN: Whether the DB Manager / RDS client security workaround on Bastion Prod is temporary only, and what permanent Artifactory/pipeline fix is expected.
@@ -462,5 +474,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
+- `sources/meetings/2026-10-07-granola-integration-of-jupyterlab-to-airflow.md`
+- `sources/meetings/2026-10-07-granola-morning-standup.md`
+- `sources/meetings/2026-10-07-granola-sprint-review.md`
 
-Last Updated: 2026-10-07
+Last Updated: 2026-10-08
