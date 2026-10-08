@@ -590,9 +590,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-10-01-codex-conversations.txt`; `sources/meetings/2026-10-01-1415-granola-smp-standup.md`
 
-- [ ] Continue `SCR-1274` HPX national DAM/GDAM/RTM after Matteo and Lou create the HPX Scraper time series in UAT and production, then add DAG/publication integration, verify worker-network access, TSDB catalog mappings, publication-readiness behavior, and zero-price/zero-volume semantics.
+- [ ] Continue `SCR-1274` HPX national DAM/GDAM/RTM after Adrien, Matteo, or Lou unblock the HPX Scraper time series in UAT and production, then add DAG/publication integration, verify worker-network access, TSDB catalog mappings, publication-readiness behavior, and zero-price/zero-volume semantics.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/codex-conversations/2026-10-01-codex-conversations.txt`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`
+  - Source: `sources/codex-conversations/2026-09-30-codex-conversations.txt`; `sources/codex-conversations/2026-10-01-codex-conversations.txt`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`; `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 
 - [ ] Raise a security whitelist request with James Snow for the H. India website/provider blocked by Zscaler 403 before implementing national website scraping.
   - Context: [[smp-platform]]
@@ -774,9 +774,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-24-1515-granola-technical-standup.md`; `sources/notes/2026-07-27-ingest-handover-clarifications.md`; `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
 
-- [ ] Pair with Joyce or Michael on `SCR-507` to automate SMP Docker image build and push to AWS ECR.
+- [ ] Pair with Joyce or Michael on `SCR-507` to automate SMP Docker image build and push to AWS ECR, then finish the new Docker image commit, Helm upgrade, and pipeline permission checks.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`; `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`; `sources/meetings/2026-08-19-granola-smp-overview-with-jeroen.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1415-granola-smp-standup.md`; `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`; `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 
 - [ ] Define a Docker image rebuild and security-patching policy for SMP custom Airflow images.
   - Context: [[smp-platform]]
@@ -790,13 +790,41 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`
 
-- [ ] Revisit `SCR-1210` Jupyter DAG-authoring scope with Fred and Nilo/Milo, validate SMP dev Jupyter access with François and Eric, organize Brian and Michael's JupyterLab demo, identify must-haves versus drops, and split it into implementable stories with mandatory PR review.
+- [ ] Revisit `SCR-1210` Jupyter DAG-authoring scope with Fred and Nilo/Milo, validate SMP dev Jupyter access with François and Eric, schedule the Jupyter/cluster alignment follow-up, confirm the persistent DevX namespace / shared-volume architecture, agree CPU/memory budget limits, and split the work into implementable stories with mandatory PR review.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`; `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`; `sources/meetings/2026-10-07-granola-integration-of-jupyterlab-to-airflow.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`
+  - Source: `sources/meetings/2026-07-28-1430-granola-smp-backlog-grooming.md`; `sources/codex-conversations/2026-08-24-codex-conversations.txt`; `sources/meetings/2026-09-02-backlog-grooming.md`; `sources/codex-conversations/2026-09-02-codex-conversations.txt`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`; `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`; `sources/meetings/2026-10-07-granola-integration-of-jupyterlab-to-airflow.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`; `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`; `sources/meetings/2026-10-08-1431-granola-another-attempt-at-jupyter-discussion.md`; `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 
 - [ ] Prepare the SMP steering-committee topic list by Monday, incorporating Jayant, Lou, and Matteo input where available.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-10-07-granola-sprint-review.md`
+
+- [ ] Analyze `SCR-1284` dashboard data delay across Airflow, TSDB, CDH, Grafana, and Pathway, then decide whether to optimize the flow or tell users real-time visibility is outside current scope.
+  - Context: [[smp-platform]]; [[smp-alerting-and-ops]]
+  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+
+- [ ] Write `SCR-1285` repository-local onboarding documentation for Lou, starting from the India process docs and covering which time series come from where.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+
+- [ ] Check with the KJ team whether they see the same GEMS Artifactory 503 / TSDB gem dependency pipeline issue.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+
+- [ ] Take and link the CD for Darwin ticket `3822`, including the render-Darwin JSON push and SMP India image-parameter path.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+
+- [ ] Review the overdue access-rights ticket and close it if it is now irrelevant.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+
+- [ ] Discuss the Japan connector export ticket with Sai and decide its priority.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+
+- [ ] Keep Gauthier / Francois's Aurora-to-TSDB request in scoping mode until dataset, source format, update frequency, TSDB mapping, ownership, and support framework are clear.
+  - Context: [[smp-platform]]
+  - Source: `sources/codex-conversations/2026-10-08-codex-conversations.txt`
 
 - [ ] Remove paused production DAGs from automatic trigger/orchestrator configuration only after confirming owners, consumers, and stale queued-run handling.
   - Context: [[smp-alerting-and-ops]]
@@ -814,9 +842,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-alerting-and-ops]]
   - Source: `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/codex-conversations/2026-10-05-codex-conversations.txt`; `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 
-- [ ] Implement `SCR-1268` Darwin collector monitoring with Prometheus discovery first, then health, freshness, backlog, and operational alert verification for QA.
+- [ ] Implement `SCR-1268` Darwin collector monitoring by checking Jeka's existing observability coverage first, confirming the estimate with Jacob, then adding health, freshness, backlog, and operational alert verification for QA only where the existing stack has gaps.
   - Context: [[smp-alerting-and-ops]]; [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
+  - Source: `sources/codex-conversations/2026-09-25-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`; `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 
 - [ ] Keep monitoring the Grafana gaps bug through cobweb freshness checks and decide whether the raised 1-point ticket should use five-minute polling or a real-time approach.
   - Context: [[smp-alerting-and-ops]]

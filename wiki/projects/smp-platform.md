@@ -232,6 +232,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - October 7 sprint review says Sprint 3 delivered the legacy scraper fix, Bitstack data pushed to TSDB, India geomap in Grafana, bilateral-contract dashboard, Grafana alerting documentation, and a small Japan interconnector backfill/bug fix. Darwin access remained a blocker for pushing ready data to TSDB, while Grid India depended first on legal approval for VPN/scraping access and then on a separate WBS portal approval.
 - Budget status at the October 7 sprint review was about EUR 45,000 total for the period, roughly 60% spent after 1.5 to 2 months, projected to close around 80%, with about 20% expected surplus. Next-period priorities included Darwin data fetch after access resolution, Jupyter integration, Docker image push automation, observability stack work, Lou onboarding/knowledge transfer, and Matteo dashboard support after leave.
 - The October 7 sprint review set steering-committee preparation work: define next-period topics by Monday, review the long-term plan, include Jayant and Lou in a prep session, use Matteo input if available, and prepare Microsoft Forms survey questions before the Friday demo.
+- October 8 sprint planning kept the sprint around 12 to 15 points. Current candidates included Darwin API extension work, HPX scraping blocked on Adrien's time-series IDs, Darwin collector monitoring, Docker image / Helm / pipeline permission work for `SCR-507`, dashboard delay analysis under `SCR-1284`, and repository-local documentation for Lou under `SCR-1285`.
+- October 8 Jupyter discussion refined the preferred DAG-authoring architecture: a persistent DevX namespace with paired Jupyter and Airflow instances, a shared volume for fast DAG reflection, strict pod CPU/memory limits, Git/PR review as the merge gate, and no spin-up/teardown unless later evidence requires it. The resource risk is non-prod cluster capacity, because the shared EKS cluster was described as about 90% utilized across 10 nodes / 78.2 cores.
+- The October 8 Jupyter notes distinguish notebooks from DAG files: notebooks are useful for debugging CDH/API/data-transform logic, but Airflow still needs Python DAG files. The proposed user path is to iterate in Jupyter, copy validated logic into the DAG file, wait roughly 30-45 seconds for shared-volume reflection, then commit and open a PR.
+- October 8 planning added `SCR-1284` to analyze about 20 minutes of dashboard data delay between source APIs and Grafana visibility. The task is to map the Airflow, TSDB, CDH, Grafana, and Pathway flow and decide whether the current architecture can be optimized or whether users need to be told that real-time display is out of original scope.
+- October 8 Codex evidence located the existing Aurora XLSX loader for Mateo in `apac-tsdb-scraper`. It is a manual Excel-to-TSDB flow for quarterly India DAM/GDAM/RTM forecasts, useful as discussion evidence for Francois and Gauthier, but adaptation needs dataset, source format, update-frequency, TSDB mapping, ownership, and support-framework clarification before implementation.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -271,6 +276,10 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Nicola`, `Abraham`, `David`, `Pankaj`, and `Nick` are exact names from the July 20 TA standup.
 - UNCERTAIN: Whether `Gen-A` and `Go Anywhere` are the exact pipeline and managed-file-transfer names from the July 28 grooming notes.
 - UNCERTAIN: Whether `Matthew`, `Adrian`, and `Eric` are the exact people for Gen-A access and Jupyter/Airflow follow-up.
+- UNCERTAIN: Whether `Pathway` is the exact system name in the `SCR-1284` dashboard-delay flow or a transcript artifact.
+- UNCERTAIN: Whether `DevX branch` / persistent DevX namespace is the chosen name for the Jupyter development-session architecture.
+- UNCERTAIN: Whether `Gauthier de Maere` and the Strategy / Market Analysis Aurora ownership split are exact enough for durable stakeholder tracking.
+- UNCERTAIN: Whether `KJ team` and `Sai` are exact names from the October 8 sprint-planning source.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
 - UNCERTAIN: Whether `KSDB` in the August 11 standup is exact or a transcription artifact for TSDB.
 - UNCERTAIN: Whether `Fluid`, `Material`, and `CABA` are exact names from the August 11 standup and grooming notes.
@@ -477,5 +486,9 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-10-07-granola-integration-of-jupyterlab-to-airflow.md`
 - `sources/meetings/2026-10-07-granola-morning-standup.md`
 - `sources/meetings/2026-10-07-granola-sprint-review.md`
+- `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+- `sources/meetings/2026-10-08-1431-granola-another-attempt-at-jupyter-discussion.md`
+- `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+- `sources/codex-conversations/2026-10-08-codex-conversations.txt`
 
-Last Updated: 2026-10-08
+Last Updated: 2026-10-09

@@ -58,6 +58,8 @@ SMP operational discussions in late June and early July focused on production in
 - October 5 Codex evidence says the `SCR-1267` Confluence guide was published as `SCR-1267 -- Send Grafana alerts to a Microsoft Teams channel` beside the original `SCR-1244` email-alert setup guide under SMP India. The guide stops at creating/testing the Teams email contact point, then links to the `SCR-1244` guide for alert rules and routing; the TL;DR was later moved into a blue info banner.
 - October 6 standup notes say Grafana Teams alert tickets `1267` and `1269` were proven working, that Teams channel setup is out of scope for the implementation, and that the Confluence guide covers the Teams-side setup while referencing the existing Grafana guide. The remaining step is validation after review.
 - October 7 morning standup and sprint-review notes keep observability as next-period work: backlog grooming is needed for observability-stack tickets, blocked tickets, and ungroomed work; Jack advised on setup order; and the next priorities include monitoring computational resource usage.
+- October 8 sprint planning kept `SCR-1268` as Darwin collector monitoring work. Best case is that Jeka's existing observability stack already covers the needed signals and the ticket stays around 1 point; worst case is about 3 points if SMP must build a small health/error-log monitor. The suggested first checks are OctaConnection logs, existing Grafana/Prometheus coverage, and Jeka's knowledge of current monitoring gaps.
+- October 8 planning also tied observability to dashboard delay: `SCR-1284` should identify where roughly 20 minutes of delay is introduced across Airflow, TSDB, CDH, Grafana, and Pathway before the team promises optimization or real-time behavior.
 
 ## Open Questions
 
@@ -89,6 +91,8 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Whether the Grafana dashboard access errors reported by Matteo are related to the September 29 Athena throttling pattern, permissions, datasource behavior, or a separate dashboard issue.
 - UNCERTAIN: Whether ticket `1269` is a second Grafana Teams alert ticket paired with `SCR-1267`, or whether the meeting source compressed two related ticket references.
 - UNCERTAIN: Which observability-stack ticket sequence Jack recommended and whether it changes the existing `SCR-1254` resource-monitoring baseline.
+- UNCERTAIN: Whether `OctaConnection logs` is the exact log source name for Darwin collector monitoring.
+- UNCERTAIN: Whether `Pathway` is the exact system name in the dashboard-delay path.
 
 ## Sources
 
@@ -132,5 +136,7 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-07-granola-morning-standup.md`
 - `sources/meetings/2026-10-07-granola-sprint-review.md`
+- `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
+- `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 
-Last Updated: 2026-10-08
+Last Updated: 2026-10-09
