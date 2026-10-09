@@ -28,6 +28,7 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
 - July 24 standup says the Darwin root cause was accepted and Mateo committed to perform the backfill. Brian confirmed on July 27 that Mateo fixed the issue and completed the follow-up.
 - September 23 IEX incident probing found that all 12 national IEX series had metadata updates on September 22 around 14:33:52-14:34:15 IST and now resolve under `iex_api`; the unchanged Lambda scraper still searched `iex`, so its catalog lookup returned no national series and stopped publishing. Mateo confirmed the catalog change was intended, so Brian changed the national lookup to `iex_api`, added validation for missing/duplicate/invalid destination IDs, added bounded DAM/GDAM replay support, and pushed commits `60588d2` and `c0bf1f9` to `apac-tsdb-scraper` `main`. Local evidence reports 232 passing tests and a live-source check mapping 2,136 observations; production deployment and backfill were still pending because deployment credentials needed VPN refresh.
 - The same September 23 investigation separated upstream TSDB publication failure from downstream `smp-india` Airflow failures: the Lambda fix can restore source-backed TSDB prices/bid/cleared-volume publication, but separate scheduled-volume TSDB IDs were returning catalog-object 404s in Airflow and require a separate SMP India reader-side repair.
+- October 9 Codex review context says `SCR-1286` addressed IEX day-ahead DAM/GDAM publication gaps by keeping existing regular task properties byte-for-byte and adding lookback tasks for products 1 and 2 covering delivery days today, today-1, and today-2 in IST, marked with `lookback=True`. The October 9 standup says the gap fix was pushed with additional scraper optimizations and Lou confirmed the GDEM fix was working.
 
 ## Open Questions
 
@@ -36,6 +37,7 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
 - UNCERTAIN: Whether a read-only UAT catalog lookup was later run for the catalog refactor; dry run does not exercise TSDB catalog resolution.
 - UNCERTAIN: Whether the September 22 IEX scheduled-volume catalog-object 404s share the same root cause as the intended `iex_api` catalog reclassification.
 - UNCERTAIN: Whether `apac-tsdb-scraper` production deployment/backfill completed after the September 23 commits.
+- UNCERTAIN: Whether `SCR-1286` has been formally reviewed and closed after Lou's confirmation.
 
 ## Sources
 
@@ -44,5 +46,7 @@ Mateo reported that the new Aurora release renamed the price worksheet from mark
 - `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
 - `sources/notes/2026-07-27-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-09-23-codex-conversations.txt`
+- `sources/codex-conversations/2026-10-09-codex-conversations.txt`
+- `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
-Last Updated: 2026-09-24
+Last Updated: 2026-10-10

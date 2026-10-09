@@ -60,6 +60,7 @@ SMP operational discussions in late June and early July focused on production in
 - October 7 morning standup and sprint-review notes keep observability as next-period work: backlog grooming is needed for observability-stack tickets, blocked tickets, and ungroomed work; Jack advised on setup order; and the next priorities include monitoring computational resource usage.
 - October 8 sprint planning kept `SCR-1268` as Darwin collector monitoring work. Best case is that Jeka's existing observability stack already covers the needed signals and the ticket stays around 1 point; worst case is about 3 points if SMP must build a small health/error-log monitor. The suggested first checks are OctaConnection logs, existing Grafana/Prometheus coverage, and Jeka's knowledge of current monitoring gaps.
 - October 8 planning also tied observability to dashboard delay: `SCR-1284` should identify where roughly 20 minutes of delay is introduced across Airflow, TSDB, CDH, Grafana, and Pathway before the team promises optimization or real-time behavior.
+- October 9 standup notes say `SCR-1284` needs timing evidence across scraping, TSDB injection, and CDH push time, including mean and standard deviation for one IEX series and one non-IEX source. The evidence is needed before asking the TSDB team to accept a bypass design where Airflow writes IEX RTM directly to both TSDB and CDH.
 
 ## Open Questions
 
@@ -93,6 +94,7 @@ SMP operational discussions in late June and early July focused on production in
 - UNCERTAIN: Which observability-stack ticket sequence Jack recommended and whether it changes the existing `SCR-1254` resource-monitoring baseline.
 - UNCERTAIN: Whether `OctaConnection logs` is the exact log source name for Darwin collector monitoring.
 - UNCERTAIN: Whether `Pathway` is the exact system name in the dashboard-delay path.
+- UNCERTAIN: Whether TSDB itself can meet the 2-3 minute delay target, or whether it lacks the side-signaling needed for near-real-time behavior.
 
 ## Sources
 
@@ -138,5 +140,6 @@ SMP operational discussions in late June and early July focused on production in
 - `sources/meetings/2026-10-07-granola-sprint-review.md`
 - `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
 - `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+- `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
-Last Updated: 2026-10-09
+Last Updated: 2026-10-10

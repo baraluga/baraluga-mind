@@ -24,6 +24,10 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[team-operations]]; [[ai-assisted-engineering]]
   - Source: `sources/meetings/2026-10-07-granola-morning-standup.md`
 
+- [ ] Discuss the SMP Kanban transition with Bang (source spelling) and Fred, including whether sprint reviews can be replaced by lighter budget/status communication.
+  - Context: [[team-operations]]; [[smp-platform]]
+  - Source: `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+
 - [ ] Submit Q3 actuals after the September 19 projected inputs, if the end-of-month close was not already completed.
   - Context: [[team-operations]]
   - Source: `sources/meetings/2026-09-30-0945-granola-morning-standup.md`
@@ -478,17 +482,13 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/codex-conversations/2026-09-17-codex-conversations.txt`; `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 
-- [ ] Validate `SCR-1229` production bilateral-contract data through CDH format checks and spot-checked data points.
+- [ ] Confirm no outstanding bilateral-contract feedback remains, then close the related tickets or open a support ticket if new action is needed.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-10-05-granola-smp-standup.md`
+  - Source: `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/meetings/2026-10-06-1415-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`; `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
-- [ ] Follow up with Adrien on ticket `1078` / `1075` bilateral-contract validation after his trader discussion.
+- [ ] Deploy and validate the `SCR-1261` adaptive Darwin collector in the India dev cluster, bumping Adrian or IT on the pending resource/API availability blocker if needed, then enable the DAG to publish EFS-collected values to TSDB and run controlled read-back/validation.
   - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-10-06-1415-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`
-
-- [ ] Deploy and validate the `SCR-1261` adaptive Darwin collector in the India dev cluster, resolving the Darwin API availability/version ticket if needed, then enable the DAG to publish EFS-collected values to TSDB and run controlled read-back/validation.
-  - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`; `sources/meetings/2026-09-30-0945-granola-morning-standup.md`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`; `sources/meetings/2026-10-01-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-10-01-codex-conversations.txt`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-morning-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`
+  - Source: `sources/codex-conversations/2026-09-18-codex-conversations.txt`; `sources/meetings/2026-09-18-1230-granola-darwin-api.md`; `sources/meetings/2026-09-18-1415-granola-smp-standup.md`; `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`; `sources/codex-conversations/2026-09-21-codex-conversations.txt`; `sources/meetings/2026-09-25-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-09-28-codex-conversations.txt`; `sources/meetings/2026-09-30-0945-granola-morning-standup.md`; `sources/meetings/2026-09-30-1415-granola-smp-standup.md`; `sources/meetings/2026-10-01-1415-granola-smp-standup.md`; `sources/codex-conversations/2026-10-01-codex-conversations.txt`; `sources/meetings/2026-10-05-granola-smp-standup.md`; `sources/meetings/2026-10-07-granola-morning-standup.md`; `sources/meetings/2026-10-07-granola-sprint-review.md`; `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
 - [ ] Gather India user feedback on the QA-only `SCR-1243` IEX bid-stack dashboard, implement the independent-scale/intersection feedback from Mateo, then finalize and promote to production once QA is reachable.
   - Context: [[smp-platform]]
@@ -798,13 +798,9 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Context: [[smp-platform]]
   - Source: `sources/meetings/2026-10-07-granola-sprint-review.md`
 
-- [ ] Analyze `SCR-1284` dashboard data delay across Airflow, TSDB, CDH, Grafana, and Pathway, then decide whether to optimize the flow or tell users real-time visibility is outside current scope.
+- [ ] Analyze `SCR-1284` dashboard data delay across the scraper, TSDB, Airflow, CDH, Grafana, and Pathway; confirm Adrian's acceptable delay threshold; and gather mean/std-dev timing evidence for one IEX series and one other source before deciding whether to optimize or reset real-time expectations.
   - Context: [[smp-platform]]; [[smp-alerting-and-ops]]
-  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
-
-- [ ] Write `SCR-1285` repository-local onboarding documentation for Lou, starting from the India process docs and covering which time series come from where.
-  - Context: [[smp-platform]]
-  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`; `sources/codex-conversations/2026-10-09-codex-conversations.txt`; `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
 - [ ] Check with the KJ team whether they see the same GEMS Artifactory 503 / TSDB gem dependency pipeline issue.
   - Context: [[smp-platform]]
@@ -824,7 +820,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 - [ ] Keep Gauthier / Francois's Aurora-to-TSDB request in scoping mode until dataset, source format, update frequency, TSDB mapping, ownership, and support framework are clear.
   - Context: [[smp-platform]]
-  - Source: `sources/codex-conversations/2026-10-08-codex-conversations.txt`
+  - Source: `sources/codex-conversations/2026-10-08-codex-conversations.txt`; `sources/codex-conversations/2026-10-09-codex-conversations.txt`
+
+- [ ] Do the final check and close `SCR-1286` after Lou's confirmation that the October IEX GDEM gap fix is working.
+  - Context: [[smp-platform]]; [[apac-tsdb-scraper]]
+  - Source: `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
 - [ ] Remove paused production DAGs from automatic trigger/orchestrator configuration only after confirming owners, consumers, and stale queued-run handling.
   - Context: [[smp-alerting-and-ops]]
@@ -1170,6 +1170,11 @@ Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
   - Source: `sources/codex-conversations/2026-08-04-codex-conversations.txt`
 
 ### SMP Platform
+
+- [x] Write `SCR-1285` repository-local onboarding documentation for Lou, starting from the India process docs and covering which time series come from where.
+  - Closure: The October 9 standup says `SCR-1285` created a repository-local `data_catalog` file for enabled DAGs and added a GitHub pipeline that validates documentation against existing DAGs.
+  - Context: [[smp-platform]]
+  - Source: `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`; `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 
 - [x] Wait for Mateo/Darwin to provision Brian's exploratory Darwin API access and the SMP machine-to-machine Darwin application account with Tuticorin asset permissions.
   - Closure: September 30 standups record the Darwin ticket as unblocked, with machine-to-machine client ID and secret obtained and tested locally; remaining work moved to dev-cluster deployment and live validation.

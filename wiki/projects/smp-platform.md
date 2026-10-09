@@ -237,6 +237,11 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - The October 8 Jupyter notes distinguish notebooks from DAG files: notebooks are useful for debugging CDH/API/data-transform logic, but Airflow still needs Python DAG files. The proposed user path is to iterate in Jupyter, copy validated logic into the DAG file, wait roughly 30-45 seconds for shared-volume reflection, then commit and open a PR.
 - October 8 planning added `SCR-1284` to analyze about 20 minutes of dashboard data delay between source APIs and Grafana visibility. The task is to map the Airflow, TSDB, CDH, Grafana, and Pathway flow and decide whether the current architecture can be optimized or whether users need to be told that real-time display is out of original scope.
 - October 8 Codex evidence located the existing Aurora XLSX loader for Mateo in `apac-tsdb-scraper`. It is a manual Excel-to-TSDB flow for quarterly India DAM/GDAM/RTM forecasts, useful as discussion evidence for Francois and Gauthier, but adaptation needs dataset, source format, update-frequency, TSDB mapping, ownership, and support-framework clarification before implementation.
+- October 9 standup notes say sprint burn-rate charts look irregular because work is pulled mid-sprint when tickets are unclear at sprint start or when the team runs out of ready work. The discussion favored a Kanban transition over adding a break between sprints, because sprint reviews add little value for SMP India beyond budget tracking while users already see production changes and give real-time feedback. This needs discussion with Bang (source spelling) and Fred.
+- October 9 standup notes say `SCR-1285` created a repository-local `data_catalog` file covering enabled DAG purpose, run frequency, source, CDH or TSDB storage, time-series IDs, and dataset names. A GitHub pipeline validates the documentation against existing DAGs. Aurora remains correctly excluded because it lives in `apac-tsdb-scraper`; Kafka/Kaba collection was confirmed to be inside a DAG and therefore covered.
+- October 9 standup notes sharpened `SCR-1284`: IEX RTM delay comes from two scheduled processes on separate environments, with `apac-tsdb-scraper` publishing source data to TSDB outside Airflow and the India Airflow DAG copying TSDB to CDH on its own fixed schedule. Lowering intervals may reduce but not eliminate delay; the preferred option, if Adrian accepts a 2-3 minute target, is for Airflow to write IEX RTM directly to both TSDB and CDH in parallel. True real-time visibility would expand toward the Darwin-style design rather than a normal Airflow schedule.
+- October 9 CDH UI evidence found 4 October 2026 GDAM data present in `india_iex_tsdb_expanded_latest` with 96 distinct timestamps and non-null price/sold/purchased values for each day from 2-6 October IST. The older `india_iex_tsdb_dashboard_latest` and `india_iex_tsdb_latest` tables were empty, while the checked-in GDAM panel still queried `dashboard_latest`, so the data existed but the panel table reference appeared stale.
+- October 9 standup notes say the October IEX day-ahead Green DAM / GDEM gap fix for `SCR-1286` was pushed to `apac-tsdb-scraper` with scraper optimizations, Lou confirmed it was working, and final ticket review/closure remained.
 - The September 17 Tech Lead Roundtable said several Lambdas across projects are deployed without VPC binding; Prosumer prod was described as comparatively compliant, while Extruder, The Click, and others in the no-prod account were non-compliant. The issue is not urgent, but a report should be created.
 - The same roundtable said CrowdStrike is not working on ephemeral machines including ARM, Prosumer, and GMR because the security group lacks port 8080 access for the proxy. Carlo said he lacked permission to fix it; Nilo was expected to grant or add the port for GMR and Prosumer.
 - For DayClick, the team can use `declick.myengi.com` for production. NGIT needs to configure the domain and point it to the load balancer, with a DigiCert setup assumed similar to Prosumer. Nika and Reina were named as the current DayClick tech-lead tandem.
@@ -279,6 +284,8 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - UNCERTAIN: Whether `Pathway` is the exact system name in the `SCR-1284` dashboard-delay flow or a transcript artifact.
 - UNCERTAIN: Whether `DevX branch` / persistent DevX namespace is the chosen name for the Jupyter development-session architecture.
 - UNCERTAIN: Whether `Gauthier de Maere` and the Strategy / Market Analysis Aurora ownership split are exact enough for durable stakeholder tracking.
+- UNCERTAIN: Whether `Bang` in the October 9 Kanban-transition note means Bong or another person.
+- UNCERTAIN: Whether the checked-in GDAM Grafana panel is still deployed live with `india_iex_tsdb_dashboard_latest`, or whether live Grafana has already diverged from the repository query.
 - UNCERTAIN: Whether `KJ team` and `Sai` are exact names from the October 8 sprint-planning source.
 - UNCERTAIN: Whether `XLSEC 12.01` and `Gong` are the exact product/version and hours-reporting system names from the July 28 grooming notes.
 - UNCERTAIN: Whether `KSDB` in the August 11 standup is exact or a transcription artifact for TSDB.
@@ -490,5 +497,7 @@ The recurring operational theme was that India was still tied to Japan-era infra
 - `sources/meetings/2026-10-08-1431-granola-another-attempt-at-jupyter-discussion.md`
 - `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 - `sources/codex-conversations/2026-10-08-codex-conversations.txt`
+- `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+- `sources/codex-conversations/2026-10-09-codex-conversations.txt`
 
-Last Updated: 2026-10-09
+Last Updated: 2026-10-10

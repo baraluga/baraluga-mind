@@ -44,6 +44,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - Atlas work on September 17 applied the lean AI-assisted pattern: repository instructions, hooks, CI, manual dry-run deployment, and optional Dash Expert support, while avoiding a full SDD agent fleet for Francois's current solo-developer workflow.
 - September 18 Atlas work created Brian's reusable `$estimate-project-time` skill for stakeholder effort questions. The method uses Codex logs and Git evidence, treats collaboration-session time as the headline, deduplicates parallel work, reports recorded runtime and 15/30/60-minute cutoff sensitivity, and converts hours to person-days with an explicit eight-hour-day assumption.
 - The September 18 AMA GenAI session captured leadership's current stance: AI decouples output production from junior-skill formation, but there is no clear timeline or role model yet for structural changes. Dimitri committed to direct communication before structural announcements, using productivity gains for backlog/additional tasks before headcount reductions, and preserving junior career paths. Mental-health concerns from AI-driven purpose loss, isolation, and responsibility creep were acknowledged, with Employee Assistance Program resources cited.
+- October 9 Codex setup work installed REA 6.1.0 for local reverse-engineering workflows, configured it as a Codex MCP server with a fixed Node 22.23.3 runtime, installed the matching skill, and installed Hopper 6.6.0 demo for native analysis. MCP discovery reported 138 REA tools and a live JavaScript analysis passed after restarting Codex; native decompilation remained untested and may be limited by Hopper's demo mode.
 
 ## Open Questions
 
@@ -66,6 +67,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - UNCERTAIN: Whether Better Codex or another board tool actually fits Brian's current Codex task workflow after local compatibility testing.
 - UNCERTAIN: Whether the `$estimate-project-time` method should become the default evidence standard for project-effort questions beyond Atlas.
 - UNCERTAIN: What formal change-management or reskilling program will follow the GenAI job-family impact mapping.
+- UNCERTAIN: Whether Hopper demo mode is sufficient for Brian's expected native reverse-engineering tasks, or whether a license or Ghidra/IDA setup is needed.
 
 ## Sources
 
@@ -97,5 +99,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 - `sources/meetings/2026-09-18-1500-granola-ama-genai.md`
+- `sources/codex-conversations/2026-10-09-codex-conversations.txt`
 
-Last Updated: 2026-09-19
+Last Updated: 2026-10-10
