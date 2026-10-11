@@ -16,6 +16,7 @@ The wiki is the synthesized memory layer. It should be more stable, more careful
 - Follow the root Current-State Rule: rewrite `Current State`, replace superseded claims, and keep `History` to turning points.
 - If a page is mostly a bucket for unclear material, name it plainly, such as `unclear-captures.md`.
 - Put every SMP page (platform, India, Japan, dashboards, ops, SMP tooling) in `wiki/smp/`. Other pages stay in `people/`, `projects/`, `concepts/`, or `decisions/`. Wiki-links resolve by page name, so moving a page never breaks links.
+- Maintain `wiki/aliases.md`. Use the canonical name in pages. Add a variant to its line only when Brian confirms it or the evidence is unambiguous, and resolve any `UNCERTAIN:` line it settles. Leave unconfirmed matches as `UNCERTAIN:` and list them under `Needs Confirmation`.
 - Keep `wiki/index.md` complete. When a page is created, renamed, split, or removed, update its entry under the right area with a one-line description.
 
 ## Entity Pages

@@ -11,8 +11,13 @@ Treat `/Users/qn5792/baraluga-mind` as the canonical root. Use absolute paths in
 
 1. Confirm the root exists. If it does not, report the missing path and stop.
 2. Read `/Users/qn5792/baraluga-mind/AGENTS.md` and any nested `AGENTS.md` that applies to files being read or changed.
-3. Translate the request into search terms: the exact phrase, obvious spelling or acronym variants, related project and person names, and likely Obsidian page slugs. Do not invent speculative synonyms.
-4. Skim `/Users/qn5792/baraluga-mind/wiki/index.md` to find the pages that own the topic. Then search filenames, headings, body text, and Obsidian links with `rg`. Start with `wiki/`, then search `sources/` for evidence and details. Search `inbox/` only when the user asks for exhaustive or very recent knowledge, and label unprocessed material clearly.
+3. Translate the request into search terms: the exact phrase, related project and person names, and likely page slugs. Then look up each name in `/Users/qn5792/baraluga-mind/wiki/aliases.md` and add every confirmed variant on its line (e.g. Khaba → Kaba, Kaaba, CABA, KAVA, …). Do not invent speculative synonyms; use whole-word matching (`-w`) for short names so `Bang` does not match `Bangkok`.
+4. Answer from the wiki first; search wider only when it falls short:
+   1. Skim `/Users/qn5792/baraluga-mind/wiki/index.md` to find the pages that own the topic.
+   2. `rg` across `wiki/` with the expanded terms.
+   3. Read the sources those pages cite.
+   4. Only if the wiki has no answer or looks stale, `rg` across all of `sources/`, including `.txt` transcripts.
+   5. Search `inbox/` only when the user asks for exhaustive or very recent knowledge, and label unprocessed material clearly.
 5. Open the most relevant durable pages in full. Read `Current State` first and note its "as of" date; treat `History` as turning points only. Follow their `[[wiki-links]]` and `Sources` references when they materially expand or verify the answer.
 6. For pending work, use the dated pending items in each page's `Current State`, then verify against recent sources. `actions.md` is a frozen archive from before 2026-10-11; cite it only for historical context, and do not infer that any item belongs to the user.
 7. Inspect relevant source passages directly before making detailed claims. For transcript-derived material, preserve uncertainty around unfamiliar names, acronyms, owners, dates, and jargon.
@@ -22,8 +27,9 @@ Example discovery commands:
 
 ```bash
 rg --files /Users/qn5792/baraluga-mind/wiki /Users/qn5792/baraluga-mind/sources /Users/qn5792/baraluga-mind/inbox
-rg -n -i --glob '*.md' 'term|variant' /Users/qn5792/baraluga-mind/wiki
-rg -n -i --glob '*.md' 'term|variant' /Users/qn5792/baraluga-mind/sources
+rg -n -i -w 'term|variant' /Users/qn5792/baraluga-mind/wiki/aliases.md   # expand names first
+rg -n -i -w 'term|variant' /Users/qn5792/baraluga-mind/wiki
+rg -n -i -w 'term|variant' /Users/qn5792/baraluga-mind/sources   # fallback; covers .md and .txt
 ```
 
 Use quoted patterns and `rg -F` when search terms contain regular-expression characters.
