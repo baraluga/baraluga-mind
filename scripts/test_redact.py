@@ -28,7 +28,7 @@ class RedactTest(unittest.TestCase):
         self.assertEqual(redact(url), url)
 
     def test_labelled_values_including_json_keys(self) -> None:
-        out = redact('password: hunter22\n"approval_token": "810fabcdef0123456789",\n"execute": true')
+        out = redact('password: hunter22\n"approval_token": "810fabcdef0123456789",\n"execute": true')  # gitleaks:allow (fake fixture)
         self.assertNotIn("hunter22", out)
         self.assertNotIn("810fabcdef", out)
         self.assertIn('"execute": true', out)
