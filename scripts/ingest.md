@@ -17,9 +17,6 @@ Goals:
 - Link related pages with Obsidian-style links.
 - Mark uncertainty explicitly.
 - Move processed `inbox/` files to the appropriate `sources/` folder when they remain useful as evidence.
-- Treat `inbox/YYYY-MM-DD.md` as a live stateful daily note: carry its durable context into the wiki, then move it to `sources/notes/YYYY-MM-DD.md`.
-- Leave the current Asia/Manila day's live note in `inbox/` unless the user explicitly asks to close or ingest it.
-- When the daily note duplicates messages in a Codex conversation transcript, prefer the daily note as the structured source and do not duplicate durable claims.
 - Treat `YYYY-MM-DD-codex-conversations.md` and its paired `.txt` transcript as one source: review the text evidence and move both files together without changing the transcript back to Markdown.
 - Leave files in `inbox/` when they still need follow-up, review, or clarification.
 - Give me a concise changelog when finished.
@@ -39,8 +36,6 @@ Do not delete files unless I explicitly ask.
 6. Rewrite `Current State` on every touched page, including people pages; replace superseded claims.
 7. Add source references.
 8. Move processed `inbox/` files worth preserving to the right `sources/` folder. Keep Codex conversation `.md`/`.txt` pairs together.
-   - Move live `inbox/YYYY-MM-DD.md` notes to `sources/notes/YYYY-MM-DD.md`.
-   - Deduplicate daily-note content against the paired Codex conversation transcript.
 9. Validate source references, wiki links, current `Last Updated` dates, and synthesized-file whitespace.
 10. Commit and push only when at least one item passed the value gate and produced a durable source or wiki change.
 11. Report what changed.

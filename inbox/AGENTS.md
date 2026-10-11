@@ -1,41 +1,8 @@
-# Daily Capture Instructions
+# Inbox Instructions
 
-These rules apply to live daily notes in `inbox/`.
+`inbox/` is the landing zone for automated captures: the daily Codex, GitHub Copilot, and Granola exports. Anything dropped here by hand follows the same ingest path.
 
-## Live Note Shape
-
-Use `YYYY-MM-DD.md` for the current Asia/Manila date:
-
-```markdown
-# YYYY-MM-DD
-
-## Today
-
-## Notes
-
-## Timeline
-
-Last Updated: YYYY-MM-DD
-```
-
-- `Today` is a provisional, stateful view of inferred tasks and status changes.
-- `Notes` contains non-actionable observations, ideas, decisions, and reflections.
-- `Timeline` preserves each raw chat dump once under a local-time heading.
-
-## Stateful Updates
-
-- Add inferred tasks as unchecked checkboxes.
-- When later evidence completes a task, change it to `[x]`, strike through its text, and add a timestamped completion annotation.
-- Preserve cancelled and superseded tasks with a struck-through entry and source-backed reason.
-- Keep blocked or waiting tasks unchecked and annotate their state.
-- Update existing entries instead of adding semantic duplicates.
-- Do not delete raw timeline entries.
-- Use `UNCERTAIN:` for ambiguous owners, names, acronyms, dates, or high-impact interpretations.
-
-## Ingest Handoff
-
-- Daily-note tasks are provisional capture, not the canonical action register.
-- Leave the current Asia/Manila day's live note in `inbox/` unless the user explicitly asks to close or ingest it.
-- During ingest, carry durable context and still-relevant pending items into the affected wiki pages' `Current State`. Do not write to `actions.md`.
-- Move the processed note to `sources/notes/YYYY-MM-DD.md`.
-- When the same dump also appears in a Codex conversation export, prefer this daily note as the structured source and use the transcript only as backup evidence. Do not duplicate actions or durable claims.
+- There is no live daily note. The `dump` skill was retired on 2026-10-11, and ingest runs autonomously on a schedule.
+- Codex exports arrive as a `.md` index plus `.txt` transcript pair. Treat the pair as one source and move both together.
+- Leave a file here only when it still needs clarification; say why in the ingest report.
+- Older `inbox/YYYY-MM-DD.md` notes, if any remain, are ordinary sources. Ingest them, then move them to `sources/notes/`.

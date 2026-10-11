@@ -9,7 +9,7 @@ As of 2026-10-11.
   - Codex sessions, from `~/.codex/sessions/`.
   - GitHub Copilot sessions, from Copilot CLI state and VS Code chat storage.
   - Granola meetings.
-- **Manual capture:** the `dump` skill writes a live daily note to `inbox/YYYY-MM-DD.md`.
+- **No manual capture step:** ingestion is meant to be as autonomous as possible. Anything dropped into `inbox/` by hand is picked up by the next run.
 - **Ingest:** a scheduled pass at 00:30 applies the value gate, moves evidence to `sources/`, and updates `wiki/`. Since 2026-10-11, pages follow the Current-State Rule: `Current State` is rewritten, never appended to.
 - **Retrieval:** the global Codex skill `consult-mind-palace` searches the repo read-only from any directory.
 - **Not captured:** Claude conversations, and Teams. Teams needs corporate access.
@@ -36,6 +36,7 @@ As of 2026-10-11.
 - 2026-09-04: all captures aligned to 00:10 with ingest at 00:30.
 - 2026-10-06: Notion pilot started, with the repo staying canonical during the trial.
 - 2026-10-11: Notion pilot dropped; the repo stays the home.
+- 2026-10-11: `dump` skill and live daily notes retired in favour of fully autonomous capture and ingest.
 - 2026-10-11: revamp after an audit found pages had become append-only logs, people pages were stale, and `actions.md` had 258 open items nobody read.
   - `actions.md` frozen as an archive.
   - Current-State Rule adopted.
