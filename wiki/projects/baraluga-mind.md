@@ -40,6 +40,7 @@ As of 2026-10-11.
 - 2026-10-11: `dump` skill and live daily notes retired in favour of fully autonomous capture and ingest.
 - 2026-10-11: `consult-mind-palace` moved into the repo's `skills/` and symlinked for both Codex and Claude Code.
 - 2026-10-11: Claude Code conversation capture added via a `Stop` hook.
+- 2026-10-11: CI added (wiki lint, script tests, gitleaks, weekly ingest heartbeat). The first full-history scan found Darwin client credentials and expired CDH JWTs pasted into Codex chats. They were redacted in current files and acknowledged in `.gitleaksignore`, history was not rewritten, and the Darwin secret needs rotating. The Codex exporter had no redaction; both exporters now share `scripts/redact.py`.
 - 2026-10-11: confirmed-aliases glossary, wiki-first search, and the auto-recall hook added. A cheaper alternative to embedding search until `rg` starts missing things.
 - 2026-10-11: revamp after an audit found pages had become append-only logs, people pages were stale, and `actions.md` had 258 open items nobody read.
   - `actions.md` frozen as an archive.

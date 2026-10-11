@@ -1,0 +1,12 @@
+# Historical gitleaks findings, triaged on 2026-10-11. Values are redacted in the current files
+# but remain in git history (no history rewrite). Only add a line here after triage.
+# Darwin client secret (2026-09-30/10-01) must be rotated outside this repo.
+597648916afb1c5498caaafc479c615b799bea58:wiki/projects/smp-platform.md:generic-api-key:210
+597648916afb1c5498caaafc479c615b799bea58:sources/codex-conversations/2026-09-30-codex-conversations.txt:generic-api-key:2221
+ed7bd49b9db3acee27ed525a4f4dd4dcad9c85fb:sources/codex-conversations/2026-10-01-codex-conversations.txt:generic-api-key:7887
+ed7bd49b9db3acee27ed525a4f4dd4dcad9c85fb:sources/codex-conversations/2026-10-01-codex-conversations.txt:generic-api-key:9028
+ed3b49ec86b8291ac424698866cc5c9b547e6f18:sources/codex-conversations/2026-09-18-codex-conversations.txt:generic-api-key:595
+540ae4e5a19924098c7d1a3e68a0c7b769f8da0b:sources/codex-conversations/2026-09-02-codex-conversations.txt:jwt:3444
+a51ebaf8c035a70bd2cfb83c42bcd735f175ad41:sources/codex-conversations/2026-07-31-codex-conversations.txt:generic-api-key:4666
+81df425eca744459063e956df61586f578c16164:sources/codex-conversations/2026-07-13-codex-conversations.md:jwt:833
+687f8ec0240e939f371a7fd38a5e30b5b798be87:sources/codex-conversations/2026-07-07-codex-conversations.md:jwt:935
