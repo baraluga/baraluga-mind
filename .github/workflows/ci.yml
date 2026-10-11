@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+  workflow_dispatch: # manual run: full-history secret scan plus the heartbeat
+  schedule:
+    - cron: "0 3 * * 1" # Mondays 11:00 Asia/Manila
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # gitleaks needs history to scan the pushed commit range
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Lint wiki
+        run: python -B scripts/lint-wiki.py
+      - name: Script tests
+        run: for t in scripts/test_*.py; do echo "== $t"; python -B "$t" || exit 1; done
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Ingest runs unattended; if nothing new reaches sources/ for days, it has probably stopped.
+  heartbeat:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fail if no ingest commit touched sources/ in 4 days
+        run: |
+          last=$(git log -1 --format=%ct -- sources/)
+          age=$(( ($(date +%s) - last) / 86400 ))
+          echo "Last sources/ commit: $(git log -1 --format='%cI %s' -- sources/) (${age} days ago)"
+          if [ "$age" -gt 4 ]; then
+            echo "::error::No ingest has landed in sources/ for ${age} days. Check the daily-baraluga-mind-ingest automation."
+            exit 1
+          fi
