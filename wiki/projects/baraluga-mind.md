@@ -13,6 +13,7 @@ As of 2026-10-11.
 - **Ingest:** a scheduled pass at 00:30 applies the value gate, moves evidence to `sources/`, and updates `wiki/`. Since 2026-10-11, pages follow the Current-State Rule: `Current State` is rewritten, never appended to.
 - **Retrieval:** the `consult-mind-palace` skill searches the repo read-only from any directory. It lives in `skills/` and is symlinked into both Codex and Claude Code, so both agents share one copy.
 - **Claude Code capture:** a `Stop` hook appends each finished turn to a per-day, per-session file labelled by Claude project, not by repo, because `smp` spans many repos. This avoids having to detect when a conversation has "ended". Obvious secrets are redacted at capture.
+- **Auto-recall (Claude Code only):** a `UserPromptSubmit` hook matches each prompt against page titles and [[aliases]]. On a match it adds a one-line hint, at most once per page per session. No match means nothing is added, so there is no token cost. Codex stays on-demand only, because a global `AGENTS.md` line would cost tokens on every session.
 - **Not captured:** Teams, which needs corporate access.
 - **Planned:**
   - Optionally, a Claude Code mod for `/palace` lookups.
@@ -39,6 +40,7 @@ As of 2026-10-11.
 - 2026-10-11: `dump` skill and live daily notes retired in favour of fully autonomous capture and ingest.
 - 2026-10-11: `consult-mind-palace` moved into the repo's `skills/` and symlinked for both Codex and Claude Code.
 - 2026-10-11: Claude Code conversation capture added via a `Stop` hook.
+- 2026-10-11: confirmed-aliases glossary, wiki-first search, and the auto-recall hook added. A cheaper alternative to embedding search until `rg` starts missing things.
 - 2026-10-11: revamp after an audit found pages had become append-only logs, people pages were stale, and `actions.md` had 258 open items nobody read.
   - `actions.md` frozen as an archive.
   - Current-State Rule adopted.

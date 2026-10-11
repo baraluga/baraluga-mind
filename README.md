@@ -14,6 +14,8 @@ Everything runs on a schedule, with no manual step required:
 
 Claude Code conversations are captured continuously instead. A `Stop` hook in `~/.claude/settings.json` runs `scripts/capture-claude-conversation.py` after every turn, appending new messages to `inbox/YYYY-MM-DD-claude-<project>-<session8>.txt`.
 
+Recall works the other way round. A `UserPromptSubmit` hook runs `scripts/recall-hint.py` on every prompt. When the prompt names a wiki page or a confirmed alias, it adds a one-line hint pointing at the relevant pages, at most once per page per session. Unmatched prompts get nothing added, so they cost no tokens.
+
 Anything else can be dropped into `inbox/` by hand, and the next run picks it up.
 
 ## Folder Map
