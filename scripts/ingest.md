@@ -38,6 +38,7 @@ Do not delete files unless I explicitly ask.
 7. Add source references.
 8. Move processed `inbox/` files worth preserving to the right `sources/` folder. Keep Codex conversation `.md`/`.txt` pairs together.
 9. Validate source references, wiki links, current `Last Updated` dates, and synthesized-file whitespace.
+   - Run `python3 -B scripts/lint-wiki.py` and fix every error before committing.
 10. Commit and push only when at least one item passed the value gate and produced a durable source or wiki change.
 11. Report what changed.
 12. Include a `Needs Confirmation` handover:

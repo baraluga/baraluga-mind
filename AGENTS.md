@@ -100,7 +100,8 @@ When processing files from `inbox/` or `sources/`:
    - `sources/notes/` for manual notes and historical daily notes
    - `sources/codex-conversations/`, `sources/copilot-conversations/`, and `sources/claude-conversations/` for agent conversation captures
 9. Add a short `Last Updated` date using `YYYY-MM-DD`.
-10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source or wiki change that passed the value gate.
+10. Run `python3 -B scripts/lint-wiki.py` and fix every error it reports; warnings are optional. CI runs the same lint plus a secret scan on every push, so a red run means the last ingest broke something.
+11. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source or wiki change that passed the value gate.
 
 ## Wiki Page Shape
 

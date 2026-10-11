@@ -18,6 +18,14 @@ Recall works the other way round. A `UserPromptSubmit` hook runs `scripts/recall
 
 Anything else can be dropped into `inbox/` by hand, and the next run picks it up.
 
+Every push runs CI (`.github/workflows/ci.yml`):
+
+- `scripts/lint-wiki.py`: broken links, missing cited sources, index completeness, aliases format, and no checkboxes.
+- The script tests.
+- A `gitleaks` secret scan.
+
+A weekly heartbeat fails if no ingest has touched `sources/` for 4 days. Run the workflow manually for a full-history secret scan.
+
 ## Folder Map
 
 - `inbox/` - temporary landing zone for automated exports and anything dropped in by hand.
