@@ -8,3 +8,6 @@
 inbox/*
 !inbox/.gitkeep
 !inbox/AGENTS.md
+
+# Python bytecode from running script tests.
+__pycache__/
