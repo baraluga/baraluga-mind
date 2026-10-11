@@ -1,0 +1,4 @@
+interface:
+  display_name: "Consult Mind Palace"
+  short_description: "Search and synthesize the Baraluga Mind wiki"
+  default_prompt: "Use $consult-mind-palace to find and synthesize everything the mind palace knows about a topic."

@@ -28,6 +28,11 @@ Anything else can be dropped into `inbox/` by hand, and the next run picks it up
 - `wiki/concepts/` - durable notes about reusable ideas, patterns, topics, and frameworks.
 - `wiki/decisions/` - durable records of decisions, rationale, tradeoffs, and open questions.
 - `scripts/` - repeatable prompts and runbooks for maintaining the system.
+- `skills/` - agent skills shared by Codex and Claude Code. Each skill is symlinked from `~/.codex/skills/<name>` and `~/.claude/skills/<name>`. To set one up on a new machine:
+
+  ```bash
+  for d in ~/.codex/skills ~/.claude/skills; do ln -s ~/baraluga-mind/skills/consult-mind-palace "$d/consult-mind-palace"; done
+  ```
 
 ## Naming
 

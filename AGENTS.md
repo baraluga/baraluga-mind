@@ -57,7 +57,7 @@ Avoid:
 
 ## Process Improvement
 
-Do not edit `AGENTS.md`, `CLAUDE.md`, or nested instruction files during normal ingest unless explicitly asked.
+Do not edit `AGENTS.md`, `CLAUDE.md`, nested instruction files, or anything under `skills/` during normal ingest unless explicitly asked.
 
 If you notice repeated friction, ambiguity, bad output, a useful convention, or instruction bloat, append a short note to `process-notes.md` instead.
 

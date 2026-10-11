@@ -11,10 +11,9 @@ As of 2026-10-11.
   - Granola meetings.
 - **No manual capture step:** ingestion is meant to be as autonomous as possible. Anything dropped into `inbox/` by hand is picked up by the next run.
 - **Ingest:** a scheduled pass at 00:30 applies the value gate, moves evidence to `sources/`, and updates `wiki/`. Since 2026-10-11, pages follow the Current-State Rule: `Current State` is rewritten, never appended to.
-- **Retrieval:** the global Codex skill `consult-mind-palace` searches the repo read-only from any directory.
+- **Retrieval:** the `consult-mind-palace` skill searches the repo read-only from any directory. It lives in `skills/` and is symlinked into both Codex and Claude Code, so both agents share one copy.
 - **Not captured:** Claude conversations, and Teams. Teams needs corporate access.
 - **Planned:**
-  - Share the skills between Codex and Claude via symlinks from this repo.
   - Add a Claude Code plugin/mod for capture and `/palace` lookups.
   - Add an `index.md` so no page is orphaned.
   - Convert the remaining large pages to the current-state shape.
@@ -37,6 +36,7 @@ As of 2026-10-11.
 - 2026-10-06: Notion pilot started, with the repo staying canonical during the trial.
 - 2026-10-11: Notion pilot dropped; the repo stays the home.
 - 2026-10-11: `dump` skill and live daily notes retired in favour of fully autonomous capture and ingest.
+- 2026-10-11: `consult-mind-palace` moved into the repo's `skills/` and symlinked for both Codex and Claude Code.
 - 2026-10-11: revamp after an audit found pages had become append-only logs, people pages were stale, and `actions.md` had 258 open items nobody read.
   - `actions.md` frozen as an archive.
   - Current-State Rule adopted.
