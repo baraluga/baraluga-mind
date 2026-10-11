@@ -1,5 +1,7 @@
 # Actions
 
+FROZEN 2026-10-11: archive only. Ingest no longer reads or writes this file; pending work lives in each wiki page's `Current State`.
+
 Centralized action list migrated from wiki page `TODO:` items on 2026-07-04.
 
 ## Today

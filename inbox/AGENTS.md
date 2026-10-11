@@ -36,6 +36,6 @@ Last Updated: YYYY-MM-DD
 
 - Daily-note tasks are provisional capture, not the canonical action register.
 - Leave the current Asia/Manila day's live note in `inbox/` unless the user explicitly asks to close or ingest it.
-- During ingest, reconcile unresolved and completed items with root `actions.md`.
+- During ingest, carry durable context and still-relevant pending items into the affected wiki pages' `Current State`. Do not write to `actions.md`.
 - Move the processed note to `sources/notes/YYYY-MM-DD.md`.
 - When the same dump also appears in a Codex conversation export, prefer this daily note as the structured source and use the transcript only as backup evidence. Do not duplicate actions or durable claims.

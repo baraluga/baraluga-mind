@@ -19,22 +19,23 @@ Your job is to turn raw captures into durable, useful wiki pages without inventi
 - Use `UNCERTAIN:` when a claim needs verification.
 - If source material is ambiguous, say so in the page.
 
-## Actions
+## Purpose
 
-`actions.md` is the canonical register for follow-up work.
+This is a reference memory, not a task tracker. Optimize every page for "what do I need to remember about this right now?"
 
-- Put every captured follow-up, task, owner commitment, or call to action in `actions.md`.
-- Keep `actions.md` organized into exactly these top-level sections: `Today`, `Open`, `Waiting`, and `Done`.
-- Add newly captured actions to `Open` by default.
-- Use `Today` only when the user explicitly selects or prioritizes work for today.
-- Use `Waiting` for actions blocked on another person, external answer, access, or event.
-- Do not bury active TODOs inside wiki pages.
-- Wiki pages may preserve context for an action, but the actionable checkbox belongs in `actions.md`.
-- When adding an action, include a `Context` link to the related wiki page and a `Source` path to the captured evidence.
-- Do not duplicate an existing open action; update it only when the new source adds material context.
-- Move completed actions to `Done` instead of deleting them.
-- Reconcile existing actions against new evidence during ingest. Move completed, superseded, or no-longer-relevant actions to `Done` with a brief source-backed reason; do not infer closure from ambiguous evidence.
-- Source summaries may include non-canonical `Next Steps` when reflecting meeting content, but active tracking still belongs in `actions.md`.
+- `actions.md` is retired as of 2026-10-11 and kept only as a frozen archive. Do not add, update, or reconcile actions.
+- Commitments and follow-ups stay in source summaries (`Next Steps`). When one matters to a topic, mention it once in that page's `Current State` as pending, with a date. Never use checkboxes in wiki pages.
+
+## Current-State Rule
+
+Wiki pages describe the present, not a diary of updates.
+
+- Rewrite `Current State` on every ingest that touches the page. Do not append dated bullets to it.
+- When new evidence supersedes a claim, replace or remove the old claim. The sources keep the history.
+- Put a dated line in `History` only for real turning points: role changes, reversals, launches, decisions. Keep it terse.
+- Date volatile facts inline ("as of YYYY-MM-DD") so staleness is visible.
+- When an ingest mentions a person or project that has a page, update that page too, not only the topic page the source is mainly about.
+- Split a page that grows past roughly 1,500 words into linked sub-pages.
 
 ## File Naming
 
@@ -87,10 +88,9 @@ When processing files from `inbox/` or `sources/`:
    - concepts
    - decisions
    - open questions
-   - action items
-4. Update existing pages when possible.
+4. Update existing pages when possible, following the Current-State Rule: rewrite `Current State` for every page the source touches, including people pages.
 5. Create new pages only when the topic is likely to matter again.
-6. Add or update captured action items in `actions.md`.
+6. Keep `Background` for slow-changing context; move anything time-sensitive into `Current State`.
 7. Add a short `Sources` section with the source filename or path.
 8. Move processed `inbox/` files to the appropriate `sources/` subfolder when they remain useful as evidence:
    - `sources/articles/` for articles, links, and reading notes
@@ -99,25 +99,29 @@ When processing files from `inbox/` or `sources/`:
    - `sources/pdfs/` for PDFs and extracted PDF notes
    - `sources/notes/` for manual or AI-maintained daily notes
    - Leave the current Asia/Manila day's live daily note in `inbox/` unless the user explicitly asks to close or ingest it.
-   - For a live `inbox/YYYY-MM-DD.md` daily note, reconcile its provisional task states with `actions.md`, then preserve it in `sources/notes/`.
+   - Preserve a closed `inbox/YYYY-MM-DD.md` daily note in `sources/notes/`.
    - When a daily note duplicates content in a Codex conversation export, prefer the structured daily note and use the transcript as backup evidence.
 9. Add a short `Last Updated` date using `YYYY-MM-DD`.
-10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source, wiki, or action change that passed the value gate.
+10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source or wiki change that passed the value gate.
 
 ## Wiki Page Shape
 
-Use this structure when creating a new durable page:
+Use this structure for durable pages. When an ingest touches a page still in the older `Summary`/`Details` shape, convert it.
 
 ```markdown
 # Page Title
 
-## Summary
+## Current State
 
-One to three paragraphs explaining the durable point of the page.
+As of YYYY-MM-DD. What is true now: status, owners, blockers, pending items. Rewritten, never appended.
 
-## Details
+## Background
 
-Concrete facts, context, links, tradeoffs, and examples.
+Slow-changing context: what it is, why it exists, how it works, who is involved.
+
+## History
+
+- YYYY-MM-DD: turning points only.
 
 ## Open Questions
 
@@ -168,7 +172,6 @@ After an ingest pass, report:
 
 - pages created
 - pages updated
-- actions added or updated in `actions.md`
 - source files processed
 - uncertain claims
 - new or suspicious names, acronyms, systems, projects, or jargon needing confirmation
@@ -179,8 +182,6 @@ Also include a consolidated handover section titled `Needs Confirmation`.
 `Needs Confirmation` should be pleasant to scan and useful as a one-by-one clarification queue for the user. It should include only:
 
 - all current needs-confirmation items from the ingest review, including suspicious names, acronyms, systems, projects, jargon, ambiguous owners, and uncertain high-impact claims.
-
-Do not include the full `Open` action register in this handover by default. `actions.md` remains the canonical action register, but many captured TODOs may belong to other people or teams and should not be presented as Brian's assignment unless the user explicitly asks.
 
 Format `Needs Confirmation` as grouped checklists by durable area when possible, such as `Team Operations`, `SMP Platform`, `Japan Interconnector`, and `Alerting and Ops`.
 
