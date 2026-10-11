@@ -4,7 +4,7 @@
 
 As of 2026-10-07. Network and access blockers are the main drag on [[smp-india]] delivery.
 
-- **Grid India (`SCR-1230`):** geo-blocked. It needs legal approval for VPN or scraping access first, then a separate WBS portal approval. Zscaler enablement may not be legally permitted. One or two static IPs routing to India was proposed on 2026-10-05. The approval email will go to Francois, "Pong" (source spelling, likely Bong), Frederic, Brian, Michael, and the SMP team.
+- **Grid India (`SCR-1230`):** geo-blocked. It needs legal approval for VPN or scraping access first, then a separate WBS portal approval. Zscaler enablement may not be legally permitted. One or two static IPs routing to India was proposed on 2026-10-05. The approval email will go to Francois, Bong, Frederic, Brian, Michael, and the SMP team.
 - **Darwin:** the proxy allowlist is missing, so the dev cluster gets 403s. The request is with IT. See [[darwin-collector]].
 - **H. India national website:** Zscaler returns 403, but the site works from the office and off-Zscaler. The fix is a security whitelist ticket with James Snow. The same blocker got an earlier HPX scraper ticket rejected.
 - **Cross-account CDH/S3:** Khaba QA could not read the production-owned source bucket because of an explicit AWS Organizations SCP deny. CDH support changed an SCP on 2026-09-30 to allow cross-region access; Airflow QA validation is still pending. See [[smp-india]].
@@ -28,7 +28,7 @@ As of 2026-10-07. Network and access blockers are the main drag on [[smp-india]]
 
 - UNCERTAIN: Whether the legal and WBS approvals are both mandatory for production scraping, or only for the current workaround.
 - UNCERTAIN: Whether the H. India whitelist should cover only Brian's path or a reusable SMP execution path.
-- UNCERTAIN: Whether the SCP change also fixes the KAVA Dev/QA cross-account loss.
+- UNCERTAIN: Whether the SCP change also fixes the 2026-09-04 Khaba Dev/QA cross-account loss (recorded as "KAVA").
 
 ## Sources
 

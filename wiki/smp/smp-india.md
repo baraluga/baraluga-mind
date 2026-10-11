@@ -63,7 +63,7 @@ As of 2026-10-09. These are the India data products built on [[smp-platform]]. S
 
 ## Open Questions
 
-- UNCERTAIN: Whether `Kaba`, `KAVA`, `Sakaba`, `Khaba`, `Kavda`, and `Khavda` are distinct assets or transcript variants. KAVA had its own Dev/QA cross-account S3 loss on 2026-09-04, with root cause unknown.
+- UNCERTAIN: Root cause of the 2026-09-04 Khaba Dev/QA cross-account S3 loss (recorded as "KAVA"), and whether the 2026-09-30 SCP change fixed it. Khaba and Khavda are two distinct sites; see [[aliases]] for variants.
 - UNCERTAIN: Whether bilateral-contract data should stay CDH-only or also feed TSDB.
 - UNCERTAIN: Whether the live GDAM panel already diverged from the checked-in query.
 - UNCERTAIN: Whether the one-minute Khaba path passed stakeholder validation after QA.

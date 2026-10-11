@@ -54,6 +54,7 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 ## This System
 
 - [[baraluga-mind]]: how the mind palace runs and why it's shaped this way.
+- [[aliases]]: confirmed spelling variants for people, sites, and terms. Expand search terms with these.
 - [[unclear-captures]]: sources too ambiguous to turn into durable notes.
 
 Last Updated: 2026-10-11

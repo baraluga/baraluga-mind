@@ -27,7 +27,6 @@ The main durable value is reducing repeated DAG setup work while still keeping i
 
 - UNCERTAIN: Final branch and PR workflow was not decided in the captured meeting.
 - UNCERTAIN: Whether `smp-japan` should align its DAG Helper instruction with `smp-india` by explicitly requiring a draft PR targeting `dev`.
-- UNCERTAIN: Whether Mateo and Matthew refer to the same beta tester in the August 19 overview note.
 
 ## Sources
 

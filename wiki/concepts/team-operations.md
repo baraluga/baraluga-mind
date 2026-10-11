@@ -4,7 +4,7 @@
 
 As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is run, logged, and coordinated. SMP specifics are on [[smp-platform]], non-SMP projects on [[technical-activities]], and the GitHub migration on [[sff-walnut-migration]].
 
-- **SMP process:** moving off strict sprints. On 2026-09-02, Brian recommended Scrumban: continuous pull, WIP limits, a visible `Waiting` state, and cycle-time metrics instead of velocity, while keeping a two-week demo and budget cadence. On 2026-10-09 the team favoured Kanban because mid-sprint pulls distort burn-down and India users already validate in near real time. This still needs discussion with Fred and "Bang" (likely Bong).
+- **SMP process:** moving off strict sprints. On 2026-09-02, Brian recommended Scrumban: continuous pull, WIP limits, a visible `Waiting` state, and cycle-time metrics instead of velocity, while keeping a two-week demo and budget cadence. On 2026-10-09 the team favoured Kanban because mid-sprint pulls distort burn-down and India users already validate in near real time. This still needs discussion with Fred and Bong.
 - **Time tracking:** the Philippines team left Tempo on 2026-09-01. Prométhée (also spelled Promethe) is filled every Friday. UNCERTAIN: the name of the new tracker.
 - **AI credits:** to request more, email Fred and the requester with the business need, current usage, and planned use, then submit the ticket (2026-10-07).
 - **Coming up:**

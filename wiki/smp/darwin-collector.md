@@ -33,7 +33,7 @@ As of 2026-10-07.
 - UNCERTAIN: Whether Darwin can replay previous-minute values, which would allow a simpler scheduled DAG.
 - UNCERTAIN: How the collector avoids two active pollers during Kubernetes redeploys.
 - UNCERTAIN: Whether 15-second polling is within Darwin's supported request rate.
-- UNCERTAIN: Asset spellings. Granola has `Cavda`, `Raganesta`, `Kitty`; Codex discovery has `Khavda`, `Raganesda`, `Titwha`. Also, Cavda irradiance returns only 6–7 values per 15 minutes.
+- UNCERTAIN: Whether Khavda's sparse irradiance (6–7 values per 15 minutes) is expected Darwin behaviour. Asset spellings are settled in [[aliases]].
 - UNCERTAIN: Whether Gregory is the right escalation owner.
 
 ## Sources
