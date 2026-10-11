@@ -1,0 +1,411 @@
+<title>Baraluga Mind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an archive console. A header ledger, then the ask desk, then three instruments (timeline, map, freshness), and a page reader drawer. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #16191f; --ink-2: #4a5160; --ink-3: #6f7787; --line: #dde1e8; --hover: #eef1f5;
+  --accent: #1f5fae; --accent-ink: #ffffff;
+  --s-smp: #2a78d6; --s-work: #eb6834; --s-personal: #1baf7a; --s-system: #8a909c;
+  --fresh: #008300; --aging: #a86f00; --stale: #c43c3b;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171b; --panel: #1d2026; --ink: #eef0f4; --ink-2: #b4bac6; --ink-3: #8b92a0; --line: #2e323a; --hover: #252930;
+  --accent: #5598e7; --accent-ink: #0d1520;
+  --s-smp: #3987e5; --s-work: #d95926; --s-personal: #199e70; --s-system: #6f7683;
+  --fresh: #3fae3f; --aging: #d4a017; --stale: #e66767; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15171b; --panel: #1d2026; --ink: #eef0f4; --ink-2: #b4bac6; --ink-3: #8b92a0; --line: #2e323a; --hover: #252930;
+  --accent: #5598e7; --accent-ink: #0d1520;
+  --s-smp: #3987e5; --s-work: #d95926; --s-personal: #199e70; --s-system: #6f7683;
+  --fresh: #3fae3f; --aging: #d4a017; --stale: #e66767; color-scheme: dark; }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 28px; }
+h1, h2 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 700; line-height: 1.05; }
+h2 { font-size: 20px; font-weight: 700; }
+.eyebrow { font: 500 11px/1 var(--f-mono); text-transform: uppercase; letter-spacing: .12em; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+button { font: 500 14px/1 var(--f-body); border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 9px 14px; cursor: pointer; }
+button:hover { background: var(--hover); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: grid; gap: 16px; }
+.toprow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+.ledger { display: flex; flex-wrap: wrap; gap: 8px 28px; font-variant-numeric: tabular-nums; }
+.ledger div { display: grid; gap: 2px; }
+.ledger b { font: 600 22px/1.1 var(--f-display); }
+.snap { font: 12px/1.4 var(--f-mono); color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#refreshNote { font: 12px/1.4 var(--f-body); color: var(--ink-2); }
+
+section.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.sechead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
+
+/* Ask desk */
+.ask { display: grid; gap: 10px; }
+.askrow { display: flex; gap: 8px; flex-wrap: wrap; }
+#q { flex: 1 1 280px; min-width: 0; font: 16px/1.4 var(--f-body); padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { font-size: 13px; padding: 6px 10px; color: var(--ink-2); }
+#answer { font-size: 15px; line-height: 1.6; max-width: 72ch; }
+#answer:empty { display: none; }
+#read { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 12px var(--f-mono); color: var(--ink-3); }
+#read:empty { display: none; }
+
+/* Shared chart bits */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chart { position: relative; overflow-x: auto; }
+.chart svg { display: block; }
+.chart text { fill: var(--ink-3); font: 11px var(--f-mono); }
+.chart .lane { fill: var(--ink-2); font: 600 12px var(--f-body); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .edge { stroke: var(--line); stroke-width: 1.2; }
+.chart .node, .chart .ev { cursor: pointer; stroke: var(--panel); stroke-width: 2; }
+.chart .node:hover, .chart .ev:hover, .chart .on { stroke: var(--ink); }
+.chart .nlabel { fill: var(--ink-2); font: 500 11px var(--f-body); pointer-events: none; }
+.tip { position: absolute; pointer-events: none; z-index: 5; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; line-height: 1.4; max-width: 320px; box-shadow: 0 6px 20px rgb(0 0 0 / .12); }
+.tip b { display: block; }
+.tip small { color: var(--ink-3); font-family: var(--f-mono); }
+
+/* Freshness table */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th { text-align: left; font: 500 11px var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td.num, th.num { text-align: right; }
+tr.row { cursor: pointer; }
+tr.row:hover { background: var(--hover); }
+.age { display: inline-flex; align-items: center; gap: 6px; }
+.age i { width: 8px; height: 8px; border-radius: 50%; }
+.age.fresh i { background: var(--fresh); } .age.aging i { background: var(--aging); } .age.stale i { background: var(--stale); }
+
+/* Wiki-rendered text */
+.md h3 { font: 700 17px/1.3 var(--f-display); margin: 18px 0 6px; }
+.md h4 { font: 600 14px/1.3 var(--f-body); margin: 14px 0 4px; }
+.md p { margin: 8px 0; }
+.md ul { margin: 6px 0; padding-left: 20px; }
+.md li { margin: 3px 0; }
+.md code { font: 13px var(--f-mono); background: var(--hover); padding: 1px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.md a.wl { color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Reader drawer */
+#reader { position: fixed; inset: 0 0 0 auto; width: min(640px, 100%); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -10px 0 30px rgb(0 0 0 / .15); z-index: 10; display: grid; grid-template-rows: auto 1fr; padding-top: env(safe-area-inset-top, 0px); }
+#reader header { display: flex; justify-content: space-between; align-items: start; gap: 12px; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
+#readerBody { overflow-y: auto; padding: 4px 20px 32px; max-width: 70ch; }
+@media (prefers-reduced-motion: no-preference) { #reader { transition: transform .18s ease-out; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="toprow">
+      <div style="display:grid;gap:6px">
+        <span class="eyebrow">Second brain · snapshot</span>
+        <h1>Baraluga Mind</h1>
+      </div>
+      <div style="display:grid;gap:6px;justify-items:end">
+        <div class="snap"><span id="snapText"></span><button id="refresh" type="button">Refresh snapshot</button></div>
+        <span id="refreshNote" hidden></span>
+      </div>
+    </div>
+    <div class="ledger" id="ledger"></div>
+  </header>
+
+  <section class="card ask" aria-labelledby="askh">
+    <div class="sechead"><h2 id="askh">Ask what's recorded</h2><span class="eyebrow">answers only from these notes</span></div>
+    <form class="askrow" id="askForm">
+      <label for="q" hidden>Question</label>
+      <input id="q" name="q" autocomplete="off" placeholder="Why is Darwin blocked as we speak?">
+      <button class="primary" id="askBtn" type="submit">Ask</button>
+      <button id="stopBtn" type="button" hidden>Stop</button>
+    </form>
+    <div class="examples" id="examples"></div>
+    <div id="read"></div>
+    <div id="answer" class="md" aria-live="polite"></div>
+    <p id="askNote" class="muted" hidden></p>
+  </section>
+
+  <section class="card" aria-labelledby="tlh">
+    <div class="sechead"><h2 id="tlh">Timeline</h2><span class="muted" style="font-size:13px">Turning points from each page's History. Select one to open the page.</span></div>
+    <div class="legend" id="legendT"></div>
+    <div class="chart" id="timeline"></div>
+  </section>
+
+  <section class="card" aria-labelledby="maph">
+    <div class="sechead"><h2 id="maph">Map</h2><span class="muted" style="font-size:13px">Pages and their links. Size is length; faded means not updated in a while.</span></div>
+    <div class="legend" id="legendM"></div>
+    <div class="chart" id="map"></div>
+  </section>
+
+  <section class="card" aria-labelledby="frh">
+    <div class="sechead"><h2 id="frh">Freshness</h2><span class="muted" style="font-size:13px">Every page, stalest first. This is also the table view of both charts.</span></div>
+    <div class="tablewrap"><table id="fresh"><thead><tr><th>Page</th><th>Area</th><th>As of</th><th>Age</th><th class="num">Words</th><th class="num">Open questions</th><th class="num">Turning points</th></tr></thead><tbody></tbody></table></div>
+  </section>
+</div>
+
+<aside id="reader" hidden aria-labelledby="readerTitle">
+  <header><div style="display:grid;gap:4px;min-width:0"><span class="eyebrow" id="readerMeta"></span><h2 id="readerTitle"></h2></div><button id="readerClose" type="button" aria-label="Close page">Close</button></header>
+  <div id="readerBody" class="md"></div>
+</aside>
+
+<script>
+const DATA = /*__DATA__*/null;
+const GROUPS = [["smp", "SMP"], ["work", "Work"], ["personal", "Personal"], ["system", "System"]];
+const GROUP_LABEL = Object.fromEntries(GROUPS);
+const pages = DATA.pages;
+const bySlug = Object.fromEntries(pages.map(p => [p.slug, p]));
+const DAY = 864e5;
+const snapDate = new Date(DATA.snapshot + "T00:00:00");
+const ageDays = p => p.asOf ? Math.round((snapDate - new Date(p.asOf + "T00:00:00")) / DAY) : null;
+const ageClass = d => d == null ? "stale" : d <= 7 ? "fresh" : d <= 21 ? "aging" : "stale";
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const color = g => `var(--s-${g})`;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+
+// ---------- tiny markdown (escaped first; wiki-links become page openers) ----------
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[\[([^\]|#]+)\]\]/g, (m, slug) => bySlug[slug.trim()] ? `<a class="wl" data-slug="${esc(slug.trim())}">${esc(bySlug[slug.trim()].title)}</a>` : esc(slug));
+}
+function md(text) {
+  const out = []; let list = 0;
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/\s+$/, "");
+    const li = line.match(/^(\s*)- (.*)$/);
+    const depth = li ? Math.floor(li[1].length / 2) + 1 : 0;
+    while (list > depth) { out.push("</ul>"); list--; }
+    if (li) { while (list < depth) { out.push("<ul>"); list++; } out.push(`<li>${inline(li[2])}</li>`); continue; }
+    if (/^# /.test(line)) continue;
+    if (/^## /.test(line)) { out.push(`<h3>${inline(line.slice(3))}</h3>`); continue; }
+    if (/^### /.test(line)) { out.push(`<h4>${inline(line.slice(4))}</h4>`); continue; }
+    if (line.trim()) out.push(`<p>${inline(line)}</p>`);
+  }
+  while (list-- > 0) out.push("</ul>");
+  return out.join("");
+}
+document.addEventListener("click", e => { const a = e.target.closest("a.wl"); if (a) openPage(a.dataset.slug); });
+
+// ---------- header ----------
+function header() {
+  const words = pages.reduce((s, p) => s + p.words, 0);
+  const open = pages.reduce((s, p) => s + p.uncertain, 0);
+  const events = pages.reduce((s, p) => s + p.history.length, 0);
+  const stale = pages.filter(p => ageClass(ageDays(p)) === "stale").length;
+  $("ledger").innerHTML = [["Pages", pages.length], ["Words", words.toLocaleString()], ["Turning points", events], ["Open questions", open], ["Stale pages", stale]]
+    .map(([k, v]) => `<div><span class="eyebrow">${k}</span><b>${v}</b></div>`).join("");
+  $("snapText").textContent = `Snapshot ${DATA.snapshot}${DATA.commit ? " · " + DATA.commit : ""}`;
+  const legend = GROUPS.filter(([g]) => pages.some(p => p.group === g)).map(([g, l]) => `<span><i class="sw" style="background:${color(g)}"></i>${l}</span>`).join("");
+  $("legendT").innerHTML = legend; $("legendM").innerHTML = legend;
+}
+$("refresh").addEventListener("click", async () => {
+  const ask = "Refresh the Baraluga Mind page";
+  const note = $("refreshNote"); note.hidden = false;
+  try { await navigator.clipboard.writeText(ask); note.textContent = `Copied "${ask}". Paste it into a Claude Code session to rebuild this page from the latest wiki.`; }
+  catch { note.textContent = `Say "${ask}" in a Claude Code session to rebuild this page from the latest wiki.`; }
+});
+
+// ---------- tooltip ----------
+function tipFor(container) {
+  let tip = container.querySelector(".tip");
+  if (!tip) { tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; container.appendChild(tip); }
+  return {
+    show(html, x, y) { tip.innerHTML = html; tip.hidden = false; const w = container.clientWidth; tip.style.left = Math.min(Math.max(x + 12, 0), w - 330 + container.scrollLeft) + "px"; tip.style.top = (y + 14) + "px"; },
+    hide() { tip.hidden = true; }
+  };
+}
+const svgEl = (tag, attrs) => { const el = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; };
+
+// ---------- timeline ----------
+function timeline() {
+  const box = $("timeline"); box.querySelector("svg")?.remove();
+  const events = pages.flatMap(p => p.history.map(h => ({...h, page: p, t: new Date((h.date.length === 7 ? h.date + "-15" : h.date) + "T00:00:00")})));
+  const lanes = GROUPS.filter(([g]) => events.some(e => e.page.group === g));
+  const W = Math.max(box.clientWidth, 560), left = 82, right = 16, top = 26, laneH = 44, H = top + lanes.length * laneH + 10;
+  const t0 = new Date(Math.min(...events.map(e => e.t)) - 7 * DAY), t1 = new Date(+snapDate + 3 * DAY);
+  const x = t => left + (t - t0) / (t1 - t0) * (W - left - right);
+  const svg = svgEl("svg", {width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Timeline of turning points by area"});
+  for (let m = new Date(t0.getFullYear(), t0.getMonth() + 1, 1); m <= t1; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
+    svg.append(svgEl("line", {x1: x(m), x2: x(m), y1: top - 6, y2: H - 8, class: "grid"}));
+    const lab = svgEl("text", {x: x(m) + 4, y: 14}); lab.textContent = m.toLocaleString("en", {month: "short"}); svg.append(lab);
+  }
+  const tip = tipFor(box);
+  lanes.forEach(([g, label], i) => {
+    const y = top + i * laneH + laneH / 2;
+    svg.append(svgEl("line", {x1: left, x2: W - right, y1: y, y2: y, class: "grid"}));
+    const lab = svgEl("text", {x: 0, y: y + 4, class: "lane"}); lab.textContent = label; svg.append(lab);
+    const mine = events.filter(e => e.page.group === g).sort((a, b) => a.t - b.t);
+    let lastX = -99, stack = 0;
+    for (const e of mine) {
+      const cx = x(e.t); stack = cx - lastX < 9 ? stack + 1 : 0; lastX = cx;
+      const cy = y + [0, -9, 9, -18, 18][stack % 5];
+      const c = svgEl("circle", {cx, cy, r: 6, fill: color(g), class: "ev", tabindex: 0, role: "button", "aria-label": `${e.date} ${e.page.title}: ${e.text}`});
+      const show = () => { const r = c.getBoundingClientRect(), b = box.getBoundingClientRect(); tip.show(`<small>${esc(e.date)} · ${esc(e.page.title)}</small><b>${inline(e.text)}</b>`, r.left - b.left + box.scrollLeft, r.top - b.top); };
+      c.addEventListener("mouseenter", show); c.addEventListener("focus", show);
+      c.addEventListener("mouseleave", tip.hide); c.addEventListener("blur", tip.hide);
+      c.addEventListener("click", () => openPage(e.page.slug)); c.addEventListener("keydown", k => { if (k.key === "Enter") openPage(e.page.slug); });
+      svg.append(c);
+    }
+  });
+  const now = svgEl("line", {x1: x(snapDate), x2: x(snapDate), y1: top - 6, y2: H - 8, stroke: "var(--ink-3)", "stroke-dasharray": "3 3"}); svg.append(now);
+  box.prepend(svg);
+}
+
+// ---------- map (small deterministic force layout) ----------
+let layout = null;
+function computeLayout(W, H) {
+  const nodes = pages.filter(p => p.slug !== "index").map((p, i) => {
+    const a = i * 2.39996, r = 40 + 9 * Math.sqrt(i);
+    return {p, x: W / 2 + r * Math.cos(a), y: H / 2 + r * Math.sin(a), vx: 0, vy: 0, r: 5 + Math.sqrt(p.words) / 4.5};
+  });
+  const idx = Object.fromEntries(nodes.map((n, i) => [n.p.slug, i]));
+  const edges = [];
+  nodes.forEach((n, i) => n.p.links.forEach(l => { const j = idx[l]; if (j != null && j > i || (j != null && !bySlug[l].links.includes(n.p.slug))) edges.push([i, j]); }));
+  for (let step = 0; step < 400; step++) {
+    const k = 1 - step / 400;
+    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j]; let dx = b.x - a.x, dy = b.y - a.y; const d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2);
+      const f = 1800 / d2, min = a.r + b.r + 14, push = d < min ? (min - d) * 0.5 : 0;
+      dx /= d; dy /= d; a.vx -= (f + push) * dx; a.vy -= (f + push) * dy; b.vx += (f + push) * dx; b.vy += (f + push) * dy;
+    }
+    for (const [i, j] of edges) { const a = nodes[i], b = nodes[j]; const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, f = (d - 90) * 0.02; a.vx += f * dx / d; a.vy += f * dy / d; b.vx -= f * dx / d; b.vy -= f * dy / d; }
+    for (const n of nodes) { n.vx += (W / 2 - n.x) * 0.004; n.vy += (H / 2 - n.y) * 0.006; n.x += n.vx * 0.5 * k; n.y += n.vy * 0.5 * k; n.vx *= 0.6; n.vy *= 0.6;
+      n.x = Math.max(n.r + 4, Math.min(W - n.r - 4, n.x)); n.y = Math.max(n.r + 14, Math.min(H - n.r - 14, n.y)); }
+  }
+  return {nodes, edges};
+}
+function map() {
+  const box = $("map"); box.querySelector("svg")?.remove();
+  const W = Math.max(box.clientWidth, 560), H = Math.round(Math.min(560, Math.max(380, W * 0.55)));
+  if (!layout || layout.W !== W) layout = {...computeLayout(W, H), W};
+  const {nodes, edges} = layout;
+  const svg = svgEl("svg", {width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Map of wiki pages and their links"});
+  const tip = tipFor(box);
+  const edgeEls = edges.map(([i, j]) => { const l = svgEl("line", {x1: nodes[i].x, y1: nodes[i].y, x2: nodes[j].x, y2: nodes[j].y, class: "edge"}); svg.append(l); return l; });
+  nodes.forEach((n, i) => {
+    const d = ageDays(n.p), fade = d == null ? .35 : d <= 7 ? 1 : d <= 21 ? .7 : .4;
+    const c = svgEl("circle", {cx: n.x, cy: n.y, r: n.r, fill: color(n.p.group), "fill-opacity": fade, class: "node", tabindex: 0, role: "button", "aria-label": `${n.p.title}, as of ${n.p.asOf || "unknown"}`});
+    const show = () => {
+      edgeEls.forEach((l, k) => l.style.stroke = edges[k].includes(i) ? "var(--ink-3)" : "");
+      tip.show(`<small>${GROUP_LABEL[n.p.group]} · as of ${esc(n.p.asOf || "?")}</small><b>${esc(n.p.title)}</b>${n.p.words.toLocaleString()} words · ${n.p.uncertain} open · ${n.p.links.length} links`, n.x, n.y);
+    };
+    const hide = () => { edgeEls.forEach(l => l.style.stroke = ""); tip.hide(); };
+    c.addEventListener("mouseenter", show); c.addEventListener("focus", show); c.addEventListener("mouseleave", hide); c.addEventListener("blur", hide);
+    c.addEventListener("click", () => openPage(n.p.slug)); c.addEventListener("keydown", k => { if (k.key === "Enter") openPage(n.p.slug); });
+    svg.append(c);
+  });
+  nodes.filter(n => n.p.words > 700 || n.p.group === "smp" && n.p.words > 400).forEach(n => {
+    const t = svgEl("text", {x: n.x, y: n.y - n.r - 5, "text-anchor": "middle", class: "nlabel"}); t.textContent = n.p.title; svg.append(t);
+  });
+  box.prepend(svg);
+}
+
+// ---------- freshness table ----------
+function freshness() {
+  const rows = [...pages].filter(p => p.slug !== "index").sort((a, b) => (a.asOf || "").localeCompare(b.asOf || ""));
+  $("fresh").tBodies[0].innerHTML = rows.map(p => {
+    const d = ageDays(p), cls = ageClass(d);
+    return `<tr class="row" data-slug="${esc(p.slug)}" tabindex="0"><td><span class="sw" style="background:${color(p.group)};margin-right:8px"></span>${esc(p.title)}</td><td>${GROUP_LABEL[p.group]}</td><td>${esc(p.asOf || "unknown")}</td><td><span class="age ${cls}"><i></i>${d == null ? "unknown" : d + " d"} · ${cls}</span></td><td class="num">${p.words.toLocaleString()}</td><td class="num">${p.uncertain}</td><td class="num">${p.history.length}</td></tr>`;
+  }).join("");
+}
+$("fresh").addEventListener("click", e => { const r = e.target.closest("tr.row"); if (r) openPage(r.dataset.slug); });
+$("fresh").addEventListener("keydown", e => { const r = e.target.closest("tr.row"); if (r && e.key === "Enter") openPage(r.dataset.slug); });
+
+// ---------- reader ----------
+function openPage(slug) {
+  const p = bySlug[slug]; if (!p) return;
+  $("readerMeta").textContent = `${GROUP_LABEL[p.group]} · as of ${p.asOf || "unknown"} · ${p.words.toLocaleString()} words`;
+  $("readerTitle").textContent = p.title;
+  $("readerBody").innerHTML = md(p.text);
+  $("reader").hidden = false; $("readerBody").scrollTop = 0; $("readerClose").focus();
+}
+$("readerClose").addEventListener("click", () => { $("reader").hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("reader").hidden = true; });
+
+// ---------- ask: pick pages locally, then one grounded call ----------
+const STOP = new Set("a an and are as at be by did do does for from has have how i in is it its me my of on or so that the this to was we what when where which who why will with yet you as speak right now currently status update".split(" "));
+function expand(terms) {
+  const out = new Set(terms);
+  for (const g of DATA.aliases) if (g.some(n => terms.includes(n.toLowerCase()))) g.forEach(n => out.add(n.toLowerCase()));
+  return [...out];
+}
+function pick(question) {
+  const terms = expand((question.toLowerCase().match(/[\p{L}\p{N}_-]+/gu) || []).filter(t => t.length > 2 && !STOP.has(t)));
+  if (!terms.length) return [];
+  const scored = pages.filter(p => !["index", "aliases"].includes(p.slug)).map(p => {
+    const title = p.title.toLowerCase(), body = p.text.toLowerCase();
+    let s = 0;
+    for (const t of terms) {
+      const re = new RegExp(`(^|[^\\p{L}\\p{N}])${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "gu");
+      const hits = (body.match(re) || []).length;
+      s += hits ? 1 + Math.log(hits) : 0;
+      if (re.test(title) || p.slug.includes(t)) s += 4;
+    }
+    return {p, s};
+  }).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
+  const chosen = []; let size = 0;
+  for (const {p} of scored) { if (chosen.length >= 4 || size + p.text.length > 60000) break; chosen.push(p); size += p.text.length; }
+  return chosen;
+}
+const ERR = {
+  not_granted: "Claude isn't allowed for this page. Allow it from the page's permissions to ask questions.",
+  sampling_disabled: "Claude isn't available for this account.", not_declared: "This page can't ask Claude.",
+  capability_disabled: "Asking isn't available in this view.", capability_removed: "Asking isn't available in this view.",
+  rate_limited: "Too many questions for now. Try again in a minute.", session_expired: "Sign in again to ask.",
+  refused: "Claude declined that question. Try asking it differently.", empty_completion: "No answer came back. Try a more specific question.",
+  prompt_too_large: "Those pages were too long to send together. Ask something narrower.", upstream_error: "The answer was interrupted. Try again."
+};
+let samplePromise = window.claude?.use ? window.claude.use("sample") : Promise.resolve(null), ctl = null;
+samplePromise.then(s => { if (!s) { $("askBtn").disabled = true; $("askNote").hidden = false; $("askNote").textContent = "Asking needs the Claude viewer. Open this page on claude.ai to ask questions."; } });
+const EXAMPLES = ["Why is Darwin blocked as we speak?", "What's still open on Grid India access?", "What does Michael own right now?", "What changed in the mind palace setup?"];
+$("examples").innerHTML = EXAMPLES.map(q => `<button type="button">${esc(q)}</button>`).join("");
+$("examples").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { $("q").value = b.textContent; $("askForm").requestSubmit(); } });
+$("stopBtn").addEventListener("click", () => ctl?.abort());
+$("askForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const question = $("q").value.trim(); if (!question) return;
+  const sample = await samplePromise; if (!sample) return;
+  const chosen = pick(question);
+  $("read").innerHTML = chosen.length ? "Read: " + chosen.map(p => `<a class="wl" data-slug="${esc(p.slug)}">${esc(p.title)}</a> <span>(as of ${esc(p.asOf || "?")})</span>`).join(" · ") : "No page matched those words.";
+  $("askNote").hidden = true;
+  if (!chosen.length) { $("answer").innerHTML = "<p>Nothing recorded matches that. Try the names used in the notes, for example a project, ticket or person.</p>"; return; }
+  const notes = chosen.map(p => `=== PAGE [[${p.slug}]] "${p.title}" (as of ${p.asOf || "unknown"}) ===\n${p.text}`).join("\n\n");
+  const prompt = `You answer questions about Brian's work notes ("Baraluga Mind"). Use ONLY the notes below, a snapshot taken ${DATA.snapshot}. No outside knowledge, no guessing.
+
+Rules:
+- Answer in a few sentences or short bullets. Lead with the direct answer.
+- Cite the page for each claim as [[slug]] and say how current it is ("as of YYYY-MM-DD").
+- "As we speak" means "as of the latest note"; say that date plainly.
+- If the notes don't answer the question, say "That isn't recorded in these notes." and stop. Partial answers say what is missing.
+- Keep any UNCERTAIN item marked as uncertain.
+
+NOTES
+${notes}
+
+QUESTION
+${question}`;
+  ctl = new AbortController();
+  $("askBtn").disabled = true; $("stopBtn").hidden = false; $("answer").innerHTML = "<p class='muted'>Thinking…</p>";
+  try {
+    await sample(prompt, {signal: ctl.signal, onText: ({text}) => { $("answer").innerHTML = md(text); }});
+  } catch (err) {
+    if (err.code === "cancelled") { if (!err.text) $("answer").innerHTML = ""; }
+    else { $("answer").innerHTML = err.text && err.code !== "refused" ? md(err.text) : ""; $("askNote").hidden = false; $("askNote").textContent = ERR[err.code] || ERR.upstream_error; }
+  } finally { $("askBtn").disabled = false; $("stopBtn").hidden = true; }
+});
+
+// ---------- boot ----------
+header(); freshness(); timeline(); map();
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { timeline(); map(); }, 150); });
+</script>
