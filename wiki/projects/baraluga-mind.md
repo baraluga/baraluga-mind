@@ -15,6 +15,7 @@ As of 2026-10-11.
 - **Claude Code capture:** a `Stop` hook appends each finished turn to a per-day, per-session file labelled by Claude project, not by repo, because `smp` spans many repos. This avoids having to detect when a conversation has "ended". Obvious secrets are redacted at capture.
 - **Auto-recall (Claude Code only):** a `UserPromptSubmit` hook matches each prompt against page titles and [[aliases]]. On a match it adds a one-line hint, at most once per page per session. No match means nothing is added, so there is no token cost. Codex stays on-demand only, because a global `AGENTS.md` line would cost tokens on every session.
 - **Not captured:** Teams, which needs corporate access.
+- **Visual page:** a private claude.ai artifact at `https://claude.ai/artifact/CMT5qzomFGnz27aP417mS6` holds a wiki snapshot with a timeline, link map, freshness table, and an ask box that answers only from recorded notes. It does not update itself. When Brian says "Refresh the Baraluga Mind page", run `python3 scripts/build-palace-page.py <out>.html` and publish the output to that URL.
 - **Planned:**
   - Optionally, a Claude Code mod for `/palace` lookups.
   - Add an `index.md` so no page is orphaned.
