@@ -15,6 +15,7 @@ The wiki is the synthesized memory layer. It should be more stable, more careful
 - Do not create TODO checkboxes or `TODO:` items in wiki pages. Mention pending work once, dated, in `Current State`.
 - Follow the root Current-State Rule: rewrite `Current State`, replace superseded claims, and keep `History` to turning points.
 - If a page is mostly a bucket for unclear material, name it plainly, such as `unclear-captures.md`.
+- Put every SMP page (platform, India, Japan, dashboards, ops, SMP tooling) in `wiki/smp/`. Other pages stay in `people/`, `projects/`, `concepts/`, or `decisions/`. Wiki-links resolve by page name, so moving a page never breaks links.
 - Keep `wiki/index.md` complete. When a page is created, renamed, split, or removed, update its entry under the right area with a one-line description.
 
 ## Entity Pages

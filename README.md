@@ -25,6 +25,8 @@ Anything else can be dropped into `inbox/` by hand, and the next run picks it up
 - `sources/notes/` - manual notes and historical daily notes preserved as source evidence.
 - `sources/pdfs/` - PDFs and extracted PDF notes.
 - `sources/codex-conversations/` - small Markdown indexes paired with complete raw `.txt` transcripts so Obsidian does not parse oversized conversation exports.
+- `wiki/index.md` - every page, grouped by area. Start here.
+- `wiki/smp/` - all SMP pages (platform, India, Japan, dashboards, ops, tooling), kept together because SMP dominates the captures.
 - `wiki/people/` - durable notes about people, teams, stakeholders, and relationships.
 - `wiki/projects/` - durable notes about active or past projects.
 - `wiki/concepts/` - durable notes about reusable ideas, patterns, topics, and frameworks.
