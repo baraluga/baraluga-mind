@@ -64,6 +64,24 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - The remaining `sff-ai-halo` follow-up is operational, not migration parity: Steffen still needs access to the new private GitHub repository, and the repository's fresh install has an MCP 2.x dependency incompatibility because `mcp>=1.2.0` resolves to an incompatible major version.
 - On August 5, three `qrm-dms` repositories were renamed to align with the SFF naming convention: `sff-tool-tdb-client` became `sff-lib-tdb-client`, `sff-tool-json-ref-dict` became `sff-lib-json-ref-dict`, and `sff-tool-or-common` became `sff-common-or`.
 
+## Migration Playbook
+
+Moved from [[team-operations]] on 2026-10-11.
+
+- **Organization:** one private-by-default `qrm-dms` GitHub organization for QRM/DMS ([[2026-07-14-use-single-qrm-github-organization]]). Org-wide default repo access is off; GitHub teams grant access per QRM group. By August, migration was project-specific, coordinated by tech leads and POs with [[michael]].
+- **Methods:**
+  - A plain mirror push or GitHub Importer preserves Git history without a Migrator role.
+  - `ado2gh` (GitHub Enterprise Importer) can also keep PRs and branch policies, but needs an org owner or Migrator role. PR history was judged not worth it ([[2026-07-09-skip-pr-history-for-walnut-migration]]).
+  - The default is a staged private mirror, with the source kept live until the target is verified, then ADO branches locked.
+- **Definition of done:** the repo is usable in Walnut and every ADO pipeline, deployment included, is recreated and proven. Git history can move first, but don't retire the ADO path until build, publish, deploy, and downstream consumption all work.
+- **Selection:** use the SharePoint workbook. The `Action` column is a required gate (`quality_tools` was marked `Archive`). Of the 172 `Migrate` rows audited in July: 50 trivial, 2 easy, 120 hard. Recheck repos that are still active, and roll back when readiness evidence fails (`strategy-common-infra`, 2026-07-21).
+- **Runners and secrets:**
+  - Use GitHub-hosted runners when no internal network access is needed; use Walnut runners for private Artifactory or internal endpoints.
+  - Org-level variables hold non-secret Azure Artifacts coordinates; org-level secrets hold the PATs.
+  - `qrm-dms/.github` holds org configuration and agents; `qrm-dms/sff-actions` is the versioned automation library.
+- **Access guidance (2026-08-05):** repository access is not deployment authority. Write access is acceptable when protected branches, CODEOWNERS on workflows, and approval-gated environments separate the two.
+- **Still open:** functional-user authentication (ServiceNow-linked or a service-account token) to replace PATs. Harbor was mentioned as an Artifactory alternative.
+
 ## Open Questions
 
 - UNCERTAIN: Who owns approval and custody for the GAMS installers and licence needed by Data Types and OR Common.
@@ -93,5 +111,11 @@ Repositories within the SFF project use a purpose-based `sff-*` prefix:
 - `sources/meetings/2026-09-08-1515-granola-supporting-gams-installer-thing.md`
 - `sources/meetings/2026-09-09-1600-granola-supporting-gams-in-our-walnut-artifactory.md`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
+- `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
+- `sources/codex-conversations/2026-07-13-codex-conversations.md`
+- `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
+- `sources/codex-conversations/2026-07-15-codex-conversations.md`
+- `sources/codex-conversations/2026-07-21-codex-conversations.md`
+- `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
 
-Last Updated: 2026-09-11
+Last Updated: 2026-10-11

@@ -1,166 +1,75 @@
 # SMP Dashboards
 
-## Summary
+## Current State
 
-Several dashboard efforts were active in late June and early July 2026: Japan interconnector, Yoko day-ahead price and volume, India IEX REC, Carlos's TV/dashboard setup, Grafana backup, and possible TSDB integration.
+As of 2026-10-07. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
 
-Dashboard delivery was moving quickly, while infrastructure work was slower and often blocked by access, proxy, VPN, or dependency issues.
+- **India geomap:** delivered. It shows realtime market price and volume by region, with max/min/average and current-slot views and a freshness indicator. The Plotly prototype was replaced by native Grafana geomap, and colour settings live in the dashboard JSON, so the same JSON imports into production. Mateo expects three maps (price/volume sets joined by region codes such as `N1`–`N3`), using fixed scales: yellow to red, price 0–10,000, volume up to last year's maximum plus 10%.
+- **Bilateral contracts (`SCR-1275`):** a table of all contracts with a region legend, freshness, and anomaly indicators. Still needs validation. It consumes `SCR-1278`'s validated tables rather than fixing scraper behaviour in dashboard code, and it must show source differences explicitly (see [[smp-india]]).
+- **IEX `DAM/GDAM/RTM MCP & Volume Trends`:** the main India market dashboard. It includes `Khaba Generation vs Forecast` (panel 18), the `SCR-1257` historical MCP heatmap, and the `SCR-1243` bid-stack curves. The bid-stack curves use separate buy/sell axes because the values are already cumulative, plus an estimated crossing marker; Mateo's QA feedback was pending.
+- **Grafana usage (`SCR-1252`):** SMP runs Grafana OSS, so Enterprise Usage Insights isn't available. The cheapest first answer is active-user counts from the org-users API (`lastSeenAt`) or Okta logs, going deeper only if usage justifies it.
+- **Not urgent:** Matteo's KPI dashboard (end of year; flat CDH output if its shape is unknown) and the Grafana + JupyterLab integration, waiting on Nilo (see [[smp-jupyter-dag-authoring]]).
 
-## Details
+## Background
 
-- Yoko day-ahead price and volume dashboard was complete and live in Japan production by July 1.
-- Yoko dashboard shows price and volume percentile curves for Tohoku and Chugoku.
-- Yoko percentiles are fixed at p5, p25, p50, p75, and p95.
-- Yoko date range is +1 day for day-ahead view.
-- India IEX REC dashboard is live in India production and pulls from the IEX API.
-- India REC dashboard shows cleared volume, total sell, total buy, and clearing price.
-- India REC data window was extended from 1 year to 4 years, starting from 2023.
-- Grafana dashboard backup was considered desirable. One discussed approach was API export of JSON config to SharePoint or an auto-PR, but access was blocked by VPN/Zscaler constraints.
-- Carlos requested interconnector data also be pushed to TSDB.
-- Japan interconnector production dashboard updates on July 6 added daily-average JEPX spread, interconnector-specific spread labels, and compact `Last`, `WTD avg`, and `MTD avg` spread stat boxes.
-- The final Japan interconnector stat layout uses three right-aligned metric boxes per interconnector, with WTD/MTD based on the latest available spread date in the selected range.
-- July 7 Francois-help notes describe the expected self-service dashboard flow: register dataset/schema in CDH, assign the dataset to the CDH project for dev/QA/prod, add the data source to the CDH project in Grafana, then edit the visible dashboard.
-- The same notes say the contributor had edit rights in QA but not dev, and that the SMP Dashboard README has the full guide.
-- Carlos previously handled CDH setup himself; Brian only added the data source to the CDH project.
-- July 7 Codex work added a targeted CDH dataset-manager path for Japan interconnector effective-capacity historical stage registration and improved schema/crawler refresh behavior for existing datasets and stages.
-- CDH crawler lag made the historical stage appear broken at first; once it caught up, the cleaner same-dataset/two-stage model was restored.
-- July 8 AWS migration standup favored backing up the full Grafana database instead of only dashboard JSON exports. Grafana was thought to use MySQL or Postgres, with an option to connect to existing RDS using the same pattern as Airflow.
-- July 17 Codex notes requested hardening the manual `cdh-register.yml` workflow so the target environment is inferred from the branch and the one-hour CDH token can be pasted as an explicit workflow input. The motivation was to avoid a dev branch run accidentally targeting production.
-- July 17 `SCR-1202` dashboard work added an opt-in HJKS 2Y `As of` selector pattern with immediate visibility for complete scheduled snapshots, exact snapshot filtering across all 12 panels, and a reusable look-back playbook for future dashboards.
-- August 3 SMP India notes reaffirm the dashboard publication path for new DAG outputs: create the CDH dataset in the project, write parquet under a matching S3 dataset key and stage, then query it from Grafana through Athena once CDH registration exposes the table.
-- Mateo identified generation dashboarding as a straightforward first India DAG-to-Grafana use case, with forecaster benchmarking as a more complex follow-up because it compares three external forecasters against actual generation curves and may require several data sources. Brian could not yet confirm the forecaster benchmarking ownership or source breakdown on 2026-08-04.
-- August 4 production Japan dashboard troubleshooting showed a practical CDH registration hazard: the manual workflow can finish green after submitting crawler jobs even when Athena tables are not yet visible or stage refreshes were skipped/rejected because another crawler was already running.
-- `smp-dashboard` depends on private `cdh-sdk` directly from GitHub Tools, not only on Artifactory packages. The manual CDH registration workflow therefore needs `ENGIE_GITHUB_TOOLS_NETRC` for dependency installation and `CDH_TOKEN_ONESHOT` for CDH itself.
-- The August 4 production registration failure was caused by an expired or revoked GitHub Tools credential while installing `cdh-sdk`; it did not reach CDH and caused no partial registration. A fresh GitHub Tools PAT with access to `GBSEngieDigitalDPAAS/cdh-sdk` fixed the dependency step.
-- The long-term cleanup preference is to publish `cdh-sdk` to Artifactory or use an organization-managed machine account, rather than keeping a personal GitHub Tools PAT in `smp-dashboard`.
-- August 11 standup and grooming notes kept old Louis-dashboard metadata as a blocker. The team can pre-check whether providers already exist in TSDB, identify provider owners, and coordinate injection scheduling so dashboard continuity is not disrupted.
-- The August 11 feature spike makes Grafana alerting a possible alternative to stakeholders manually checking dashboards every day, especially for threshold-based monitoring such as power-price triggers. Grafana monitoring views also need an inventory before the team claims a reusable operations pattern.
-- August 19 India planning added a bid-stack dashboard request: publish 15-minute buy/sell volume and price across three markets, group contracts by price category, push the result as TSDB time series, and build one Grafana dashboard per market. Japan bid-stack reports were named as the reference shape.
-- The August 20 SCR-1222 Grafana spike recommended five native or official workflow improvements: data freshness and alerts, dynamic dashboards, guided drill-downs, Git Sync, and the Foundation SDK. No community plugin made the top five because native Grafana capabilities carried broader value with less maintenance and governance overhead.
-- The SCR-1222 output was a brief Confluence-ready table plus a private interactive demo at `https://smp-grafana-top-five.baraluga.chatgpt.site`.
-- The August 27 FEDV chapter meeting shifted monitoring standardization toward Splunk for 24/7 production support because the IS team recommends Splunk, has Splunk expertise, and lacks internal Grafana expertise for round-the-clock support. Existing or planned Grafana deployments may be converted to Splunk where needed.
-- Dashboard standardization was flagged as a chapter-level need after initial business stakeholder presentations showed inconsistent visual design, including random colors and unclear representations.
-- The same FEDV meeting marked Power BI MCP work as not relevant for now because usage was declining while Grafana and Synapse took over. Argos and one other Power BI project were expected to be decommissioned by year-end, although Microsoft Copilot licensing could make future Power BI agent integration possible if demand returns.
-- August 27 `SCR-1238` work exposed a dashboard source-control convention: portable Grafana dashboard sources belong under `dashboards/india/`, while `dashboards/backups/india/` is for snapshots captured after live promotion. The portable India IEX dashboard source should retain the dashboard UID when it is meant to overwrite the existing dashboard, but datasource UIDs must be parameterized, for example with `${DS_SMP_CDH}`, so dev, QA, and production imports can bind the correct Athena datasource.
-- The same work clarified that the existing India IEX DAM/GDAM/RTM MCP and volume dashboard cannot display a raw TSDB UUID directly because it queries Athena/CDH. Khaba active generation therefore needs a CDH/Athena table sourced from the validated Khaba pipeline before the Grafana panel can be imported and tested cleanly.
-- During the `SCR-1238` migration, the dashboard query was made tolerant of overlap between a temporary rolling Khaba snapshot and the new date-based Parquet files by deduplicating rows and preferring the daily files.
-- September 1 sprint planning aimed for at least one mini POC for the 2026-09-09 sprint review or steering committee. Candidate themes came from the SCR-1235 epic and included Grafana or Airflow out-of-the-box features.
-- A September 1 Copilot reconnaissance ranked `SCR-1248` Grafana Drill-downs as a low-risk POC because it stays inside `smp-dashboard` JSON and can link an overview dashboard to the existing `outages_report.json` detail view without new infrastructure, plugins, credentials, DAG work, or Helm changes. Brian then chose to stay in Jira-management mode and set `SCR-1248` Story Points to 3.
-- The `SCR-1248` estimate was calibrated against actual SCR story-point anchors: 2-point tickets for bounded panel/spike work such as `SCR-1238` and `SCR-1222`, 3-point tickets for new patterns or new dashboards such as `SCR-1202` and `SCR-1243`, and 5-point tickets for new data-source or infrastructure integrations such as `SCR-1229`, `SCR-1230`, and `SCR-1171`.
-- Later September 1 Codex work corrected the `SCR-1248` interpretation: ordinary Grafana dashboard data links were the wrong product shape for the ticket, so both dashboard-link attempts were reverted from `smp-dashboard` `main`. The useful direction is Grafana's dedicated Drilldown apps/queryless exploration, which fit observability backends such as Prometheus/Mimir, Loki, Tempo, or Pyroscope rather than Athena/CDH market dashboards.
-- A fresh isolated `SCR-1248` Metrics Drilldown POC was then committed to branch `scr-1248-grafana-metrics-drilldown` at `9b1e7bf`. It uses Grafana 12.2.5, Metrics Drilldown 2.5.1, Prometheus 3.5.0, and synthetic SMP-style scraper metrics labelled by region, DAG, scraper, and status. It is intentionally not a production SMP integration.
-- September 2 backlog grooming narrowed Grafana usage monitoring to dashboard access by user and frequency, excluding internal team usage. Loki was identified as the likely first tool because it is Grafana-native and Signups already has Loki running; Okta logs may provide basic connection metadata but need a quick check.
-- The same grooming discussion noted that the shared Grafana/Airflow stack is used beyond SMP by Synapse and Delphi, so monitoring cost attribution should be clarified before SMP absorbs the whole cost.
-- September 2 Codex review of `SCR-1252` found that Grafana Usage Insights fits the requested per-user, per-dashboard view-frequency data, but SMP appeared to be running Grafana OSS rather than Enterprise/Cloud. A licensed Enterprise path would be straightforward; otherwise the likely alternatives are Okta login data, Loki logs, or another lightweight usage baseline.
-- `SCR-1255` changed the existing India IEX volume trends dashboard rather than creating a new dashboard: panel 18 in `IEX - DAM/GDAM/RTM MCP & Volume Trends` was renamed `Khaba Generation vs Forecast` and configured to show actual generation, Manikaran day-ahead forecast, and Manikaran intraday forecast in one graph.
-- The Khaba/Manikaran dashboard work reused the existing `india_khaba_generation` CDH dataset by adding new `metric` values rather than creating a new datasource. Follow-up debugging showed non-empty schema samples can leak into Athena/Grafana, so dashboard queries now need to prefer legitimate pipeline output files over registration artifacts when the table can scan both.
-- `SCR-1257` delivered data availability and example Athena/Grafana queries for India IEX heatmap-style analysis, not a committed heatmap panel. The open product choice is whether the heatmap should remain an ad hoc Explore/query artifact, become a panel in an existing India IEX dashboard, or become a separate dashboard.
-- On September 3, Brian decided to include the `SCR-1257` historical MCP heatmap in the existing `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard so Adrien could see the intended query and visualization. The final `smp-dashboard/main` heatmap fix was commit `590f9ff`, leaving future/null cells blank while preserving a 0-10 rupees/kWh color gradient for real DAM/GDAM/RTM values.
-- India Prod then hit the same CDH symptom previously seen in Japan Prod: registration was green but the new `india_iex_tsdb_expanded_historical` table was not visible to the project. A read-only crawler-status refresh changed the crawler from `RUNNING` to `DELETED`, the table became available, and a manual `SMP_INDIA_CDH_PROD` project-role refresh at 2026-09-03 16:43 GMT+8 made the table visible in CDH SQL Lab.
-- The permanent India Prod workflow fix was committed to `smp-dashboard/main` as `154cec1 fix: refresh India production CDH project role`. It adds the India Prod `project_role_refresh` mapping so future CDH registrations wait for crawler completion and refresh `SMP_INDIA_CDH_PROD` before reporting green.
-- The September 8 sprint-review slide work treated dashboard screenshots as evidence, not decoration: use one clear Khaba actual-versus-Manikaran forecast chart, one IEX historical national-price chart if available, and one Japan production TSDB interconnector-capacity chart. Section dividers should stay screenshot-free, and the Airflow Assets preview screenshot is optional while validation is pending.
-- September 10 `SCR-1244` work prepared a QA-only Grafana alert POC for the India `IEX - DAM/GDAM/RTM MCP & Volume Trends` dashboard. The chosen first alert was RTM MCP above INR 8/kWh, using the `SMP_INDIA_CDH_QA` Athena datasource and HTTP API setup rather than dashboard JSON import.
-- The POC created a dedicated `SCR-1244 POC` folder and `SCR-1244 QA email` contact point for `brian.peralta@engie.com` without enabling the alert. A live QA query returned `price_inr_kwh = 10`, so Grafana-to-Athena access and the threshold query worked.
-- Notification delivery remained blocked because Grafana QA reported SMTP was not configured. Checked-in Airflow QA config uses `mailhost.infrasys16.com:25`, so the recommended path is to test whether Grafana's QA pod can reach that relay and then configure SMTP, rather than introducing a separate Teams workflow first.
-- September 17 `SCR-1259` work deliberately avoided changing the existing Khaba Grafana panel. The one-minute Khaba readings are being published for operational use alongside the current 15-minute scraper and dashboard behavior.
-- September 22 Codex evidence captured `SCR-1243` QA feedback: Mateo wanted the IEX bid-stack curves to be easier to compare and asked for the buy/sell crossing point to be highlighted. The recommended dashboard response was independent BUY and SELL Y-axis scales because the source values were already cumulative, plus an estimated crossing marker and guide lines rather than stacking values and double-counting volume. A later same-day test pass updated `tests/test_iex_bid_stack_dashboard.py`, but QA promotion was not proven in this source because the QA Grafana URL was unreachable by DNS in the earlier run.
-- The same September 22 Codex export records that Adrien and another user were added to the Intact `editor` group for the QA environment, while Grafana's admin dashboard still showed their roles as `Viewer`; the suggested operational check was to log out and back into Grafana so group-derived permissions could refresh.
-- The September 28 SMP standup captured two Grafana map-dashboard approaches: a Plotly file hosted in the Runfra Grafana folder, and Grafana geomap. Plotly worked but used a non-standard format; geomap fit Grafana better but was limited to static JSON with hardcoded colors. A ticket was created to explore dynamic JSON activation and connect the correct time series for material requests.
-- The same standup said the Grafana + JupyterLab integration direction should mirror Signups' setup, with a PR review layer and an environment escalation path still needed before next-period readiness. Nilo was expected to be looped in.
-- September 30 `SCR-1252` feasibility narrowed the lowest-effort Grafana usage question to active-user counting before deeper dashboard analytics. Grafana's organization-users API exposes `lastSeenAt`, which may answer "how many users are using Grafana" without Enterprise Usage Insights; Okta connection logs remain a lightweight alternative. Dashboard-level views, edits, and refresh/zoom behavior still depend on license/features, Loki logs, or deeper instrumentation.
-- September 30 grooming split `SCR-1254` observability into user/pain-point-driven work instead of copying Synapse's stack wholesale: monitor Airflow CPU pressure, monitor Airflow memory pressure, and investigate Grafana dashboard access errors reported by Matteo. Grafana usage monitoring should start with Okta connection logs and only go deeper if the simple connection signal shows enough users to justify more detailed tracking.
-- September 30 grooming sharpened the India clearing-zone map request: three time-series sets from Matteo should drive three separate maps, joined by region names such as `N1`, `N2`, and `N3`. Plotly already has a working prototype but needs code/source review; native Grafana geomap dynamic GeoJSON coloring may be version-limited or require activation. The color scale must use fixed min/max thresholds agreed with Matteo rather than autoscaling per snapshot.
-- September 30 `SCR-1275` dashboard review found the bilateral-contract dashboard should display source differences explicitly: average/lowest/highest prices are contract-level for IEX GTAM, while IEX TAM and HPX monthly reports provide discovered price instead. HPX market-summary statistics should not be reused as per-contract values, and split delivery windows make a single start/end pair unsafe for some contract names.
-- October 1 backlog grooming confirmed the India clearing-map dashboard should go straight to Plotly as a quick win: three maps, reusable panels, yellow-to-red colors because India prices have no negative values, price bounds from 0 to 10,000, and volume bounds from last year's historical data plus 10%. Each map panel needs a freshness indicator showing the oldest latest date across the panel's time series, similar to existing last-collected/last-push indicators.
-- October 1 notes kept the Grafana + JupyterLab integration behind an update from Nilo. Matteo's KPI dashboard was accepted as end-of-year/not urgent and should probably wait until Jupyter integration is clearer. If the dashboard shape is unknown, a flat CDH dump is preferred; if Matteo confirms the desired dashboard structure, a normalized schema may be better.
-- October 1 Codex discussion captured a reusable Grafana pattern for dashboards that need multiple async endpoint calls: if scheduled refresh is acceptable, use a backend aggregator/orchestrator that resolves calls and polling, writes completed outputs to CDH, and lets Grafana keep querying Athena. If dashboard filters must trigger fresh API jobs interactively, a direct backend API datasource or custom Grafana backend plugin is a different, heavier requirement.
-- October 1 Codex work says `SCR-1278` now owns bilateral-contract ingestion, normalization, replay, migration, and the CDH interface that blocks `SCR-1275`; the Grafana ticket should consume validated table names, schema, example queries, freshness joins, and documented limitations rather than correcting scraper behavior inside dashboard code.
-- October 5 presentation planning recommended demoing one or two production Grafana dashboards in depth, briefly enumerating the available graphs, and choosing examples that show different visual types, such as Bitstack stacked area, bilateral-contract concepts, and KABA/KAFDA. The alerting feature should be mentioned as email-capable with Teams chat integration under testing.
-- The same planning notes say the bilateral-contract dashboard had a dashboard comment, screenshot, and upcoming Adrien validation session. KABA and KAFDA site generation were described as running every five minutes with one-minute granularity and flowing through TSDB.
-- October 6 standup notes say the Geomap dashboard was built in QA against live IEX data. The same dashboard JSON imported successfully into production, which confirmed color configuration can live in dashboard settings rather than inside the GeoJSON file. Matteo expects three maps; the source says all three are feasible, and reusable panels are not a near-term priority because copy-pasting the query is acceptable for now.
-- October 7 sprint review says the India geomap dashboard now shows real-time market price and volume by region, supports max/min/average views plus current slot, and includes a data-freshness indicator. The initial Plotly prototype was replaced by the cleaner Grafana geomap.
-- The same review says the bilateral-contract dashboard now has a table view of all bilateral contracts, a region/code legend, freshness indicators, and anomaly indicators, but still needs validation.
+### Publishing a dashboard
+
+- **Data path:** DAG writes parquet → CDH dataset with a matching S3 key and stage → Athena → Grafana. Rules are on [[smp-platform]]. Grafana cannot show a raw TSDB series, so TSDB data needs a CDH table first.
+- **Registration workflow:** `cdh-register.yml` in `smp-dashboard`.
+  - It needs `ENGIE_GITHUB_TOOLS_NETRC` (private `cdh-sdk` installs from GitHub Tools) and a one-hour `CDH_TOKEN_ONESHOT`.
+  - A green run can still leave Athena without the table if the crawler was busy. Production now waits for the crawler and refreshes the CDH project role before reporting green: India prod got this in `154cec1`.
+  - The preference is to move `cdh-sdk` to Artifactory or a machine account instead of a personal PAT.
+- **Schema samples must have zero rows,** or Athena serves them as data. Dashboard queries should prefer real pipeline files when a table can scan both.
+- **Source control:**
+  - Portable dashboard sources live under `dashboards/<region>/`, and post-promotion snapshots under `dashboards/backups/<region>/`.
+  - Keep the dashboard UID when the source is meant to overwrite a live dashboard, but parameterise datasource UIDs (e.g. `${DS_SMP_CDH}`) so dev, QA, and prod bind correctly.
+  - Git as the single source of truth, with no drift from live Grafana, remains the goal.
+- **Permissions:** group-based edit rights (e.g. Intact `editor`) can show as `Viewer` until the user logs out and back in.
+
+### Patterns and Preferences
+
+- **Multi-endpoint data:** if scheduled refresh is acceptable, put a backend aggregator in front that writes to CDH, and keep Grafana on Athena. Interactive, filter-triggered API calls would need a custom datasource or plugin, which is a much heavier ask.
+- **Grafana spike (`SCR-1222`):** the best native wins are freshness and alerts, dynamic dashboards, guided drill-downs, Git Sync, and the Foundation SDK. No community plugin made the cut.
+- **Drilldown apps** (`SCR-1248`) suit Prometheus/Loki-style observability data, not Athena market dashboards. Ordinary data links were reverted. An isolated Metrics Drilldown demo branch exists (`scr-1248-grafana-metrics-drilldown`).
+- **Demos:** go deep on one or two production dashboards with different visual types, and treat screenshots as evidence.
+- **Chapter context:** dashboard visual standardisation was flagged as a need. The IS team prefers Splunk for 24/7 production monitoring. Power BI is declining in favour of Grafana and Synapse.
+- **Story-point anchors:** 2 for a bounded panel or spike, 3 for a new pattern or dashboard, 5 for a new data source or infrastructure integration.
+
+## History
+
+- 2026-07-01: Japan "Yoko" day-ahead price/volume percentile dashboard and India IEX REC dashboard (4 years from 2023) live in production.
+- 2026-07-17: reusable HJKS 2Y `As of` look-back selector pattern (`SCR-1202`).
+- 2026-09-03: India IEX heatmap added; India prod CDH role-refresh fix.
+- 2026-10-07: India geomap and bilateral-contract dashboard delivered.
 
 ## Open Questions
 
-- UNCERTAIN: Grafana backup implementation path remains blocked by network/VPN access in the captured notes.
-- UNCERTAIN: CDH crawler delay duration and operator-facing status behavior are not fully characterized.
-- UNCERTAIN: Grafana database engine and RDS backup path still need confirmation.
-- UNCERTAIN: Whether the `cdh-register.yml` input-token redesign has been implemented after the July 17 request.
-- UNCERTAIN: Whether the forecaster benchmarking sources and ownership will be handled by Brian's team, Mateo, Adrian, or a broader India workflow.
-- UNCERTAIN: Whether `cdh-register.yml` should fail, wait, or emit a separate required follow-up when requested production stage refreshes are skipped because a crawler is already running.
-- UNCERTAIN: Whether `cdh-sdk` will be packaged into Artifactory or remain a direct GitHub Tools dependency.
-- UNCERTAIN: Which old Louis-dashboard providers and metadata owners are needed before TSDB injection can proceed.
-- UNCERTAIN: Which three India bid-stack markets are in scope and whether the Japan bid-stack reference has exact reusable panel semantics.
-- UNCERTAIN: Whether the SCR-1222 Git Sync and Foundation SDK recommendations were later piloted against committed SMP dashboard JSON.
-- UNCERTAIN: Which Grafana deployments are actually being converted to Splunk, and whether SMP dashboards are in that conversion scope.
-- UNCERTAIN: Which Power BI project besides Argos is expected to be decommissioned by year-end.
-- UNCERTAIN: Whether the `SCR-1238` portable India IEX dashboard JSON has been imported into live QA Grafana and verified against the exact Khaba TSDB series.
-- UNCERTAIN: Whether the September 9 mini POC should stay as a spike-only artifact or be promoted into production dashboard JSON.
-- UNCERTAIN: Whether the isolated `SCR-1248` Metrics Drilldown branch should become a PR, remain a demo artifact, or be superseded by a different SCR-1235 POC.
-- UNCERTAIN: Whether Loki's default logs expose enough dashboard-access detail for the intended Grafana usage-monitoring scope.
-- UNCERTAIN: Whether Okta logs are accessible and useful enough for dashboard usage metadata.
-- UNCERTAIN: Whether Bastian or another owner decides cost attribution for shared Grafana/Airflow monitoring across SMP, Synapse, and Delphi.
-- UNCERTAIN: Whether SMP has or can obtain Grafana Enterprise/Cloud entitlement for `SCR-1252` Usage Insights, or must implement usage reporting through Okta/Loki instead.
-- UNCERTAIN: Whether the latest production India IEX dashboard JSON, including the `SCR-1257` heatmap and stronger schema-artifact query filters, has been imported into production Grafana.
-- UNCERTAIN: Whether the sprint-review screenshots were later reflected back into checked-in Grafana/dashboard source or only added to the SharePoint deck.
-- UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay `mailhost.infrasys16.com:25`, and which sender/TLS/auth requirements apply.
-- UNCERTAIN: Whether `SCR-1244` should prove email notification only, or later add a Teams contact point after the threshold/firing/recovery behavior is accepted.
-- UNCERTAIN: Whether the one-minute Khaba TSDB series should later receive dashboard panels or remain operational-only as currently scoped.
-- UNCERTAIN: Whether Mateo accepts independent BUY/SELL axes as satisfying his "cumulative graph" feedback, or whether he specifically wants derived per-band stacked contributions.
-- UNCERTAIN: Whether the `SCR-1243` crossing marker changes were promoted to live QA after the DNS failure.
-- UNCERTAIN: Whether Adrien's QA Grafana edit rights refreshed after logging out and back in.
-- UNCERTAIN: Whether `Runfra` is the exact Grafana folder/system name from the September 28 standup.
-- UNCERTAIN: Which "material requests" time series the dynamic Grafana map ticket should connect to.
-- UNCERTAIN: Whether Signups' JupyterLab integration pattern can be reused directly for SMP or only as a reference shape.
-- UNCERTAIN: Whether SMP Grafana exposes enough organization-user `lastSeenAt` or Okta data to answer `SCR-1252` without Enterprise Usage Insights or Loki.
-- UNCERTAIN: Whether the current Grafana version can dynamically color GeoJSON regions for India clearing zones without falling back to Plotly.
-- UNCERTAIN: Which fixed min/max thresholds Matteo expects for the India clearing-zone heatmap color scales.
-- UNCERTAIN: Whether `SCR-1275` should represent split delivery windows with multiple intervals rather than a single start/end time.
-- UNCERTAIN: Whether the October 1 price and volume bounds for India clearing maps are final acceptance criteria or current meeting guidance.
-- UNCERTAIN: Whether the async multi-endpoint dashboard use case can use scheduled CDH/Athena refresh or requires interactive dashboard-triggered computation.
-- UNCERTAIN: Whether KABA/KAFDA are the exact site names and how they relate to existing Kaba/Khaba/Khavda naming variants.
-- UNCERTAIN: Whether production Grafana allows uploading a new GeoJSON country-map file to the public folder without special rights.
-- UNCERTAIN: Whether the bilateral-contract dashboard validation should be done by Adrien, traders, Matteo, or another owner before it is considered done.
+- UNCERTAIN: Whether production Grafana has the latest India IEX dashboard JSON (heatmap, schema-artifact filters, bid-stack crossing marker).
+- UNCERTAIN: Who validates the bilateral-contract dashboard before it counts as done.
+- UNCERTAIN: Whether Grafana backup should be the full database (the July preference) or JSON in Git. No backup path was confirmed.
+- UNCERTAIN: Which Grafana deployments, if any, are being converted to Splunk.
 
 ## Sources
 
-- `sources/meetings/2026-06-24-1552-granola-backlog-grooming.md`
 - `sources/meetings/2026-07-01-1630-granola-smp-revie.md`
-- `sources/meetings/2026-07-02-1100-granola-sprint-planning.md`
-- `sources/codex-conversations/2026-07-06-codex-conversations.md`
 - `sources/meetings/2026-07-07-1530-granola-francois-help.md`
-- `sources/codex-conversations/2026-07-07-codex-conversations.md`
-- `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
 - `sources/codex-conversations/2026-07-17-codex-conversations.md`
-- `sources/meetings/2026-08-03-1415-granola-busy.md`
-- `sources/notes/2026-08-04-ingest-handover-clarifications.md`
 - `sources/codex-conversations/2026-08-04-codex-conversations.txt`
-- `sources/meetings/2026-08-11-1415-granola-daily-standup.md`
-- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
-- `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/codex-conversations/2026-08-27-codex-conversations.txt`
-- `sources/meetings/2026-09-01-granola-busy.md`
 - `sources/copilot-conversations/2026-09-01-copilot-conversations.md`
 - `sources/codex-conversations/2026-09-01-codex-conversations.txt`
-- `sources/meetings/2026-09-02-backlog-grooming.md`
-- `sources/meetings/2026-09-02-standup.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-03-codex-conversations.txt`
-- `sources/codex-conversations/2026-09-08-codex-conversations.txt`
-- `sources/codex-conversations/2026-09-10-codex-conversations.txt`
-- `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
-- `sources/meetings/2026-09-28-1415-granola-smp-standup.md`
 - `sources/codex-conversations/2026-09-30-codex-conversations.txt`
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 - `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
 - `sources/codex-conversations/2026-10-01-codex-conversations.txt`
-- `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-07-granola-sprint-review.md`
+- Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-08
+Last Updated: 2026-10-11

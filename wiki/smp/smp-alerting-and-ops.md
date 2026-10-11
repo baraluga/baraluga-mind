@@ -1,145 +1,72 @@
 # SMP Alerting and Ops
 
-## Summary
+## Current State
 
-SMP operational discussions in late June and early July focused on production incident handling, failed MS Teams email alerting, proxy errors, Grafana backup, and repeatable runbooks. The most concrete alerting direction was to add direct-email fallback when Graph API or MS Teams alerting fails.
+As of 2026-10-09.
 
-## Details
+- **Grafana alerts to email and Teams.**
+  - Native Grafana alerts work in India QA (`SCR-1244`); the POC was an IEX RTM 10,000 threshold, and Francois created his own alert to confirm.
+  - Teams delivery (`SCR-1267`/`1269`) was proven working by 2026-10-06. Users create a Teams channel, allow external senders, and add its email address as a Grafana Email contact point, with no IT request.
+  - The Confluence guide is published under SMP India next to the `SCR-1244` email guide. Validation after review is the remaining step.
+  - Business/data alert channels are user-owned and kept separate from SMP's operational alerting.
+- **Observability is next-period work.**
+  - `SCR-1254` covers resource monitoring, starting from real pain points: Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors. Grafana usage tracking starts from cheap Okta or user-activity evidence.
+  - `SCR-1268` covers Darwin collector monitoring: about 1 point if Jeka's existing observability stack covers it, about 3 if SMP must build a small health monitor. See [[darwin-collector]].
+- **`SCR-1284` dashboard delay:** before proposing the Airflow dual-write bypass described in [[smp-india]], the team needs timing evidence across scrape → TSDB → CDH, with mean and standard deviation for one IEX series and one non-IEX source.
 
-- MS Teams email still returned 403 after switching to the NPRM68 mailbox in one June 22 note.
-- June 29 notes say NPRM68 without `.sem-em` worked for users but not the Teams channel.
-- July 2 planning proposed catching Graph API email failures and sending SMTP/direct email fallback alerts.
-- Proposed noise control: suppress repeated alerts for about 5 days and cap alerts around 3 per day.
-- July 7 standup notes say ticket 1181 added an alert-on-alert mechanism: if MS Teams alerting fails, send fallback email. A dedicated forced-failure test was set up in Japan QA for Francois to verify.
-- July 9 Codex/Copilot captures add a debug-only email callback, `send_debug_dag_email`, in `smp-common 0.4.3`, using `SMP_DEBUG_EMAIL_ENABLED` and `SMP_DEBUG_EMAIL_RECIPIENTS`. The callback is for manual/debug DAG runs, not production monitoring.
-- July 9 captures say the Japan interconnector manual backfill DAG temporarily used the debug email callback for both success and failure, but runtime deployment needed the QA Airflow image to include `smp-common 0.4.3`.
-- July 9 notes say `SCR-1181` email alert debugging showed the current DAG was not reaching the expected failure point, so lack of alert did not prove the alert path itself was broken.
-- Francois wanted the MS Teams email issue resolved quickly or escalated through a vendor meeting.
-- ServiceNow incident fields discussed: affected service, symptom, and dropdown incident link.
-- Proxy errors were reported as 403s in FMP Japan prod and FMP India prod while QA was consistently successful.
-- Application team meeting notes describe AI-assisted runbook automation for recurring APM issues, with diagnosis time reduced from about 10-20 minutes to about 2 minutes.
-- Runbooks were stored in `docs/runbooks`; Confluence discoverability was discussed because of Microsoft 365 AI and searchability.
-- July 9 technical standup says Grafana APM alerts were created and tested by lowering the threshold. SMTP was not configured; the proposed path was an encrypted common-stack SNS topic with a Teams channel subscriber.
-- July 13 standup says the Grafana-alert SNS stack was created and testing was in progress; Sentry for APL was next.
-- July 14 team notes reported APM notification setup blocked because email notifications were not working due to SMTP configuration. The recommended resolution path was IAM or identity-provider based, with console checking as a workaround. A July 15 clarification says this was APM, not EPM, and Huk is working on it.
-- July 14 technical standup said APM migration was complete and SNS infrastructure was done, but Grafana still needed AWS-admin help to create or confirm a role for CloudWatch/publish access in the APM context.
-- July 17 technical-activities notes say an SNS publisher role had been created and attached to the Grafana service account, but a web-identity/STSS error still persisted and Jeka was asked for namespace access. The SNS ticket was not expected to close that day because of a later demo.
-- The same meeting introduced a broader alerting idea from the Prosumer simulation blockage: restore Prosumer-specific alarms if needed, but also consider account-level global alarms because the immediate root cause was shared AWS infrastructure capacity rather than a Prosumer application failure.
-- August 11 backlog grooming proposed a short spike on out-of-the-box Airflow and Grafana features not yet used by the team. Airflow assets were called out as unexplored potential low-hanging fruit; Grafana alerting could replace daily manual dashboard checks for threshold-driven cases such as power prices; and Grafana monitoring views should be mapped for operational reuse.
-- The intended spike output feeds the August 28 steering committee presentation, with findings expected by August 21 before the other speaker's August 24-30 holiday. The meeting expected two tickets: one for Grafana features and one for Airflow features.
-- August 19 notes refined the spike output into a table of feature name, description, usefulness assessment, and applicable use cases. The same notes proposed Grafana threshold alerts that users can configure themselves, plus Prometheus and Loki monitoring for SMT health, pod usage, and processing load.
-- The proposed resource-monitoring work is expected to fit Airflow and Grafana, take under five days, and provide earlier warning before failures or scaling issues.
-- The August 20 SCR-1221 Airflow spike narrowed the recommendation to five practical improvements: Airflow Assets, deadline alerts, self-service runs with Params/backfills, exception-aware retry policies, and versioned Git DAG bundles. Assets were judged useful mainly for Japan's orchestration complexity and lower-value for India today; the recommended proof was Japan OCCTO daily capacity feeding a reconciliation consumer.
-- The SCR-1221 and SCR-1222 work produced Confluence-ready tables plus private interactive demos: `https://smp-airflow-capabilities.baraluga.chatgpt.site` and `https://smp-grafana-top-five.baraluga.chatgpt.site`.
-- August 24 notes reframed the Airflow/Grafana spikes as product-discovery demos rather than pure technical POCs. The defensible rationale is to position SMP around stakeholder problems that users may not know to request yet, but the guardrail is to start from a named persona, workflow pain point, and adoption decision. A valid spike result can be "interesting but no demonstrated demand," and productionization should wait for stakeholder validation.
-- The same discussion flagged an allocation mismatch: Brian's SMP work had moved into a maintenance phase with about 30% FTE allocation, while two two-day exploratory spikes could exceed that timebox if both are treated as required implementation work.
-- The August 27 FEDV chapter meeting positioned Splunk as the preferred production monitoring support path where 24/7 support matters, because the IS team recommends it and has internal expertise. Grafana remains useful, but lack of internal Grafana expertise was cited as a reason to convert some deployments to Splunk.
-- September 2 backlog grooming scoped SMP resource monitoring under `SCR-1254` toward Grafana-visible CPU/memory baselines and simple 95% usage alerts with manual response before autoscaling. Signups already has Loki on its cluster, and Michael was expected to coordinate a demo with Jeka when Jeka returns.
-- The same grooming discussion separated Grafana usage monitoring from Airflow usage monitoring. The Grafana usage question is who accesses which dashboards and how often, excluding internal team usage; Loki is the likely first check, with Okta logs as a secondary metadata source.
-- September 2 Codex review of queued production DAGs concluded that paused DAGs receiving queued external runs are evidence of a stale trigger/orchestrator configuration, not proof that every paused DAG is obsolete. The safer lifecycle is to stop new automatic triggers first, identify owners/consumers and stale queued runs, then unpause only required production DAGs through controlled single runs or retire no-owner/no-consumer DAGs after observation.
-- September 10 `SCR-1244` Grafana alerting work clarified that alert rules are not imported through the normal dashboard JSON import screen. The simplest POC path is an authenticated HTTP API payload for one QA rule, with a paused-then-enable flow and a separate firing/recovery test.
-- The same work recorded that SMP Grafana instances are VPN-only, so offline preparation can build payloads and scripts, but live query, contact point, and delivery checks require a VPN-connected session or someone with cluster access.
-- India QA Grafana authenticated successfully with `GRAFANA_TOKEN_INDIA_QA`, returned Grafana 12.3.1, and queried `SMP_INDIA_CDH_QA`; the alert data side returned `price_inr_kwh = 10` for the POC query. Email delivery failed because Grafana SMTP was not configured.
-- Airflow's India QA configuration uses `mailhost.infrasys16.com:25` for SMTP, while Teams notifications use Microsoft Graph. Grafana and Airflow are separate Helm releases in the same namespace according to checked-in deployment design, not the same pod. The next operational check is whether Grafana's QA pod can reach the SMTP relay and what sender/TLS/auth rules apply.
-- September 14 standup says Grafana alerting worked through manual testing: a Grafana contact point was configured using the terminal email address, corporate email and SMS were triggered, a POC chart fired at a 10K threshold, and alerting reused the same namespace/configuration pattern as Airflow. The remaining operational step was a redeploy after Grafana reconfiguration, with Michael involved through Git.
-- The same standup records cobweb/freshness monitoring running every 15 minutes. A brute-force five-minute check and a more graceful real-time approach were discussed. A 1-point ticket had been raised at 12:59, the prior gaps bug was not visible in Grafana at the time of the meeting, and the team planned to keep monitoring.
-- September 18 standup said Grafana native alerts were working in QA and were safe to push to production in the sprint. Alerts fire on both threshold breach and recovery, programmatically created alerts are read-only in the UI, and end-user-created alerts work normally. A Confluence page on end-user alert setup had been drafted.
-- The September 18 daily standup also put ticket 544, the black-box exporter implementation, at high priority for the day; alert implementation had started but was not yet tested.
-- September 21 standup said the Grafana alerting POC for ticket 1260 was done in QA only, which was acceptable for the current stage. Dev had a configuration issue suspected to come from QA-only config; if alerting is approved, the QA config needs to be backpropagated to dev.
-- September 21 Darwin consultation said Prometheus is already running in the SMP cluster and Grafana dashboards are active for namespace metrics. The Synapse team was building full Prometheus/alerting integration with a target production release in one to two weeks, so the recommendation was to wait before building separate monitoring for a new Darwin collector pod. Nilo still needed to double-check cluster coverage, and Jeka was named as the current SMP monitoring owner.
-- The September 23 sprint review says the IEX RTM 10,000-threshold Grafana email-alert proof of concept works in QA; Francois independently confirmed alerting by creating his own alert. Production rollout was expected within the following days, with documentation already prepared and to be shared after rollout. Email-to-mailbox delivery can support Teams notifications; Airflow already uses that pattern for DAG errors, and Mateo wanted to confirm trader demand before extending it beyond internal use.
-- September 25 Codex work clarified the Teams-notification path for Grafana alerts: Airflow already sends DAG-failure alerts to Teams by emailing a channel through Microsoft Graph, with SMTP fallback for support recipients when Graph delivery fails. Grafana can probably reuse the channel-email destination concept, but the transport differs because Grafana alerting would send through SMTP unless the native Teams contact-point path is proven.
-- `SCR-1267` was created as a spike for Grafana alerts via Teams for SMP Japan and India. The intended shape is dedicated regional Teams channels/contact points for business/data alerts, separate from Airflow operational-failure alerts, with delivery feasibility, firing/recovery tests, channel ownership, and implementation recommendations in scope.
-- `SCR-1268` was created for Darwin collector monitoring: confirm whether existing Prometheus can monitor the collector, expose availability/freshness/backlog signals, configure operational alerts, verify stopped-collector / failed-poll / stalled-publication scenarios in QA, and document the pattern for future realtime collectors.
-- September 28 Darwin trial evidence sharpened the collector-monitoring need: the first one-minute trial showed successful polls can still miss a source-minute bucket, while 15-second polling captured complete windows in a local fake-TSDB trial. Monitoring should therefore distinguish request success from per-entity/tag source-minute freshness and backlog.
-- September 29 SMP India Grafana troubleshooting showed a recurring operational pattern: transient Athena `GetWorkGroup` throttling can self-clear before investigation, as also happened in a previous SMP Japan Grafana incident. The practical recurrence evidence to collect is dashboard name, approximate time and timezone, request ID if visible, Athena account/role/region, and whether the role has CloudTrail or Service Quotas read access.
-- September 30 grooming reframed `SCR-1254` resource observability around concrete user pain points instead of copying another stack wholesale. The first subtasks should cover Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors, while Grafana usage monitoring should start from low-effort Okta or user-activity evidence before deeper interaction tracking.
-- October 5 standup notes say `SCR-1267` can use Teams channel email addresses without a new IT request: users create the Teams channel, allow external senders, and add the channel address as a Grafana Email contact point. This keeps business/data alert channels user-owned and separate from SMP operational alerting channels.
-- October 5 Codex evidence says the `SCR-1267` Confluence guide was published as `SCR-1267 -- Send Grafana alerts to a Microsoft Teams channel` beside the original `SCR-1244` email-alert setup guide under SMP India. The guide stops at creating/testing the Teams email contact point, then links to the `SCR-1244` guide for alert rules and routing; the TL;DR was later moved into a blue info banner.
-- October 6 standup notes say Grafana Teams alert tickets `1267` and `1269` were proven working, that Teams channel setup is out of scope for the implementation, and that the Confluence guide covers the Teams-side setup while referencing the existing Grafana guide. The remaining step is validation after review.
-- October 7 morning standup and sprint-review notes keep observability as next-period work: backlog grooming is needed for observability-stack tickets, blocked tickets, and ungroomed work; Jack advised on setup order; and the next priorities include monitoring computational resource usage.
-- October 8 sprint planning kept `SCR-1268` as Darwin collector monitoring work. Best case is that Jeka's existing observability stack already covers the needed signals and the ticket stays around 1 point; worst case is about 3 points if SMP must build a small health/error-log monitor. The suggested first checks are OctaConnection logs, existing Grafana/Prometheus coverage, and Jeka's knowledge of current monitoring gaps.
-- October 8 planning also tied observability to dashboard delay: `SCR-1284` should identify where roughly 20 minutes of delay is introduced across Airflow, TSDB, CDH, Grafana, and Pathway before the team promises optimization or real-time behavior.
-- October 9 standup notes say `SCR-1284` needs timing evidence across scraping, TSDB injection, and CDH push time, including mean and standard deviation for one IEX series and one non-IEX source. The evidence is needed before asking the TSDB team to accept a bypass design where Airflow writes IEX RTM directly to both TSDB and CDH.
+## Background
+
+- **Airflow alerting:** DAG failures go to Teams by emailing a channel through Microsoft Graph, with an SMTP fallback (`mailhost.infrasys16.com:25`) to support recipients when Graph fails. This "alert-on-alert" fallback came from `SCR-1181` in July. Proposed noise control was roughly a 5-day repeat suppression and about 3 alerts per day.
+- **Grafana alerting mechanics:**
+  - Alert rules are not imported through dashboard JSON; use the HTTP API.
+  - Alerts fire on both breach and recovery.
+  - Alerts created programmatically are read-only in the UI, while ones created by end users behave normally.
+  - SMP Grafana is VPN-only, so live checks need a VPN session.
+  - Grafana and Airflow are separate Helm releases in the same namespace, according to the checked-in design.
+- **Debug email:** `send_debug_dag_email` in `smp-common` (`SMP_DEBUG_EMAIL_ENABLED`, `SMP_DEBUG_EMAIL_RECIPIENTS`) is for manual and debug DAG runs only, not production monitoring.
+- **Monitoring stack:** Prometheus already runs in the SMP cluster with namespace dashboards. Synapse was building fuller Prometheus/alerting integration as of September, and Jeka is the current SMP monitoring owner. Signups runs Loki on its cluster, which is a possible reference.
+- **Splunk versus Grafana:** the IS team prefers Splunk for 24/7-supported production monitoring because it has in-house expertise. Grafana stays the SMP tool.
+- **Recurring patterns:**
+  - Athena `GetWorkGroup` throttling in shared accounts can clear before anyone investigates. Collect the dashboard, time, request ID, and account/role/region when it recurs.
+  - Paused DAGs that still receive queued runs point to a stale trigger configuration. Stop the triggers first, then decide per DAG to unpause or retire it.
+- **Product framing (2026-08-24):** the Airflow/Grafana capability spikes (`SCR-1221`/`1222`) are product-discovery demos. Start from a named persona and pain point; "interesting, but no demonstrated demand" is a valid outcome.
+  - The recommended Airflow features were Assets, deadline alerts, self-service Params/backfills, exception-aware retries, and versioned DAG bundles.
+
+## History
+
+- 2026-07: MS Teams email 403s led to the Graph-then-SMTP fallback (`SCR-1181`).
+- 2026-08-20: Airflow and Grafana capability spikes delivered with demos.
+- 2026-09-14: first working Grafana email alert in QA.
+- 2026-10-05/06: Grafana-to-Teams path proven and documented.
 
 ## Open Questions
 
-- UNCERTAIN: Exact permissions or routing cause of MS Teams channel email 403s was not confirmed in the notes.
-- UNCERTAIN: Exact root cause of production proxy 403s was not confirmed in the notes.
-- UNCERTAIN: Whether the Grafana alert destination should be one shared Teams channel or separate per system still needs confirmation.
-- UNCERTAIN: Which AWS admin can create the Grafana role needed for APM CloudWatch/publish access.
-- UNCERTAIN: Whether `STSS` and `Jeka` are exact names from the July 17 technical-activities source.
-- UNCERTAIN: Whether the Japan OCCTO daily capacity to reconciliation Asset proof was built or adopted after the August 20 demo.
-- UNCERTAIN: Whether `SMT health` is the exact term from the August 19 backlog grooming note or a transcription artifact for SMP health.
-- UNCERTAIN: Which stakeholder persona and decision each exploratory Airflow/Grafana demo is meant to validate.
-- UNCERTAIN: Which production-monitoring use cases should stay in Grafana versus move to Splunk.
-- UNCERTAIN: Whether Signups' Loki setup can be reused as an SMP reference pattern without importing Signups-specific assumptions.
-- UNCERTAIN: Whether Okta logs can expose the specific dashboard/user/frequency fields needed for Grafana usage monitoring.
-- UNCERTAIN: Which production orchestrator or allow-list is still triggering paused SMP DAGs, and which paused DAGs are manual/diagnostic versus obsolete.
-- UNCERTAIN: Whether Grafana QA can reuse Airflow's SMTP relay and sender configuration for `SCR-1244` alert delivery.
-- UNCERTAIN: Whether the checked-in separate-Helm-release deployment design matches the live India QA cluster layout.
-- UNCERTAIN: Whether the September 14 manual alerting success fully resolves the earlier Grafana SMTP-relay question or only proves one configured contact point.
-- UNCERTAIN: Whether the cobweb/freshness ticket should use five-minute polling, a real-time design, or a narrower monitor-only scope.
-- UNCERTAIN: Whether ticket 544 black-box exporter implementation has passed testing after the September 18 priority push.
-- UNCERTAIN: Whether ticket 1260 alerting should be promoted beyond QA, and exactly which QA Grafana alerting config must be backpropagated to dev.
-- UNCERTAIN: Whether Synapse Prometheus/alerting integration actually covers the SMP AWS cluster and the future Darwin collector pod.
-- UNCERTAIN: Whether the September 23 "coming days" production rollout of Grafana email alerts has completed and whether trader-facing Teams/email-to-mailbox notification demand was confirmed.
-- UNCERTAIN: Whether ENGIE allows Teams channel email from Grafana's SMTP sender outside the tested India QA path, or whether some instances still need the native Grafana Teams contact-point path.
-- UNCERTAIN: Who should own and receive the proposed SMP Japan and SMP India Teams alert channels for Grafana business/data alerts.
-- UNCERTAIN: Whether the existing Prometheus setup can scrape the Darwin collector pod directly, or whether `SCR-1268` should begin with a heartbeat/Airflow-check fallback.
-- UNCERTAIN: Which Darwin collector freshness signals should become operational alerts versus diagnostics only.
-- UNCERTAIN: Whether recurring SMP Grafana Athena throttling should become a formal monitor, or remain a note-and-watch operational hiccup until recurrence frequency increases.
-- UNCERTAIN: Whether the Grafana dashboard access errors reported by Matteo are related to the September 29 Athena throttling pattern, permissions, datasource behavior, or a separate dashboard issue.
-- UNCERTAIN: Whether ticket `1269` is a second Grafana Teams alert ticket paired with `SCR-1267`, or whether the meeting source compressed two related ticket references.
-- UNCERTAIN: Which observability-stack ticket sequence Jack recommended and whether it changes the existing `SCR-1254` resource-monitoring baseline.
-- UNCERTAIN: Whether `OctaConnection logs` is the exact log source name for Darwin collector monitoring.
-- UNCERTAIN: Whether `Pathway` is the exact system name in the dashboard-delay path.
-- UNCERTAIN: Whether TSDB itself can meet the 2-3 minute delay target, or whether it lacks the side-signaling needed for near-real-time behavior.
+- UNCERTAIN: Whether Grafana email alerts reached production after the 2026-09-23 "coming days" plan.
+- UNCERTAIN: Whether traders want alerts beyond internal use. Mateo was to confirm.
+- UNCERTAIN: Whether Synapse's Prometheus integration covers the SMP cluster and the Darwin pod.
+- UNCERTAIN: Whether `Pathway`, in the delay path, is an exact system name.
 
 ## Sources
 
-- `sources/meetings/2026-06-22-1415-granola-daily-standup.md`
-- `sources/meetings/2026-06-29-1415-granola-standup.md`
-- `sources/meetings/2026-07-02-1100-granola-sprint-planning.md`
-- `sources/meetings/2026-07-02-1500-granola-sprint-planning.md`
-- `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-07-07-1415-granola-standup.md`
-- `sources/notes/2026-07-09.md`
 - `sources/codex-conversations/2026-07-09-codex-conversations.md`
-- `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
-- `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
-- `sources/meetings/2026-07-13-1515-granola-technical-activities-standup.md`
-- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
-- `sources/meetings/2026-07-14-1515-granola-technical-standup.md`
-- `sources/notes/2026-07-15-ingest-handover-clarifications.md`
-- `sources/meetings/2026-07-17-1600-granola-technical-activities.md`
-- `sources/meetings/2026-08-11-1430-granola-backlog-grooming.md`
-- `sources/meetings/2026-08-19-granola-busy.md`
-- `sources/meetings/2026-08-19-granola-backlog-grooming.md`
 - `sources/codex-conversations/2026-08-20-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-24-codex-conversations.txt`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
-- `sources/meetings/2026-09-02-backlog-grooming.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-10-codex-conversations.txt`
 - `sources/meetings/2026-09-14-1415-granola-standup.md`
-- `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 - `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
-- `sources/meetings/2026-09-21-1415-granola-smp-standup.md`
 - `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 - `sources/meetings/2026-09-23-1630-granola-smp-sprint-review.md`
 - `sources/codex-conversations/2026-09-25-codex-conversations.txt`
-- `sources/meetings/2026-09-25-1415-granola-smp-standup.md`
-- `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-29-codex-conversations.txt`
 - `sources/meetings/2026-09-30-1530-granola-sprint-backlog-grooming.md`
 - `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/codex-conversations/2026-10-05-codex-conversations.txt`
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
-- `sources/meetings/2026-10-07-granola-morning-standup.md`
-- `sources/meetings/2026-10-07-granola-sprint-review.md`
 - `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
-- `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+- Older sources (June–July Teams/APM threads) are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-10
+Last Updated: 2026-10-11

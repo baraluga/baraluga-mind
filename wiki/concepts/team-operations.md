@@ -1,219 +1,69 @@
 # Team Operations
 
-## Summary
+## Current State
 
-Team operations notes from late June and early July 2026 covered recruitment, office routines, anniversaries, AI tooling, portfolio demand, migrations, and cross-team planning. Most items are coordination context rather than durable decisions.
+As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is run, logged, and coordinated. SMP specifics are on [[smp-platform]], non-SMP projects on [[technical-activities]], and the GitHub migration on [[sff-walnut-migration]].
 
-## Details
+- **SMP process:** moving off strict sprints. On 2026-09-02, Brian recommended Scrumban: continuous pull, WIP limits, a visible `Waiting` state, and cycle-time metrics instead of velocity, while keeping a two-week demo and budget cadence. On 2026-10-09 the team favoured Kanban because mid-sprint pulls distort burn-down and India users already validate in near real time. This still needs discussion with Fred and "Bang" (likely Bong).
+- **Time tracking:** the Philippines team left Tempo on 2026-09-01. Prométhée (also spelled Promethe) is filled every Friday. UNCERTAIN: the name of the new tracker.
+- **AI credits:** to request more, email Fred and the requester with the business need, current usage, and planned use, then submit the ticket (2026-10-07).
+- **Coming up:**
+  - Fred and Christina's Philippines visit on 2026-11-16 to 11-20, with full attendance requested and no leave that week.
+  - A three-week November Philippines trip with training: Kubernetes, possibly Copilot Studio, and Explorer sessions.
+  - Dinner and Dance, tentatively 2026-11-12.
+- **Recent changes:** Jerome Blanc was expected to leave at the end of September, with handover to UK contacts. Development reviews were due in Sesame by 2026-09-15.
 
-- First anniversary celebration was planned before July 15, with a survey to decide the celebration date.
-- Office credits were expected to be auto-applied by July, and some members still needed to complete June office visits.
-- Tempo project target completion was June 30; the later application meeting said the Tempo timesheet parallel run was complete with remaining configuration issues.
-- Demand management topics included AWS migration, prosumer penetration testing, Lean/GMR migration, and Transvect database feedback.
-- GitHub/Walnut migration direction was one shared organization instead of one org per project because of runner cost.
-- Open GitHub/Walnut question: reuse and rename the existing SMP organization or create a new one.
-- July 7 weekly team notes say one-organization consolidation was underway, members and targets should be set before the end of July, cleanup/migration was planned after summer while Europeans are on vacation, and git rules/policies still needed definition.
-- July 7 standup notes say Brian used GitHub CLI to transfer an existing repo/update its remote, rather than Guido's import process. The transfer path appeared better for existing repos because local remotes can be updated in place.
-- July 8 Walnut migration planning split repo migration into ADO-direct and non-GitHub-source paths. The proposed sequence was read-only repo migration, recreate GitHub pipelines, add users after pipelines stabilize, then turn off ADO access after a few days.
-- July 8 notes say most migration effort is pipeline recreation rather than repo transfer. Michael was execution lead, Brian handled support/automation/governance oversight, and Alexander owned governance pipeline and master branch protection settings.
-- [[ado-ios]] is a small Python CLI for one-repo-at-a-time Azure DevOps to GitHub migration through `gh ado2gh migrate-repo`, with dry-run defaults and source-lock support.
-- July 9 AM standup clarified that the migrator role does not cover repository migration by default, bulk pipeline migration may be an option, and the team principle is to understand the manual UI process before automating.
-- July 9 technical standup decided not to pursue migrator role for PR history. See [[2026-07-09-skip-pr-history-for-walnut-migration]].
-- July 9 technical standup said ABT dashboard was migrated as a test case using GitHub CLI and Azure CLI without migrator role. Click migration should wait until JB's security remediation work is complete because commits during migration can leave leftovers.
-- Artifact migration was still unsettled. SFF components may need dedicated repos for common artifacts, SMP Common may become a shared artifact source, and ADO artifacts remain in use until cutover.
-- July 8 AWS migration notes introduced a centralized technical-activities board with separate epics for AWS migration, Walnut migration, and security remediation, charged per project instead of one blanket bucket.
-- Pyrene/GMR migration notes mention default EFS backup in the new DMS account, 35-day warm backup, daily incremental backup, and Pyrene storage cost estimated around USD 600-700/month for about 13 TB.
-- Pyrene environment scope was unresolved because a resource-heavy always-on machine was estimated around USD 2,000/month.
-- Atlassian migration was virtually moved around July 1, with actual migration still coming.
-- Sentry will be recreated from scratch in Europe, with previous logs accepted as lost.
-- Portfolio topics mentioned: GMR / Model Runner v2, AVST index builder, Onset, Platform, Sign Ups, SMP, carbon emissions platform, Delphi CLI, APM, and Click.
-- Sign Ups AKS migration covered Azure resource groups, naming conventions, storage accounts, Key Vault, workload identity, Bicep, and IT dependencies.
-- A July 12 `smp-japan` migration attempt showed that native GitHub transfers can create an approval window where neither organization URL is accessible. For migrations that only need branches, tags, and commit history, the preferred operational method is now a staged private mirror with the source left available until the target is verified.
-- The July 13 migration presentation settled the current comparison: plain mirror push and GitHub Importer preserve Git source/history without a Migrator role; `ado2gh` uses GitHub Enterprise Importer and requires an organization owner or Migrator role. GitHub Importer does not preserve ADO PRs, while `ado2gh` can preserve PRs and branch policies.
-- The current package path is transitional: migrated repositories may publish to and install from Walnut Artifactory, GitHub Packages remains a secondary option to assess by package type, and some consumers still use ADO Artifacts through a technical-account PAT. The final standard is not yet fixed.
-- Migration is considered done when the repository is usable in Walnut and every existing ADO pipeline, including deployment, has been recreated and proven. PRs, Issues, and other ADO metadata are explicitly out of scope for the current program.
-- The July 14 QRM BE chapter meeting chose one QRM/DMS GitHub Cloud organization by default. See [[2026-07-14-use-single-qrm-github-organization]].
-- Repositories in the QRM org should be private by default, with org-wide default repository access disabled. GitHub teams provide read/write access, including a planned department-wide QRM-all team and sub-teams per QRM group.
-- The migration approach remains pragmatic: Git mirror push is the simplest scriptable path when Git history is enough; GitHub UI import is simpler but limited; `ado2gh` can preserve richer ADO metadata but needs elevated roles. Pipelines must be recreated regardless of migration method.
-- Runner selection guidance from the July 14 chapter: use GitHub-hosted runners when no NG network access is needed; use Walnut runners for workflows that need private Artifactory or internal endpoints.
-- The August 27 FEDV chapter meeting extended the GitHub-as-source-of-truth pattern to chapter standards: current standards live in an org-level `.github` repository, should be reorganized by chapter, and should sync back to Confluence through a deterministic pipeline rather than direct Confluence edits. An MCP server was mentioned as another option, but the deterministic pipeline was preferred.
-- Angular standards are being updated for Angular 22, and PrimeNG is no longer recommended because newer versions are paid. A React initiative was deprioritized because the one known React project was stalled.
-- FEDV year-end deliverables were mostly complete for documentation, standards, and final members list; initiatives remained incomplete, and a UX/UI knowledge-sharing session still needed a date.
-- The package-hosting discussion expanded to include Harbor as an alternative to JFrog/Artifactory for shared Python/npm packages, especially where project-level access or robot users may be easier than per-developer/per-component access.
-- A July 15 clarification says Walnut runner certificate pre-installation and Harbor package governance are real topics, but not current confirmation priorities.
-- July 15 SFF migration work moved from ad hoc repo selection toward a tracker-driven process. A local tracker was created from the SharePoint workbook, grouped by workbook priority, owner, owner confirmation, commit activity, and pipeline complexity.
-- The first high-priority trivial migrations were grouped by low red tape and owner coordination. The completed local set included IAM federation, Cubicweb infrastructure, Pydantic tools, Certificate, Kubestat, Cmdutil, and File Manager. `common_data_model` and `tdb_client` became the capped active pipeline-transfer pair.
-- The workbook `Action` column became a required gate after `quality_tools` was initially treated as an easy migration candidate even though the workbook action was `Archive`. Later audit separated `Migrate` rows from archive/done rows.
-- A full workbook pipeline audit found 172 rows marked `Migrate`: 50 `TRIVIAL`, 2 `EASY`, and 120 `HARD` under the strict rule that no pipeline is trivial, a pipeline with no variables/secrets is easy, and anything credentialed, variable-driven, broken, unreadable, or unproven is hard.
-- For migrated GitHub pipelines that need the shared Azure Artifacts feed, the preferred model is organization-level variables for non-secret coordinates and organization-level secrets for Azure Artifacts PATs. `qrm-dms/.github` remains the organization-facing configuration/profile/agent repository, while `qrm-dms/sff-actions` remains the versioned executable automation library.
-- A July 16 note says the `tdb_client` pipeline migration was completed. The same note says the ADO backwards-compatibility action was set up in `sff-actions`.
-- July 17 SFF migration work hardened the standard migrated Python package shape. Meteomatics was fixed to mount Azure Artifacts `.netrc` into its Lambda Docker compatibility test, split CI from manual publishing, remove duplicate push/PR runs, use the shared tested-artifact publisher, and pass a dry-run publish. TDB kept the split release model, removed duplicate CI triggers, pinned public bootstrap tools, and passed CI plus dry-run publishing.
-- The organization-level modernizer and `sff-actions` now treat migration correctness as an executable contract: generated repositories should run `validate-python-migration@v1` locally and in CI, rather than relying only on Copilot prompt adherence.
-- Repository ruleset cleanup on July 17 found automatic Copilot review only on active `smp-japan`, plus a stranded ruleset on archived legacy `DMS-Scraper-and-Models-Platform/smp-india`. The legacy ruleset was removed after temporary unarchive, and `smp-japan` kept its branch protections while removing the `copilot_code_review` rule.
-- July 20 SFF work migrated `user_ms_client` to `qrm-dms/sff-lib-user-ms-client`, `web_common` to `qrm-dms/sff-lib-web-common`, and `user_microservice` to `qrm-dms/sff-ms-user`. Git refs matched source branches/tags, ADO source branches were locked, migrated GitHub CI went green, and manual publisher dry-runs passed without package upload.
-- The SFF naming convention was clarified with Bong's rule: deployed microservices use `sff-ms-*`, while importable clients use `sff-lib-*-client`. The SharePoint workbook's red-font repository names appear to indicate naming corrections, not visibility issues.
-- A temporary org-wide `All-repository admin` role enabled a confirmed batch rename of 20 SFF repositories. `sff-actions` and stale/no-op `sff-tool-tdb-client` were intentionally left unchanged. Brian clarified on 2026-07-21 that all repo admin will be revoked at the end of July.
-- Public-facing Confluence migration guidance was published as three child pages: repository migration, pipeline migration, and `Artifact migration (WIP)`. The artifact page is explicitly WIP/TBD because package hosting, historical artifact migration, retention, permissions, and consumer cutover are not final.
-- A July 20 standup said Chantal Lee leads a UK data-governance project, "Empowering Users with Data", with possible SMP overlap. The key unresolved operating question is whether SMP provides platform-only support or active delivery support for teams such as UK data governance and Iberia.
-- July 21 migration planning created a separate Markdown audit and polished spreadsheet from the master workbook's unmigrated rows. The audit found 126 unmigrated records, with 124 verified latest commits, one empty repository (`NEMO / NEMO`), and one Azure DevOps URL that returned missing or inaccessible (`Prosumer / prosumer-shared-tools`). A later scope cut removed 16 PLEXOS and pegase repositories from the workbook, leaving 110 in-scope records sorted oldest activity first.
-- The migration-age workbook was kept as a companion artifact rather than merged into the live shared SharePoint master workbook. The rationale was to avoid disrupting an actively edited master while preserving a timestamped, replaceable audit snapshot. A future integration could add namespaced audit sheets directly to the SharePoint workbook if stakeholders prefer one file.
-- July 21 Git-only migration moved `wss_client` to private `qrm-dms/sff-lib-wss-client`, preserved 9 branches and 12 tags, set default branch `master`, and locked all 9 ADO source branches. `strategy-common-infra` was briefly migrated to `qrm-dms/sff-infra-strategy`, but the migration was rolled back the same day: the GitHub repository was deleted, and the ADO `main` branch was unlocked after pipeline modernization evidence showed the repo was not ready.
-- July 22 DeCliC work migrated three repositories into private `qrm-dms` GitHub repositories and locked their ADO source branches: `declic-kpicalculator`, `declic-okta-scripts`, and `DigitalizeTaxoMatchForms`. ADO reported `main` as the default branch for all three, so GitHub was configured to match. GitHub descriptions were then updated from repository evidence: decarbonization KPI library, Excel-driven Okta user provisioning and group assignment, and bilingual EU Taxonomy form and decision-tree generator.
-- A July 22 audit found that `declic-app`, `declic-backend`, and `declic-infra` are technically clean to mirror but not safe for full cutover. The blockers are active development and deployment flow: 13 active ADO PRs across the three repositories, enabled recent YAML pipelines, AWS deployments, private package feeds, Sentry token transfer, deployment controls, and a required final freeze/sync window.
-- The audited DeCliC application repositories have no LFS, no current submodules, no blob over about 24 MB, and no pre-existing GitHub targets. The ADO defaults are `dev` for `declic-app` and `declic-backend`, and `main` for `declic-infra`; `declic-infra` needs default-branch confirmation because `main` was reported about 982 commits behind `dev` while active delivery branches included `dev`, `qa`, `preprd`, `prd`, `stage`, and `prod`.
-- July 22 artifact discussion clarified the GitHub-to-ADO bridge: GitHub Actions can publish tested Python distributions directly to the existing Azure Artifacts PyPI-compatible feed using `uv publish`, authenticated by `AZURE_ARTIFACTS_PUBLISH_PAT` from a technical account. Dry-run publication should precede real upload, and the selected commit should already have a successful push CI run with a `dist` artifact.
-- If SFF package publishing moves to Walnut Artifactory/JFrog, the tested-artifact flow and `uv publish` command can stay, but the destination URL, credentials, shared configuration action, and consumer install index must change. The correct SFF Artifactory repository, permissions, retention, historical versions, and consumer cutover remain unsettled.
-- The July 22 answer to Guido framed repository migration as staged rather than binary: Git history can be moved and validated before JFrog is ready, but a repository should not be declared fully cut over or have its ADO path retired until build, publish, deployment, and downstream package consumption are proven.
-- The August 5 GitHub Actions access guidance distinguishes repository visibility from deployment authority. Read-only access is low risk if repository contents and logs are safe to share; write access can still be acceptable when protected deployment branches, blocked direct pushes, owner-reviewed PRs, CODEOWNERS protection for workflow changes, and restricted GitHub environments with separate approval prevent repo access from becoming privileged deployment access.
-- July 23-25 SFF work established Walnut Artifactory DEV as the proven destination for the current Python package migration, published the recoverable dependency chain, accepted reusable CI contracts, and closed the first organization-wide CI centralization pass. The detailed program state now lives in [[sff-walnut-migration]].
-- The Pipeline Modernizer was decommissioned after its useful rules were converted into executable `sff-actions` contracts and tested human-facing recipes. This supersedes the earlier assumption that the organization agent itself would remain the primary migration interface.
-- July 24 meeting notes say the SFF functional account requires an SFF project in CMDB first. Someone with Snow/CMDB catalog access must create the project before the linked account request can be submitted.
-- July 24 daily standup says Brian's migrated-Jira access problem remained unresolved and may require a new manually associated account because the old email may not be integrated with Okta.
-- July 27 DeCliC work established real credential-free CI on `declic-app` and `declic-infra`, corrected and merged `declic-backend` PR 4, and published the historical package dependencies needed by the infrastructure checks. Both DeCliC application repositories were aligned to `dev`, but CD remained intentionally parked behind environment, credentials, OIDC, approval, smoke-test, and recovery gates.
-- July 28 normalized DeCliC GitHub environments from stage-by-stage names to `qrm-noprod`, `qrm-prod`, and `declic-prod`, retaining only the required OIDC variable and placeholder secrets. This reduced configuration noise but did not complete deployment cutover.
-- The historical Python package backfill process was documented in `sff-actions`, with an organization policy pointer and tests for semantic/path safety. The procedure preserves source evidence and fails closed rather than treating package reconstruction as ordinary publication.
-- A July 28 inactivity audit found `wow-infra` and `wow-scripts-import-xlsx` ready for migration, and `wow-okta-scripts` ready with the caveat of stale PR 6422. `wow-app` and `wow-backend` were active that day and should be rechecked on 2026-08-11 if no newer activity occurs.
-- The DeCliC sharing note's `custom orchestrator agent` was a proposed generic abstraction, not an existing named agent.
-- The July 29 SMP retro projected roughly a 15% budget overshoot, around EUR 5,900, driven by added scope including Japan look-back work. The agreed default was to keep Brian full-time through August and reduce capacity only if the client rejects the scope-based explanation.
-- A July 31 standup says Francois sent a request covering a 15% current-sprint increase plus a time-and-materials provision from mid-August to the first steering committee. A steering-committee preparation meeting with Bong was brought forward because of upcoming holidays.
-- The same day, the team flagged gaps in the Data Type 3 inventory—especially provider and update-frequency details not visible in the dashboard—and offered to help Adrian, Louis, and Carlos complete it.
-- The same retro recommended stopping speculative scope discovery while budget is tight and waiting for explicit user pain before investing.
-- Brian's Atlassian blocker is an identity collision rather than missing product entitlement. The inaccessible `brian.peralta@engie.com` account already owns the target email and is protected by unavailable MFA/recovery credentials, while the previously usable Tractebel account lost service access after migration. An administrator must reset/recover the ENGIE account or free its email by changing or deleting that account.
-- August 4 application-team notes say all SFF/common component city migrations to Walnut GitHub were complete, Artifactory access was available for Python packages only, and project-specific repository migrations were still in progress through tech-lead and PO coordination.
-- The same meeting says personal access tokens were still in use for some migrated workflows; the durable direction is still a functional-user setup, with ServiceNow project linkage and a GitHub service-account token both discussed as possible paths requiring a dedicated alignment meeting.
-- The August 4 portfolio snapshot listed upcoming Onset Energy, SDB metadata, and Delphi extension work; Kiva industrialization kicking off on August 5; ABS Index Builder in development; WOW and Best-of Sign-ups near completion; and AWS/Walnut-Centiment migration, Pyrene, and Storm as ongoing support/monitoring.
-- Tempo and Promethe were in a final parallel run through August 2026. The team should fill in Promethe every Friday, with Tempo planned for decommissioning at the end of August.
-- On August 10, Brian used the active SMP Sprint 26 story-point split as the project-time allocation basis: `SMP-JAPAN` 8 of 13 points, `SMP-INDIA` 5 of 13 points, and `SMP-COMMON` 0 points. For operational timesheet entry this rounded to 62.2% Japan, 37.8% India, and 0% Common.
-- The same session established a repeatable timesheet workflow shape: Brian pre-fills scheduled Teams meetings, then the remaining daily capacity is allocated through Tempo and Prométhée using the sprint that was active for the target week. Tempo should use designated logging tickets `SCR-1203` for Japan, `SCR-1204` for India, and `SCR-1205` for Common; Prométhée should map to the matching CAPEX rows and be explicitly saved and reload-verified rather than treated as autosaved.
-- Guardrails for that workflow include inspecting existing entries first, excluding declined/cancelled or personal calendar items, respecting leave and holidays, using 15-minute Tempo increments and 0.125-day Prométhée increments, and saving Prométhée by default while treating final submission as a separate explicit action.
-- Team-life notes from the same meeting captured the July 10 QRM first anniversary recap, a requirements-solicitation/stakeholder-management workshop planned for August 28, anniversaries for Hook and Pierre, August birthdays for Joyce and Nico, Rudy joining Pierre's team, and a reminder to update Sezane Career Explorer skills and trajectory.
-- August 11 weekly team notes said Walnut migration is now project-specific, with actual deployment moving to AWS. POCs and tech leads should coordinate with POs while Michael has availability, without requiring extra allocation from the project side.
-- The August 11 development-plan reminder made the pre-work more concrete: update the skills page with proficiency ratings, fill in career aspirations, set geographic mobility preference, and then connect completed career goals to existing goals before the next meeting with Bong.
-- The same weekly notes captured team-calendar constraints: Philippine holidays on August 21 and August 31, one RTO workshop on August 28, a tentative Dinner and Dance on November 12, and full-force attendance requested for Fred and Christina's Philippines visit on November 16-20.
-- Second-quadrimester team-building planning targets August or September and can be a full-day non-overnight activity; volunteers were asked to send suggestions for review.
-- For the August 28 stakeholder-management workshop, Brian used SMP Japan as the exercise case. The final framing reduced stakeholders to four groups: SMP development team, SMP product owner, SMP Japan stakeholders, and everything else. SMP's purpose was stated as delivering timely data and displaying it in dashboards for end-users; the recommended presentation narrative was `Why -> Who -> Success -> Risk -> Collaboration -> Commitment`.
-- The September 1 application team meeting flagged three end-of-year challenges: the new Synapse production-support model, AI onboarding using lessons from Kiva, and MCP for collection support connected to Synapse. DNS and `Br1JMS` discussions were still ongoing and could affect scope, but no change was confirmed.
-- Jerome Blanc is expected to leave by the end of September 2026; the meeting said he is involved in key projects and that handover with UK contacts is being arranged.
-- Development and learning reviews are due in Sesame by 2026-09-15. The meeting also said the Philippines team moved from Tempo to a new time-tracking application on 2026-09-01.
-- A November 2026 Philippines trip is planned for three weeks, including training sessions. Training priorities mentioned Kubernetes upskilling, possible Microsoft Copilot Studio training at about EUR 1,300 for 3-4 days, and Friday-morning Explorer sessions for some team members.
-- The September 2 daily standup announced AI Ventures training registration open until 2026-09-15. The captured shape is 12 sessions every other Friday starting in October, with beginner and advanced levels.
-- September 2 Codex consultation recommended Scrumban for SMP rather than strict Scrum or pure Kanban. The reasoning was that SMP still benefits from a two-week stakeholder/demo/budget cadence, but delivery is dominated by external blockers, variable support demand, changing priorities, and independently releasable work. The suggested trial uses continuous pull, explicit WIP limits, visible `Waiting` state, service classes, and cycle-time/blocked-time metrics instead of velocity as the primary signal.
-- The September 15 weekly team meeting recorded operational reminders: leave carry-over is capped at 5 days and valid only until June of the following year; bonus details were still pending, with at least one extra bonus expected around the 30th; a new project was kicking off the following week with Miss Reina, Miss Joy, JB, Florine, and Brian; and team-trip restaurant/menu volunteers were still needed.
-- The September 15 QRM All meeting said the SharePoint for data and models was live, ScienceDirect and Scopus licenses had expanded to 10 with one access contact expected per team, the onboarding Confluence page led by FX was pending review, and chapter objectives had been finalized into member/core-team/chapter-lead tiers.
-- The same QRM All meeting reported a EUR 7.65M commercial pipeline, a EUR 1.52M gap to objective, and EUR 2.2M in sales pipeline. Newly signed or continuing work included Best optimization support in the US, Atlas continuation for Bertrand Fauchet's portfolio team, Onset Energy Platform, and Besalgo platform phase 2.
-- QRM All also captured hackathon follow-through: 40+ participants across Philippines and Europe innovation hubs, 12 topics, and 90%+ ROTI. Durable next-hackathon lessons were to add sponsor pitches, hold sponsor/team briefings before the event, provide flat-file data to avoid access issues, use a more interactive sponsor-present debrief, and consider targeted domain sessions alongside the main event.
-- The September 17 Tech Lead Roundtable reiterated certificate-handling policy: private keys must not be shared in Jira, repositories, or email; Vault should be used for secure file transfer. A longer-term internal certificate process with Pierre should be proposed.
-- The roundtable also said the architecture committee validates security design and best practices, not only alert hygiene. Tech lead roles and responsibilities had been published on Confluence, a new Sentry server was set up with alerting configuration still in progress, and IT requests should use the dedicated IT request channel by tagging IT admin rather than DMS One chat.
-- The September 18 daily standup moved Signups/Dolphy toward an urgent production-readiness window: production deployment was requested for September 19 or September 21-22 if simple, with October 9 as a main progress milestone. Signups stubbing was flagged as urgent, a longer-term domain-error/runbook fix was preferred over multiple patches, and the team noted that Key Vault was readable from inside the cluster if migration became necessary.
-- The same standup said Brian's official SMP handover was in final feedback, targeting completion on September 18 if all went well, and noted that an Abram/Piri production-monitoring request needed a Rancher access request.
-- The September 22 weekly team meeting captured several operational reminders: APE clinic preferences were due by end of day with preferred clinic and planned dates, Alfred was exempted, and the top-choice clinic would be prioritized. It also said Fred/Sebastian were expected on Monday, Wednesday, and Saturday, with possible office lunch/activities, team members encouraged to showcase work, and support-week RTO/standby handling allowed to reflect 24/7 duty.
-- The September 22 Walnut incident notice said Artifactory cybersecurity remediation temporarily affected GitHub Actions, Walnut billing, Walnut Jira Service Management, and Claude Code. For internal deployments, this means a queued workflow can be a platform-runner/service issue even when repository validation jobs have passed.
-- October 7 morning standup notes captured a lightweight process for AI credit increases: first email Fred and the requester with the new business need, current AI usage in the workflow, and planned additional-credit usage, then submit the ticket. Angie and one other person had completed this flow, while one unresolved case might be a system error.
-- October 9 standup notes reinforced the case for moving SMP away from strict sprint mechanics: mid-sprint pulls distort burn-rate charts, a pause between sprints would only temporarily hide the backlog-readiness problem, and SMP India users already validate production changes in near real time. The next step is to discuss a Kanban transition with Bang (source spelling) and Fred while preserving whatever budget reporting still needs to happen.
+## Background
+
+- **Rules worth remembering:**
+  - Never share private keys in Jira, repos, or email; use Vault (Tech Lead Roundtable, 2026-09-17).
+  - Raise IT requests in the dedicated IT channel by tagging IT admin.
+  - The architecture committee validates security design, not just alert hygiene.
+  - Leave carry-over is capped at 5 days and must be used by June of the following year.
+- **Timesheet workflow (from 2026-08-10):**
+  - Pre-fill scheduled Teams meetings first, then split the rest by the active sprint's story points per project.
+  - Logging tickets: `SCR-1203` Japan, `SCR-1204` India, `SCR-1205` Common.
+  - Steps: 15-minute increments in Tempo, 0.125-day increments in Prométhée.
+  - Prométhée must be explicitly saved and re-checked after reload; submission is a separate step.
+- **Chapters:**
+  - FEDV keeps standards in the org `.github` repo, synced to Confluence by a deterministic pipeline.
+  - Angular standards are moving to Angular 22; PrimeNG is no longer recommended.
+  - Dashboard visual standardisation was flagged.
+  - The IS team prefers Splunk for 24/7 production monitoring.
+- **QRM business snapshot (2026-09-15):** EUR 7.65M commercial pipeline, EUR 1.52M short of objective. The hackathon had 40+ participants and 90%+ ROTI. Lesson for next time: sponsor pitches and flat-file data up front.
+- **Stakeholder framing (2026-08-28 workshop):** SMP's purpose is timely data shown in dashboards for end users. Four stakeholder groups: the dev team, the PO, Japan stakeholders, and everyone else. Narrative order: Why → Who → Success → Risk → Collaboration → Commitment.
+- **Platform incidents:** the 2026-09-22 Walnut Artifactory remediation briefly affected GitHub Actions and Claude Code. A queued workflow can be a platform problem even when validation has passed.
+
+## History
+
+- 2026-07-08: a central technical-activities board was created, with AWS migration, Walnut migration, and security remediation epics charged per project.
+- 2026-07-14: one QRM GitHub organization chosen.
+- 2026-07-29: SMP projected about 15% over budget (about EUR 5,900) from added scope. Brian stayed full time through August.
+- 2026-09-01: Tempo replaced for the Philippines team.
+- 2026-10-09: Kanban transition proposed for SMP.
 
 ## Open Questions
 
-- UNCERTAIN: Extraordinary/additional bonus question was raised with no answer captured.
-- UNCERTAIN: Whether GitHub/Walnut should reuse and rename the existing SMP organization or create a new one.
-- UNCERTAIN: Whether a native transfer is still required for any repository whose GitHub metadata must be preserved; it is no longer the default for Git-only migrations.
-- UNCERTAIN: Whether Artifactory is active, pending, or not applicable for every migrated artifact path.
-- UNCERTAIN: Whether Pyrene UAT/pre-prod should be always-on or on-demand.
-- UNCERTAIN: `Auto` in the July 9 Maintainer-access request may refer to an org, repo, or internal system; confirm before creating durable tooling around it.
-- UNCERTAIN: Whether `sff-tool-tdb-cliennt`, `sff-tool-federatioam-federation`, and `sff-tool-certificatte` are intentionally misspelled destination names or workbook artifacts that should be corrected later.
-- UNCERTAIN: Whether the newly migrated SFF `master` branches should receive branch protection immediately or wait for the broader GitHub governance rules.
-- UNCERTAIN: `Dexter` remains unidentified; Brian did not recognize what this referred to in the July 20 standup.
-- UNCERTAIN: Whether `Chantal Lee` is the exact spelling from the July 20 standup.
-- UNCERTAIN: Whether the July 21 migration-age audit should stay as a companion workbook, be uploaded beside the SharePoint master, or be integrated as namespaced sheets in the master workbook.
-- UNCERTAIN: Whether `strategy-common-infra` should be migrated only after its stale ADO deploy path and GitHub OIDC deployment model are fixed, or whether it should remain out of the current batch.
-- UNCERTAIN: Whether `declic-infra` should keep ADO's reported `main` default branch in GitHub, or use an active delivery branch such as `dev`.
-- UNCERTAIN: Whether Walnut Artifactory/JFrog should be the destination for non-Python package types and production promotion; the current evidence proves only the SFF Python DEV contract.
-- UNCERTAIN: Whether the source wording "`Library-DeCliC-New`" is the exact Sentry token holder or a repository/project nickname.
-- UNCERTAIN: Who has the Snow/CMDB catalog access needed to create the SFF project.
-- UNCERTAIN: Whether stale WoW PR 6422 should be closed or migrated before `wow-okta-scripts`.
-- UNCERTAIN: Whether the long-term migrated-repository authentication path will be a ServiceNow-linked functional user, a GitHub service-account token, or another approved model.
-- UNCERTAIN: Whether `Centiment` is the exact migration name from the August 4 meeting source; it may be a transcript artifact.
-- UNCERTAIN: Whether `Rudy`, `Hook`, `Joyce`, `Nico`, and `Sezane` are exact spellings from the August 4 meeting source.
-- UNCERTAIN: Whether `Prométhée` is the preferred spelling for the timesheet system in durable notes; older sources spell it as `Promethe`.
-- UNCERTAIN: Whether the September 18 SMP handover actually finalized by end of day.
-- UNCERTAIN: Whether the Signups/Dolphy September production-readiness request became a quick production deployment, slipped to the following week, or moved to the October 9 milestone.
-- UNCERTAIN: Whether `Sesame` in the August 11 weekly notes is the same HR/development system previously captured as `Sezane Career Explorer`.
-- UNCERTAIN: Whether `Reina`, `Carlo`, `Pear`, and `Guido` are exact names from the August 11 weekly notes.
-- UNCERTAIN: Whether `FEDV` is the preferred durable acronym/name for the chapter, and which chapter taxonomy should be used in the standards repository.
-- UNCERTAIN: Whether PrimeNG is disallowed outright or only no longer recommended for new Angular standards.
-- UNCERTAIN: Whether Upper Management should stay in "Keep satisfied" for the SMP Japan stakeholder map, or move to "Manage closely" when funding, scope, or release approval is directly involved.
-- UNCERTAIN: Whether `Br1JMS` is the exact system or project name from the September 1 application team meeting.
-- UNCERTAIN: Which old accounts are being deleted and who owns raising relevant items before deletion.
-- UNCERTAIN: What the replacement time-tracking application is called after the Philippines team moved away from Tempo on 2026-09-01.
-- UNCERTAIN: Whether "AI Ventures" is the exact training program name and whether registration creates any commitment beyond attendance.
-- UNCERTAIN: Whether SMP stakeholders want to formalize the Scrumban operating model or treat it only as Brian's working recommendation.
-- UNCERTAIN: Whether `Run.io`, `Promethee`, `FX`, `Best optimization`, `Onset Energy Platform`, and `Besalgo` are exact names from the September 15 QRM All source.
-- UNCERTAIN: Whether `Kaseb`, `Massimi Lisa`, `Rest Hydro`, and the people names in the QRM All people-news section are exact spellings.
-- UNCERTAIN: Whether `Vault`, `Pierre`, and the exact Sentry rollout ownership from the September 17 roundtable need more precise internal references.
-- UNCERTAIN: Whether `Fred/Sebastian` in the September 22 weekly meeting refers to the same visit previously captured as Fred and Christina's Philippines visit, or a separate visit.
-- UNCERTAIN: Whether `Palanetto` is the exact name of the online word-guessing game mentioned in the September 22 weekly meeting.
-- UNCERTAIN: Who the October 7 source calls "the speaker" in the AI credit request process, and whether Angie is the exact spelling.
-- UNCERTAIN: Whether `Bang` in the October 9 SMP Kanban-transition note means Bong or another person.
+- UNCERTAIN: What the new time-tracking app is called.
+- UNCERTAIN: Whether SMP formally adopts Kanban or Scrumban.
 
 ## Sources
 
-- `sources/meetings/2026-06-23-0945-granola-team-meeting.md`
-- `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
-- `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
-- `sources/meetings/2026-07-07-1415-granola-standup.md`
-- `sources/meetings/2026-07-08-0945-granola-am-standup.md`
-- `sources/meetings/2026-07-08-1330-granola-walnut-migration-planning.md`
 - `sources/meetings/2026-07-08-1514-granola-aws-migration-standup.md`
-- `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
-- `sources/meetings/2026-07-09-0945-granola-am-standup.md`
-- `sources/meetings/2026-07-09-1515-granola-technical-team-standup.md`
-- `sources/codex-conversations/2026-07-12-codex-conversations.md`
-- `sources/codex-conversations/2026-07-13-codex-conversations.md`
-- `sources/meetings/2026-07-14-0945-granola-team-meeting.md`
 - `sources/meetings/2026-07-14-1700-granola-qrm-be-chapter-meeting.md`
-- `sources/notes/2026-07-15-ingest-handover-clarifications.md`
-- `sources/codex-conversations/2026-07-15-codex-conversations.md`
-- `sources/notes/2026-07-15.md`
-- `sources/notes/2026-07-16.md`
-- `sources/codex-conversations/2026-07-17-codex-conversations.md`
-- `sources/meetings/2026-07-20-1415-granola-standup.md`
-- `sources/meetings/2026-07-20-1645-granola-ta-standup.md`
-- `sources/codex-conversations/2026-07-20-codex-conversations.md`
-- `sources/notes/2026-07-20.md`
-- `sources/codex-conversations/2026-07-21-codex-conversations.md`
-- `sources/codex-conversations/2026-07-22-codex-conversations.md`
-- `sources/codex-conversations/2026-07-23-codex-conversations.md`
-- `sources/codex-conversations/2026-07-24-codex-conversations.md`
-- `sources/codex-conversations/2026-07-25-codex-conversations.md`
-- `sources/codex-conversations/2026-07-26-codex-conversations.md`
-- `sources/meetings/2026-07-24-1045-granola-walnut-migration-caucus.md`
-- `sources/meetings/2026-07-24-1415-granola-daily-standup.md`
-- `sources/meetings/2026-07-24-1515-granola-technical-standup.md`
-- `sources/codex-conversations/2026-07-27-codex-conversations.md`
-- `sources/meetings/2026-07-28-1050-granola-declic-sharing.md`
-- `sources/codex-conversations/2026-07-28-codex-conversations.md`
-- `sources/notes/2026-07-29-ingest-handover-clarifications.md`
-- `sources/codex-conversations/2026-07-29-codex-conversations.md`
 - `sources/meetings/2026-07-29-1500-granola-sprint-retro.md`
-- `sources/notes/2026-07-30-ingest-handover-clarifications.md`
-- `sources/meetings/2026-07-31-0945-granola-am-standup.md`
-- `sources/meetings/2026-07-31-1415-granola-daily-standup.md`
-- `sources/meetings/2026-08-04-1700-granola-application-team-meeting.md`
-- `sources/codex-conversations/2026-08-04-codex-conversations.txt`
-- `sources/codex-conversations/2026-08-05-codex-conversations.txt`
 - `sources/codex-conversations/2026-08-10-codex-conversations.txt`
 - `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-08-27-granola-fedv-chapter-meeting.md`
 - `sources/codex-conversations/2026-08-28-codex-conversations.txt`
 - `sources/meetings/2026-09-01-1700-granola-application-team-meeting.md`
-- `sources/meetings/2026-09-02-daily-standup.md`
 - `sources/codex-conversations/2026-09-02-codex-conversations.txt`
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/meetings/2026-09-15-qrm-all.md`
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
-- `sources/meetings/2026-09-18-0945-granola-daily-standup.md`
 - `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
-- `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 - `sources/meetings/2026-10-07-granola-morning-standup.md`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+- Migration evidence moved with the playbook to [[sff-walnut-migration]]. Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-10
+Last Updated: 2026-10-11

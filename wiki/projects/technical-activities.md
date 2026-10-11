@@ -6,6 +6,7 @@ Non-SMP projects that came up in technical-activities standups, the tech-lead ro
 
 - **Pyrene** (2026-07-24): UAT deployed on 2026-07-13. File Manager still needed integration. An EKS update Snow ticket for weekday cluster scheduling and pod labels had stalled.
 - **GMR / Model Runner** (2026-07-24): EFS and images migrated by [[alfred-villalva]]; the final migration was tentatively the following week. Cutover means scaling up cluster instances, not redeploying. On 2026-07-17 a GMR compute environment with minimum CPU 1,200 was running more than 1,200 EC2 instances without CrowdStrike; it was reduced to zero. Maximum vCPU limits still needed review.
+- **APM** (2026-07-17): migration to Walnut was complete. Grafana APM alerts were tested, routed through an encrypted common-stack SNS topic to Teams because SMTP wasn't configured. The SNS publisher role on the Grafana service account still hit a web-identity error.
 - **Prosumer** (2026-07-20): backend authorization fixes for user lookup/sharing were incomplete; the frontend-controlled permission model was called insufficient. Data migration was planned for 2026-07-21.
 - **CrowdStrike** (2026-09-17/22): ephemeral machines (ARM, Prosumer, GMR) lacked port 8080 to the proxy; Nilo was to add it. A separate issue traced to the customer ID pointing to the US tenant instead of Europe, still to be reconfirmed.
 - **Lambda VPC binding** (2026-09-17): several no-prod Lambdas, including Extruder and The Click, are deployed without VPC binding. Not urgent; a report is wanted.
