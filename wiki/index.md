@@ -13,6 +13,7 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 - [[smp-dashboards]]: Grafana dashboard work across Japan and India.
 - [[smp-alerting-and-ops]]: alerting, incidents, monitors, and runbooks.
 - [[smp-tsdb-explorer]]: a local, read-only TSDB diagnostic tool.
+- [[smp-local-workspace]]: what lives in `/Users/qn5792/repos/smp` and what can be archived or deleted.
 - [[apac-tsdb-scraper]]: the older Lambda TSDB scrapers, including IEX RTM and Aurora XLSX.
 - [[copilot-dag-agent]]: the Copilot DAG Helper that scaffolds new DAGs.
 - [[tsdb-bulk-read-probing]]: standing preference for bulk TSDB reads when probing.
@@ -57,4 +58,4 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 - [[aliases]]: confirmed spelling variants for people, sites, and terms. Expand search terms with these.
 - [[unclear-captures]]: sources too ambiguous to turn into durable notes.
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-12

@@ -1,0 +1,41 @@
+# Claude Conversation - 2026-10-11
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `b6f4d55c-967f-4890-9bfd-4a4b0f3a46ae`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/b6f4d55c-967f-4890-9bfd-4a4b0f3a46ae.jsonl`
+Resume: `claude --resume b6f4d55c-967f-4890-9bfd-4a4b0f3a46ae`
+
+## 23:43 user
+
+hello u there
+
+## 23:43 assistant
+
+Yes, I'm here. What do you want to work on?
+
+## 23:44 user
+
+i'm seeing lots of files in the root, what are they?
+
+## 23:44 assistant
+
+`~/repos/smp` isn't a git repo itself. It's a folder that holds the real repos, and over time it has also collected loose scratch work from past sessions (mine and Codex's). Here's what's in it.
+
+**Repos (keep):** `apac-tsdb-scraper`, `smp-common`, `smp-dashboard`, `smp-india`, `smp-japan`, `smp-tool`, `smp-tsdb-explorer`, `sff-actions`, `smp-standup-dashboard`. There are also some side clones and worktrees: `smp-dashboard-grafana-alerts`, `smp-dashboard-scr1269` and `copilot-worktrees`.
+
+**Workspace config (keep):** `AGENTS.md`, `CLAUDE.md`, `Makefile`, `.envrc`, `.claude`, `.vscode`, `.cursor`.
+
+**Loose scratch work, by topic:**
+- **OCCTO (June):** about 20 files. These are `occto-*-plan.md`/`-findings.md`, the probe and review scripts (`occto_capacity_http_poc.py`, `run_occto_capacity_review.py`, `build_occto_capacity_review.mjs`, `probe_occto_august_tsdb.py`), their tests, the audit report (.md and .pdf), and an 11MB `occto_legacy_workbook_with_audit.xlsx`.
+- **JEPX day-ahead price (June):** a probe plan, findings, a probe script, a test and an implementation plan.
+- **Khaba / CDH cross-account (Sept):** `khaba_*.py`, `khaba-csv-access-retest.md`, `cdh_cross_account_probe.py`, `cdh-cross-account-test-20260924.md`.
+- **Tickets:** `scr-1267-*` (the Teams alerts guide and screenshots), `scr-1105-*.png`, and the `scr1278-date-repair-backup/` folder.
+- **Decks:** three `SMP-*.pptx` files plus an `.inspect.ndjson` sidecar.
+- **Other docs:** `japan-interconnector-prod-backfill-runbook.md`, `smp-observability-synapse-assessment-2026-09-24.md`, confluence snapshots (.png and .txt).
+- **Folders:** `discovery/`, `evidence/`, `implementation-plans/`, `_dump/`, `dags/`.
+
+**Junk you can delete safely:** `.DS_Store`, `.coverage`, `__pycache__`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.playwright-mcp`, `.codex-build`, `.codex-tmp`, `.codex-slides-work`.
+
+To tidy up, I'd delete the junk and move the loose files into an `archive/` folder grouped by topic (occto, jepx, khaba-cdh, tickets, decks). Want me to do that?
+
+I only went by file names and dates and didn't open anything. Hold on to `scr1278-date-repair-backup/` until you've checked whether that repair is finished.

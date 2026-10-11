@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-11.
+As of 2026-10-12.
 
 - **Purpose:** a reference memory and second brain for anything Brian might forget. It is not a task tracker. The operating rules live in `AGENTS.md`; this page records how the system runs and why it is shaped this way.
 - **Capture:** daily exports at 00:10 Asia/Manila, each covering the full previous local day, land in `inbox/`. There are three:
@@ -27,6 +27,7 @@ As of 2026-10-11.
 - **Conversation exports** keep only user and assistant messages, dropping tool calls, system and developer prompts, and reasoning. Each export is a pair: a small `.md` index plus the full `.txt` transcript, moved together. Large Markdown transcripts crashed Obsidian 1.12.7 during indexing.
 - **The Codex exporter** scans continuing sessions across the whole tree and filters messages by Asia/Manila date. That way a long-lived session is captured on every day it is used. Days with no messages write nothing.
 - **Scheduled-automation sessions** are excluded from export. Ingest also requires a durable knowledge delta before moving or committing anything (see History, 2026-08-19).
+- **External memory tools:** the 2026-10-11 survey found several agent-memory products worth trialling, but the chosen direction stayed repo-first: shared skills and local hooks now, with MCP, embeddings, or hosted memory deferred until `rg`/wiki retrieval actually starts failing.
 
 ## History
 
@@ -38,6 +39,7 @@ As of 2026-10-11.
 - 2026-09-04: all captures aligned to 00:10 with ingest at 00:30.
 - 2026-10-06: Notion pilot started, with the repo staying canonical during the trial.
 - 2026-10-11: Notion pilot dropped; the repo stays the home.
+- 2026-10-11: memory-layer options surveyed; markdown-in-git remained canonical, shared skills became the parity layer, and MCP/embeddings were postponed.
 - 2026-10-11: `dump` skill and live daily notes retired in favour of fully autonomous capture and ingest.
 - 2026-10-11: `consult-mind-palace` moved into the repo's `skills/` and symlinked for both Codex and Claude Code.
 - 2026-10-11: Claude Code conversation capture added via a `Stop` hook.
@@ -60,6 +62,7 @@ As of 2026-10-11.
 - `sources/codex-conversations/2026-07-21-codex-conversations.md`
 - `sources/codex-conversations/2026-09-04-codex-conversations.txt`
 - `sources/codex-conversations/2026-10-06-codex-conversations.txt`
-- User clarification on 2026-10-11 (Claude Code session): Notion pilot dropped; revamp scope.
+- `sources/codex-conversations/2026-10-11-codex-conversations.txt`
+- `sources/claude-conversations/2026-10-11-claude-scratch-50c5d1ab.txt`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-12

@@ -38,6 +38,6 @@ Add a variant only once it is confirmed, by Brian or by unambiguous repeated evi
 ## Sources
 
 - User clarifications from 2026-07-21 to 2026-08-04, recorded in `sources/notes/*-ingest-handover-clarifications.md`.
-- User clarification on 2026-10-11 (Claude Code session).
+- `sources/claude-conversations/2026-10-11-claude-scratch-50c5d1ab.txt`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-12
