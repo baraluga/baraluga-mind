@@ -23,25 +23,14 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # hooks run with `python3 -I`, which drops the script dir
+from redact import redact  # noqa: E402
+
 INBOX = Path(os.environ.get("BARALUGA_INBOX", Path.home() / "baraluga-mind" / "inbox"))
 STATE_DIR = Path(os.environ.get("BARALUGA_CAPTURE_STATE", Path.home() / ".cache" / "baraluga-mind" / "claude-capture"))
 TZ = ZoneInfo("Asia/Manila")
 
 REMINDER = re.compile(r"<system-reminder>.*?</system-reminder>", re.S)
-# ponytail: pattern-based redaction only catches obvious secrets; ingest must still watch for others.
-REDACTIONS = [
-    (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?-----END [A-Z ]*PRIVATE KEY-----", re.S), "[REDACTED: private key]"),
-    (re.compile(r"(?i)\b(bearer)\s+[A-Za-z0-9._~+/=-]{16,}"), r"\1 [REDACTED]"),
-    (re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"), "[REDACTED: aws key]"),
-    (re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|sk-[A-Za-z0-9_-]{20,}|xox[abpr]-[A-Za-z0-9-]{10,})"), "[REDACTED: token]"),
-    (re.compile(r"(?i)\b(password|passwd|pwd|secret|api[_-]?key|access[_-]?token|token)(\s*[:=]\s*)[\"']?[^\s\"']{4,}"), r"\1\2[REDACTED]"),
-]
-
-
-def redact(text: str) -> str:
-    for pattern, replacement in REDACTIONS:
-        text = pattern.sub(replacement, text)
-    return text
 
 
 def project_label(root: str) -> str:

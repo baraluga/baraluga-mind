@@ -5,7 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # works under `python3 -I`, which drops the script dir
+from redact import redact  # noqa: E402
 
 
 AUTOMATION_MARKERS = ("Automation ID:", "Automation memory:")
@@ -258,7 +262,7 @@ def render_transcript(capture_date: str, codex_home: Path, sessions: list[dict])
                 [
                     f"### {role} - {message.get('timestamp') or 'unknown time'}",
                     "",
-                    message["text"],
+                    redact(message["text"]),
                     "",
                 ]
             )
