@@ -98,6 +98,7 @@ When processing files from `inbox/` or `sources/`:
    - `sources/voice/` for voice-note transcripts and dictated thoughts
    - `sources/pdfs/` for PDFs and extracted PDF notes
    - `sources/notes/` for manual notes and historical daily notes
+   - `sources/codex-conversations/`, `sources/copilot-conversations/`, and `sources/claude-conversations/` for agent conversation captures
 9. Add a short `Last Updated` date using `YYYY-MM-DD`.
 10. Validate the complete ingest diff. Commit and push using an unscoped conventional commit only when the ingest produced a durable source or wiki change that passed the value gate.
 

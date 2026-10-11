@@ -18,6 +18,7 @@ Goals:
 - Mark uncertainty explicitly.
 - Move processed `inbox/` files to the appropriate `sources/` folder when they remain useful as evidence.
 - Treat `YYYY-MM-DD-codex-conversations.md` and its paired `.txt` transcript as one source: review the text evidence and move both files together without changing the transcript back to Markdown.
+- Treat `YYYY-MM-DD-claude-<project>-<session8>.txt` as a Claude conversation source. Ingest only files dated before today in Asia/Manila, since today's files are still being appended. Use the `Project:` header to route context to the right pages, redact any secret the capture missed, and move the file to `sources/claude-conversations/`.
 - Leave files in `inbox/` when they still need follow-up, review, or clarification.
 - Give me a concise changelog when finished.
 - If no inbox item passes the value gate, do not edit, move, commit, or push anything; report a clean no-op.

@@ -12,6 +12,8 @@ Everything runs on a schedule, with no manual step required:
 2. At 00:30, the ingest automation follows `scripts/ingest.md`: it gates for durable value, moves evidence to `sources/`, rewrites the affected wiki pages, then commits and pushes.
 3. Skim the ingest report and diff for accuracy when convenient.
 
+Claude Code conversations are captured continuously instead. A `Stop` hook in `~/.claude/settings.json` runs `scripts/capture-claude-conversation.py` after every turn, appending new messages to `inbox/YYYY-MM-DD-claude-<project>-<session8>.txt`.
+
 Anything else can be dropped into `inbox/` by hand, and the next run picks it up.
 
 ## Folder Map
