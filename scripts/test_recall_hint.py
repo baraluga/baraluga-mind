@@ -49,6 +49,7 @@ class RecallHintTest(unittest.TestCase):
         self.assertIsNone(self.hint("darwin collector again"))
         self.assertIsNotNone(self.hint("darwin collector", session="s2"))
         self.assertIsNone(self.hint("darwin collector", session="s3", source="system"))
+        self.assertIsNotNone(self.hint("darwin collector", session="s4", source="sdk"))
 
 
 if __name__ == "__main__":

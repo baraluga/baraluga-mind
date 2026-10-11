@@ -71,7 +71,8 @@ def as_of(path: Path) -> str:
 
 
 def hint(hook: dict) -> str | None:
-    if hook.get("source") not in (None, "user"):
+    # Desktop and IDE prompts arrive as `sdk`, so skip only machine-injected turns.
+    if hook.get("source") in ("system", "loop_wakeup", "schedule_wakeup", "poll_event"):
         return None
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     state_path = STATE_DIR / f"{hook['session_id']}.json"
