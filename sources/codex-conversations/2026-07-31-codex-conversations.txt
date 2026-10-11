@@ -4663,7 +4663,7 @@ Trigger the same DAG with:
   "batch_end_date": "2019-01-30",
   "max_batch_days": 31,
   "execute": true,
-  "approval_token": "810fc5f962e2442f2083bc8cf68f1e43bc233dd70a88ccedf88c0948697ce795",
+  "approval_token": "[REDACTED: approval token]",
   "all_source_batches_complete": false
 }
 ```

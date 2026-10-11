@@ -7886,8 +7886,8 @@ sorry, mispressed lol.
 
 Let's do a proper discovery phase pls. You should have access to Bruno. HEre are the creds:
 
-0oalbom1uoX50DxLA0i7
-keA2VLccBJzPRD6xTuX6x882JSUnvwabi0ARmXHp4_9UbRHnnJ9Qn2DquFGu9eJx
+[REDACTED: Darwin client id]
+[REDACTED: Darwin client secret]
 
 Think we can do that?
 
@@ -9027,8 +9027,8 @@ sorry, mispressed lol.
 
 Let's do a proper discovery phase pls. You should have access to Bruno. HEre are the creds:
 
-0oalbom1uoX50DxLA0i7
-keA2VLccBJzPRD6xTuX6x882JSUnvwabi0ARmXHp4_9UbRHnnJ9Qn2DquFGu9eJx
+[REDACTED: Darwin client id]
+[REDACTED: Darwin client secret]
 
 Think we can do that?
 
