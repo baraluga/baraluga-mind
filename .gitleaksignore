@@ -10,3 +10,5 @@ ed3b49ec86b8291ac424698866cc5c9b547e6f18:sources/codex-conversations/2026-09-18-
 a51ebaf8c035a70bd2cfb83c42bcd735f175ad41:sources/codex-conversations/2026-07-31-codex-conversations.txt:generic-api-key:4666
 81df425eca744459063e956df61586f578c16164:sources/codex-conversations/2026-07-13-codex-conversations.md:jwt:833
 687f8ec0240e939f371a7fd38a5e30b5b798be87:sources/codex-conversations/2026-07-07-codex-conversations.md:jwt:935
+# Fake fixture in scripts/test_redact.py before its gitleaks:allow comment was added.
+4e85d445b87a7552ced941fad37094a79459f933:scripts/test_redact.py:generic-api-key:31
