@@ -1,12 +1,12 @@
 # AI Assisted Engineering
 
-## Summary
+## Current State
 
-AI-assisted engineering appeared in several captures as a practical workflow theme: Copilot DAG generation, agentic pull requests, reusable AI-generated scripts, MCP/browser validation, dependency and vulnerability remediation, AI-assisted runbook automation, and AI-permitted candidate assessments.
+As of 2026-10-13, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills for repeated writing or operational workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
 
-The notes frame AI as a way to reduce repeated implementation or diagnosis work, while still requiring human review, explanation, and workflow controls.
+Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 REA work made local reverse engineering available and showed that web-app analysis is feasible, but browser runtime tracing needs a Chrome DevTools debugging port or a deliberately limited fallback through the in-app browser.
 
-## Details
+## Background
 
 - [[copilot-dag-agent]] uses current repository conventions to scaffold Airflow DAGs.
 - Application team AI workflow ideas included MCP-based browser rendering for frontend validation, reusable AI-generated scripts, and agent workflows for dependency and vulnerability remediation.
@@ -45,6 +45,7 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - September 18 Atlas work created Brian's reusable `$estimate-project-time` skill for stakeholder effort questions. The method uses Codex logs and Git evidence, treats collaboration-session time as the headline, deduplicates parallel work, reports recorded runtime and 15/30/60-minute cutoff sensitivity, and converts hours to person-days with an explicit eight-hour-day assumption.
 - The September 18 AMA GenAI session captured leadership's current stance: AI decouples output production from junior-skill formation, but there is no clear timeline or role model yet for structural changes. Dimitri committed to direct communication before structural announcements, using productivity gains for backlog/additional tasks before headcount reductions, and preserving junior career paths. Mental-health concerns from AI-driven purpose loss, isolation, and responsibility creep were acknowledged, with Employee Assistance Program resources cited.
 - October 9 Codex setup work installed REA 6.1.0 for local reverse-engineering workflows, configured it as a Codex MCP server with a fixed Node 22.23.3 runtime, installed the matching skill, and installed Hopper 6.6.0 demo for native analysis. MCP discovery reported 138 REA tools and a live JavaScript analysis passed after restarting Codex; native decompilation remained untested and may be limited by Hopper's demo mode.
+- October 12 Claude scratch work showed the practical web-app path for REA-style investigation: static bundle reading can inspect public JavaScript assets, runtime REA tracing requires Chrome launched with a DevTools debugging port, and the in-app browser fallback can read page scripts/network history but not attach REA directly or expose request bodies. The YNAB test became [[ynab-web-app]] evidence.
 
 ## Open Questions
 
@@ -100,5 +101,6 @@ The notes frame AI as a way to reduce repeated implementation or diagnosis work,
 - `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 - `sources/meetings/2026-09-18-1500-granola-ama-genai.md`
 - `sources/codex-conversations/2026-10-09-codex-conversations.txt`
+- `sources/claude-conversations/2026-10-12-claude-scratch-3c479f77.txt`
 
-Last Updated: 2026-10-10
+Last Updated: 2026-10-13

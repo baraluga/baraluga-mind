@@ -51,6 +51,7 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 - [[game-price-tracker]]: idea for a game wishlist and sale-alert tool.
 - [[home-network]]: home Wi-Fi and router setup.
 - [[thailand-2026]]: August 2026 Bangkok and Pattaya trip.
+- [[ynab-web-app]]: notes from the REA-style exploration of YNAB's web app and sync flow.
 
 ## This System
 
@@ -58,4 +59,4 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 - [[aliases]]: confirmed spelling variants for people, sites, and terms. Expand search terms with these.
 - [[unclear-captures]]: sources too ambiguous to turn into durable notes.
 
-Last Updated: 2026-10-12
+Last Updated: 2026-10-13

@@ -1,0 +1,300 @@
+# Claude Conversation - 2026-10-12
+
+Project: scratch (/Users/qn5792/Library/Application Support/Claude/scratch-workspaces/51e6d2f7-6c23-40c5-8911-1ec13f91289a/3b33c286-228a-43eb-a71b-035943e2d589/scratch-2026-10-12-c5d9d8)
+Session: `3c479f77-e946-4708-9a1f-643aaaac9d14`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-Library-Application-Support-Claude-scratch-workspaces-51e6d2f7-6c23-40c5-8911-1ec13f91289a-3b33c286-228a-43eb-a71b-035943e2d589-scratch-2026-10-12-c5d9d8/3c479f77-e946-4708-9a1f-643aaaac9d14.jsonl`
+Resume: `claude --resume 3c479f77-e946-4708-9a1f-643aaaac9d14`
+
+## 15:07 user
+
+<command-message>reverse-engineer-anything</command-message>
+<command-name>/reverse-engineer-anything</command-name>
+<command-args>-- does this work on webapps too?</command-args>
+
+## 15:07 assistant
+
+Yes, it works on webapps. REA has a set of browser tools, and they come at a webapp from three directions:
+
+**1. Static: the shipped JS bundle**
+- `analyze_web_bundle` and `export_web_scripts` pull the minified bundles and inspect them.
+- `recover_javascript_sources` rebuilds the original source when the site ships source maps.
+- `trace_web_module_imports` and `trace_web_source_location` follow modules and map bundle locations back to source lines.
+- `compare_bundles` and `compare_source_to_bundle` diff two deploys, or your source against what's actually deployed.
+
+**2. Runtime: a page you already have open**
+- It attaches to a browser you started yourself, through a local Chrome DevTools debugging port (Chrome launched with `--remote-debugging-port=9222`).
+- `list_browser_targets` lists the open pages. Then `inspect_web_page`, `inspect_web_event_listeners`, `observe_web_session`, `observe_web_execution` and `capture_web_screenshot` look at the selected page.
+- It only watches. It won't click, navigate or run code in the page, so you drive the app while it records.
+- Cookies, auth headers, storage values and request/response bodies are left out of captures on purpose.
+
+**3. Recorded traffic**
+- `inspect_web_network_capture` reads a HAR file (exported from browser DevTools) or a mitmproxy capture you made earlier, without re-fetching any URL.
+- `compare_web_captures` diffs two captures.
+
+**Tying it together:** `reconcile_javascript_runtime` matches what the static analysis found against what was seen at runtime. One limit: seeing a bundle load doesn't prove every module inside it ran.
+
+**What it can't see:** server-side code. You only get what reaches the browser: the client bundle, network traffic, the DOM and console output.
+
+If you have a specific webapp in mind, give me the URL or a HAR file and tell me what you want to understand about it. For a live page, start Chrome with the debugging port first.
+
+I took this from the skill's docs and the REA tool list. I haven't run any of the web tools in this session, so I haven't confirmed they connect on your machine.
+
+## 15:08 user
+
+https://app.ynab.com/01f16888-e6a8-4244-af11-b2ec167f4781/budget YNAB in general!
+
+## 15:09 assistant
+
+Yes, REA can take YNAB apart, but I can't start yet. Every REA web tool needs a Chrome that you launched yourself with a debugging port open. I checked the usual ports (9222, 9223, 9229) and nothing is listening.
+
+**To get started:**
+
+1. Quit Chrome completely, or run this second copy alongside it. Recent Chrome versions refuse a debugging port on your normal profile, so it needs its own data folder:
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --remote-debugging-port=9222 --user-data-dir="$HOME/.chrome-rea"
+```
+2. Sign in to YNAB in that window yourself and open your budget page. I won't type your password for you.
+3. Tell me when it's ready.
+
+**What I'll do once it's ready:**
+
+1. `list_browser_targets` finds the YNAB tab.
+2. `analyze_web_bundle` collects the JavaScript the page loaded and works out:
+   - the framework (likely Ember, based on YNAB's history; I'll check)
+   - how the code is split into chunks
+   - the routes and the API endpoints the app calls
+   - third-party libraries
+   - the source code, if YNAB publishes source maps
+3. `inspect_web_page` looks at the DOM, network calls, web workers, and the names of what's kept in browser storage. This is where I'd look for how sync and offline mode work.
+
+REA only reads JavaScript files as text and never runs them. It just watches the page, so you click around while it records. Cookies, auth headers and the contents of requests and responses are left out of captures, which means your budget numbers aren't recorded.
+
+**What are you after?** "In general" can mean a lot here. Some options:
+- **The architecture:** framework, modules, how the client syncs with the server
+- **The private API** the web app uses, including calls the public API doesn't offer
+- **A specific feature**, such as Targets, Age of Money, reconciliation or Loans
+
+Also, if what you actually want is your budget data, the YNAB connector already active in this session uses YNAB's official API. That's simpler and allowed by YNAB's terms, while digging into their private web API probably isn't.
+
+I haven't confirmed that REA's source recovery (`recover_javascript_sources`) runs on macOS. It's documented for Linux x64, so on this Mac I may only get readable source if YNAB publishes source maps.
+
+## 15:10 user
+
+I have it in your browser tab!
+
+## 15:10 assistant
+
+I worked from your tab, but not through REA. The built-in browser doesn't open a debugging port that REA can attach to, so instead I ran two read-only snippets in the page to list its scripts, network calls and Ember's module registry. Nothing in the page was changed or clicked, and your budget data wasn't read. These results are what the page reported, not REA's evidence-tracked output.
+
+## What YNAB's web app is made of
+
+**Framework**
+- **Ember.js.** The page has `Ember`, `requirejs` and `define` globals, and the app's own code lives in modules named `ynab_web/...`.
+- **Two build systems side by side.** One set of files is a Rails webpack build (`/assets/packs/js/`: runtime, 418, 956, 421, `before_ynab_web_head`). The Ember app is a separate set under `/assets/ynab_web/`: a 93 KB vendor file plus two big chunks of **3 MB** and **8 MB**.
+- Only 234 modules are registered with Ember's loader, and none of them are data models. My guess is that most of the code, including the models, is inside the 8 MB chunk and loaded by webpack instead.
+
+**Screens (57 routes)**
+- `budget`, `accounts`, `reflect/*` (age-of-money, net-worth, spending breakdown, trends and totals), the older `reports/*`, and `category-templates`.
+- `group/*`: an employer or benefits plan with members, eligibility lists, and utilization and survey reports.
+- Also `labs`, `users/*` and `templates-import`.
+
+**Logic layer (73 services)**
+- Everyday features: `budget`, `accounts`, `reconcile`, `loan-accounts`, `money-moves`, `quick-budget`, `budget-goals`, `cost-to-be-me`, and a family of `register-*` services for the transaction register.
+- `sync-control` is the most likely place to look for offline mode and syncing.
+- `account-widget/*` (institutions, authorization sessions) looks like the bank-connection flow.
+- `slik/*` is organized as "use cases" plus "repositories", a pattern unlike the rest of the code. My guess is a shared domain layer used across YNAB's platforms; I haven't checked.
+
+**Who it talks to**
+- **YNAB's own servers:** `app.ynab.com/api/v1/catalog` and `/api/v2/user` (its internal API, separate from the public developer API), `experiments.ynab.com` (feature flags and A/B tests), and `analytics.ynab.com`.
+- **Third-party services:**
+  - Datadog: performance and error monitoring
+  - Braze: in-app messaging cards
+  - Castle.io: fraud and bot detection
+  - CookiePro/OneTrust: the cookie consent banner
+  - Kustomer and Forethought: the support chat
+
+Only network calls made since the page loaded show up. No service worker is registered.
+
+## Going deeper
+
+To trace how a feature actually works (sync, reconcile, how targets are calculated), I need the YNAB scripts saved locally so REA's `analyze_javascript_application` can read them. That means downloading:
+
+| File | Size |
+|---|---|
+| `chunk.9068ad2b41904d1431ac.js` | 8.1 MB |
+| `chunk.7bd67ec4d1cff4ed86e3.js` | 3.0 MB |
+| `vendor.415646efd44903cb1190197118751ba1.js` | 93 KB |
+| `packs/js/` runtime, 418, 956, 421, `before_ynab_web_head` | ~470 KB |
+
+That's about 11.7 MB of public, static files from `app.ynab.com/assets/`. No login is needed. They would go into a temporary folder for this session and only be read as text, never run.
+
+**OK to download those?** And which area should I trace first? `sync-control` would show how the app keeps your budget in sync.
+
+I didn't check for source maps, and I couldn't read the Ember version (the page doesn't expose it).
+
+## 15:11 user
+
+yes go ahead, start with sync-control
+
+## 15:11 assistant
+
+Maps not public. Running REA's static analysis on the bundle tree and locating sync-control in parallel.
+
+## 15:13 assistant
+
+sync-control is a thin wrapper. The real engine is `applicationService.syncManager` and a "shared lib" (module 30361). Following both.
+
+## 15:14 assistant
+
+Still on it: I've traced sync down to the request YNAB sends. One last check on how conflicting edits get resolved.
+
+## 15:15 assistant
+
+I've traced how sync-control works. The short version: YNAB's web app keeps its own copy of your budget in the browser, and every so often swaps "what's changed since we last talked" with the server, using a running change counter on each side to know what to send.
+
+## How it fits together
+
+```
+sync-control (Ember service, ~30 lines)
+  └─ applicationService.syncManager       ← created when the app starts
+       └─ shared library ("defaultInstance")
+            ├─ entityManager   (fires an event when a record is created or edited)
+            ├─ store           (works out what changed, does the sync)
+            └─ apiAdapter.v1   → POST /api/v1/catalog
+```
+
+**1. sync-control is just a pause button.** It has suspend, resume, start, stop and sync-now. Suspend waits for any sync in progress, sends your unsaved edits, then turns on a read-only flag in the shared library. Resume turns read-only off and restarts automatic syncing if it was running before.
+
+**2. The real engine is a separate shared library.** Two clues:
+- Its code is written differently from the Ember app's own code (it looks like compiled TypeScript).
+- It's created with `deviceOS: "web"`, which suggests the same library also runs on other platforms.
+
+Next to it in the same file there's a lot of code compiled from Kotlin (the language), including class names like `persistence.catalog.userbudget.UserBudgetServer`. My guess is that YNAB shares data-layer code across web and mobile. That's an inference from how the code looks; I haven't confirmed it.
+
+**3. When it syncs:**
+- **When you edit something:** creating or changing a record triggers a sync after a very short wait (`timeToWaitAfterChangeToPushChanges` is 10, probably milliseconds).
+- **On a timer:** it also syncs on a regular "heartbeat". The built-in default is every 60 seconds, but your page sets `AUTO_SYNC_RATE` to **180000**, so in practice it's **every 3 minutes**.
+- **When the connection drops:** a 503 error, status 0 (no response) or a timeout marks the app as Disconnected. After a failed sync while disconnected, it retries after 2 seconds.
+
+**4. One request carries everything.** Your budget, user-level ("catalog") data and family data all sync through a single endpoint, `POST /api/v1/catalog`. The body is `{operation_name, request_data}`, where the operation is `syncBudgetData`, `syncCatalogData` or `syncFamilyData`. Login, logout and password reset go through the same endpoint. Version 2 of the API (`/api/v2/user` and so on) is a normal REST API used for other things.
+
+**5. Change counters decide what gets sent.** Each budget sync sends:
+```
+budget_version_id, sync_type (Delta | Backfill),
+starting_device_knowledge, ending_device_knowledge,
+device_knowledge_of_server, schema_version, schema_version_of_knowledge,
+changed_entities: { be_accounts, be_transactions, be_payees,
+                    be_subcategories, be_monthly_subcategory_budgets, ... }
+```
+- Your browser and the server each keep a running count of changes (called "knowledge").
+- Each side tells the other "I've seen you up to change N", and the reply includes only records newer than that.
+- A **Backfill** sync resets the counters to 0, which means "send me everything".
+- Deleted records are kept and flagged (`is_tombstone`) rather than removed.
+
+**6. Writes are blocked in read-only mode,** except for a sync request that has no outgoing changes. That's how suspend still lets server updates come in.
+
+## Two things worth knowing
+
+- **Local edits beat incoming changes for that round.** If you edit something while a delta sync is in flight, the server's incoming changes are thrown away, with the log line "Incoming changes from delta sync were ignored because we had new local changes." I assume a later sync picks them up again, but I didn't check that.
+- **Every sync is checked against the server's schema version.** If the server answers in a schema version different from the one the client expects, the client errors out instead of trying to merge.
+
+## How I got this, and the limits
+
+- REA's full analysis of the downloaded scripts ran, but the result was too large to come back in one response. So I traced everything above by reading the minified code directly, starting from the `ynab_web/services/sync-control` registration (webpack module 89777), then into `SyncManager` and then `BaseStore`.
+- The `AUTO_SYNC_RATE` value came from your live page. Everything else is static reading of the code. **I didn't watch any real sync traffic**, so call order and timing are as written in the code, not observed.
+- The source maps returned 404, so the original variable names are gone.
+- The config readout also printed some third-party client keys (Amplitude, Braze, Recurly and others). Every visitor's browser receives these, so they aren't your secrets, and I haven't repeated them.
+
+The downloaded scripts are in a temporary folder for this session. Next I could look at how records are stored offline in the browser (IndexedDB), trace the `slik/*` layer to check the Kotlin guess, or watch a real sync happen in your tab.
+
+## 15:16 user
+
+watch a real sync in my tab
+
+## 15:17 assistant
+
+Reaching into the app's internal state from the page doesn't work, so I'm sticking to watching network traffic. Checking whether any timed syncs have fired since the page loaded:
+
+## 15:18 assistant
+
+I watched the sync traffic from when your page loaded, but it hasn't synced since then. To catch a real sync I need you to change something.
+
+## What happened when the page loaded
+
+Everything went to `POST /api/v1/catalog`:
+- **1 login request.** It's the only one that puts the operation name in the URL (`?operation_name=loginUser`).
+- **11 sync requests** in about 150 ms, plus one `GET /api/v2/user`.
+
+I opened the response bodies of the last three. Each sync area has its own change counter and its own schema version, which matches the code:
+
+| Response | Server's change counter | Schema version | Record types (prefix) |
+|---|---|---|---|
+| Catalog (user data) | 1,420,933,639 | 17 | `ce_` (users, settings, user_budgets, privacy agreements) |
+| Family | 4 | 4 | `fe_` (family, members) |
+| Budget | 414 | 45 | `be_` (about 25 types) |
+
+The counter values suggest catalog uses a single counter shared across YNAB's servers, while each budget and family keeps its own small one. That's a guess from the numbers alone.
+
+**Two things I hadn't seen in the code:**
+- **Budget syncs cover a range of months.** The budget response came back with `first_month: 2026-09-01` and `last_month: 2026-10-01`, so a sync seems to cover only certain months. That would fit the backfill flow from the code: load recent months first, then fill in the rest. I haven't confirmed it.
+- **The server sends back calculated results.** The budget response has its own record types for computed values (`be_monthly_budget_calculations`, `be_account_calculations`, `be_monthly_subcategory_budget_calculations`). It looks like the server does at least some of the budget math and sends results down, rather than the browser working it all out.
+
+All three responses were empty deltas. Each had `server_knowledge_of_device: 0`, meaning this browser hadn't sent the server any changes yet.
+
+## No timed syncs so far
+
+The page has been open about 8 minutes, and the timer is set to every 3 minutes, but nothing has gone out since load. The code pauses syncing only when the tab is hidden, and your tab reports `visible`. I couldn't get at the sync engine's internal state from the page to see why: YNAB's build doesn't expose it.
+
+My best guess is how the heartbeat decides when to run. Each sync resets a "last synced" time, and with that many sync requests at startup, the heartbeat may have kept being rescheduled. Another possibility is that the in-app browser only records network calls from a limited window. Both are guesses.
+
+## Next step: make one small edit
+
+Change something harmless in the YNAB tab, such as adding a memo to a transaction or nudging an assigned amount by $0.01, then change it back. In the code, that triggers an upload almost immediately. Tell me when you've done it and I'll capture:
+- what your browser sends up (`changed_entities` and the counters going up)
+- what the server sends back
+
+I won't make the edit myself because it changes your real budget data.
+
+## 15:20 user
+
+done, I edited a memo
+
+## 15:20 assistant
+
+Five new requests. Reading their responses:
+
+## 15:21 assistant
+
+I caught your edit going up to YNAB and the server confirming it, and the traffic matches what the code says. One gap: the in-app browser only shows me the server's replies, not what your browser sent. So the contents of your upload are inferred from the counters, not seen.
+
+## What happened, in order
+
+| # | Request | Budget counter (server) | Your browser's counter (as the server knows it) | What came back |
+|---|---|---|---|---|
+| 250 / 252 / 253 | catalog + family + budget | 414 → 414 | 0 → 0 | nothing changed |
+| **260** | **budget** | **414 → 415** | **0 → 1** | 2 transfer payees |
+| **261** | **budget** | **415 → 416** | **1 → 2** | the same 2 payees |
+
+**Requests 250–253: a full sync with nothing new.** It's the same catalog, family and budget trio that ran at page load, and all three were empty. It came right before your edit, when the tab had moved from the Plan page to an account page. It was either the 3-minute timer finally firing or something triggered by changing pages. I can't tell which from here.
+
+**Request 260: your memo edit.**
+- **Your browser's counter went 0 → 1.** Your browser told the server "I have one new change", and the server stored it.
+- **The budget counter went 414 → 415.** Your change got stamped with a new number on the server's side.
+- **The server didn't send your transaction back.** That makes sense: the response is only meant to carry changes your browser doesn't already have.
+- **No calculated records came back.** That fits, since a memo doesn't change any numbers.
+
+**Request 261: a second change.** The counters went up by one again. Either you changed the memo back, or YNAB saved your typing in two steps. The counters alone can't tell those apart.
+
+## Matches and surprises
+
+**Matches the code:**
+- Nothing was waiting for the 3-minute timer. Your edit went out almost immediately as a budget-only sync, with no catalog or family requests alongside it.
+- The counters behave exactly as the code describes: one change from your browser moves both counters up by one.
+
+**Not explained yet:**
+- **Two transfer payees came back with both syncs.** These are the "Transfer : …" payees for two of your accounts, one of which is the account you were on. Editing a memo shouldn't touch payees, so the server seems to have updated them for its own reasons. Both still show as not deleted, with nothing in them looking different. I haven't worked out why.
+
+## What I couldn't see
+
+- **Your upload itself:** the in-app browser tool doesn't show request bodies. To see the actual `changed_entities` your browser sent (I'd expect one `be_transactions` record with the new memo), export a HAR file from Chrome's DevTools while making an edit, and I'll read it with `inspect_web_network_capture`. That file would contain your budget data and session cookies, so keep it local.
+- **Whether the 3-minute timer actually fires:** I still haven't confirmed it, and syncs triggered by edits can hide it. Leaving the tab idle on one page for 4 minutes or so and then checking the network log would settle it.
