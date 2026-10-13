@@ -1,0 +1,807 @@
+# Claude Conversation - 2026-10-13
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `32cc547a-400a-4583-b09e-f1e428141ad8`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8.jsonl`
+Resume: `claude --resume 32cc547a-400a-4583-b09e-f1e428141ad8`
+
+## 17:17 user
+
+can you take over my ongoing conversation with codex. It's named: "Review SCR-1284". Tell me where we are in this ticket. It's been a while
+
+## 17:18 assistant
+
+I read through the whole Codex thread. Here's where SCR-1284 stands.
+
+## Where we are
+
+**The investigation is finished. Adrien chose near-real-time delivery, and you've sent him a follow-up asking him to confirm the design fits. That's the last message on record.** Nothing has been built or changed yet. The ticket is still **To Do**, unassigned, in Sprint 31 (ends Oct 21). It hasn't been touched since your comment on Oct 9.
+
+### Why prices are late (confirmed with production evidence)
+There are two separate waits, and each step's actual processing only takes seconds:
+1. **IEX → TSDB:** `iex_api_national_rtm` in `apac-tsdb-scraper` runs on a Lambda every 30 minutes. New prices sat **14–19 minutes** before they were collected. Collecting and inserting them took about 5–8 seconds.
+2. **TSDB → CDH:** `india_iex_tsdb_expanded_rtm_dag` in `smp-india` also runs every 30 minutes. It starts reading about 10 seconds before the new prices land in TSDB, so it misses them and only picks them up on the next run.
+   - Total in one sample: **about 45 minutes** from the price appearing in the API to it reaching S3.
+
+Step timings: scraping about 3s, TSDB ingest about 2–4s, TSDB read about 15s (the whole extract task is about 28s), S3 upload about 0.4s.
+
+### What's been decided
+- You offered two options. Adrien said **near-real-time is mandatory** (they want to stop relying on the IEX portal), that you can take the time you need, and that they aren't bidding on RTM yet.
+- **Chosen: option 2.** Move the IEX RTM scraper out of `apac-tsdb-scraper` into `smp-india`, check the API frequently, and publish straight to both TSDB and CDH. That removes the second polling wait.
+- Scope is **RTM only**. DAM/GDAM keep their current schedules.
+- RTM uses 15-minute delivery blocks, but IEX publishes new auction results about every 30 minutes. The goal is to catch each new result quickly after it's published.
+
+### Still open
+1. **Adrien's reply:** does option 2 fit, and what's the maximum acceptable delay from the API to Grafana? That answer becomes the acceptance target.
+2. **Design choice:** a 1-minute Airflow DAG (simpler, delay of about a minute) or a Darwin-style continuous collector (delay of seconds, more work). This depends on #1.
+3. **Not measured yet:** how long Athena and Grafana take to show new data. The dashboard exports have no auto-refresh set, and the live dashboard settings haven't been checked.
+4. **Not checked yet:** IEX API rate limits for frequent polling.
+
+### Files from that session
+- [probe_rtm_latency.py](apac-tsdb-scraper/scripts/probe_rtm_latency.py) and [probe_rtm_downstream.py](apac-tsdb-scraper/scripts/probe_rtm_downstream.py)
+- Findings: [README.md](apac-tsdb-scraper/_dump/scr-1284-provenance/README.md) and [airflow-findings.md](apac-tsdb-scraper/_dump/scr-1284-provenance/airflow-findings.md)
+
+**Next step:** check whether Adrien has replied to your confirmation question. If he hasn't, I can start drafting the `smp-india` RTM DAG design while you wait.
+
+I only checked the Codex transcript and the Jira ticket. I didn't look at Teams or Slack, so Adrien may have replied somewhere I can't see.
+
+## 17:20 user
+
+yea, he replied actually..
+
+"A maximum of 5 minutes is fine for them
+They remarks ideally between 10am and 11am, when they prepare the bidding for the next day
+If we can make it shorter for the RTM prices to be really near Realtime, they will find that very usefu"
+
+## 17:20 assistant
+
+Adrien's answer gives you a target to build against: **5 minutes at most** from the price appearing in the API to it showing in Grafana. Anything faster is a bonus, and **10:00–11:00 IST** is the window that matters most.
+
+**What this means for the design:**
+- **Option 1 isn't enough.** Even with both 30-minute schedules shortened to 5 minutes and staggered, the waits alone add up to about 6 minutes, before any Grafana delay. So option 2 is the right choice.
+- **Option 2 as a 1-minute Airflow DAG should meet the target.** Without the separate TSDB read, the work is about 3s to fetch from IEX plus a few seconds to write to TSDB and S3. Worst case is about 1 minute of polling wait plus seconds of processing, leaving room for Athena and Grafana. The Darwin-style continuous collector isn't needed for 5 minutes. Keep it in reserve in case traders later want delays of seconds.
+- **Grafana has to refresh every minute.** Today the dashboard exports have no auto-refresh set, and a missing refresh setting alone could break the 5-minute target.
+- **Run it all day, not just 10–11.** RTM is useful all day, and limiting it to that window would add complexity for little gain.
+
+**Still to check before building:**
+1. How soon new data is visible in Athena after it lands in S3. This is the last part of the delay we haven't measured.
+2. Whether the IEX API rate limits allow polling every minute.
+3. Whether Airflow can handle a DAG running every minute. airflow-dev has only one worker with 4 task slots, so that needs a check.
+
+I saved this decision to memory so future sessions start from here.
+
+Should I post a short comment on SCR-1284 recording the 5-minute target and the chosen design, then start on the `smp-india` RTM DAG design?
+
+I took Adrien's reply as you pasted it and didn't verify it anywhere else. How long Athena and Grafana take to show new data is still unmeasured, and that's the main risk to the 5-minute target.
+
+## 17:21 user
+
+yes, comment on the ticket then start the design.
+
+## 17:21 assistant
+
+Comment posted ([SCR-1284](https://tractebel-et.atlassian.net/browse/SCR-1284?focusedCommentId=134804)). Now reading the existing RTM code paths for the design.
+
+## 17:22 assistant (smp-india/dags/src)
+
+Still mapping the existing pieces: the HPX DAG and `smp_common.tsdb` already cover "scraper in Airflow → TSDB", which shortens the design a lot. Checking the regional RTM schedule next.
+
+## 17:23 assistant (apac-tsdb-scraper)
+
+I posted the comment on [SCR-1284](https://tractebel-et.atlassian.net/browse/SCR-1284?focusedCommentId=134804). Here's the design, built from what already exists.
+
+## Design: `india_iex_rtm_realtime` DAG (smp-india)
+
+**Three pieces of existing code do most of the work:**
+- **The HPX RTM DAG** ([india_hpx_national_dags.py](../smp-india/dags/src/india/india_hpx_national_dags.py)) already runs a scraper inside Airflow and publishes to TSDB with a read-back check. That's the template.
+- **`smp_common.tsdb.publish_batch`** skips values that haven't changed. So polling every minute doesn't mean writing every minute, and the number of rows written tells us whether new prices arrived.
+- **`write_india_iex_tsdb_expanded_parquet(RTM_TARGETS)`** plus the upload tasks already produce the parquet Grafana reads. Reusing them means Athena and the dashboards need no changes.
+
+**How it works (DAG runs every minute, one run at a time, paused on creation):**
+
+| Task | What it does |
+|---|---|
+| `collect` | Calls the IEX API using the current scraper's retrieval plan (latest blocks plus a 6-hour look-back to pick up corrections). The provider code is ported from `apac-tsdb-scraper`. |
+| `publish` | Calls `publish_batch` with read-back, so CDH is only refreshed once TSDB can actually be read. If nothing was written, the run stops here (most runs). |
+| `refresh_cdh` | Runs the existing RTM parquet writer and upload, about 48 times a day (only when new data arrives). |
+
+**Expected delay:** up to 60s waiting for the next poll, about 3s to fetch, about 5–10s to write and read back from TSDB, about 30s to build the parquet, about 1s to upload, then Grafana's 1-minute refresh. That's **about 2–3 minutes worst case**, before Athena (not yet measured). This fits within 5 minutes.
+
+**What gets retired:**
+- `iex_api_national_rtm` (and possibly `iex_api_rtm`) in the `apac-tsdb-scraper` Lambda
+- The 30-minute schedule on `india_iex_tsdb_expanded_rtm_dag`
+
+For a while both the old and new paths would write the same series. That's harmless, because unchanged values are skipped.
+
+**Considered and rejected:**
+- **Writing the parquet straight from the IEX response:** the snapshot covers 44 series over a month with metadata, so we'd have to merge it ourselves and maintain a second copy of the data contract. Not worth it to save 30s.
+- **A Darwin-style continuous collector:** only needed if traders want a delay of seconds.
+
+**To check before building:**
+1. **Whether the SMP service app's TSDB credentials can write the `iex_api` RTM series.** This is the biggest unknown. HPX writes to its own series.
+2. IEX API rate limits. We'd make about 2 calls a minute (national and regional), compared with 2 per half hour today.
+3. Whether Airflow can handle 1,440 runs a day in prod.
+4. How long S3 takes to show up in Athena, and whether Grafana caches query results.
+5. Where the IEX API password goes: an Airflow Variable or Connection.
+
+**Rollout:** dev, then measure with the existing `probe_rtm_latency.py`, then qa, then prod alongside the Lambda, then turn off the Lambda RTM scrapers.
+
+I haven't written any code yet. I read the code paths, but I didn't check the TSDB write permissions or the IEX rate limits, and those two could change the design.
+
+Two yes/no questions before I start building:
+1. **Should regional RTM (`iex_api_rtm`) be included too?** Yes means the Lambda RTM path can be fully retired. No means national only to start, since that's where the clearing price traders asked about comes from.
+2. **Should I publish this design as a page** you can share with Francois and Adrien?
+
+## 17:26 user (apac-tsdb-scraper)
+
+hold... why did we go for 1 minute retrieval instead of settling with just 5 minutes?
+
+## 17:26 assistant (apac-tsdb-scraper)
+
+Because a 5-minute poll by itself can use up the whole 5-minute limit. I should have spelled that out instead of just picking 1 minute.
+
+**Worst case with 5-minute polling:** IEX publishes just after a poll. The data waits up to **5 minutes** for the next one, then needs about 45s to publish and build the parquet. Grafana's refresh adds up to 60s, and Athena time is still unknown. That's about **6–7 minutes, which breaks Adrien's maximum.** On average it would be about 3.5 minutes, so it would usually meet the target but not reliably.
+
+**With 1-minute polling,** the worst case is about 2–3 minutes. That gives room for Athena, which we haven't measured, and covers his "shorter would be very useful".
+
+**What 1 minute costs** compared with 5 minutes:
+- About 1,440 Airflow runs a day instead of 288. Most of these do nothing and stop after `publish`.
+- About 5 times more IEX API calls.
+- TSDB writes stay the same, because unchanged values are skipped.
+
+**Options in between, if the Airflow load worries you:**
+- **Every 2 minutes:** worst case about 3.5–4 minutes. That still meets the target with a smaller margin.
+- **Poll every minute only around publication times:** in our samples IEX published at about :11–:16 and :41–:46. So poll every minute in those windows and every 5 minutes otherwise. This needs the fewest runs, but it rests on just 3 data points: our two samples and Adrien's 10:41. If IEX publishes outside those windows, we're back to a 5-minute wait.
+
+**My recommendation is still 1 minute,** unless prod Airflow can't handle it. That's open item #3 on the list, and if it fails, every 2 minutes is the fallback.
+
+Should I keep 1 minute in the design?
+
+The publication-time pattern comes from only three observations, and I haven't checked prod Airflow capacity.
+
+## 17:28 user (apac-tsdb-scraper)
+
+I see. Anything we can probe on now locally to answer our questions?
+
+## 17:28 assistant (apac-tsdb-scraper)
+
+Checking what the earlier probe data and the repos already tell us before running anything new.
+
+## 17:29 assistant (apac-tsdb-scraper)
+
+Some of the questions are already answered by data and code we have. The others need VPN, or someone outside the team.
+
+## Already answered locally
+- **IEX rate limits: likely fine.** The Oct 8 watcher polled IEX once a minute for about an hour with **0 failures**. One call also returns national plus all 13 regional prices (same endpoint, `Product_Code=3`), so the new DAG needs **1 call a minute**, not 2. That's not a documented limit, but it's a real hour of 1-minute polling without problems.
+- **Grafana refresh: confirmed missing.** The RTM dashboards in `smp-dashboard` (`iex_tsdb_expanded*.json`) have `refresh: ''` and no query caching. So we need to add a 1-minute refresh, and there's no cache to worry about.
+- **Something else reads this data:** `smp-dashboard/alerts/scr-1244/rtm_price.sql` and `scripts/rtm_alert_poc.py` read the RTM data. The design keeps the parquet format unchanged, so they shouldn't break, but they're on the list to check.
+- **Athena delay: probably just query time.** The table reads the S3 folder directly, with no load step. One timed query would confirm it.
+
+## Can probe now, but needs VPN
+Both AWS profiles' credentials have expired, so you'd need to refresh them on VPN. It's about 15:00 IST, so a watch would catch the :11 and :41 publication windows.
+1. **More publication-time samples:** a **35-minute** IEX watch, with a fixed end time. This tests the ":11–:16 / :41–:46" pattern behind the "poll every minute only in windows" option. Skip it if you're keeping plain 1-minute polling, because that option doesn't depend on the pattern.
+2. **Athena delay:** one timed query on the RTM table. This takes seconds.
+
+## Can't probe from here
+- **TSDB write permission** for the SMP service app on the `iex_api` RTM series. This needs a test write with credentials that live in Airflow, or a question to the TSDB platform team. It's the biggest risk, so I'd ask them now.
+- **Prod Airflow capacity** for 1,440 runs a day. That's for whoever runs the platform, or a look at the worker and pool settings in the prod Airflow UI.
+
+Should I prepare a VPN script that does #2 only (about a minute), and draft the message to the TSDB team about write access?
+
+I didn't run anything live, because the credentials have expired. The "rate limits are fine" conclusion rests on one hour of polling, not on anything IEX has published.
+
+## 17:31 user (apac-tsdb-scraper)
+
+yes, prep the script and draft the message
+
+And pls keep this in global memory, that whenever there's something you wanted to clarify either: write an ephemeral script that you can run yourself to see and find out OR if something within the vpn is needed, handover a script so I can run once inside.
+
+## 17:31 assistant
+
+Writing the VPN script now. It's a self-contained heredoc, so nothing gets added to the repo. I'll dry-run it here to check it gets as far as authentication.
+
+## 17:32 assistant (apac-tsdb-scraper)
+
+The script runs and stops at authentication with an expired token, which is expected. Now saving your preference to global memory.
+
+## 17:32 assistant (apac-tsdb-scraper)
+
+Missing newline merged two lines; fixing.
+
+## 17:32 assistant (apac-tsdb-scraper)
+
+Both are ready below. I also added your probing preference to your global `~/.claude/CLAUDE.md`, so it applies in every project.
+
+## VPN script (stops itself after 90 seconds, read-only)
+
+This refreshes the `smp_india_prod` credentials, then checks two things. First, it compares the newest national RTM price timestamp in the S3 parquet with what Athena returns. Matching values mean Athena isn't lagging behind S3. Second, it times one Athena query.
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem" REQUESTS_CA_BUNDLE="$PWD/certs.pem" SSL_CERT_FILE="$PWD/certs.pem"
+
+.venv/bin/daccli cdh get_credential --use-profile smp_india_prod --aws-profile smp_india_prod --save
+
+# Read-only, stops after 90s: does Athena see the current S3 RTM snapshot, and how long does a query take?
+.venv/bin/python -I - <<'PY'
+import io, signal, time
+import boto3, pandas as pd
+from botocore.config import Config
+
+signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('90s limit')))
+signal.alarm(90)
+SERIES = '6ef8d9b6-971b-501f-9cd0-f151f96c9d55'  # national RTM price
+BUCKET, KEY = 'cdh-smpdatasourceprod-337381', 'india_iex_tsdb_expanded/latest/india_iex_tsdb_expanded_rtm_latest.parquet'
+DB, TABLE = 'smpdatasourceprod', 'india_iex_tsdb_expanded_latest'
+s = boto3.Session(profile_name='smp_india_prod', region_name='eu-west-1')
+cfg = Config(connect_timeout=5, read_timeout=15, retries={'max_attempts': 1})
+
+assert s.client('sts', config=cfg).get_caller_identity()['Account'] == '046847230914', 'wrong account'
+obj = s.client('s3', config=cfg).get_object(Bucket=BUCKET, Key=KEY)
+df = pd.read_parquet(io.BytesIO(obj['Body'].read()))
+s3_max = pd.to_datetime(df.loc[df.series_id.astype(str) == SERIES, 'insertion_date'], utc=True).max()
+print(f'S3 last modified : {obj["LastModified"]}')
+print(f'S3 max insertion : {s3_max}')
+
+athena = s.client('athena', config=cfg)
+groups = [g['Name'] for g in athena.list_work_groups()['WorkGroups'] if g['State'] == 'ENABLED']
+print('Workgroups:', groups)
+sql = f"SELECT max(insertion_date) AS max_ins, count(*) AS n FROM {TABLE} WHERE series_id = '{SERIES}'"
+last_err = None
+for wg in groups:  # ponytail: first workgroup that runs the query wins
+    try:
+        qid = athena.start_query_execution(QueryString=sql, QueryExecutionContext={'Database': DB}, WorkGroup=wg)['QueryExecutionId']
+    except Exception as exc:
+        last_err = f'{wg}: {type(exc).__name__}'; continue
+    t0 = time.monotonic()
+    while (q := athena.get_query_execution(QueryExecutionId=qid)['QueryExecution'])['Status']['State'] in ('QUEUED', 'RUNNING'):
+        time.sleep(0.5)
+    wall = time.monotonic() - t0
+    if q['Status']['State'] != 'SUCCEEDED':
+        last_err = f"{wg}: {q['Status'].get('StateChangeReason', q['Status']['State'])}"; continue
+    rows = athena.get_query_results(QueryExecutionId=qid)['ResultSet']['Rows']
+    st = q['Statistics']
+    print(f'Workgroup        : {wg}')
+    print(f'Athena max_ins/n : {[c.get("VarCharValue") for c in rows[1]["Data"]]}')
+    print(f'Query wall time  : {wall:.1f}s (queue {st.get("QueryQueueTimeInMillis")}ms, engine {st.get("EngineExecutionTimeInMillis")}ms)')
+    break
+else:
+    print('Athena query failed in every workgroup; last error:', last_err)
+PY
+SH
+```
+
+Paste the output here when it's done.
+
+## Message to the TSDB platform team
+
+```text
+Hi team! Quick question on write access.
+
+We're moving the IEX RTM scraper (national + regional, source iex_api) out of the apac-tsdb-scraper Lambda and into SMP India's Airflow, polling every minute so traders get RTM prices within ~5 min of IEX publishing them.
+
+That means the SMP service app (the Okta client SMP India Airflow already uses for TSDB) would start writing to the existing iex_api RTM series instead of the solaris-apac writer:
+- national RTM: price, volume bid purchase/sell, volume cleared
+- regional RTM (13 areas): price, volume bid purchase/sell
+
+Can you confirm:
+1. Does our client have write rights on those series in UAT and prod? If not, what's needed to grant them?
+2. Any issue with both writers submitting the same series for a short overlap during cutover? We only write changed values.
+3. Any rate/volume guidance for ~1 write attempt per minute?
+
+Thanks!
+```
+
+I couldn't run the Athena part myself because the credentials have expired. It only got as far as the authentication check. If none of the Athena workgroups accept the query, the script prints the last error instead of a timing. You'll need to add the TSDB team's channel or contact name to the message, since I don't know who they are.
+
+## 17:34 user (apac-tsdb-scraper)
+
+for the tsdb permissions, can't we also include that in the probe to see if we have the necessary access? Although I wanna say yesssss as we have other dags that write to tsdb
+
+## 17:34 assistant
+
+Good question. The other DAGs write to series SMP created itself, so they don't settle whether SMP can write to series another team owns. Checking whether the TSDB SDK can tell us without actually writing.
+
+## 17:34 assistant
+
+Still digging. I found that SMP already publishes IEX bid-stack data to TSDB (`india_iex_bid_stack_dag`). If those series belong to the same `iex_api` provider, that answers the question.
+
+## 17:35 assistant (apac-tsdb-scraper)
+
+Yes, a read-only version can go in the probe. One caveat first: **TSDB checks write rights per provider, not per series.** Writes go through the provider's Kafka topic, and the SDK has no way to test a write without making one. Your other DAGs (HPX, Darwin, Khavda) write to providers SMP owns, so they don't prove anything about `iex_api`.
+
+**But `india_iex_bid_stack_dag` might.** It already publishes IEX bid-stack series (`apac_in_iex_volume_bid_*_RTM`). The probe looks up the provider, source, scraper and owner of:
+- the RTM price series we want to write
+- one bid-stack series SMP already writes
+
+It also checks when the bid-stack series was last written in prod.
+- **Same provider and recent bid-stack writes:** we almost certainly have write access, and the TSDB message can wait.
+- **Different provider:** send the message.
+
+The only definitive test is a real write. That will happen naturally with the new DAG's first UAT publish, which stays off behind a flag like HPX's.
+
+## Combined VPN script (two checks, each stops after 90 seconds, read-only)
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem" REQUESTS_CA_BUNDLE="$PWD/certs.pem" SSL_CERT_FILE="$PWD/certs.pem"
+
+.venv/bin/daccli cdh get_credential --use-profile smp_india_prod --aws-profile smp_india_prod --save
+.venv/bin/daccli cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+
+echo '=== 1. Athena vs S3 ==='
+.venv/bin/python -I - <<'PY' || true
+import io, signal, time
+import boto3, pandas as pd
+from botocore.config import Config
+
+signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('90s limit')))
+signal.alarm(90)
+SERIES = '6ef8d9b6-971b-501f-9cd0-f151f96c9d55'  # national RTM price
+BUCKET, KEY = 'cdh-smpdatasourceprod-337381', 'india_iex_tsdb_expanded/latest/india_iex_tsdb_expanded_rtm_latest.parquet'
+DB, TABLE = 'smpdatasourceprod', 'india_iex_tsdb_expanded_latest'
+s = boto3.Session(profile_name='smp_india_prod', region_name='eu-west-1')
+cfg = Config(connect_timeout=5, read_timeout=15, retries={'max_attempts': 1})
+
+assert s.client('sts', config=cfg).get_caller_identity()['Account'] == '046847230914', 'wrong account'
+obj = s.client('s3', config=cfg).get_object(Bucket=BUCKET, Key=KEY)
+df = pd.read_parquet(io.BytesIO(obj['Body'].read()))
+s3_max = pd.to_datetime(df.loc[df.series_id.astype(str) == SERIES, 'insertion_date'], utc=True).max()
+print(f'S3 last modified : {obj["LastModified"]}')
+print(f'S3 max insertion : {s3_max}')
+
+athena = s.client('athena', config=cfg)
+groups = [g['Name'] for g in athena.list_work_groups()['WorkGroups'] if g['State'] == 'ENABLED']
+print('Workgroups:', groups)
+sql = f"SELECT max(insertion_date) AS max_ins, count(*) AS n FROM {TABLE} WHERE series_id = '{SERIES}'"
+last_err = None
+for wg in groups:  # first workgroup that runs the query wins
+    try:
+        qid = athena.start_query_execution(QueryString=sql, QueryExecutionContext={'Database': DB}, WorkGroup=wg)['QueryExecutionId']
+    except Exception as exc:
+        last_err = f'{wg}: {type(exc).__name__}'; continue
+    t0 = time.monotonic()
+    while (q := athena.get_query_execution(QueryExecutionId=qid)['QueryExecution'])['Status']['State'] in ('QUEUED', 'RUNNING'):
+        time.sleep(0.5)
+    wall = time.monotonic() - t0
+    if q['Status']['State'] != 'SUCCEEDED':
+        last_err = f"{wg}: {q['Status'].get('StateChangeReason', q['Status']['State'])}"; continue
+    rows = athena.get_query_results(QueryExecutionId=qid)['ResultSet']['Rows']
+    st = q['Statistics']
+    print(f'Workgroup        : {wg}')
+    print(f'Athena max_ins/n : {[c.get("VarCharValue") for c in rows[1]["Data"]]}')
+    print(f'Query wall time  : {wall:.1f}s (queue {st.get("QueryQueueTimeInMillis")}ms, engine {st.get("EngineExecutionTimeInMillis")}ms)')
+    break
+else:
+    print('Athena query failed in every workgroup; last error:', last_err)
+PY
+
+echo '=== 2. TSDB ownership: RTM targets vs SMP bid-stack ==='
+.venv/bin/python -I - <<'PY'
+import json, os, signal, tomllib
+from pathlib import Path
+import boto3, pandas as pd
+
+signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('90s limit')))
+signal.alarm(90)
+from engie_tsdb.catalog import Config, Timeseries
+from engie_tsdb.data import read_ts
+
+s = boto3.Session(profile_name='dac_cdh_solarisapac_48380', region_name='eu-west-1')
+secret = [REDACTED]'secretsmanager').get_secret_value(SecretId='cdh_solarisapac_48380_23a1bb-secret')['SecretString'])
+client = tomllib.loads(Path('lambda_step_prod/src/sfw_config.toml').read_text())['solaris']['scrapers']['iex']['intact_catalog_client_id']
+Config.set(catalog_endpoint='prod', client_name='scr-1284-access-probe', intact_client=client,
+           intact_secret=[REDACTED]'intact_catalog_client_secret'], okta_cache_folder=None,
+           ssl_verify=os.getenv('REQUESTS_CA_BUNDLE') or True, catalog_cache_size=0, catalog_retries=1,
+           log_level='ERROR', read_data_methods=['api', 'athena'])
+
+def tn(o):
+    return getattr(o, 'technical_name', None) or getattr(o, 'name', None) or str(o)
+
+SERIES = {
+    'national RTM price  (to write)': '6ef8d9b6-971b-501f-9cd0-f151f96c9d55',
+    'N2 RTM price        (to write)': '93c5a55c-c97b-515f-94d1-fa4f0504e188',
+    'bid-stack RTM sell  (SMP writes)': '31abe5e9-13f1-5503-8eec-0668ed4e3628',
+}
+for label, sid in SERIES.items():
+    ts = Timeseries.get(sid)
+    print(f'{label}: provider={tn(ts.provider)} source={tn(ts.source)} scraper={tn(ts.scraper)} owner={tn(ts.owner)}')
+
+now = pd.Timestamp.now(tz='UTC')
+bid = read_ts(timeseries=[Timeseries.get(SERIES['bid-stack RTM sell  (SMP writes)'])],
+              start_application_date=now - pd.Timedelta(days=3), end_application_date=now + pd.Timedelta(days=1),
+              columns=['*'], drop_duplicates=False, max_rows=50_000)
+latest = pd.to_datetime(bid['insertion_date'], utc=True).max() if 'insertion_date' in bid else None
+print(f'bid-stack RTM latest prod insertion: {latest}  (rows={len(bid)})')
+PY
+SH
+```
+
+Paste the output here when it's done. Hold the TSDB message until then. If the providers match, we may not need to send it.
+
+I could only run both checks up to the point where the expired credentials stopped them. The lookups by series ID and the SDK calls are checked against the installed `engie_tsdb`. Even if the providers match, that's strong evidence of write access, not proof. The real proof is the first UAT write.
+
+## 17:44 user (apac-tsdb-scraper)
+
+done, check the output
+
+## 17:44 assistant
+
+Here's what the output shows.
+
+**1. TSDB write access: very likely yes.**
+
+| Series | Provider | Source |
+|---|---|---|
+| National and N2 RTM price (to write) | `iex` | `iex_api` |
+| Bid-stack RTM (SMP already writes) | `iex` | `iex_website` |
+
+- **Same provider.** TSDB writes go through the provider's Kafka topic, so SMP already writes to the `iex` provider. All three series also have the same owner.
+- **The bid-stack write is live and fresh:** the latest prod insertion was today at 09:30:53Z (15:00 IST), 382 rows. `apac-tsdb-scraper` doesn't reference these series, so the writer is most likely SMP's `india_iex_bid_stack_dag`.
+- **Remaining gap:** permissions can also be scoped by source (the SDK's `AccessRight` has a `source` field), and ours is `iex_website`, not `iex_api`. The first UAT publish settles that. **I'd hold the TSDB message** and only send it if that write fails.
+
+**2. Athena: not measured, and that's my fault.**
+- S3 is current: the snapshot was written at 09:30:36Z and its newest insertion is from 09:30:15Z. The current DAG is behaving as expected.
+- My "try each workgroup" loop wasn't filtered to SMP. It sent the SELECT query to other teams' workgroups in the shared CDH account. Every attempt failed with access denied, so nothing ran, but it shouldn't have tried. The listing also only returned the first page of 50, so SMP's workgroup wasn't in it.
+
+Here's the fix. It runs only on workgroups with `smp` in the name, stops after 60 seconds, and reuses the credentials you just refreshed:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem"
+.venv/bin/python -I - <<'PY'
+import signal, time, boto3
+signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('60s limit'))); signal.alarm(60)
+a = boto3.Session(profile_name='smp_india_prod', region_name='eu-west-1').client('athena')
+wgs = [g['Name'] for p in a.get_paginator('list_work_groups').paginate() for g in p['WorkGroups']
+       if g['State'] == 'ENABLED' and 'smp' in g['Name'].lower()]
+print('SMP workgroups:', wgs)
+sql = ("SELECT max(insertion_date), count(*) FROM india_iex_tsdb_expanded_latest "
+       "WHERE series_id = '6ef8d9b6-971b-501f-9cd0-f151f96c9d55'")
+for wg in wgs:
+    try:
+        qid = a.start_query_execution(QueryString=sql, QueryExecutionContext={'Database': 'smpdatasourceprod'}, WorkGroup=wg)['QueryExecutionId']
+    except Exception as e:
+        print(wg, type(e).__name__); continue
+    t0 = time.monotonic()
+    while (q := a.get_query_execution(QueryExecutionId=qid)['QueryExecution'])['Status']['State'] in ('QUEUED', 'RUNNING'):
+        time.sleep(0.5)
+    st = q['Status']
+    if st['State'] != 'SUCCEEDED':
+        print(wg, st.get('StateChangeReason', st['State'])); continue
+    row = a.get_query_results(QueryExecutionId=qid)['ResultSet']['Rows'][1]['Data']
+    print(f"{wg}: max_ins/n={[c.get('VarCharValue') for c in row]} wall={time.monotonic()-t0:.1f}s "
+          f"queue={q['Statistics'].get('QueryQueueTimeInMillis')}ms engine={q['Statistics'].get('EngineExecutionTimeInMillis')}ms")
+    break
+PY
+SH
+```
+
+If its `max_ins` shows 09:30:15 (or a later :00/:30 run), Athena is seeing the current S3 file with no lag.
+
+I'm inferring that SMP wrote the bid-stack rows from the timing and the absence of any other writer in the code. To confirm, check that `INDIA_IEX_BID_STACK_TSDB_PUBLISH_ENABLED` is on in prod Airflow. If no workgroup name contains `smp`, the fix will print an empty list and I'll need the workgroup name from the Grafana Athena datasource.
+
+## 17:51 user
+
+error lol. read terminal pls
+
+## 17:51 assistant
+
+That's my bug: this botocore version can't paginate `list_work_groups`. The credentials are fresh now, so I'll page through manually and run it myself.
+
+## 17:52 assistant (apac-tsdb-scraper)
+
+I fixed the bug and ran the check myself, since the credentials you'd just refreshed were still valid. **Athena adds no lag.**
+
+- In SMP's own workgroup (`cdh_smpcdhindiaprod_53443`), Athena returns 09:30:15 as the newest insertion. That's exactly what the S3 file holds, so Athena reads the current snapshot directly.
+- The query took **1.3 seconds** (57ms queueing, 438ms running).
+- The `smp` name filter also matched `cdh_prodvatpsmpintergration_53385`, which I tried first. It was refused with access denied before the right one succeeded, so nothing ran there.
+
+**Where the open questions stand:**
+
+| Question | Answer |
+|---|---|
+| IEX rate limits | Likely fine: 1 call a minute, and an hour of 1-minute polling had 0 failures |
+| TSDB write access | Very likely: we write to the same `iex` provider for bid-stack. The first UAT publish will confirm it |
+| Delay from S3 to Athena | Effectively none (about 1s) |
+| Grafana refresh | Not set yet. We'll add a 1-minute refresh |
+| Prod Airflow capacity for a 1-minute DAG | **Still open.** This is the only real unknown left |
+
+So the worst case is about 2–3 minutes from IEX to Grafana, comfortably under the 5-minute limit. I've added these results to the SCR-1284 memory.
+
+**Next:** one decision is still open from the design, on whether to include regional RTM. I'd say yes, since the same IEX call already returns the 13 regions, and it lets us retire both Lambda RTM scrapers. Want me to start building the DAG on that basis?
+
+I didn't check prod Airflow worker and pool capacity, and I didn't confirm that `INDIA_IEX_BID_STACK_TSDB_PUBLISH_ENABLED` is on in prod. That flag is what makes the bid-stack evidence for write access hold.
+
+## 17:53 user (apac-tsdb-scraper)
+
+yes, include regional and start the DAG. TDD, pair program with codex, and then once fully tested and green, commit and push with scope: scr-1284
+
+## 17:55 assistant (smp-india)
+
+I've finished reading the existing code. Next I'm writing the failing tests, starting with collection (the IEX parsing and series mapping).
+
+## 17:56 assistant (smp-india)
+
+Writing the collection tests now (the red step).
+
+## 17:56 assistant (smp-india)
+
+The tests fail as expected because the module doesn't exist yet. I'm handing the tests to Codex for review in the background and writing the implementation meanwhile.
+
+## 17:57 assistant (smp-india)
+
+Collection is green: 18 tests pass. Next comes publication (TSDB write with read-back, off by default behind a flag). Checking the shared result shape first:
+
+## 17:58 assistant (smp-india)
+
+Publication is green too: 29 tests across both modules. Next is the DAG test, modelled on the existing RTM DAG test.
+
+## 17:58 assistant (smp-india)
+
+Red as expected. Implementing the config, orchestration and DAG:
+
+## 17:59 assistant (smp-india)
+
+Everything is green: 38 tests. Codex's review of the tests is still running. Meanwhile I'm running lint, the full suite with coverage, and the docs and catalogue checks.
+
+## 17:59 assistant (smp-india)
+
+Catalogue updated. Running the full suite with the coverage gate now:
+
+## 17:59 assistant (smp-india)
+
+The test file names clash with HPX's `test_collection.py` and `test_publication.py`. The bid-stack test folder avoids that with an `__init__.py`, so I'll do the same.
+
+## 18:00 assistant (smp-india)
+
+The DAG parses with no import errors. One more real check: running the new `collect()` against the live IEX API for the full window. This is read-only, with no TSDB writes.
+
+## 18:00 assistant (smp-india)
+
+The live run works: **1,204 observations, 43 series (4 national + 39 regional), 28 blocks, fetched and mapped in 0.9s.** Now I'm asking Codex to review the full implementation before I commit.
+
+## 18:08 assistant (smp-india/dags/src/scripts)
+
+`smp_common` already has a bulk reader (`TsdbBatchIO` / `run_measured_batch`), which is what the bid-stack DAG uses to avoid per-series round trips. Reading how it's used:
+
+## 18:13 assistant (smp-india/dags/src/scripts)
+
+The timing run has gone past 5 minutes. That's a warning sign in itself, so I've moved it to the background. Meanwhile I'm fixing the clear-cut findings, starting with the tests.
+
+## 18:13 assistant (smp-india)
+
+Red in exactly the 3 expected places. Fixing the implementation:
+
+## 18:13 assistant (smp-india)
+
+Collection is green again with 27 tests. Checking the TSDB timing run:
+
+## 18:14 assistant (smp-india)
+
+No output yet, because the pipe only prints at the end. Running a smaller version that prints each step as it happens, to see where the time goes:
+
+## 18:18 assistant (smp-india)
+
+The DAG tests fail as expected. Applying the DAG changes:
+
+## 18:19 assistant (smp-india)
+
+Everything is green: **1,008 passed, coverage 91.29%**, ruff and the docs/catalogue checks pass. Second pairing round: Codex re-reviews the fixes before I commit.
+
+## 18:23 assistant (smp-india)
+
+The Codex run failed with a 403 from its own backend. Retrying once:
+
+## 18:23 assistant (smp-india)
+
+Failed to authenticate. API Error: 403 Internet Security by Zscaler
+
+## 18:26 user (smp-india)
+
+sorry I had to connect to vpn. Try again with codex?
+
+## 18:33 assistant (smp-india)
+
+Confirmed: `Variable.set` logs `AirflowRuntimeError` and carries on. I'll make `save_state` read the value back and raise if it didn't stick. Tests first:
+
+## 18:33 assistant (smp-india)
+
+Green with 19 tests. Final full run before committing:
+
+## 18:33 assistant (smp-india)
+
+**1,010 passed, coverage 91.29%,** all checks green. Fetching `origin` and checking that `dev` can fast-forward before committing:
+
+## 18:34 assistant (smp-india)
+
+`dev` matches `origin/dev`. Committing in three logical steps, each green on its own:
+
+## 18:35 assistant (smp-india)
+
+The new DAG, `india_iex_rtm_realtime_dag`, is built, tested and pushed to `dev` as three `scr-1284` commits (`9c038e1..5c8e845`). All 1,010 tests pass and coverage is 91.29%. I didn't wait for the CI run on the push.
+
+**What it does**
+- **Every minute (IST)** it fetches the national RTM figures and all 13 areas from IEX in one call, about 1 second. It asks for a fixed window from 6 hours back to 2 hours ahead. The old scraper guessed publication times and missed Adrien's 10:41 example by 4 minutes; this window doesn't.
+- **It writes only changed values to TSDB**, then reads them back to confirm they landed. If IEX returns exactly what was last published, it skips TSDB entirely, which is most minutes.
+- **It rebuilds the existing RTM CDH file only when there's new data,** with the same parquet, filename and asset as the old DAG, so Grafana and Athena need no changes.
+- **It's safe by default:** paused on creation, and TSDB writes stay off until an Airflow flag is turned on.
+
+**Verified against live sources:**
+- A run of the new collector against the IEX API returned 1,204 rows across 43 series.
+- Athena reflects S3 with no lag; queries take about 1.3s.
+
+**Pairing with Codex:** it reviewed three times and found 8 real defects, all fixed with tests:
+- a CDH refresh that never retried after a failure, including when the task timed out
+- `Variable.set` failing silently
+- tasks with no timeout, which could stall the every-minute polling
+- slow one-series-at-a-time TSDB reads
+- fractional block numbers landing on the wrong 15-minute block
+
+I didn't fix one minor issue: if someone turns CDH publishing off and back on, the snapshot can stay stale for up to about 30 minutes. Fixing it would make deployments with CDH off refresh every minute forever. There's a comment in the code explaining this.
+
+**Before it goes live:**
+1. **The platform team needs to add the IEX API token** as an environment variable, `INDIA_IEX_API_TOKEN`, through the Kubernetes secret. The DAG can't run until this exists.
+2. **Turn on the Airflow Variable `INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED`** and unpause the DAG. The first write is also the definitive test of TSDB write access.
+3. **At cutover, pause `india_iex_tsdb_expanded_rtm_dag`.** Otherwise its 30-minute snapshot can overwrite the newer one.
+4. **Set a 1-minute refresh on the RTM dashboards** in `smp-dashboard`. They currently have no auto-refresh.
+5. **Retire the two RTM scrapers in the `apac-tsdb-scraper` Lambda** (`iex_api_national_rtm` and `iex_api_rtm`).
+
+**Two risks remain:**
+- **The 5-minute target can only be measured in prod.** The shared exporter always reads prod TSDB, so QA's snapshot shows prod values.
+- **Two numbers are estimates, not measured:** how long TSDB writes take, and whether prod Airflow can handle a DAG running every minute. My shell can't reach the TSDB catalog, so I couldn't time them.
+
+## 21:16 user (smp-india)
+
+tell me, did you spawn any subagents while you were doing that?
+
+## 21:16 assistant (smp-india)
+
+Yes, five, all of the same type: `codex:codex-rescue`. Each one is a thin Claude subagent that hands one prompt to Codex and returns Codex's answer. That's how I paired with Codex, since you'd asked for it. I spawned no other kind of agent.
+
+| # | Purpose | Outcome |
+|---|---|---|
+| 1 | Review the collection tests before the code existed (ran in the background) | Completed; its suggested test gaps were added |
+| 2 | Review the full implementation | Completed; found 5 issues |
+| 3 | Re-review the fixes | Failed: the Codex backend returned a 403 |
+| 4 | Retry of #3 | Failed: blocked by Zscaler before reaching Codex (you were off VPN) |
+| 5 | Re-review after you reconnected to VPN | Completed; found 3 more issues |
+
+So three reviews actually ran. #3 and #4 were lost to network and auth errors.
+
+Two related things:
+- **#1 kept running after it reported back.** It first returned saying Codex was still working, then finished separately.
+- **One background shell command (not a subagent)** was my bulk-vs-serial TSDB timing run. It hung because my shell couldn't reach the TSDB catalog, so I killed it. That's also why the TSDB write timing is still unmeasured.
+
+## 21:18 user (smp-india)
+
+I see. Back to the thing. How to test again?
+
+## 21:18 assistant (smp-india)
+
+Here's how to test it, in three layers. I'll run the first two myself now that you're on VPN.
+
+1. **Unit tests** (offline): the 74 focused tests plus the full suite.
+2. **A local Airflow run against live IEX:** `airflow dags test` with the IEX token from the apac secret and publishing **off**. It collects for real, then the publish step skips and the CDH steps are skipped too. No writes anywhere.
+3. **airflow-dev or QA,** which needs the token deployed and the flag turned on. That one's yours, below.
+
+## 21:18 assistant (smp-india)
+
+The tests passed (55 focused), but the DAG run printed nothing my filter matched. Looking at its raw output:
+
+## 21:18 assistant (smp-india)
+
+The scratch Airflow home needs its metadata database created first. Migrating it, then rerunning:
+
+## 21:19 assistant (smp-india)
+
+The local Airflow run works:
+
+| Step | Result |
+|---|---|
+| `collect_and_publish` | Fetched live IEX data, then **skipped** with "TSDB publication disabled by INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED". This is correct, because the flag is off by default |
+| CDH tasks | Skipped |
+| DAG run | **Success in 7s,** with no writes anywhere |
+
+The 55 focused unit tests also passed. Together that covers everything I can test from here. The rest needs a deployed environment.
+
+**Testing in dev or QA (writes to UAT TSDB):**
+1. **Platform team:** add `INDIA_IEX_API_TOKEN` as an env var through the Kubernetes secret. The value is `iex_api_password` from `cdh_solarisapac_48380_23a1bb-secret`. Without it, the task fails with "INDIA_IEX_API_TOKEN is required".
+2. **Airflow UI → Admin → Variables:** set `INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED` = `true`.
+3. **Trigger the DAG manually.** Dev has no schedule, because `stage_cron` returns none there. Expect:
+   - In the `collect_and_publish` log, `IEX RTM TSDB publication {... 'written_row_count': N}` with N > 0, plus an `IEX_RTM_REALTIME_TSDB_TIMING` line. **That line is the TSDB write timing we couldn't measure.**
+   - The refresh, upload and end tasks succeed. The first successful write also confirms we have write access.
+4. **Trigger it again straight away:** it should report `unchanged-source`, and the CDH tasks should be skipped.
+5. **For the every-minute behaviour and Airflow load,** unpause it in **QA**, which has the schedule, and watch for an hour.
+
+**Testing in prod (the 5-minute target):** unpause with the flag on, leaving the Lambda running alongside. Then compare when IEX first shows a block with when S3 gets updated, using the existing `probe_rtm_latency.py watch` plus the S3 timestamp check. I can bundle both into one VPN script when you're there.
+
+Should I draft the request to the platform team for step 1? It's the only real blocker.
+
+## 21:33 user (smp-india)
+
+wait... we are the platform team ha lol. 
+
+For API TOKEN, why kubernetes instead of Airflow var?
+
+## 21:34 assistant
+
+Ha, fair enough. Then step 1 is just you doing it.
+
+**Why I picked Kubernetes:** I followed this repo's own credential guide, `test_lorenz_dag/README.md`, step 4. It says to read secrets from env vars and have them exposed through a Kubernetes secret. The SMP TSDB credentials are wired that way too. I didn't weigh it against the alternative, and I should have.
+
+**An Airflow Variable is the better fit here,** and the repo already does it. `india_iex_tsdb.py` reads its TSDB credentials from an Airflow Variable first (`INDIA_IEX_TSDB_OKTA_CLIENT_SECRET`) and falls back to the env var.
+
+| | Airflow Variable | Kubernetes secret (env) |
+|---|---|---|
+| Set up per environment | Airflow UI, no deploy | Helm/secret change and a redeploy |
+| Rotating the token | Edit in the UI | Redeploy |
+| Masked in logs and UI | Yes. The name contains `TOKEN`, so Airflow masks it automatically | Yes, once it's read |
+| Who can see it | Anyone with Variable read access in that Airflow | Cluster admins only |
+
+The only real argument for Kubernetes is that last row. That only matters if your Airflow UI users shouldn't see the IEX token, and the same people already see the TSDB secret in Variables. I didn't find a secrets backend (AWS Secrets Manager) configured in these repos, so Variables live in Airflow's metadata DB.
+
+**Suggestion:** match `resolve_tsdb_credentials`. Read Airflow Variable `INDIA_IEX_API_TOKEN` first, then fall back to the env var. That's a few lines plus a test. It also means you can test in dev today by setting two Variables, with no deploy.
+
+Should I make that change and push it as a fourth `scr-1284` commit?
+
+## 21:36 user
+
+yes, switch to airflow var and push. promote to qa and prod immediately pls! Then spit back the steps I'd take in Airflow to test, concisely!
+
+## 21:36 assistant
+
+Making the change, then checking how this repo does promotions before I touch `qa` and `prod`.
+
+## 21:36 assistant (smp-india)
+
+`qa` and `prod` are identical, and `dev` is 17 commits ahead with no divergence, so promotion is a clean fast-forward. But 17 is more than my 3 commits. Checking what else would ship:
+
+## 21:36 assistant (smp-india)
+
+That second test is clumsy. Simplifying it before implementing:
+
+## 21:37 assistant (smp-india)
+
+The tests are green. Running the full checks, then commit and push:
+
+## 21:38 assistant (smp-india)
+
+Pushed to `dev`. Now promoting by fast-forward only, so nothing gets rewritten: `dev → qa`, then `qa → prod`.
+
+## 21:39 assistant (smp-india)
+
+All three branches are at `943b008`. Checking that the deploy pipelines started:
+
+## 21:39 assistant
+
+Done: the IEX token now comes from an Airflow Variable, and `dev`, `qa` and `prod` are all at `943b008`.
+
+- **Token:** read from Airflow Variable `INDIA_IEX_API_TOKEN` first, with the env var of the same name as a fallback. That's the same pattern as the TSDB credentials. It's a fourth `scr-1284` commit; 1,012 tests pass.
+- **Promotion:** fast-forward only, nothing rewritten. CI was still running on `dev`, `qa` and `prod` when I last checked. I haven't waited for it to finish.
+- **Also shipped:** the 14 SCR-1283 Darwin collector CI/docs commits you made earlier today went to prod along with this.
+
+## Testing in Airflow (QA or prod, once CI has deployed)
+
+1. **Admin → Variables:** add
+   - `INDIA_IEX_API_TOKEN`: the `iex_api_password` value from `cdh_solarisapac_48380_23a1bb-secret`
+   - `INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED` = `true`
+2. **Unpause `india_iex_rtm_realtime_dag`.** It starts running every minute. A manual trigger won't run while the DAG is paused.
+3. **Check the first run:** open the `collect_and_publish` log.
+   - `IEX RTM TSDB publication {... 'written_row_count': N}` with N > 0 means write access works.
+   - The `IEX_RTM_REALTIME_TSDB_TIMING` lines give the TSDB write and verify times we couldn't measure.
+   - `refresh_cdh_snapshot`, `upload_output_task` and `end_task` should all be green.
+4. **Check the following minutes:** `collect_and_publish` should finish in seconds with `unchanged-source`, and the CDH tasks should be skipped. Variable `INDIA_IEX_RTM_REALTIME_STATE` shows `cdh_pending: false`.
+5. **Around :11–:16 and :41–:46 IST,** a run should write rows and refresh CDH. The new price should show in Grafana within about 3 minutes (refresh the browser, since auto-refresh isn't set yet).
+6. **Cutover, prod only:** pause `india_iex_tsdb_expanded_rtm_dag`.
+7. **Rollback:** set the publish flag to `false` or pause the new DAG, then unpause `india_iex_tsdb_expanded_rtm_dag`.
+
+QA writes to UAT TSDB, but its CDH snapshot still shows prod values. So QA proves the DAG runs, and **prod** is where the 5-minute target gets measured.
+
+The 1-minute Grafana auto-refresh in `smp-dashboard` and retiring the apac Lambda RTM scrapers are still to do.

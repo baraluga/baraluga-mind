@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-07.
+As of 2026-10-14.
 
 - Back on SMP from 2026-10-01, split roughly 80% SMP and 20% Walnut migration. UNCERTAIN: the source says "SMB"; read as SMP from context.
 - Owns SMP infrastructure and deployment. As of 2026-09-18 only he or [[joyce]] could build and push Airflow Docker images, and it was still manual. He is requesting the roles needed for a GitHub pipeline that automates Airflow and Grafana image deployment; ticket 507 was waiting on his role requirements as of 2026-10-05.
@@ -10,6 +10,7 @@ As of 2026-10-07.
 - Point person for India proxy escalation, first with Nilo and then directly with Frederik.
 - Core reviewer: SMP dev, QA, and prod merges require approval from [[brian-peralta]] or Michael.
 - Pending: a knowledge-transfer walkthrough of the India DAGs for Lou with Brian, a JupyterLab demo with Eric, and a Loki demo with Jeka.
+- Made the first Khaba CSV parsing fix for `SCR-1288` by forcing pandas not to treat the first data column as an index. Follow-up hardening added regression coverage and clearer errors around the same issue.
 
 ## Background
 
@@ -25,6 +26,7 @@ Role changes only. Detail stays in the sources.
 - 2026-07-07: named lead for GitHub reorganization; 2026-07-08 execution lead for the Walnut migration, with 0.5 allocation to the AWS migration.
 - 2026-07-15: dropped to ceremonies-only on SMP as the remaining budget tightened.
 - 2026-09-30: announced the return to SMP starting 2026-10-01.
+- 2026-10-13: initial Khaba trailing-delimiter parser fix formed the base for later `SCR-1288` hardening.
 
 ## Open Questions
 
@@ -55,6 +57,7 @@ Role changes only. Detail stays in the sources.
 - `sources/meetings/2026-10-05-granola-smp-standup.md`
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
+- `sources/claude-conversations/2026-10-13-claude-smp-e3dc30e8.txt`
 - User clarification on 2026-07-04.
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-14

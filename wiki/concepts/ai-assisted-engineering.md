@@ -2,9 +2,9 @@
 
 ## Current State
 
-As of 2026-10-13, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills for repeated writing or operational workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
+As of 2026-10-14, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
 
-Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 REA work made local reverse engineering available and showed that web-app analysis is feasible, but browser runtime tracing needs a Chrome DevTools debugging port or a deliberately limited fallback through the in-app browser.
+Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 work also showed a practical personal-tooling pattern: Claude mods can expose usage and work-time signals in the prompt/footer UI, while Codex can be used as an adversarial reviewer when Brian or Claude remains the main driver.
 
 ## Background
 
@@ -46,6 +46,9 @@ Human review and workflow controls remain part of the operating model. The curre
 - The September 18 AMA GenAI session captured leadership's current stance: AI decouples output production from junior-skill formation, but there is no clear timeline or role model yet for structural changes. Dimitri committed to direct communication before structural announcements, using productivity gains for backlog/additional tasks before headcount reductions, and preserving junior career paths. Mental-health concerns from AI-driven purpose loss, isolation, and responsibility creep were acknowledged, with Employee Assistance Program resources cited.
 - October 9 Codex setup work installed REA 6.1.0 for local reverse-engineering workflows, configured it as a Codex MCP server with a fixed Node 22.23.3 runtime, installed the matching skill, and installed Hopper 6.6.0 demo for native analysis. MCP discovery reported 138 REA tools and a live JavaScript analysis passed after restarting Codex; native decompilation remained untested and may be limited by Hopper's demo mode.
 - October 12 Claude scratch work showed the practical web-app path for REA-style investigation: static bundle reading can inspect public JavaScript assets, runtime REA tracing requires Chrome launched with a DevTools debugging port, and the in-app browser fallback can read page scripts/network history but not attach REA directly or expose request bodies. The YNAB test became [[ynab-web-app]] evidence.
+- October 13 Claude/Codex setup work found an old Homebrew formula `codex` 0.46.0 shadowing the newer cask 0.162.1. Removing the formula and reinstalling the cask fixed the `model_reasoning_effort = "ultra"` config failure; ripgrep was reinstalled after Homebrew removed it as a dependency. Brian then enabled Homebrew autoupdate for all packages, including Codex.
+- October 13 Claude mod work created two persistent local mods: `usage-band`, which shows session limit usage near the prompt footer, and `work-clock`, which counts engaged Claude work time from a 6am day boundary, asks whether today is a workday, shows `/time` for the current week, and nags after 3h of working time.
+- October 13 SMP collaboration clarified "pair program with Codex": Claude/Brian remains the main driver, while Codex is used for adversarial review. Codex caught a real bug in the Khaba duplicate-resolution logic before the change was committed.
 
 ## Open Questions
 
@@ -69,6 +72,8 @@ Human review and workflow controls remain part of the operating model. The curre
 - UNCERTAIN: Whether the `$estimate-project-time` method should become the default evidence standard for project-effort questions beyond Atlas.
 - UNCERTAIN: What formal change-management or reskilling program will follow the GenAI job-family impact mapping.
 - UNCERTAIN: Whether Hopper demo mode is sufficient for Brian's expected native reverse-engineering tasks, or whether a license or Ghidra/IDA setup is needed.
+- UNCERTAIN: Whether Homebrew autoupdate will be too aggressive for Brian's local toolchain compared with updating only Codex.
+- UNCERTAIN: Whether the Claude usage/work-clock mods should become reusable skills, stay local personal tooling, or be retired after trial.
 
 ## Sources
 
@@ -102,5 +107,8 @@ Human review and workflow controls remain part of the operating model. The curre
 - `sources/meetings/2026-09-18-1500-granola-ama-genai.md`
 - `sources/codex-conversations/2026-10-09-codex-conversations.txt`
 - `sources/claude-conversations/2026-10-12-claude-scratch-3c479f77.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-54bea59b.txt`
+- `sources/claude-conversations/2026-10-13-claude-scratch-75ac0d14.txt`
+- `sources/codex-conversations/2026-10-13-codex-conversations.txt`
 
-Last Updated: 2026-10-13
+Last Updated: 2026-10-14

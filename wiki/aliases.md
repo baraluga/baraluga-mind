@@ -22,7 +22,7 @@ Add a variant only once it is confirmed, by Brian or by unambiguous repeated evi
 - **Khavda** (`india_khavda_generation`): Kavda, Cavda, KAFDA. A different site from Khaba.
 - **Tuticorin**: Tutikarin. Darwin wind site.
 - **Raganesda**: Raganesta. Darwin asset.
-- **Titwha**: Kitty. Darwin asset.
+- **Tithwa**: Titwha, Kitty. Darwin asset.
 
 ## Systems and Terms
 
@@ -39,5 +39,6 @@ Add a variant only once it is confirmed, by Brian or by unambiguous repeated evi
 
 - User clarifications from 2026-07-21 to 2026-08-04, recorded in `sources/notes/*-ingest-handover-clarifications.md`.
 - `sources/claude-conversations/2026-10-11-claude-scratch-50c5d1ab.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-68dedda3.txt`
 
-Last Updated: 2026-10-12
+Last Updated: 2026-10-14

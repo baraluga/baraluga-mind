@@ -1,0 +1,73 @@
+# Claude Conversation - 2026-10-01
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/8ce08f10-6bc0-4bbc-9efe-04ea0036aaac.jsonl`
+Resume: `claude --resume 8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+
+## 23:46 user
+
+already did preliminary work on scr-1274, tested in dev with flying colors, already promoted to QA but haven't tested yet. Although, since I only merged from dev to qa, we shouldn't see anything different.
+
+But I'd like to get your thoughts on it, do you think it's actually done na? Or maybe we missed something?
+
+## 23:47 assistant
+
+I'll pull up the ticket and find the related code.
+
+## 23:47 assistant (smp-india)
+
+Short answer: the code looks done, but the ticket isn't. I'd call it "implemented, not yet accepted." I read the ticket, the runbook and POC notes, the DAG config and the dev/qa branch state. I didn't run anything.
+
+**What's solid**
+- Collection, parsing, readiness and polling logic are covered by tests (105 HPX tests per the runbook), and the scheduled-polling fix (`b7b6ab0`) came from real dev feedback.
+- QA is at `273f2aa` ("Merge dev into qa"), so it contains everything from dev, as you said.
+
+**What's missing**
+1. **TS IDs.** `catalog_mapping.json` is still empty for every market under both `uat` and `prod`. The ticket itself says "need TS ID". Until Mateo's mapping lands, nothing can publish, so the actual deliverable (national prices and volumes in the TSDB) doesn't exist yet.
+2. **Publishing has never run.** `INDIA_HPX_NATIONAL_TSDB_PUBLISH_ENABLED` defaults to false, so dev "flying colors" only covers source collection. Publish, the `verified` readback, and the unchanged-point skip have never run against UAT.
+3. **The Zscaler comment.** Francois commented this morning: "Need to check wit zscaller team to fix that". If that refers to worker egress to `api.hpxindia.com`, it matters for QA and prod. The runbook notes that a local request doesn't verify worker access. Do you know whether your dev worker runs reached HPX, or only your local `airflow dags test`?
+4. **The 13:00 IST transition is unobserved.** Nobody has seen the empty → full change for tomorrow's DAM/GDAM on the real source. Today's 13:00 window has already passed, so the next chance is tomorrow. I'd capture it or let the dev/QA runs log it.
+5. **No Grafana or CDH wiring.** The runbook says there is no dashboard, CDH registration or backfill. Check with Francois whether the ticket needs that.
+
+**Things I'd check on QA before calling it done**
+- **Timezone of the cron.** The runbook says IST ("no time shifts"), but the schedule is plain cron strings like `*/15 13-17,20`. I didn't verify whether `stage_multi_cron` pins `Asia/Kolkata`. If the schedule runs in UTC, the 13:00 polling window is wrong.
+- **Paused state.** Both DAGs are paused on creation. Skipped branches also don't prove full coverage, because the 18:00 and 21:00 final checks are the only real completeness signal.
+
+**Suggested order:** get the Zscaler answer, load Mateo's mapping, enable publishing in UAT and require `verified`, then watch one 13:00 IST cycle in QA before moving the ticket.
+
+Do you want me to check the timezone handling in `stage_multi_cron` next, or draft a QA test checklist?
+
+## 23:50 user (smp-india)
+
+Ah. 
+
+1. Zscaler is misplaced anxiety. Nothing to worry about there. 
+2. Good call on TSDB. Unfortunately, not yet ready, but this is outside our control. 
+
+
+I don’t get the “verified” and 13:00 cycle thing. Do u mean to say we simply leave the dag enabled in QA, maybe over the weekend to see? U mentioned u checking something, pls by all means!
+
+## 23:50 assistant
+
+Timezone is fine: both DAGs pass `timezone="Asia/Kolkata"` explicitly ([india_hpx_national_dags.py:25-31](smp-india/dags/src/india/india_hpx_national_dags.py:25)), so the 13:00 window really is 13:00 IST. I'm dropping that worry.
+
+**What I meant by "verified"**
+
+When publishing is on, the DAG writes the points to the TSDB and then reads them back. The status is `verified` only if the read-back matches what was written. `submitted` means "we sent it", which isn't proof it landed. This only matters once Mateo's IDs exist, so it's blocked and you can ignore it for now.
+
+**What I meant by the 13:00 cycle**
+
+It has nothing to do with the TSDB. It's about the source. We've never watched HPX flip tomorrow's DAM/GDAM data from empty to 96 rows. Our readiness rule ("empty means unready, 96 numeric rows means ready") is inferred from overnight snapshots, so the real transition hasn't been seen. It could pass through a partial or provisional state, and we don't know.
+
+**Do you need to leave QA on over the weekend?**
+
+Not necessarily, and I wouldn't make it a requirement.
+
+- **It's observation, not a gate.** Collection works without publishing, so unpausing the DAMs in QA is harmless. Each run logs `pending` or the block counts, which tells us what the 13:00 transition looks like.
+- **One weekday is enough.** The pattern should be the same every day, so a weekend adds little. If you unpause QA before tomorrow 13:00 IST, you'll see one full cycle, including the 18:00 and 21:00 final checks.
+- **Dev already covers some of it.** Dev is manual, so you could trigger a run around 13:00 IST by hand and watch the same thing without involving QA.
+
+What to check afterwards is simple: did the first complete response come as 96 blocks in one go, or did a partial one appear first? And did the evening reconciliation change any values? If both are clean, the readiness logic is confirmed.
+
+So I'd say the plan is: unpause QA, let one weekday's cycle run, then read the logs. Want me to write a short checklist of what to look at in the logs?

@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-09. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo (on leave in early October), Adrien/Adrian (escalation while Mateo is away), and Lou Dubuisson (incoming point of contact). Validation runs through Francois.
+As of 2026-10-14. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)
@@ -13,12 +13,14 @@ As of 2026-10-09. These are the India data products built on [[smp-platform]]. S
 
 **In flight or pending:**
 - `SCR-1286`: October IEX Green DAM/GDAM gap fix, pushed to [[apac-tsdb-scraper]]. Lou confirmed it works; closure still pending.
-- `SCR-1284`: about 20 minutes of IEX RTM delay to Grafana. The cause is two independent schedules: `apac-tsdb-scraper` publishes to TSDB, then an India DAG copies TSDB to CDH. If Adrian accepts a 2–3 minute target, the proposal is for Airflow to write RTM to TSDB and CDH in parallel. True realtime would follow the [[darwin-collector]] pattern.
-- The GDAM Grafana panel queries the empty `india_iex_tsdb_dashboard_latest` table, while the data sits in `india_iex_tsdb_expanded_latest` (2026-10-09). This looks like a stale panel reference.
-- `SCR-1274`: HPX national DAM/GDAM/RTM scraper. Implemented locally, blocked on TSDB IDs from Adrien. The request is three series with a two-day forward view.
-- Darwin assets for Tuticorin and four new sites: blocked on proxy and IT. See [[darwin-collector]].
+- `SCR-1284`: production evidence showed most RTM delay comes from two independent 30-minute schedules: `apac-tsdb-scraper` publishes IEX RTM into TSDB, then an India DAG copies TSDB to CDH. Adrien said near-real-time is mandatory but they are not bidding on RTM yet. The favoured design is RTM-only: move the scraper into `smp-india`, poll the API frequently, and write TSDB and CDH in parallel. Open design choice is a simple one-minute Airflow DAG versus a continuous [[darwin-collector]] style service, depending on the accepted API-to-Grafana delay target.
+- The GDAM Grafana panel queries the empty `india_iex_tsdb_dashboard_latest` table, while the data sits in `india_iex_tsdb_expanded_latest` (2026-10-09). This looks like a stale panel reference unless the live panel has already changed.
+- `SCR-1274`: HPX national scraper scope expanded from 12 to 32 PT15M series: prices for DAM/GDAM/RTM/HPDAM; four volume metrics for DAM, RTM, and HPDAM; and a GDAM technology breakdown. Step 1 added HPDAM, switched from MCV to purchase bid, sell bid, cleared volume, and scheduled volume, and added publication-frequency metadata. The remaining blockers are Mateo's actual TSDB IDs and his answer on which four GDAM technology columns he wants, because the source has total-only purchase bid.
+- Khaba `SCR-1288`: Michael's `index_col=False` fix handles the October 9 inverter expansion and trailing-delimiter parse shift from October 10 onward. Follow-up hardening added a regression test, clearer field-count errors, and a "last row wins" rule for rare conflicting duplicate minute readings after preserving the existing all-zero safeguard. Brian confirmed the October 9-12 backfills succeeded; October 8 remained a possible follow-up.
+- Khaba scheduling: both realtime and minute DAGs now use a four-hour IST source-transition window and fail fast after that. The old minute DAG six-hour rescheduling sensor was removed because the known missing-file window should be skipped rather than treated as a long outage wait.
+- Darwin assets for Tuticorin and four Gujarat sites are moving from access-blocked design to rollout. See [[darwin-collector]].
 - Grid India (`SCR-1230`) and the national H. India site: blocked on access. See [[smp-india-access]].
-- Khaba QA: CDH support changed an SCP on 2026-09-30 to allow cross-region access. Re-enabling the QA DAGs and backfilling TSDB UAT is still open.
+- Khaba QA pauses in early October were intentional operational choices, not a DAG pause-logic defect: QA was kept runnable for testing while avoiding unnecessary side-by-side production cost.
 - Not urgent: a KPI dashboard Mateo wants to pair on (TSDB → calculations → CDH → Grafana), and adapting the Aurora XLSX loader, which needs dataset, format, and ownership answers first.
 
 ## Background
@@ -28,7 +30,7 @@ As of 2026-10-09. These are the India data products built on [[smp-platform]]. S
 - Source: a CDH-managed FTP CSV in S3 (`KHABA/FTP_DATA<dd-mm-yyyy>.csv`, `ap-south-1`) with one-minute readings, overwritten through the day.
 - **15-minute path:** a realtime DAG and a previous-day reconciliation DAG share one parser. They publish only complete 15-minute averages of Active Power, GHI, Module Surface Temperature, and Ambient Temperature to TSDB (Mateo later renamed the irradiance series to POA without changing its ID), under provider `R&F India` (code alias `rf_india`; series IDs versioned in code). They verify by read-back, then write date-based CDH parquet for Athena/Grafana (`SCR-1238`). Publication is gated by `KHABA_GENERATION_TSDB_PUBLISH_ENABLED`.
 - **One-minute path (`SCR-1259`):** runs in parallel for operational needs, with five more series IDs. The 15-minute path stays unchanged. Promoted to QA on 2026-09-17; backfill runs through `smp-common 0.8.0`.
-- **Missing source files:** an Airflow rescheduling sensor with exponential backoff, capped at 15 minutes, with a failure horizon of about six hours. Mateo was to be asked whether to back off only after about five consecutive misses.
+- **Missing source files:** both realtime and minute paths skip missing same-day source files during the first four hours after IST midnight, then fail fast. The old minute DAG six-hour sensor was removed in October 2026 after it made normal missing-file periods look like stuck tasks.
 - **Timestamp semantics:** a 15-minute block is labelled by its start (09:15 means 09:15–09:29). UNCERTAIN: Mateo has not confirmed start versus end labelling.
 - **Partial intervals** are skipped. Reprocessing them needs Mateo's agreement.
 - **Related sites:** Khavda was added as an R&F monitored asset beside Khaba in Grafana (2026-09-23 review). `SCR-1255` added Manikaran day-ahead and intraday forecasts beside actual generation.
@@ -60,6 +62,7 @@ As of 2026-10-09. These are the India data products built on [[smp-platform]]. S
 - 2026-08-27: Mateo sets priorities: POA/Khaba dashboard first, then bilateral contracts, with Grid India parked pending access.
 - 2026-09: IEX bid stack, price history, Manikaran forecasts, and bilateral contracts delivered.
 - 2026-10-07: Sprint 3 closes with bid-stack TSDB, the geomap, and the bilateral dashboard.
+- 2026-10-13: Khaba source parsing and missing-file handling hardened after the October 9 inverter expansion, and HPX `SCR-1274` scope expanded to include HPDAM plus 32 total TSDB series.
 
 ## Open Questions
 
@@ -67,6 +70,9 @@ As of 2026-10-09. These are the India data products built on [[smp-platform]]. S
 - UNCERTAIN: Whether bilateral-contract data should stay CDH-only or also feed TSDB.
 - UNCERTAIN: Whether the live GDAM panel already diverged from the checked-in query.
 - UNCERTAIN: Whether the one-minute Khaba path passed stakeholder validation after QA.
+- UNCERTAIN: Whether October 8 Khaba needed the same backfill as October 9-12.
+- UNCERTAIN: Which four GDAM technology columns Mateo wants for `SCR-1274`; the source does not expose purchase bid by technology.
+- UNCERTAIN: What exact delay target Adrien will accept for `SCR-1284` RTM.
 
 ## Sources
 
@@ -82,5 +88,12 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/codex-conversations/2026-09-28-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-30-codex-conversations.txt`
 - `sources/codex-conversations/2026-10-09-codex-conversations.txt`
+- `sources/claude-conversations/2026-10-01-claude-smp-8ce08f10.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-31a97f39.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-32cc547a.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-5c0b0e8d.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-8ce08f10.txt`
+- `sources/claude-conversations/2026-10-13-claude-smp-e3dc30e8.txt`
+- `sources/codex-conversations/2026-10-13-codex-conversations.txt`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-14

@@ -1,0 +1,1824 @@
+# Claude Conversation - 2026-10-13
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 12:42 user
+
+Darwin's unblocked finally! Operationally, how do we make sure the deployed darwin collector is updated again?
+
+## 12:42 assistant (smp-tool)
+
+There's no automatic deploy for the collector. It's a manual build, push, render and apply, from the runbook at [smp-tool/config/india/dev/darwin/README.md](smp-tool/config/india/dev/darwin/README.md). Which steps you need depends on what changed.
+
+| What changed | Airflow publisher / `mappings.json` | Collector config (`sites.json`, tags, sites) | Collector code (`services/darwin-collector`) |
+|---|---|---|---|
+| How it reaches the cluster | Push to `smp-india/dev`; git-sync picks it up in about 5 s. | Re-render and `kubectl apply`. No new image. | New image, then re-render and apply. |
+| Collector restarts? | No | Yes (the pod template changes) | Yes |
+
+**Collector config change** (adding a site, or the ModuleTemperature removal):
+1. Pull `dev` in `smp-tool`.
+2. Read the running image so you don't change it:
+   ```sh
+   COLLECTOR_IMAGE=$(kubectl -n smp-india-dev get deployment darwin-collector -o jsonpath='{.spec.template.spec.containers[?(@.name=="collector")].image}')
+   ```
+3. Render with **every site that's currently enabled**, not just the new one. Omitting a site silently stops its collection:
+   ```sh
+   python3 scripts/render_darwin.py --collector-image "$COLLECTOR_IMAGE" --site khavda > /tmp/darwin-dev.json
+   ```
+4. Compare the rendered `DARWIN_ENTITY_TAGS_JSON` with the live Deployment, then run `kubectl apply --dry-run=server -f`, then `kubectl apply -f`, then `rollout status`.
+
+**Collector code change** (rare; none since SCR-1273's per-entity tags):
+1. From `smp-india`, build and push a **new unique tag**, e.g. `scr-1273-$(git rev-parse --short HEAD)`, with `--platform linux/amd64`. Never overwrite an old tag.
+2. Render with that image and apply as above.
+
+**Checks after every rollout:**
+- The logs show `poll_complete`. A Ready pod alone proves nothing, because readiness only checks that the spool is writable.
+- `pending/` shows fresh batches with the expected tags and units, and quarantine is empty.
+- Restart once to confirm batches and `collector-state/sampling.json` survive.
+
+**Rules:**
+- Keep exactly one replica, and keep the `Recreate` strategy.
+- Never delete the spool or sampling receipts.
+- Rollback means re-rendering with the previous sites, or restoring the previous validated image.
+- A rollout can miss minutes, and Darwin may not replay them.
+
+Since you said Darwin is unblocked, the first rollout is the one that matters. If this is it, you build and push the `0.2.0-scr1273` image, which is only local so far, then render Tuticorin plus Khavda.
+
+I didn't check the cluster, so I don't know which image or sites are running now. My `git pull` in `smp-tool` also failed on GitHub auth, so I'm working from the local `dev` copy. It's at the commit we pushed, and I haven't confirmed it's still current.
+
+## 12:50 user (smp-tool)
+
+hmmm. Put yourself in Michael's shoes, do you find this cumbersome? 
+
+For example, if we had to change something tomorrow, and then you have to update the collector on all fronts.
+
+## 12:50 assistant (smp-tool)
+
+Yes, it's cumbersome. Michael can follow it, but it breaks easily, and the way it breaks is quiet.
+
+**Where it hurts:**
+- **The enabled-sites list isn't stored anywhere.** It lives in whoever's shell history typed the last `--site khavda --site sharpar ...`. If he forgets one at 6pm, that site stops collecting, and nothing errors. The runbook's fix is "compare the rendered output with the live Deployment by eye."
+- **The image is a hand-built step.** There's a `REGISTRY` placeholder, a manual `docker build` and `push`, and a tag he has to invent. Nothing links "this source commit" to "this running image" except his notes.
+- **The steps number about eight and run in order,** with kubectl context checks in between. With QA and prod coming, that repeats per environment.
+- **Two repos have to line up.** `smp-india` holds the code and `smp-tool` holds the manifest.
+- **A config-only change, like dropping ModuleTemperature, still means a full manual render and apply.**
+
+**What I'd do, smallest first:**
+1. **Make the enabled sites declarative.** Keep a per-environment `enabled_sites` list in git, in `smp-tool`, next to `sites.json`, so `render_darwin.py` needs no `--site` flags. Adding a site becomes a one-line commit that gets reviewed.
+2. **Wrap the deploy in one script,** `deploy_darwin.sh <env>`. It checks the kubectl context, reads the running image, renders, shows a `kubectl diff` against the live Deployment, applies after a yes, waits for the rollout, and prints a log summary. The diff replaces the eyeball comparison, and it would show a dropped site immediately.
+3. **Build the image in CI** on push to `smp-india`, tagged with the commit SHA, so there's nothing to build by hand. This needs a registry and a pipeline that I don't know exist for this repo, so it's a later step.
+
+I wouldn't go to GitOps tooling for one single-replica collector that changes a few times a month.
+
+Steps 1 and 2 are small, testable with the existing renderer tests, and mostly pure scripting. Step 3 depends on what Michael's team already has.
+
+Do you want me to do 1 and 2? And does the team already have a registry or CI pipeline I should hook into for step 3?
+
+I haven't touched any code. The script's `kubectl diff` would only be tested against fixtures, never a real cluster, since I don't have cluster access from here.
+
+## 12:51 user (smp-tool)
+
+<command-name>/model</command-name>
+            <command-message>model</command-message>
+            <command-args>claude-opus-5-5</command-args>
+
+## 12:51 user (smp-tool)
+
+<local-command-stdout>Set model to `claude-opus-5-5`</local-command-stdout>
+
+## 12:52 user (smp-tool)
+
+Yes, do 1 and 2
+
+For 3, we actually have a ticket this spinrt, scr-1283, I think. Can't we do anything except for the actual "deployment"? At the very least we build the image in the pipeline, up and ready for the actual deployment.
+
+## 12:52 user (smp-tool)
+
+[Request interrupted by user]
+
+## 12:52 user (smp-tool)
+
+sorry to interrupt. Let's test this out cleanly via docker. I believe I have an orbstack installed? Let's test smartly
+
+## 12:54 assistant (smp-tool)
+
+I'm writing the tests first: the renderer should take its enabled sites from a committed file instead of `--site` flags.
+
+## 12:54 assistant (smp-tool)
+
+Red as expected. Implementing.
+
+## 12:56 assistant (smp-tool)
+
+That was my setup mistake: zsh doesn't word-split `$K`. It did exercise the error path, though: a missing namespace failed cleanly with nothing applied. Retrying the setup.
+
+## 13:01 assistant (smp-tool)
+
+Now the image workflow. It follows `docker-build.yml`'s OIDC/ECR pattern and builds, smoke-tests, optionally pushes, and renders a ready-to-apply manifest. It has no deploy step, per your scope.
+
+## 13:01 assistant (smp-tool)
+
+Now I'll run the workflow's own commands locally against a clean `smp-india` checkout. There's no `act` or `actionlint` installed, so this is the closest real check.
+
+## 13:01 assistant (smp-tool)
+
+All 30 tests pass. Last piece: the runbook still documents `--site` flags and the manual apply steps, so I'm updating it to match.
+
+## 13:02 assistant (smp-tool)
+
+All three parts are done in `smp-tool` and tested locally. Nothing is committed yet, and nothing touched the real cluster or ECR.
+
+**1. Sites are declared in a file**
+- `config/india/dev/darwin/enabled_sites.json` is now the only place that says which sites to collect. It currently holds `["tuticorin"]`, which matches the rollout plan.
+- The `--site` flag is gone, so a forgotten flag can no longer drop a site. Enabling Khavda is now a one-line commit to that file.
+
+**2. `scripts/deploy_darwin.sh --context <ctx> [--image X] [--yes]`**
+- It renders the manifest from committed config and shows a `kubectl diff` against the live Deployment. It asks for confirmation, then runs a server dry-run, applies, waits for the rollout and prints the collector log.
+- It never uses your current kube context; you name it. Without `--image` it keeps the image already running, which covers config-only changes.
+- Unit tests: 7 tests using a fake `kubectl`.
+- Real test on your kind cluster (running under OrbStack), in a throwaway namespace I deleted afterwards:
+  - First deploy rolled out.
+  - Re-running with nothing changed applied nothing.
+  - Enabling Khavda showed a one-line diff, kept the running image, and a marker file in the spool survived.
+  - A bad image tag failed the rollout after 180 s and the script reported it.
+  - Redeploying the good image rolled back.
+
+**3. SCR-1283, build half: `.github/workflows/realtime-service-image.yml`**
+- It's a manual workflow. It checks out `smp-india` at the ref you choose, builds a `linux/amd64` image tagged with the commit SHA, and runs the existing container smoke test.
+- With `push_image` set, it pushes to ECR, and it never overwrites a tag that already exists.
+- It renders the dev manifest as a downloadable artifact and puts the exact `deploy_darwin.sh` command in the run summary.
+- I ran its build, smoke and render commands locally against a clean `origin/dev` checkout, and all passed. I couldn't run the workflow file itself: `act` and `actionlint` aren't installed, so I only parsed the YAML.
+
+The runbook and the scripts README now describe this flow, and all 30 `smp-tool` tests pass.
+
+**Needed before the workflow can push (all outside my reach):**
+- The ECR repository `smp-india-darwin-collector` in account 624915953606.
+- Push permission for the existing OIDC role (`AWS_ROLE_ARN_NOPROD`).
+- Pull permission for the EKS nodes.
+- A new repository secret, `SMP_INDIA_READ_TOKEN`, so `smp-tool` can check out `smp-india`. That name is my choice; rename it if your team has a convention.
+
+Until these exist, run the workflow with `push_image` off as a build check.
+
+**Things to know:**
+- **A bad image takes the collector down.** Because the Deployment uses `Recreate`, the old pod stops before the new one starts. The diff shows the image before you confirm, and you recover by redeploying a known-good one.
+- **Not done from SCR-1283:** the qa/prod configs and the automated deploy job. The qa/prod manifests depend on proxy and cluster details I don't know, and you scoped deployment out.
+
+Want me to commit this as micro commits scoped `scr-1283` and push to `smp-tool` `dev`?
+
+## 13:04 user (smp-tool)
+
+Wait, let me clarify... for scr-1273 expansion of assets, what do we update then? I assume the enabled_sites json change?
+
+## 13:04 assistant (smp-tool)
+
+Yes. For the four SCR-1273 sites, that one file is the only change:
+
+1. Add the next site to `smp-tool/config/india/dev/darwin/enabled_sites.json`, e.g. `["tuticorin", "khavda"]`, and commit it to `dev`.
+2. From `smp-tool`, run:
+   ```bash
+   scripts/deploy_darwin.sh --context <india-dev-context>
+   ```
+   With no `--image`, it keeps the running image. The diff should show only the `DARWIN_ENTITY_TAGS_JSON` line changing.
+3. Check the logs for `poll_complete` with `"failed_entities": 0` and the new entity's batches in `pending/`. Then let the publisher run and confirm UAT read-back before adding the next site.
+
+Nothing else needs to change for these four:
+- **No new image:** the current collector already handles per-entity tags.
+- **No publisher change:** all 16 mappings are already in `smp-india` `mappings.json`, and git-sync has them.
+- **No `sites.json` edit:** Khavda, Sharpar, Raganesda and Tithwa are already in the catalogue.
+
+Do them in order: Khavda, then Sharpar, then Raganesda, then Tithwa. Tithwa waits until Mateo creates its UAT series, or the publisher will fail writing to series that don't exist.
+
+A site that isn't in the catalogue yet, like a future one, needs three changes:
+- an entry in `sites.json` (entity code and tags),
+- its rows in `smp-india` `mappings.json`, merged and synced **before** the collector starts collecting it, otherwise its observations get quarantined,
+- the `enabled_sites.json` line.
+
+I haven't checked what's running in the dev cluster, so make sure Tuticorin-only is deployed and healthy before you add Khavda.
+
+## 13:05 user (smp-tool)
+
+can't we simply add all 4, in total 5 sites?
+
+## 13:05 assistant (smp-india)
+
+Yes. Adding them all at once is technically just one edit. The reason I'd still hold back Tithwa is the missing UAT series, not the rollout order.
+
+- **Khavda, Shapar, Raganesda: add them together.** Their mappings are installed and their UAT series exist. We also proved them live in Docker yesterday with the real publisher. Adding sites one at a time was only there to isolate problems, and these three have already been checked. Volume isn't a concern either: six entities wrote about 10 batches a minute, against a 200-file limit every 5 minutes.
+- **Tithwa: wait for Mateo.** Its four series 404 in UAT. When the publisher hits a write error, the whole task run fails rather than skipping that series, as `test_partial_tsdb_failure_retries...` shows. So every 5-minute run would go red and retry, and the other sites' publishing could get stuck behind it. Once Mateo creates the UAT series, adding it is another one-line change.
+
+So the change now is:
+
+```json
+["tuticorin", "khavda", "sharpar", "raganesda"]
+```
+
+That's 4 sites. Tithwa makes 5 once UAT is ready.
+
+I didn't trace exactly which non-Tithwa points still get written before a failing run aborts. The conclusion that those runs fail comes from the existing retry test. If Mateo has already created the Tithwa UAT series, re-run the probe and add all five.
+
+## 13:06 user (smp-india)
+
+add the 3 solar sites, then commit and push.
+
+I'm wondering, did we test all 4 assets in docker? Can't remember lol
+
+## 13:06 assistant (smp-india)
+
+Yes, all four were tested live in Docker on 2026-10-02, Tithwa included. The run collected 45 observations across all 18 streams and 6 entities. The real publisher then wrote 34 points to a fake TSDB, including Tithwa's power, wind speed and wind direction. What hasn't been tested anywhere is a real TSDB write.
+
+Adding the three solar sites now, then committing in micro commits.
+
+## 13:07 assistant (smp-tool)
+
+The remote `dev` is 15 commits ahead, so the push was rejected. I'm checking what came in before I rebase.
+
+## 13:07 assistant (smp-tool)
+
+No overlapping files, but two things are worth a look. Someone changed the runner and credential setup in `docker-build.yml`, which my workflow copies. And a root-level `darwin.json` appeared.
+
+## 13:08 assistant (smp-tool)
+
+The three solar sites are enabled, committed and pushed to `smp-tool` `dev`. That's five micro commits (`afd9833..9dab538`), rebased onto Michael's 15 new commits.
+
+| Commit | What |
+|---|---|
+| `fb1aac0` | The renderer reads sites from `enabled_sites.json` |
+| `ef36be9` | `deploy_darwin.sh` and its tests |
+| `f4705d1` | The image build workflow |
+| `3f497f1` | Runbook and scripts README |
+| `9dab538` | Enable Khavda, Shapar and Raganesda in dev (5 entities) |
+
+**Changed during the rebase:** I aligned the workflow with Michael's latest `docker-build.yml`.
+- It uses the `ubuntu-24.04` runner and takes the AWS role from `vars.AWS_ROLE_ARN_NOPROD`.
+- It checks out `smp-india` with the existing `GH_COM_TOKEN` secret, instead of the new one I'd invented.
+- Images go into the existing `smp-india-dev-airflow` ECR repo, tagged `darwin-collector-<sha>`, which follows his `darwin-collector-1.0.0` convention. So no new ECR repo is needed, and the push may already work with the existing role. That's untested.
+
+**Before the first real deploy:** Michael's `darwin.json` shows `darwin-collector-1.0.0` deployed as `darwin-poc`, the mock setup, configured with the old `DARWIN_ENTITIES`/`DARWIN_TAGS` variables. That image probably predates per-entity tag support.
+- So the first real deploy must pass `--image` with an image built from current `smp-india`, either from the new workflow or by hand. Don't reuse `1.0.0`.
+- The real `darwin-collector` Deployment probably doesn't exist yet, in which case the script refuses to run without `--image` anyway.
+
+I also haven't checked whether `GH_COM_TOKEN` can read `smp-india`; it's only known to read `smp-common`. And nothing has been run on the real cluster or written to real TSDB.
+
+## 13:08 user (smp-tool)
+
+draft a message to Michael for the first deploy
+
+then how do we test the new gh workflow?
+
+## 13:09 assistant (smp-tool)
+
+Draft for Michael:
+
+```
+hey Michael, Darwin's unblocked so we're ready for the first real collector deploy in smp-india-dev 🎉
+
+pull smp-tool dev first, there's a new script that does render → diff → apply → rollout in one go. sites are now committed in config/india/dev/darwin/enabled_sites.json (tuticorin + khavda/shapar/raganesda), so no --site flags anymore.
+
+1. image: don't reuse darwin-collector-1.0.0, that's the POC build and uses the old DARWIN_ENTITIES/DARWIN_TAGS config. build from current smp-india dev, either via the new "Build India realtime service image" workflow in smp-tool (push_image on) or by hand. tag will be smp-india-dev-airflow:darwin-collector-<sha>
+2. make sure the darwin-api-credentials secret exists in smp-india-dev (DARWIN_CLIENT_ID / DARWIN_CLIENT_SECRET)
+3. scripts/deploy_darwin.sh --context <india-dev-context> --image <that image>
+   it shows the diff and asks before applying. first run should be a brand new darwin-collector Deployment
+4. after a few min, logs should show poll_complete with "failed_entities": 0, and new batches under /export/smp-india-dev/darwin/pending/
+
+keep india_darwin_realtime_tsdb_dag paused, I'll handle publishing. send me the image tag + a snippet of the logs once it's up. thanks!
+```
+
+**How to test the workflow.** It's already on `dev`, which is this repo's default branch, so it shows in Actions as "Build India realtime service image". I'd test it in two runs:
+
+1. **`push_image` off.** This has no side effects; it only builds and uploads an artifact. It proves the things we haven't verified:
+   - `GH_COM_TOKEN` can check out `smp-india`. This is the most likely failure.
+   - The `ubuntu-24.04` runner can build `linux/amd64`.
+   - The smoke test passes on the runner.
+   - The rendered manifest artifact and run summary come out right.
+2. **`push_image` on**, once run 1 is green. This proves the OIDC role can push to `smp-india-dev-airflow`. Then re-run it for the same SHA: it should log "already published" and push nothing, which confirms we never overwrite a tag.
+
+After that, Michael deploys the image from run 2 using the summary's command, which tests the whole chain end to end.
+
+I can trigger run 1 now from here (`gh workflow run ... -f push_image=false`) and watch it. Do you want me to? Run 2 pushes to ECR, so I'd leave that to you, or ask you first.
+
+I haven't confirmed Michael's dev kube context name, which is why the message says `<india-dev-context>`.
+
+## 13:09 user (smp-tool)
+
+yes, trigger run 1 and watch it
+
+## 13:10 assistant (smp-tool)
+
+The checkout of `smp-india` failed, which is the risk I flagged. The token is non-empty (masked as `***`), but GitHub rejected it for `smp-india`. Checking which secrets this repo has:
+
+## 13:11 assistant (smp-tool)
+
+Run 1 failed at the very first `smp-india` step, so nothing after the checkout ran. [Run link](https://github.com/qrm-dms/smp-tool/actions/runs/38349991421)
+
+```
+Check out smp-india  →  fatal: could not read Username for 'https://github.com': terminal prompts disabled
+```
+
+**Why it failed:** `GH_COM_TOKEN` exists and is non-empty, but it can't read `qrm-dms/smp-india`. It was set up on 2026-10-02 for Michael's Airflow build, and that build only needs `smp-common`. GitHub answers "no access" with a login prompt, and Actions has prompts disabled.
+
+None of `smp-tool`'s current secrets can read `smp-india`, and I can't create or change secrets from here. Ranked options:
+
+1. **Grant `GH_COM_TOKEN` read access to `smp-india`.** If it's a fine-grained token, whoever owns it adds `smp-india` to its repository list with Contents: read. Nothing changes in the workflow, so this is the fastest fix.
+2. **Add a dedicated read-only secret.** This was my original `SMP_INDIA_READ_TOKEN` idea: a fine-grained token or deploy key with Contents: read on `smp-india` only. It's cleaner, because the Airflow build token doesn't gain extra reach. It's a one-line workflow change on my side.
+3. **Build in `smp-india` CI instead,** which already builds the image. No cross-repo checkout would be needed, but the AWS role would have to trust `smp-india` too. That's a bigger infra change, and it goes against the ticket's design.
+
+I'd go with 1 if Michael owns that token, since he's the one you're messaging anyway. Add a line like this to his message:
+
+```
+also, can you give GH_COM_TOKEN (smp-tool secret) read access to qrm-dms/smp-india? the new image workflow checks it out and currently gets denied
+```
+
+Once that's done I'll re-run run 1. Everything after the checkout (build, smoke test, render, artifact) is still untested on the runner, so more failures could show up then. The local run of the same commands passed, which lowers that risk.
+
+## 13:16 user (smp-tool)
+
+wait wait, can't I simply do this from our end? I wanna say we have enough rights.
+
+## 13:17 assistant (smp-tool)
+
+Yes, you're right. Your `QN5792_engieco` account is admin on both `smp-tool` and `smp-india`, so we can fix this ourselves without anyone else's token.
+
+The cleanest fix is a read-only deploy key:
+1. Generate an SSH key pair locally, in a temp dir.
+2. Add the public key to `smp-india` as a deploy key named `smp-tool realtime-service-image`, with read-only access.
+3. Store the private key as a new `smp-tool` secret, `SMP_INDIA_DEPLOY_KEY`. I'll pipe it straight into `gh secret set`, so it's never printed, then delete the local copy.
+4. Change the workflow's checkout from `token: [REDACTED] to `ssh-key: SMP_INDIA_DEPLOY_KEY`. That's a one-line commit to `dev`.
+5. Re-run run 1, with `push_image` still off.
+
+This beats widening `GH_COM_TOKEN`:
+- It only reads one repo.
+- It isn't tied to a person's account, so it won't expire or break when someone leaves.
+- It doesn't give the Airflow build token any extra reach.
+
+Steps 2 and 3 add a lasting deploy key and secret to the org's repos, so I'd like your yes before I do it. Should I go ahead with all five steps?
+
+## 13:17 user (smp-tool)
+
+yes, go ahead with all five
+
+## 13:18 assistant (smp-tool)
+
+Step 4 is done: the workflow now checks out with `ssh-key: SMP_INDIA_DEPLOY_KEY`, committed and pushed as `ec33b6c` on `smp-tool` `dev`, with the runbook updated to match.
+
+The auto-mode classifier blocked steps 2 and 3 as secret-store writes. Paste this in your terminal to do them. It never prints the private key, and it deletes the temp copy afterwards:
+
+```bash
+export GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco); D=$(mktemp -d) && ssh-keygen -q -t ed25519 -N '' -C 'smp-tool realtime-service-image' -f "$D/key" && gh repo deploy-key add "$D/key.pub" -R qrm-dms/smp-india --title 'smp-tool realtime-service-image' && gh secret set SMP_INDIA_DEPLOY_KEY -R qrm-dms/smp-tool < "$D/key"; rm -rf "$D"; gh repo deploy-key list -R qrm-dms/smp-india | grep realtime; gh secret list -R qrm-dms/smp-tool | grep DEPLOY
+```
+
+`gh repo deploy-key add` creates read-only keys by default, since we don't pass `--allow-write`. The last two commands should each print one line, confirming the key and the secret exist.
+
+If you'd rather I run this kind of thing myself next time, you can add a Bash permission rule for it in your Claude Code settings. Or say "done" when it's in, and I'll re-run run 1 (step 5) and watch it.
+
+## 13:21 user (smp-tool)
+
+i set bypass permissions, try again?
+
+## 13:21 assistant (smp-tool)
+
+I deleted the orphan secret. Before recommending a next step, I'm checking whether `smp-india` already has the AWS role, since building there would avoid the cross-repo checkout entirely.
+
+## 13:21 assistant (smp-tool)
+
+Deploy keys are disabled for `smp-india` at the org level, so admin rights on the repo can't turn them back on. The orphan secret is deleted, and nothing else changed.
+
+What I found:
+- `GH_COM_TOKEN` belongs to `px6116@engie.com`, according to the `GH_COM_USERNAME` variable. That's presumably Michael's personal access token, and it's the convention the Airflow build already uses.
+- `smp-india` has no AWS role variable, so building the image there would need an IAM trust change. That rules it out as a quick fix.
+
+That leaves two options, both of which need a personal token:
+
+1. **You create a fine-grained token now.** In GitHub, go to Settings → Developer settings → Fine-grained tokens. Set the owner to `qrm-dms`, choose only the `smp-india` repository, and set Contents to read-only. Then set it as an `smp-tool` secret named `SMP_INDIA_READ_TOKEN`. I'll switch the workflow to it and re-run, so there's no waiting on anyone. Your org may require approval for fine-grained tokens, and the token expires and is tied to you.
+2. **Michael adds `smp-india` to his existing token.** It's a few clicks for him and matches the current convention. I'd revert the workflow to `token: [REDACTED], and you'd add the one-liner I drafted to your message to him.
+
+I'd go with 2, because it keeps one convention for both builds, and his message is going out anyway. Choose 1 if you want run 1 green today. I can't create the token itself; only you can do that in the browser. Which do you prefer?
+
+## 13:22 user (smp-tool)
+
+wait, I'm lost na lol. Why does #2 make the convention? What is it based on?
+
+## 13:23 assistant (smp-tool)
+
+Fair, I overstated it. "Convention" just means what's already there. Here's what I based it on:
+
+- The existing Airflow image workflow, `docker-build.yml` in `smp-tool`, already reads private repos (like `smp-common`) during its build.
+- It does that with the `GH_COM_TOKEN` secret, and `smp-tool` has a variable `GH_COM_USERNAME = px6116@engie.com` next to it. Both were set on 2026-10-02.
+- Michael made the recent commits to that workflow, so I **assumed** `px6116` is Michael. I haven't verified that.
+
+So the "convention" is one workflow, about 11 days old, using one person's token. It's not a team decision. Option 2 reuses that same token. Option 1 adds a second one, yours.
+
+The actual tradeoff:
+- **Both are personal tokens**, so either one breaks if that person's token expires or they leave. Neither option is cleaner in that sense.
+- **Option 2:** one token to maintain, but you wait on Michael and his token gains access to one more repo.
+- **Option 1:** you can unblock run 1 today, but there are two tokens to look after.
+
+Honestly, it's a coin flip. If you want this moving today, do option 1. Neither is really the right long-term fix. That would be a GitHub App, or re-enabling deploy keys in the org, and both need an org admin.
+
+## 13:23 user (smp-tool)
+
+Option 2 makes sense then, if we're building on something that's already existing
+
+## 13:23 assistant (smp-tool)
+
+Here's my understanding. We reuse the existing `GH_COM_TOKEN` rather than add a token of our own, and Michael grants it read access to `smp-india`. On my side:
+
+1. **Revert the workflow checkout** to `token: ${{ secrets.GH_COM_TOKEN }}`, put the runbook line back, and commit and push to `smp-tool` `dev`.
+2. **Fold the token request into the deploy message** for Michael, so he gets one message.
+3. **Re-run run 1** with `push_image` off once he confirms, and watch it.
+
+Before I do that, a few quick questions:
+- **Is `px6116@engie.com` actually Michael?** If not, the request should go to whoever owns that account.
+- **Should I push the revert now**, or wait until Michael confirms? Pushing now changes nothing in practice, since the workflow fails at checkout either way until he grants access.
+- **Do you want the merged message to Michael**, or will you send the token request separately?
+
+## 13:24 user (smp-tool)
+
+yes it's Michael, push the revert and merge the message
+
+## 13:24 assistant (smp-tool)
+
+The revert is pushed to `smp-tool` `dev` as `99a22bf`. The workflow checks out `smp-india` with `GH_COM_TOKEN` again, and the runbook notes that this token needs read access to `smp-india` because deploy keys are disabled.
+
+Merged message for Michael:
+
+```
+hey Michael, Darwin's unblocked so we're ready for the first real collector deploy in smp-india-dev 🎉
+
+one ask first: can you give your GH_COM_TOKEN (the smp-tool secret) read access to qrm-dms/smp-india? Contents: read is enough. the new "Build India realtime service image" workflow checks out smp-india with it and currently gets denied. deploy keys are disabled in the org so this was the simplest route. ping me once done and I'll run the build.
+
+for the deploy itself, pull smp-tool dev first. there's a new script that does render → diff → apply → rollout in one go. sites are committed in config/india/dev/darwin/enabled_sites.json (tuticorin + khavda/shapar/raganesda), so no more --site flags.
+
+1. image: don't reuse darwin-collector-1.0.0, that's the POC build with the old DARWIN_ENTITIES/DARWIN_TAGS config. I'll send you the tag from the workflow (smp-india-dev-airflow:darwin-collector-<sha>), or build from current smp-india dev by hand if you want to go ahead
+2. make sure the darwin-api-credentials secret exists in smp-india-dev (DARWIN_CLIENT_ID / DARWIN_CLIENT_SECRET)
+3. scripts/deploy_darwin.sh --context <india-dev-context> --image <that image>
+   it shows the diff and asks before applying. first run should be a brand new darwin-collector Deployment
+4. after a few min, logs should show poll_complete with "failed_entities": 0, and new batches under /export/smp-india-dev/darwin/pending/
+
+keep india_darwin_realtime_tsdb_dag paused, I'll handle publishing. send me a snippet of the logs once it's up. thanks!
+```
+
+Once Michael confirms access, I'll re-run run 1 with `push_image` off. The push run comes after that, and I'll ask before it since it publishes to ECR.
+
+Everything after the checkout step is still untested on the runner. I also haven't checked whether the org requires approval when he edits his token's repository access.
+
+## 13:28 user (smp-tool)
+
+too much. keep it extremely tight pls. Also in taglish lol
+
+## 13:28 assistant (smp-tool)
+
+```
+hi Michael! unblocked na si Darwin, ready na tayo sa first collector deploy sa dev 🎉
+
+1. pa-add naman ng read access sa qrm-dms/smp-india for your GH_COM_TOKEN (Contents: read lang). kailangan siya ng new image workflow sa smp-tool. ping mo ako pag okay na, I'll run the build then send you the image tag
+2. pull smp-tool dev, then: scripts/deploy_darwin.sh --context <dev-context> --image <tag>
+   wag yung darwin-collector-1.0.0, POC build pa yun
+
+paused muna yung DAG ha, ako na bahala sa publishing. send mo lang logs pag up na. salamat!
+```
+
+## 13:29 user (smp-tool)
+
+what's the correct image tag?
+
+## 13:29 assistant (smp-india)
+
+The tag doesn't exist yet. The workflow creates it from whichever `smp-india` commit it builds. If it built `smp-india` `dev` as it is now, the tag would be:
+
+```
+624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-dev-airflow:darwin-collector-eb567abe1f51
+```
+
+`eb567abe1f51` is the first 12 characters of the current `smp-india` `origin/dev` commit. The collector code was last changed in `134b656` (2026-10-02, SCR-1273), and `eb567abe1f51` comes after it, so that build includes per-entity tags.
+
+The exact tag is only final once the push run finishes, because a new commit on `smp-india` `dev` before then would change the SHA. That's why the message leaves it as `<tag>`. I'll send you the real tag from the run summary once Michael grants access and the push run is green.
+
+## 13:42 user (smp-india)
+
+I see. Michael's unresponsive though. Can we do the option 1 instead? Or maybe compromise both? Option 1 to test now, once proven, we move to 2?
+
+## 13:43 assistant (smp-india)
+
+Yes, that works, and it needs no workflow churn later. I'll make the checkout prefer your token when it exists and fall back to Michael's:
+
+```yaml
+token: ${{ secrets.SMP_INDIA_READ_TOKEN || secrets.GH_COM_TOKEN }}
+```
+
+Moving to option 2 later then means deleting your secret once Michael has granted access. No code change.
+
+## 13:43 assistant (smp-tool)
+
+The fallback is pushed to `smp-tool` `dev` (`6a79db7`), with the runbook updated. The token itself has to come from you: I can't create tokens, and it shouldn't pass through chat.
+
+1. **Create the token** at https://github.com/settings/personal-access-tokens/new, signed in as your work account:
+   - Resource owner: `qrm-dms`
+   - Repository access: only `qrm-dms/smp-india`
+   - Permissions: Contents → **Read-only** (Metadata read is added automatically)
+   - Expiration: short, e.g. 30 days, since it's temporary
+   - If the org requires approval, the token stays pending until an owner approves it.
+2. **Store it as a secret.** Run this in your terminal. It prompts for the value without echoing it, so paste the token there and never in chat:
+   ```bash
+   GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco) gh secret set SMP_INDIA_READ_TOKEN -R qrm-dms/smp-tool
+   ```
+3. Say "done" and I'll trigger run 1 (`push_image` off) and watch it.
+
+**Later, moving to option 2:** once Michael grants his token access, delete your secret and re-run. If the run is still green, the fallback works:
+```bash
+GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco) gh secret delete SMP_INDIA_READ_TOKEN -R qrm-dms/smp-tool
+```
+
+The tight message for Michael is still valid as-is. His step 1 just stops blocking us, since your token covers the build for now.
+
+## 13:44 user (smp-tool)
+
+can you do for me pls? I have gh opened here in the tab
+
+## 13:44 assistant (smp-tool)
+
+I can't do this one for you. Creating the token means its value would appear on screen for me to read and copy into the secret. I'm not allowed to handle credentials like API tokens in plain text, even with your permission. GitHub may also ask for your password or 2FA on that page, which is yours to enter.
+
+It's about a minute in that tab:
+1. Open **https://github.com/settings/personal-access-tokens/new**.
+2. Name it `smp-tool smp-india read (temp)` and set Expiration to 30 days.
+3. Set Resource owner to `qrm-dms`, choose **Only select repositories**, and pick `smp-india`.
+4. Under Permissions → Repository → **Contents**, choose **Read-only**.
+5. Click **Generate token** and copy it.
+6. In your terminal, run this and paste the token at the hidden prompt:
+   ```bash
+   GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco) gh secret set SMP_INDIA_READ_TOKEN -R qrm-dms/smp-tool
+   ```
+
+Say "done" and I'll take it from there: trigger run 1, watch it, and report back.
+
+## 13:46 user (smp-tool)
+
+<bash-input>GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco) gh secret set SMP_INDIA_READ_TOKEN -R qrm-dms/smp-tool</bash-input><bash-stdout>t set SMP_I$(gh_READ_TOKEN -R qrm-dms/smp-tool                        ) gh
+
+? Paste your secret: 
+[REDACTED] user typed into the terminal pane (tab 0) while this command was running, so output after that point is not included; it may still be running there, or they may have stopped it. Use read_terminal with tab_id "0" to check on it.]</bash-stdout><bash-stderr></bash-stderr>
+
+## 13:47 assistant (smp-tool)
+
+No paste has gone in yet; the terminal is still sitting at the prompt (tab 0):
+
+```
+? Paste your secret:
+```
+
+The secret doesn't exist yet: `gh secret list` shows no `SMP_INDIA_READ_TOKEN`. Click into that terminal, paste the token, and press Enter. Nothing will appear as you paste, because the prompt is hidden.
+
+If you haven't generated the token yet, press Ctrl+C there first, create it in your browser tab, and then re-run the command. Say "done" once it's in, and I'll trigger run 1.
+
+## 13:48 user (smp-tool)
+
+there
+
+## 13:49 assistant (smp-tool)
+
+Run 2 failed at the checkout again, but this time differently ([run](https://github.com/qrm-dms/smp-tool/actions/runs/38353266816)). The secret was read and the token authenticated: GitHub now returns a 403 instead of asking for a login.
+
+```
+remote: Write access to repository not granted.
+fatal: unable to access 'https://github.com/qrm-dms/smp-india/': ... error: 403
+```
+
+Despite the wording, this is GitHub's usual (misleading) error when a fine-grained token can't read the repo. Checkout doesn't need write access. There are three likely causes, most likely first:
+
+1. **The token is pending org approval.** On https://github.com/settings/personal-access-tokens, look for the token: it shows "Pending" for `qrm-dms` if an org owner still has to approve it. If so, we wait on an approval, or ask an owner to approve it.
+2. **The resource owner is your personal account, not `qrm-dms`.** The token then can't see org repos at all.
+3. **`smp-india` isn't selected, or Contents isn't set to Read-only.**
+
+Can you open that page and tell me what the token's status and settings show? If it's 2 or 3, you can fix it in place by editing the token; the secret doesn't need to change. Then I'll re-run.
+
+## 13:49 user (smp-tool)
+
+:(
+
+## 13:50 assistant (smp-tool)
+
+Confirmed: the token is **Pending**, so the org requires an owner to approve fine-grained tokens. Until then, GitHub treats it as having no access, which explains the 403. Nothing is wrong with the token's settings.
+
+You're not a `qrm-dms` org owner, and neither is Michael's account. The owners are:
+
+`AJC531` · `BJM501` · `FR6034` · `JGAI11` · `LQ5839` · `NP6766` · `SD5895` · `SVIJ09` (all `_engieco`)
+
+One of them approves it under **qrm-dms → Settings → Personal access tokens → Pending requests**. A short ask:
+
+```
+hi! could you approve my pending fine-grained token request in qrm-dms? "smp-tool smp-india read (temp)", read-only Contents on smp-india, 30 days. it's for the new image build workflow in smp-tool. thanks!
+```
+
+So we're waiting on someone either way: an org owner approving your token, or Michael granting his. Send both, and I'll re-run run 1 as soon as either one lands. The workflow tries your token first, then Michael's, so no code change is needed.
+
+I can't tell which owner is quickest to respond. You'd know better who those IDs belong to.
+
+## 13:52 user (smp-tool)
+
+sent. if in case Michael makes the first move, do we need to change anything? Or are we taking his token as precedent over our pending token?
+
+## 13:52 assistant (smp-tool)
+
+You don't need any code change, but you do need one action. The workflow uses `SMP_INDIA_READ_TOKEN || GH_COM_TOKEN`, so your token wins whenever the secret exists. A token that's still pending is non-empty, so the workflow would keep picking it, and keep failing, even after Michael grants his.
+
+- **If Michael moves first:** delete your secret, then I re-run, and the workflow falls back to his token:
+  [REDACTED]
+  GH_TOKEN=[REDACTED] auth token --hostname github.com --user QN5792_engieco) gh secret delete SMP_INDIA_READ_TOKEN -R qrm-dms/smp-tool
+  ```
+  You can then withdraw the pending request, or let it expire.
+- **If the owner approves first:** nothing to change. It works right away, and we delete the secret later, once Michael has granted his token, which was the original plan anyway.
+
+Either way, tell me which one landed and I'll re-run.
+
+## 14:00 user (smp-tool)
+
+Michael clarified:
+"ayy sorry Bri panong read access sa GH_COM_TOKEN? as in yung mismong value ba need ko rin ilagay sa smp-india?"
+
+## 14:00 assistant (smp-tool)
+
+No, he doesn't need to put the value anywhere. The secret stays in `smp-tool`. He only edits the token itself in his own GitHub settings. Tight Taglish reply:
+
+```
+hindi na, walang ilalagay sa smp-india 😅 yung token mismo lang i-edit mo:
+
+github.com/settings/personal-access-tokens → yung token na nasa GH_COM_TOKEN → Edit → Repository access, add qrm-dms/smp-india → Contents: Read-only → Update
+
+same token value pa rin, walang babaguhin sa secret. if classic token yan (settings/tokens), check mo lang na naka-Configure SSO/authorized for qrm-dms
+```
+
+Editing a fine-grained token's repository access may trigger org approval again, like yours did. If he says it's pending, we're waiting on an owner either way.
+
+If his token works first, delete your `SMP_INDIA_READ_TOKEN` secret so the workflow falls back to his.
+
+## 14:01 user (smp-tool)
+
+how did we know again Michael added this token
+
+## 14:01 assistant (smp-tool)
+
+We inferred it; it isn't proven. There are three clues:
+
+1. **A matching variable.** `smp-tool` has `GH_COM_USERNAME = px6116@engie.com`, created 2026-10-02 at 06:11:51, 23 seconds after the `GH_COM_TOKEN` secret (06:11:28). They were clearly set together, as a username and token pair.
+2. **You confirmed `px6116` is Michael.**
+3. **His commits use them.** Michael's recent commits to `docker-build.yml` and `docker_build_tag_push.sh` switched the build over to `GH_COM_TOKEN` and `GH_COM_USERNAME`.
+
+What we haven't verified:
+- **Who created the secret.** GitHub doesn't show a secret's author, and the org audit log needs owner access.
+- **Whose account the token belongs to.** The username variable is only a label next to it. The token could belong to someone else.
+
+His reply ("panong read access sa GH_COM_TOKEN?") suggests he knows the token but not exactly how to change its access. If it isn't his, he won't find it in his token settings, and that answers it.
+
+## 14:55 user (smp-tool)
+
+From Michael:
+"aahh yung PAT mismo no? actually classic PAT lang to eh. Need pa nga ba ng read access to smp-india?"
+
+-- then now I realized, can't we move the things we need from india to tool instead? Or it wouldn't make sense?
+
+## 14:56 assistant (smp-tool)
+
+On Michael's question: a classic token doesn't have per-repo settings. It can read every repo his account can read, as long as it has the `repo` scope and is SSO-authorized for `qrm-dms`. I checked, and he's **admin on `smp-india`**, so a healthy classic token should already work.
+
+But run 1 failed with "could not read Username", which is what checkout prints after GitHub rejects the token outright (a 401). That points to the token itself:
+- **Expired or revoked**, or the secret holds an old value.
+- **Missing the `repo` scope.**
+- **Not SSO-authorized for `qrm-dms`.**
+
+Reply for Michael:
+
+```
+classic pala, so no need i-edit per repo, admin ka naman sa smp-india. pero nag-fail yung checkout as if invalid yung token 🤔 pa-check lang sa github.com/settings/tokens: (1) hindi pa expired, (2) may `repo` scope, (3) Configure SSO → Authorized for qrm-dms. kung okay lahat baka luma na yung value sa GH_COM_TOKEN secret
+```
+
+**On moving things from `smp-india` to `smp-tool`:** it wouldn't make sense. What the build needs is the collector source code, and that belongs in `smp-india`, next to its tests and the publisher it shares a file format with. Copying it into `smp-tool` would create two copies that drift apart, which is the "image doesn't match source" problem SCR-1283 is meant to fix.
+
+Doing it the other way around does make sense: **build and push the image in `smp-india`'s own CI**, where the source already lives.
+- `smp-india` CI already builds and smoke-tests this exact image. Pushing would add one step, and no cross-repo token would be needed at all.
+- The blocker is that the AWS role (`dms-smp-deploy`) only trusts `smp-tool` today. Someone with IAM access would add `qrm-dms/smp-india` to its trust policy.
+
+For today, fixing Michael's token or getting your pending one approved is still the fastest path. Longer term, building in `smp-india` removes the personal-token dependency entirely, and it's what I'd put in SCR-1283's notes.
+
+I haven't confirmed that Michael's Airflow build actually uses `GH_COM_TOKEN` successfully. The last successful run shows it set, but not proven used, so it's possible that token has never worked.
+
+## 14:58 user (smp-tool)
+
+Huh. If we do what we're trying to now, we're still blocked by the deploiyment yes? Although a diff reason, we're still blocked. 
+
+So it's essentially the same as if we do everything in the CI of smp-india instead, we build what we can.. and then just stop at deployment UNTIL role recognizes smp-india...?
+
+## 14:58 assistant (smp-tool)
+
+Not quite. The two paths are blocked in different places, and the current one is closer.
+
+| | Build | Push to ECR | Deploy |
+|---|---|---|---|
+| **smp-tool workflow (now)** | Blocked on the `smp-india` checkout token | Should work, since the role already trusts `smp-tool`. Untested. | Manual: Michael runs `deploy_darwin.sh` |
+| **smp-india CI** | Works today | Blocked until IAM adds `smp-india` to the role's trust | Manual: same script |
+
+- **Deployment isn't blocked on either path.** The workflow was never going to deploy; we scoped that out. Deploying is Michael running the script with an image tag. What's blocked is getting a pushed image for him to deploy.
+- **"Build what we can, stop before the push" in `smp-india` already exists today.** Its CI job builds and smoke-tests this exact image on every push. Moving there wouldn't gain anything until IAM changes.
+- **The blockers differ in who can clear them.** The `smp-tool` path needs a working token, from Michael's fix or an org owner's approval of yours, either of which can happen today. The `smp-india` path needs an IAM trust-policy change, likely from another team, and that's usually slower.
+
+So stick with `smp-tool` for now. Moving the build into `smp-india` is the better long-term design, because it removes the personal token. I'd note it in SCR-1283 as a follow-up, not switch to it now.
+
+The push step on the `smp-tool` path has never run, so "should work" is based on Michael's Airflow workflow successfully pushing to the same ECR repo with the same role.
+
+## 14:59 user (smp-tool)
+
+Ah.. I'd rather do it right the first time then. As they say, "do it nice or do it twice" lol.
+
+## 15:00 assistant (smp-tool)
+
+Agreed, let's do it nicely. Here's my understanding of "doing it right":
+
+**The build moves to where the source lives.**
+- **`smp-india`:** the existing `darwin-collector` CI job already builds and smoke-tests the image. I'd add a push step: an OIDC login, then a push to `smp-india-dev-airflow:darwin-collector-<sha>`, never overwriting an existing tag. It stays switched off until AWS trusts `smp-india`.
+- **`smp-tool`:** I'd remove the `realtime-service-image.yml` workflow. `deploy_darwin.sh` and `enabled_sites.json` stay; Michael still deploys by tag.
+- **Cleanup:** I delete the `SMP_INDIA_READ_TOKEN` secret, you delete your pending token, and we tell Michael no token change is needed after all.
+- **One external ask:** whoever manages the AWS role `dms-smp-deploy` adds `qrm-dms/smp-india` to its trust policy. I checked: it isn't defined in `smp-tool`'s CDK code (that only has the EKS service-account role), so it's managed outside our repos, probably by the platform team behind the old "DMS-AWS-OIDC-QRM-NOPROD" connection.
+
+A few questions before I touch anything:
+1. **When should it push?** I'd make it automatic on every push to `smp-india` `dev` that changes `services/darwin-collector`, after tests pass, plus a manual button. That way every collector change has an image ready, and deploying stays manual. Or do you want manual only?
+2. **Where should the change go?** I'd extend the existing `darwin-collector` job in `ci.yml` rather than add a new workflow, since it already builds this exact image. Any objection?
+3. **Do you know who owns `dms-smp-deploy`**, so the trust-policy ask goes to the right person? I can draft that message too.
+4. **Prod:** the prod account has its own role. Should the trust request cover both roles now, or only non-prod for dev?
+
+## 15:02 user (smp-tool)
+
+1. that's the best case. I honestly didn't know you we can trigger the workflow depending on the change. What I only had in mind was a manual deploy
+2. Yes, especially if the one you're describing is possible
+3. This will be handled by Michael ad hoc
+4. for both. do it nice lol
+
+## 15:03 assistant (smp-tool)
+
+Got it, everything goes in `ci.yml`. One improvement on what I described: the tag will be the SHA of the **last commit that changed the collector**, not the current commit. A push that doesn't touch the collector then maps to a tag that's already published, so it's skipped. That gives "only when it changes" inside the same job, with no new dependencies or path-filter workflow.
+
+## 15:03 assistant (smp-india)
+
+The tag is now `darwin-collector-025488487ab7`, the SCR-1273 per-entity commit and the true last change to the image. Next: docs in `smp-india`, then removing the `smp-tool` workflow and its docs.
+
+## 15:04 assistant (smp-india)
+
+Tests and the docs check pass. Committing and pushing both repos, then deleting the temporary secret.
+
+## 15:04 assistant (smp-tool)
+
+Now watching the `smp-india` CI run from that push. I expect the build and smoke test to pass, then a "role variable not set, skipping publish" notice.
+
+## 15:06 assistant (smp-tool)
+
+The move to `smp-india` CI is done and pushed, and the first real CI run is green ([run](https://github.com/qrm-dms/smp-india/actions/runs/38360381203)):
+- Tests, build and smoke test passed.
+- "Resolve collector image" ran, and the publish steps were correctly skipped, because the role variables aren't set yet.
+
+**What changed:**
+- **`smp-india` (`ci.yml`):** the existing `darwin-collector` job now publishes the image it tested.
+  - The tag is `darwin-collector-<SHA of the last commit that changed Dockerfile/src>`, currently `darwin-collector-025488487ab7` (the SCR-1273 per-entity commit). Pushes that don't change the collector find the tag already published and skip it. A tag is never overwritten.
+  - `dev` and `qa` pushes go to the non-prod ECR, and `prod` pushes go to the prod account. Publishing happens on pushes to `dev`, `qa` and `prod`; I also added a manual "Run workflow" button to CI.
+  - It switches itself on once the `AWS_ROLE_ARN_*` variables exist in `smp-india`. No code change needed.
+- **`smp-tool`:** I removed the cross-repo image workflow and pointed the runbook at the CI images. `deploy_darwin.sh` and `enabled_sites.json` stay as they are.
+- **Cleanup:** I deleted the `SMP_INDIA_READ_TOKEN` secret. **You** can delete your pending token at github.com/settings/personal-access-tokens; it's no longer needed.
+
+Message for Michael. It covers the AWS role change and replaces the earlier token ask:
+
+```
+update: wag mo na galawin yung PAT 😅 inilipat ko yung image build sa smp-india CI, so need na lang i-trust ng AWS role si smp-india:
+
+1. dms-smp-deploy (noprod 624915953606) trust policy → add sub repo:qrm-dms/smp-india:ref:refs/heads/dev at refs/heads/qa
+2. dms-smp-deploy (prod 154989746575) → add repo:qrm-dms/smp-india:ref:refs/heads/prod
+3. tapos set sa smp-india repo variables: AWS_ROLE_ARN_NOPROD at AWS_ROLE_ARN_PROD (same values as sa smp-tool)
+
+auto na mag-publish yung CI after nun. ping mo ako, I'll send you the image tag for the deploy 🙏
+```
+
+The variables should be set only after the trust policy is updated. If they're set first, every CI push to `dev` fails at the AWS login step. That's why it's step 3. I could set them myself, since I'm an admin, once he confirms the trust.
+
+I haven't verified that the `smp-india-qa-airflow` and `smp-india-prod-airflow` ECR repos exist. I'm assuming them from the Airflow image naming. The first `qa` or `prod` push will tell us.
+
+## 15:38 user (smp-tool)
+
+thanks. In the meantime, how can we use this to streamline the manual process?
+
+## 15:38 assistant (smp-tool)
+
+Until the AWS role trusts `smp-india`, someone with ECR access (Michael) still has to push the image by hand. The streamlining is to make that manual push **identical to what CI will do**, with the same steps and the same tag:
+
+- **One script, used by both.** Move the CI publish logic into `smp-india/scripts/publish_darwin_image.sh <dev|qa|prod>`. It computes the tag (last collector change), checks whether that tag is already in ECR, and otherwise builds `linux/amd64`, runs the smoke test, pushes, and prints the exact `deploy_darwin.sh` command. CI calls the same script.
+- **Michael's manual flow becomes two commands:**
+  ```bash
+  scripts/publish_darwin_image.sh dev
+  ```
+  Then he runs the printed command from `smp-tool`:
+  ```bash
+  scripts/deploy_darwin.sh --context <dev-context> --image <printed image>
+  ```
+  No placeholder registry, no inventing tags, and no copy-paste errors between steps.
+- **The switch to CI is seamless.** Since the tag depends only on the source, an image Michael pushes today is the one CI finds "already published" later. Nothing gets rebuilt, and nothing conflicts.
+- **The runbook shrinks** from "build, tag, push, render, diff, apply" to those two lines.
+
+It's a small change: the CI step's logic moves into a script, CI calls it, and I add a test that runs the script with fake `docker` and `aws` binaries, like the deploy script's test. I'd also put both commands into the message to Michael, so he can do the first deploy that way.
+
+Want me to do it? It can't be tested against real ECR until Michael runs it, since I don't have AWS credentials here.
+
+## 15:40 user (smp-tool)
+
+Ah.. what I was expecting is, the CI will publish the tagged image as an artifact and one can just download that and use with deploy script...??
+
+## 15:41 assistant (smp-tool)
+
+Close, with one catch: the cluster can only pull images from a registry (ECR), not from a downloaded file. So an artifact can't skip the push; someone with ECR access still has to push it. What it does skip is building it on your machine.
+
+The flow would be:
+1. CI saves the tested image as an artifact (`docker save`, roughly 50 MB, kept 30 days).
+2. Michael downloads and pushes it:
+   ```bash
+   gh run download <run-id> -R qrm-dms/smp-india -n darwin-collector-image
+   ```
+   ```bash
+   docker load -i darwin-collector.tar
+   ```
+   ```bash
+   docker push <image>
+   ```
+   The image already carries the right ECR name and tag, and the run summary prints all of these.
+3. Then `deploy_darwin.sh --image <image>` as usual.
+
+Compared with the script idea, the artifact wins on the thing that matters most: **the deployed image is the exact one CI tested**. No local rebuild, and no Mac-builds-amd64 differences. The script only gives you the same source, rebuilt. Both still need Michael's ECR push until AWS trusts `smp-india`.
+
+So I'd go with the artifact. It's about one CI step (`docker save` plus upload), runs only on `dev`, `qa` and `prod` pushes, and gets removed once CI can push to ECR itself. Do you want me to add it?
+
+ECR's own limits don't matter here: the image is small, and artifact storage counts against the org's Actions quota. Retention is set in the step, so it won't pile up.
+
+## 15:41 user (smp-tool)
+
+yes, add the artifact step
+
+## 15:46 assistant (smp-tool)
+
+Green. The artifact is 41 MB and expires in 7 days. Now I'll follow Michael's steps myself: download, load, then run the loaded amd64 image's smoke test, stopping before the ECR push.
+
+## 15:46 assistant (smp-tool)
+
+The artifact step is live, and I've tested Michael's flow end to end, except the actual ECR push.
+
+- **CI** ([run](https://github.com/qrm-dms/smp-india/actions/runs/38364384689)): green. It attached `darwin-collector-image` (41 MB, kept 7 days), and the run summary lists the exact commands. The ECR publish steps were correctly skipped.
+- **My test:** I downloaded the artifact with `gh run download` and loaded it. It came out already named `…/smp-india-dev-airflow:darwin-collector-025488487ab7`, built for `linux/amd64`. The smoke test passed inside it.
+- **It switches itself off:** the artifact step runs only while the AWS role variable is unset. Once Michael sets it, CI pushes directly and stops uploading artifacts. Nothing to remove later.
+- **Pushed:** `smp-india` `654346b` (CI and README) and `smp-tool` `2f1fd5c` (runbook).
+
+Updated message for Michael, so he can do the first deploy now without waiting for the AWS role change:
+
+```
+pwede na mag-deploy kahit wala pa yung IAM trust 🎉 may tested image na sa CI:
+https://github.com/qrm-dms/smp-india/actions/runs/38364384689 → nasa summary yung exact commands (download, docker load, ecr login, push)
+
+then sa smp-tool dev:
+scripts/deploy_darwin.sh --context <dev-context> --image 624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-dev-airflow:darwin-collector-025488487ab7
+
+yung IAM trust + repo vars, ad hoc lang, para auto-push na si CI next time. send mo logs pag up na 🙏
+```
+
+The ECR push itself is still unproven. It relies on Michael's own push access to `smp-india-dev-airflow`, which he had when he pushed `darwin-collector-1.0.0`. The artifact expires on 2026-10-20; after that, any newer `dev` push produces a fresh one.
+
+## 15:48 user (smp-tool)
+
+where did we get the "624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-dev-airflow:darwin-collector-025488487ab7" ?
+
+## 15:48 assistant (smp-tool)
+
+It's built from four pieces. Three come from existing config, and one is computed:
+
+| Piece | Value | Source |
+|---|---|---|
+| AWS account | `624915953606` | The non-prod account in `smp-tool`'s `docker_build_tag_push.sh`, `docker-build.yml` and the `AWS_ROLE_ARN_NOPROD` variable (`arn:aws:iam::624915953606:role/dms-smp-deploy`) |
+| Registry host | `.dkr.ecr.eu-west-1.amazonaws.com` | Standard ECR address format, with the `eu-west-1` region those same scripts use |
+| Repository | `smp-india-dev-airflow` | `smp-india-<env>-airflow`, the naming in `docker-build.yml`. Michael's `darwin.json` also shows his POC collector image in this repo (`…/smp-india-dev-airflow:darwin-collector-1.0.0`) |
+| Tag | `darwin-collector-025488487ab7` | Computed by the new CI step: `darwin-collector-` plus the first 12 characters of the last commit that changed the collector's `Dockerfile` or `src/`. That's `0254884…`, the SCR-1273 "collect Darwin tags per entity" commit |
+
+The CI run applied that name to the image, and when I loaded the artifact it carried exactly this name.
+
+What's not verified: that the `smp-india-dev-airflow` repo exists and that Michael can push to it. Both are inferred from his `darwin-collector-1.0.0` image, since I haven't looked inside ECR.
+
+## 15:48 user (smp-tool)
+
+wait, did we create that string? is that verifiable in the image itself?
+
+## 15:49 assistant (smp-tool)
+
+Yes, we created it. The CI step composes that string and applies it with `docker tag`. A name like that is only a label attached to the image, not part of its content:
+
+- **Whatever is in the tar decides the name.** `docker save` records the name in the tar's `manifest.json`, which is why `docker load` reported it. Anyone can retag an image to any name, so the name proves nothing by itself.
+- **The image doesn't record its source commit.** The Dockerfile has no labels, so nothing inside the image says which commit it came from.
+
+What you can already verify is the **digest**, a content fingerprint. If the digest after Michael's push matches the digest of the image CI tested, it's byte-for-byte the same image. CI doesn't print the digest yet, though.
+
+The fix is small: stamp the source into the image at build time, using the standard OCI labels:
+
+```bash
+docker build \
+  --label org.opencontainers.image.revision=<full commit SHA CI built from> \
+  --label org.opencontainers.image.source=https://github.com/qrm-dms/smp-india \
+  -t darwin-collector:test .
+```
+
+Then anyone can check what's actually deployed, whatever its tag says:
+
+```bash
+docker inspect <image> --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}'
+```
+
+I'd also print the image digest in the CI summary, so it can be compared with ECR after the push.
+
+That makes "this image is from commit X" a fact recorded in the image itself, rather than something inferred from its name. Want me to add both? It's about 3 lines in `ci.yml`, and the next CI run would prove it, the same way we verified the artifact.
+
+## 15:51 user (smp-tool)
+
+yes, add both
+
+HOWEVER, I just feel the whole string is damn long lol. Can we shorten that in any way?
+
+## 15:51 assistant (smp-tool)
+
+Adding both now. On shortening: most of that string is fixed. The account, region and registry host are dictated by ECR, and Kubernetes needs the full reference. Only the tag is ours. I'll propose options after this change.
+
+## 15:56 assistant (smp-india)
+
+Both are live and verified on the new CI run ([run](https://github.com/qrm-dms/smp-india/actions/runs/38365405321)). I downloaded the artifact and inspected the image:
+
+```
+revision = ae86c9651103874de8f239520dc4c78f2a9f2834
+source   = https://github.com/qrm-dms/smp-india
+id       = sha256:db5cd81f…
+```
+
+The run summary also prints the source commit and the image ID. One thing that might look odd: the tag says `0254884…`, the last commit that changed the collector, while the label says `ae86c96…`, the commit CI actually built. Both are true. The collector's contents are the same in both commits.
+
+**On shortening:** `624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-dev-airflow` is the ECR address, and Kubernetes needs it in full. Only the tag is ours. Ranked options:
+
+1. **Let `deploy_darwin.sh` take just the tag**, as `--tag darwin-collector-0254884`. The script already knows the dev registry and repo and fills them in. Nobody types or pastes the long prefix anymore, which is the real win.
+2. **Shorten the SHA in the tag from 12 to 7 characters**, Git's default short form. `darwin-collector-025488487ab7` becomes `darwin-collector-0254884`. A collision at our scale is practically impossible.
+3. **Not worth it now: a dedicated ECR repo**, so the tag could be just `0254884`. That needs AWS work for 17 fewer characters.
+
+I'd do 1 and 2. One catch with 2: it changes the tag in the message to Michael, so if he hasn't pushed yet, I'll give you the updated one-liner. Do both?
+
+## 15:57 user (smp-india)
+
+1 is fine then.
+
+## 15:57 assistant (smp-india)
+
+Starting with a failing test for `--tag`.
+
+## 15:57 assistant (smp-tool)
+
+Red, as expected. The exclusivity test only passes for now because `--tag` is an unknown option. Implementing:
+
+## 15:57 assistant (smp-tool)
+
+Green. Updating the runbook, the scripts README and the CI summary to use `--tag`:
+
+## 16:00 assistant (smp-india)
+
+`deploy_darwin.sh` now takes `--tag` and fills in the dev ECR address itself:
+
+```bash
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+```
+
+- **Tests:** written first and failed as expected, then implemented. All 32 `smp-tool` tests pass, including `--tag` expanding to the dev ECR image and `--tag` together with `--image` being refused.
+- **`--image`** still works for anything outside the dev repo, and leaving out both still keeps the running image.
+- **CI** ([run](https://github.com/qrm-dms/smp-india/actions/runs/38366093641)) is green. The run summary's deploy line now prints `--tag …` on `dev` and the full `--image …` on `qa`/`prod`, since the script's shortcut only knows the dev repo.
+- **Pushed:** `smp-tool` `7d1b8cd`, `smp-india` `9d08437`.
+
+Updated line for the message to Michael:
+
+```
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+```
+
+I tested the summary's `--tag`/`--image` switch locally but haven't opened the run summary page itself to look at it. The `--tag` shortcut also hardcodes the dev ECR address, so if that ever changes, this one line in the script has to change too.
+
+## 16:11 user (smp-india)
+
+give me the full updated message for Michael
+
+## 16:11 assistant (smp-india)
+
+```
+hi Michael! unblocked na si Darwin, ready na tayo sa first collector deploy sa dev 🎉
+
+1. image: may tested image na sa CI, nasa summary yung exact commands (download, docker load, ecr login, push)
+https://github.com/qrm-dms/smp-india/actions/runs/38366093641
+2. check lang na nandun yung darwin-api-credentials secret sa smp-india-dev
+3. pull smp-tool dev, then:
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+(magpapakita muna ng diff bago mag-apply)
+
+ad hoc: pa-trust naman si qrm-dms/smp-india sa dms-smp-deploy roles (noprod: dev/qa branches, prod: prod branch), tapos set AWS_ROLE_ARN_NOPROD/PROD sa smp-india repo vars. auto-push na si CI after nun.
+
+paused muna yung DAG ha, ako na bahala sa publishing. send mo logs pag up na. salamat!
+```
+
+The run's artifact expires on 2026-10-20. If he gets to it later than that, any newer `dev` push produces a fresh one with the same tag.
+
+## 16:13 user (smp-india)
+
+yo wait, I thought the deployment should be in smp-india solely... shouldn't we transfer the script from smp-tool to smp-india??
+
+## 16:14 assistant (smp-india)
+
+No. What we moved was only the **build**, because the build needs the source code, and the source lives in `smp-india`. The **deployment** (manifest, `sites.json`, `enabled_sites.json`, renderer, `deploy_darwin.sh`) has been in `smp-tool` all along, and SCR-1283 puts it there too.
+
+Should it move? I'd keep it in `smp-tool`:
+- **`smp-tool` owns everything that runs in the cluster:** Airflow Helm values, namespaces, PVCs, secrets scripts, and now the collector. One repo describes the cluster's state.
+- **The usual split is that the app repo builds the artifact and the infra repo deploys it.** That's exactly where we are now.
+- **Automating deploys later stays easy.** The AWS role already trusts `smp-tool`, and `docker-build.yml` already has the EKS deploy plumbing. Deploying from `smp-india` would need that trust as well, plus copies of the cluster conventions.
+
+There's one real argument for moving, and it's worth knowing about: **enabling a site is split across repos.** The mappings live in `smp-india` (`mappings.json`), while `enabled_sites.json` lives in `smp-tool`. The rule "mappings first, then enable" is enforced only by the runbook. In one repo, a single test could check that every enabled site has mappings.
+
+That's fixable without moving anything: a small check in `smp-tool`'s tests that reads `smp-india`'s `mappings.json` from GitHub. Or we live with the runbook rule, since sites rarely change.
+
+So I'd keep things where they are. Did you have a specific reason for wanting deployment in `smp-india`, or was it an assumption from the build move?
+
+## 16:16 user (smp-india)
+
+I presumed based on the discussion. 
+
+We did agree the CI/CD of the darwin collector image will be built and deploy from smp-india, correct? Essentially eliminating the cross-repo dependency...
+
+## 16:17 assistant (smp-india)
+
+Not quite. Looking back, we each meant something different, and I should have caught it earlier.
+
+- **What I proposed, and you agreed to in the plan:** move the image **build** to `smp-india` CI. `deploy_darwin.sh` and `enabled_sites.json` stayed in `smp-tool`, with Michael deploying by tag. My exact words: "`deploy_darwin.sh` and `enabled_sites.json` stay; Michael still deploys by tag."
+- **What you understood:** CI/CD from `smp-india`, meaning build and deploy, with no cross-repo dependency. Your earlier question ("build what we can... then just stop at deployment UNTIL role recognizes smp-india") said exactly that, and I answered the blocker question without correcting the misunderstanding underneath it.
+
+Where that leaves us: the cross-repo **token** dependency is gone, because the build no longer checks out another repo. The cross-repo **deployment** dependency is still there. You build in `smp-india`, then hand the tag to a script in `smp-tool`. Enabling a site also still spans both repos: mappings in one, `enabled_sites.json` in the other.
+
+To fully match what you had in mind, the Darwin deployment moves into `smp-india`, next to the service:
+- **Move:** `deployment.json`, `sites.json`, `enabled_sites.json`, the renderer, `deploy_darwin.sh`, their tests and the runbook, into something like `services/darwin-collector/deploy/`.
+- **Gain:** one repo for the collector's code, image, mappings and deploy. Enabling a site becomes one PR, with a test that every enabled site has mappings. A future deploy job sits in the same CI that builds the image, with no cross-repo checkout.
+- **Cost:** it departs from SCR-1283's "smp-tool" design, so the ticket needs a one-line update. Automated deploys would also need the `smp-india` AWS role to have EKS access, on top of ECR. That's one more item for Michael's ad hoc list, and it's needed only once we automate.
+- **Unchanged:** Michael's manual deploy works the same way, just from `smp-india`. The `darwin-poc` setup stays in `smp-tool`.
+
+Given your intent, I think that's the cleaner end state, and my earlier "smp-tool owns the cluster" argument is weaker than the single-repo benefit here. Do you want me to move the deployment into `smp-india`? If yes, I'll update the message to Michael too, since the deploy command would come from `smp-india`.
+
+## 16:18 user (smp-india)
+
+yes, move the deployment into smp-india.
+
+We now have a pending request for the AWS role update
+
+## 16:18 assistant (smp-india)
+
+Moving it now. First I'll map everything that references the Darwin deploy files in `smp-tool`, so nothing is left dangling.
+
+## 16:19 assistant
+
+Copied. Now adapting the paths: the renderer reads config from its own folder, and the script calls `render.py`.
+
+## 16:19 user (smp-india/services/darwin-collector)
+
+Michael did interject...
+"and then sa workflow ni smp-india pa expect nalang ng variable for AWS_ROLE_ARN na iaassume ni smp-india workflow"
+
+## 16:20 assistant (smp-india/services/darwin-collector)
+
+The `# noqa` is gone; the moved tests load the renderer directly, and all 17 pass. The move itself isn't finished yet: the `smp-tool` cleanup, docs and CI summary are still to do.
+
+On Michael's point: his idea is that `smp-india`'s workflow just expects one variable, `AWS_ROLE_ARN`, and assumes that role. The catch is that **prod is a different AWS account** (`154989746575`, versus non-prod `624915953606`), so one role can't cover both. That's why I used two variables, `AWS_ROLE_ARN_NOPROD` and `AWS_ROLE_ARN_PROD`, the same names `smp-tool` already uses. Ways to reconcile:
+
+1. **GitHub Environments, one name:** create `dev`, `qa` and `prod` environments in `smp-india`, each with its own `AWS_ROLE_ARN` value. The publish step runs in the branch's environment. This is the cleanest way to give Michael his single name. The catch: the OIDC token's subject becomes `repo:qrm-dms/smp-india:environment:dev` instead of `…:ref:refs/heads/dev`, so **his trust policy has to match that form**. He needs to know before he writes it.
+2. **A single `AWS_ROLE_ARN`, non-prod only for now:** publish only on `dev` and `qa`, and decide prod later. This is the smallest change, but it pushes the prod question down the road.
+3. **Keep `_NOPROD`/`_PROD`:** identical to `smp-tool`, so Michael copies the same values over. No change on my side.
+
+I'd go with 1 if he wants a single name, or 3 if he doesn't mind two. Either way he needs to know which subject format the trust policy should use, since that's the part that silently fails if it's wrong. Which do you want? I can draft the Taglish reply to him once you pick.
+
+Meanwhile I'll finish moving the deployment. That's independent of the variable names.
+
+## 16:24 user (smp-india/services/darwin-collector)
+
+Which is simpler? I assume 3 lol.
+
+## 16:24 assistant (smp-india/services/darwin-collector)
+
+Yes, 3 is the simplest. It's already built and tested, it uses the same names and values as `smp-tool`, and the trust-policy subjects in the earlier message to Michael stay correct. Reply for him:
+
+```
+2 accounts kasi (noprod/prod), so dalawa yung vars: AWS_ROLE_ARN_NOPROD at AWS_ROLE_ARN_PROD, same values as sa smp-tool. naka-wire na sa CI, set mo lang pag ready na yung trust 🙏
+```
+
+I'll carry on with the deployment move.
+
+## 16:24 assistant (smp-india/services/darwin-collector)
+
+Ruff found 5 issues in the moved files: line length and import order. I'll fix them properly with the formatter and `--fix`, with no suppressions:
+
+## 16:24 assistant (smp-india/services/darwin-collector)
+
+The `smp-india` side is done: ruff is clean and all 85 collector tests pass (66 existing plus 19 moved or new). Now removing the moved files from `smp-tool`, keeping its POC test.
+
+## 16:28 assistant (smp-india)
+
+The deployment now lives in `smp-india`, next to the collector. Both repos are pushed, and the CI run on the result is green ([run](https://github.com/qrm-dms/smp-india/actions/runs/38369148478)), with a fresh image artifact attached.
+
+**What's where now:**
+- **`smp-india`, `services/darwin-collector/deploy/`:** the manifest, `sites.json`, `enabled_sites.json`, `render.py`, `deploy.sh` and the runbook, plus their tests in the collector test suite.
+- **New check:** CI fails if `enabled_sites.json` lists a site whose streams have no mappings in `mappings.json`. "Mappings first, then enable" is now enforced instead of being a runbook rule. That was the main payoff of putting everything in one repo.
+- **`smp-tool`:** the Darwin deployment is removed and its README points to `smp-india`. What stays there: the mock POC, namespaces, PVCs and the secret helpers that step 2 of the runbook uses.
+- **Tests:** all 85 collector tests pass, ruff is clean without suppressions, and the `smp-tool` tests pass.
+- **Commits:** `smp-india` `9d08437..37206fd` (4 commits) and `smp-tool` `7d1b8cd..0ff92d9` (2 commits).
+- **Image tag unchanged:** it's still `darwin-collector-025488487ab7`, because the `Dockerfile` and `src/` didn't change.
+
+Updated message for Michael, with the new path and the latest run:
+
+```
+hi Michael! unblocked na si Darwin, ready na tayo sa first collector deploy sa dev 🎉
+
+1. image: may tested image na sa CI, nasa summary yung exact commands (download, docker load, ecr login, push)
+https://github.com/qrm-dms/smp-india/actions/runs/38369148478
+2. check lang na nandun yung darwin-api-credentials secret sa smp-india-dev
+3. pull smp-india dev (lumipat na dito yung deploy), then:
+services/darwin-collector/deploy/deploy.sh --context <dev-context> --tag darwin-collector-025488487ab7
+(magpapakita muna ng diff bago mag-apply)
+
+ad hoc: pa-trust si qrm-dms/smp-india sa dms-smp-deploy roles (noprod: dev/qa branches, prod: prod branch), tapos set AWS_ROLE_ARN_NOPROD/PROD sa smp-india repo vars, same values as smp-tool. auto-push na si CI after nun.
+
+paused muna yung DAG ha, ako na bahala sa publishing. send mo logs pag up na. salamat!
+```
+
+Since the design changed from "deploy from `smp-tool`" to "build and deploy from `smp-india`", SCR-1283's Approach section is now out of date. I haven't updated the ticket. Want me to?
+
+## 16:28 user (smp-india)
+
+yes, update the ticket
+
+## 16:29 assistant (smp-india)
+
+I rewrote the description of [SCR-1283](https://tractebel-et.atlassian.net/browse/SCR-1283) to match what we built.
+
+- **Approach (revised 2026-10-13):** build and deploy now live in `smp-india`. It records why the `smp-tool` design was dropped (the personal-token problem and the code being split across two repos) and covers the CI publish, the artifact fallback, `deploy.sh --tag` and the mapping check.
+- **Scope, 3 of 6 items done:** CI publishing, the deployment move, and the runbook.
+- **Scope, still open:**
+  - AWS trust plus the two repo variables (Michael, ad hoc).
+  - The first dev deploy of `darwin-collector-025488487ab7`.
+  - The qa/prod config and secret.
+- **Out of scope:** automatic deploys from CI. They'd also need EKS access for the `smp-india` role.
+- **Acceptance criteria:** reworded for the new design. Only "runbook merged" is ticked. Two are marked "verified locally on kind" but left open, because they still need the real cluster.
+
+I didn't touch the status (still **New**), the assignee (unassigned) or the story points (2). The real scope grew, so you may want to bump the points and move it to In Progress.
+
+## 16:30 user (smp-india)
+
+Thanks. Update from Michael,:
+
+<pasted_content id="f33a">
+ah for smp-india magiging:
+NOPROD:
+arn: arn:aws:iam::624915953606:role/dms-smp-india-deploy
+ 
+PROD:
+arn: arn:aws:iam::154989746575:role/dms-smp-india-deploy
+</pasted_content id="f33a">
+
+-- can we already set these now?
+
+## 16:30 assistant (smp-india)
+
+Yes, and those are real ARNs, so we can set them now. Michael's message only gives the role names, though; it doesn't confirm the roles are fully set up. If the trust policy or ECR permissions aren't there yet, every `dev` push would fail CI at the AWS login step instead of falling back to the artifact. So I'd test it rather than assume:
+
+1. **Set `AWS_ROLE_ARN_NOPROD`** to `arn:aws:iam::624915953606:role/dms-smp-india-deploy` on `smp-india`.
+2. **Trigger CI on `dev` manually** and watch the AWS login and push steps.
+   - **Green:** the image `darwin-collector-025488487ab7` lands in ECR. That proves the trust, the push permission and the "never overwrite" check. Michael can then skip the artifact download and deploy straight from the tag.
+   - **Red:** I delete the variable right away. CI falls back to artifact mode, and I tell you which permission is missing (trust policy, or ECR push on `smp-india-dev-airflow`).
+3. **Set `AWS_ROLE_ARN_PROD`** only after step 2 passes. It's only used on `prod` branch pushes, so there's no rush, and a broken prod role would turn the first promotion red.
+
+Setting repository variables is a lasting config change, so: do you want me to run steps 1 and 2 now?
+
+## 16:30 user (smp-india)
+
+yes pls
+
+## 16:34 assistant (smp-india)
+
+Red, so I'm deleting the variable as planned to put CI back in artifact mode:
+
+## 16:34 assistant (smp-india)
+
+It failed at the AWS login. The role exists, but it doesn't trust `smp-india` yet ([run](https://github.com/qrm-dms/smp-india/actions/runs/38369786562)):
+
+```
+Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity
+```
+
+**Reverted:** `AWS_ROLE_ARN_NOPROD` is deleted, so `smp-india` has no variables and CI is back in artifact mode. The next `dev` push will be green again. Michael's first deploy via the artifact isn't affected.
+
+This error means the role's trust policy doesn't accept GitHub's token from `smp-india`. Either the trust isn't set up yet, or the subject or audience doesn't match. Reply for Michael with the exact values it must accept:
+
+```
+na-try ko na yung dms-smp-india-deploy (noprod), "Not authorized to perform sts:AssumeRoleWithWebIdentity" pa. pa-check yung trust policy:
+- Federated: token.actions.githubusercontent.com (yung existing OIDC provider sa account)
+- aud: sts.amazonaws.com
+- sub: repo:qrm-dms/smp-india:ref:refs/heads/dev at repo:qrm-dms/smp-india:ref:refs/heads/qa
+(prod role: repo:qrm-dms/smp-india:ref:refs/heads/prod)
+tapos ECR push sa smp-india-dev-airflow. ping mo ako pag okay na, I'll re-test 🙏
+```
+
+Once he confirms, I'll set the variable and re-run the same test. I can't see the role's policy myself, since I have no AWS access here. Exact `sub` values are a common slip: a wildcard like `repo:qrm-dms/smp-india:*` would also work, but it's broader, so that's his call.
+
+## 16:35 user (smp-india)
+
+no, keep that in. Let's just feature flag the actual role assumpton + deploy step
+
+## 16:35 assistant (smp-india)
+
+Got it: keep the role variables set, and put the AWS login and push behind a separate on/off switch. CI never deploys, so the "deploy step" here is the ECR push. When the switch is off, CI stays in artifact mode, even with the role variables set.
+
+## 16:36 assistant (smp-india/services/darwin-collector)
+
+All four combinations behave correctly: CI only pushes when the switch is on and the role is set. Updating the docs, setting both role variables, then pushing and verifying.
+
+## 16:36 assistant (smp-india)
+
+Both role variables are set, the switch is unset, and the code is pushed. Watching the run, which should be green and in artifact mode:
+
+## 16:39 assistant (smp-india)
+
+The role variables are back in place, and the ECR push now has its own on/off switch, the `DARWIN_COLLECTOR_ECR_PUSH` repository variable:
+
+| `DARWIN_COLLECTOR_ECR_PUSH` | Role variable for the branch | CI does |
+|---|---|---|
+| unset / not `true` | any | Uploads the image as an artifact (now) |
+| `true` | set | AWS login and push to ECR |
+| `true` | unset | Uploads the image as an artifact |
+
+**Verified:**
+- **Locally:** I ran all four combinations through the actual step script.
+- **On CI** ([run](https://github.com/qrm-dms/smp-india/actions/runs/38370413395)): green with both role variables set. It uploaded the artifact and skipped the AWS steps, because the switch is unset.
+- **Variables set on `smp-india`:**
+  - `AWS_ROLE_ARN_NOPROD` = `…624915953606:role/dms-smp-india-deploy`
+  - `AWS_ROLE_ARN_PROD` = `…154989746575:role/dms-smp-india-deploy`
+- **Pushed:** `smp-india` `466e5ad`, with the CI gate and both READMEs updated.
+
+**To turn it on** once Michael fixes the trust policy, set `DARWIN_COLLECTOR_ECR_PUSH` to `true` in `smp-india`'s repository variables, then run CI on `dev`. Setting it to `false` turns it back off, with no code change.
+
+The switch is repo-wide, so it turns the push on for `dev`, `qa` and `prod` together. If the prod role's trust lags behind non-prod, the first `prod` branch push would fail at the AWS login. The trust message for Michael from earlier still applies; his `sub` values just need to go on the new `dms-smp-india-deploy` roles.
+
+## 16:40 user (smp-india)
+
+thanks. So for manual deployment, what's the steps nalang?
+
+## 16:40 assistant (smp-india)
+
+Here are the steps for a manual deploy right now, while CI uploads the image as an artifact instead of pushing it.
+
+**Once per environment**
+- You need a kube context for the dev cluster.
+- The `darwin-api-credentials` secret must exist in `smp-india-dev` (keys `DARWIN_CLIENT_ID` and `DARWIN_CLIENT_SECRET`).
+
+**1. Push the image to ECR** (skip this once `DARWIN_COLLECTOR_ECR_PUSH` is on). Use the latest green CI run on `smp-india` `dev`; its summary has these commands with the values filled in.
+
+```bash
+gh run download 38370413395 -R qrm-dms/smp-india -n darwin-collector-image
+```
+```bash
+docker load -i darwin-collector.tar
+```
+```bash
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 624915953606.dkr.ecr.eu-west-1.amazonaws.com
+```
+```bash
+aws ecr describe-images --repository-name smp-india-dev-airflow --image-ids imageTag=darwin-collector-025488487ab7
+```
+If that last command finds the tag, it's already pushed, so skip the push. Otherwise:
+```bash
+docker push 624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-dev-airflow:darwin-collector-025488487ab7
+```
+
+**2. Deploy.** From `smp-india` on an up-to-date `dev`:
+```bash
+services/darwin-collector/deploy/deploy.sh --context <dev-context> --tag darwin-collector-025488487ab7
+```
+It shows the diff and asks before applying. On the first deploy, the whole Deployment shows as new. It then waits for the rollout and prints the logs.
+
+**3. Check it's collecting.** Look for `poll_complete` with `"failed_entities": 0` in the logs it prints, and new batches under `/export/smp-india-dev/darwin/pending/`.
+
+**Later changes:**
+- **Enable a site:** edit `services/darwin-collector/deploy/enabled_sites.json`, commit to `dev`, then run `deploy.sh --context <dev-context>`. With no tag, it keeps the running image.
+- **New collector code:** CI produces a new tag. Repeat steps 1 and 2 with it, or only step 2 once the push switch is on.
+- **Roll back:** run `deploy.sh` with the previous tag.
+
+The artifact from run `38370413395` expires on 2026-10-20; after that, use a newer run's artifact. Nobody has run the ECR login and push steps yet, so the first real test is Michael's push.
+
+## 16:41 user (smp-india)
+
+Michael can simply download from the GH UI, no?
+
+## 16:41 assistant (smp-india)
+
+Yes. He opens the CI run page, scrolls to **Artifacts** at the bottom, and clicks **darwin-collector-image**.
+
+The browser download is a zip (`darwin-collector-image.zip`) with the tar inside, so he unzips it first:
+
+```bash
+unzip darwin-collector-image.zip
+```
+
+Then he carries on from `docker load -i darwin-collector.tar`. The only difference from the CLI route is that unzip step; `gh run download` extracts the zip itself.
+
+## 16:44 user (smp-india)
+
+Hmmmm.. The pushing image to ECR sounds convoluted.  I assume we just make sure that the tag is accurate?
+
+## 16:44 assistant (smp-india)
+
+The push can't be skipped. The cluster pulls the image from ECR, never from Michael's machine. It's less convoluted than my list made it look, though, and he doesn't need to get the tag right himself, because it's already baked into the file.
+
+1. Download and unzip the artifact.
+2. Run `docker load -i darwin-collector.tar`. It prints `Loaded image: …/smp-india-dev-airflow:darwin-collector-025488487ab7`, the exact name CI gave it.
+3. Log in to ECR (one line), then run `docker push <that printed name>`.
+
+He copies the name from the load output and never types a tag himself.
+
+You can drop the "does this tag already exist" check for now. It only protects against re-pushing a tag that's already in ECR, and on this first deploy it isn't there yet. It would matter only if he re-pushed a later run's artifact for the same tag. That replaces the tested image with an equivalent rebuild. That's harmless in practice, but it breaks the "this tag is exactly what CI tested" guarantee.
+
+The whole push step goes away once Michael fixes the trust policy and `DARWIN_COLLECTOR_ECR_PUSH` is turned on. Then it's just `deploy.sh --tag …`.
+
+Do you want me to drop the check from the CI summary text so it matches?
+
+## 16:45 user (smp-india)
+
+wait, now I'm lost again lol. You make it sound like the CI/CD we're doing here in smp-india only covers ECR, aren't we also doing the actual deployment?
+
+## 16:46 assistant (smp-india)
+
+Right now, no. CI stops at ECR, and the deploy is still someone running `deploy.sh` by hand. That's my doing, and I should have flagged it more clearly:
+
+- **The original SCR-1283** asked for one manually triggered workflow that builds, publishes **and deploys**.
+- **When we scoped it down earlier**, you said "anything except the actual deployment", because of the blockers at the time. I kept that cut when I rewrote the ticket: "Automatic deploys from CI" is listed as out of scope.
+- **Your feature-flag request** said "role assumption + deploy step". I treated "deploy" as the ECR push. You probably meant the actual deploy.
+
+So the missing piece is a **"Deploy Darwin collector" button** in `smp-india`:
+- A manual `workflow_dispatch` with inputs for the environment and the tag (default: the current one).
+- It assumes the `dms-smp-india-deploy` role, connects to the EKS cluster (the same cluster names `smp-tool`'s Airflow deploy uses), and runs `deploy.sh --tag … --yes`.
+- It fails if the rollout fails, which matches the original acceptance criteria.
+- It sits behind its own switch, like the push, so it stays off until AWS is ready.
+- **Dev only for now**, because `deploy.sh` and its config only know `smp-india-dev`. qa and prod need their own config first, which is already an open item on the ticket.
+
+It needs one more thing from Michael: the `dms-smp-india-deploy` role also needs **EKS access** to the `smp-india-dev` namespace, not just ECR push. Without it, the workflow gets as far as connecting to the cluster and is then refused.
+
+Once that and the trust policy are in, the whole flow becomes: merge to `dev`, CI publishes the image, then you click Deploy. No local Docker or kubectl.
+
+Do you want me to add the Deploy workflow, behind its own switch, and put EKS access on Michael's list?
+
+## 16:50 user (smp-india)
+
+is it feasible to do the actual deployment from smp-india though? If so, should we even?
+
+Here's Michael reply when I told him about the ECR + EKS request..
+"ah I just assumed na same sa current process natin with darwin na nagrerender tayo sa smp-tool and nag doon na maghelm upgrade after natin magpush ng image sa ECR from smp-india."
+
+## 16:51 assistant (smp-india)
+
+Yes, deploying from `smp-india` is technically feasible: a manual workflow, the `dms-smp-india-deploy` role, and an EKS access entry for that role on the `smp-india-dev` namespace. But Michael's reply changes the "should we" answer, and I now think we shouldn't.
+
+Michael's model is: `smp-india` builds and pushes the image to ECR, then `smp-tool` renders and deploys. That's exactly the split I first recommended before we moved the deployment. He's the one who operates the cluster, and his reasoning holds up:
+
+| | Deploy from `smp-tool` (Michael's model) | Deploy from `smp-india` |
+|---|---|---|
+| New AWS/EKS permissions | None. `smp-tool`'s role already deploys Airflow to these clusters | EKS access for the new role, per environment |
+| Who can change the cluster | Only the infra repo | The app repo too, so a wider blast radius |
+| Fits how the team operates | Yes, same as Airflow | No, a second deploy path to maintain |
+| Enabling a site | Mappings in `smp-india`, sites in `smp-tool`; "mappings first" back to a runbook rule | One PR, with the CI check |
+
+The only thing we'd lose is the "every enabled site has mappings" check. Sites change rarely, so that's a small loss next to cluster permissions and team convention.
+
+So I'd go with Michael's model:
+- **`smp-india` stays as it is now:** test, build, label, and push to ECR once the switch is on. That's its whole job.
+- **`smp-tool` gets the deployment back:** I move `deploy/` back, mostly by reverting my move commits. Later, a manual "Deploy Darwin collector" button can sit next to the existing Airflow deploy, using the role that already has EKS access. No new permission requests.
+- **Michael's ask shrinks** to the ECR push trust for `dms-smp-india-deploy`. The EKS request is dropped.
+
+That flips the earlier decision. "Do it nice" now means matching how the cluster owner already runs things. Should I move the deployment back to `smp-tool`, and tell Michael his model stands, with no EKS access needed?
+
+## 16:52 user (smp-india)
+
+I see.. so if we decide to move everything to smp-india, that'd mean we'd be repeating certain configuration and shit, is that right?
+
+## 16:52 assistant (smp-india)
+
+Yes. Deploying from `smp-india` means copying, or keeping in sync, several things `smp-tool` already owns:
+
+- **The cluster connection:** EKS cluster names per environment (`eks-qrm-dms-noprod-6196`, `eks-qrm-dms-strategy-prod-bba1`), the region, and the `update-kubeconfig` and access-check steps. These already exist in `smp-tool`'s Airflow deploy job.
+- **Per-environment settings:** namespaces (`smp-india-dev`/`qa`/`prod`), PVC names and proxy settings live in `smp-tool/config/india/<env>/`. The collector manifest already hardcodes copies of them for dev. If Michael changes a PVC or the proxy in `smp-tool`, our copy silently goes stale. That's already a risk today, and qa and prod would triple it.
+- **Deploy guardrails:** `smp-tool` enforces rules like "deploy qa only from the qa branch". We'd have to rebuild them.
+- **Permissions:** a second role with cluster write access, maintained separately.
+- **Secrets stay in `smp-tool` anyway:** `apply_secrets.sh` and the protected bundle. So even "everything in `smp-india`" still depends on `smp-tool` for step 2 of the runbook.
+
+So "all in `smp-india`" doesn't actually remove the cross-repo dependency; it moves it, and adds copies on top. The clean split is the one Michael described:
+- **`smp-india`** owns the code, tests and image.
+- **`smp-tool`** owns the cluster and everything deployed to it.
+
+The tag is the only handoff between them.
+
+That's why I'd move the deployment back.
+
+## 16:52 user (smp-india)
+
+ok, move the deployment back to smp-tool. Sorry!!! Shit's confusing
+
+## 16:53 assistant (smp-india)
+
+No need to apologize. Moving it back now, and I'll pull the flag and role text into the restored runbook so nothing is lost.
+
+## 16:53 assistant (smp-india)
+
+The revert is clean: the config files are identical to what's in `smp-india`, and the `smp-tool` tests pass. Now I'll bring the runbook up to date on the push switch and the new roles:
+
+## 16:53 assistant (smp-tool)
+
+Now the `smp-india` side: remove `deploy/` and its tests, and point the CI summary and docs back to `smp-tool`.
+
+## 16:56 assistant (smp-india)
+
+The deployment is back in `smp-tool`, and both repos are pushed. CI on `smp-india` is green ([run](https://github.com/qrm-dms/smp-india/actions/runs/38372430376)).
+
+**Where things live now (Michael's model):**
+- **`smp-india`:** code, tests and the image. CI tests, builds, labels and publishes it. The artifact fallback and the `DARWIN_COLLECTOR_ECR_PUSH` switch are unchanged. Its CI summary points to `smp-tool` for deploying.
+- **`smp-tool`:** everything that touches the cluster. `config/india/dev/darwin/` (manifest, `sites.json`, `enabled_sites.json`), `render_darwin.py`, and `deploy_darwin.sh` with `--tag`, as before the move. The runbook now also mentions the push switch and the `dms-smp-india-deploy` roles.
+- **Dropped:** the "every enabled site has mappings" CI check. It can't work across repos without a token, so "mappings first" is back to being a runbook rule.
+
+**Commits:**
+- `smp-tool` `0ff92d9..1d61a5c`: two reverts plus a runbook update.
+- `smp-india` `466e5ad..28032bc`: the move back, plus docs and CI summary pointing to `smp-tool`.
+
+**Verified:** the config files were identical before and after, all `smp-tool` tests pass, the 66 collector tests pass, and the docs check is clean.
+
+The deploy command goes back to:
+
+```bash
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+```
+
+Run it from `smp-tool` on `dev`.
+
+Two loose ends:
+- **The message to Michael:** the last version pointed him at `smp-india` for deploying. If you haven't sent it, change step 3 to "pull smp-tool dev, then `scripts/deploy_darwin.sh …`". If you have, a one-liner correction will do.
+- **SCR-1283's description** still says "build and deploy live in `smp-india`". Want me to fix it to match: build in `smp-india`, deploy in `smp-tool`, ECR trust only, no EKS ask?
+
+## 16:57 user (smp-india)
+
+yes, update the ticket and the message for Michael
+
+For msg to Michael, keep it extremely steps-driven. For pushing to ECR, just keep it vague as he likely knows what to do already. Just do specific on the deploy as we introduced a script of sorts.
+
+## 16:57 assistant (smp-india)
+
+[SCR-1283](https://tractebel-et.atlassian.net/browse/SCR-1283) is updated.
+- **Approach:** `smp-india` builds the image, `smp-tool` deploys it, and the tag is the only handoff. It notes both dropped designs and why.
+- **Open items:**
+  - The ECR trust for `dms-smp-india-deploy`, including the failed attempt's exact error.
+  - The first dev deploy.
+  - qa/prod config.
+  - An optional Deploy button in `smp-tool`.
+- **Removed:** the EKS ask.
+
+Message for Michael:
+
+```
+hi Michael! steps for the first collector deploy sa dev:
+
+1. push image sa ECR (smp-india-dev-airflow:darwin-collector-025488487ab7). nasa artifacts ng latest CI run:
+https://github.com/qrm-dms/smp-india/actions/runs/38372430376
+
+2. sa smp-tool, pull dev:
+git checkout dev && git pull
+
+3. deploy:
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+→ magpapakita ng diff, type y para mag-apply
+→ hihintayin niya yung rollout, tapos ipi-print yung logs
+
+4. check sa logs: poll_complete na may "failed_entities": 0
+
+paused muna yung DAG, ako na sa publishing. send mo lang logs pag up na, salamat!
+```
+
+The artifact in that run expires on 2026-10-20.
+
+## 16:58 user (smp-india)
+
+clarification. For step 3, does he do this inside the pod?
+
+## 16:58 assistant (smp-india)
+
+No, he runs it on his own machine, from his `smp-tool` checkout. The script creates the collector pod itself, so there's no pod to get into before the first deploy.
+
+He needs:
+- **`kubectl` already set up for the India dev cluster** (`eks-qrm-dms-noprod-6196`), the same setup he uses for Airflow. `--context` takes that context's name, which he can find with `kubectl config get-contexts`.
+- **`python3`**, because the script renders the manifest with it.
+
+Updated step 3 for the message:
+
+```
+3. deploy (sa local mo, hindi sa pod — yung kubectl setup mo for india dev):
+scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+→ (pang-hanap ng context name: kubectl config get-contexts)
+→ magpapakita ng diff, type y para mag-apply
+→ hihintayin niya yung rollout, tapos ipi-print yung logs
+```
+
+## 17:01 user (smp-india)
+
+apologies, but I'm still confused af. Because previously, when I requested for his help to push and deploy, it was as simple as...
+
+
+FLORENDO John Michael (ENGIE Services Philippines), pa-help ulit for Darwin collector deployment chuchu.
+
+1. Pull latest `dev` in both `smp-india` and `smp-tool`
+2. Provision `darwin-api-credentials` in `smp-india-dev|qa|prod` with `DARWIN_CLIENT_ID` and `DARWIN_CLIENT_SECRET`. I’ll share these right after this msg.
+3. Build and push the collector image from `smp-india`, targeting `linux/amd64`
+4. Render and apply the real Darwin deployment from `smp-tool` using that image.
+
+So halos the same as before, pero may creds na ngayon!
+
+-- but now, it seems it got more complicated because of the script we added?
+
+## 17:01 assistant (smp-india)
+
+It's actually simpler than before. My message just spelled out every detail, which made it look longer. Mapping your old message to today:
+
+| Before | Now |
+|---|---|
+| 1. Pull `dev` in both repos | Pull `dev` in `smp-tool` only. The image is already built. |
+| 2. Provision `darwin-api-credentials` | Same. Skip it if he already did it last time. |
+| 3. Build and push the image from `smp-india` (`linux/amd64`) | No build: CI already built and tested it. He just pushes the artifact to ECR. Once the AWS role is fixed, this step disappears. |
+| 4. Render and apply from `smp-tool` | One command. The script does render, diff, apply and rollout check, the same `kubectl` steps he'd run by hand. |
+
+So the script removes work: step 4 becomes one line instead of a render plus a few `kubectl` commands. He still runs it from his own machine with his usual `kubectl` setup, exactly where he'd have run `kubectl apply` before.
+
+Same message in your old style:
+
+```
+Michael, pa-help ulit for Darwin collector deployment chuchu.
+
+1. Pull latest dev sa smp-tool
+2. darwin-api-credentials sa smp-india-dev (skip if done na)
+3. Push sa ECR yung image na built na ng CI (artifacts dito): https://github.com/qrm-dms/smp-india/actions/runs/38372430376
+4. Deploy from smp-tool: scripts/deploy_darwin.sh --context <dev-context> --tag darwin-collector-025488487ab7
+
+So halos the same as before, pero isang command na lang yung deploy!
+```
+
+## 22:10 user (smp-india)
+
+From Mateo on the other timeseries IDs:
+"
+
+<pasted_content id="f33a">
+Ok just to correct a bit, in UAT, Titwha have some other ID..! When I created the timeseries in prod, I adjusted a bit the metadatas, that's why :
+
+* 1161ac32-ab2c-524f-9299-020ac7562c46 : darwin_IN_Gujarat_Tithwa_WindDirection_PT15M
+* 3c900c0b-0a89-5440-96a4-a8d23ade70f4 : darwin_IN_Gujarat_Tithwa_Generation_PT1M
+* e33fd648-f3d5-5558-907e-ef4a185faa65 : darwin_IN_Gujarat_Tithwa_WindSpeed_PT15M
+* f81fd472-6e57-5fae-91d6-da98e77c11cb : darwin_IN_Gujarat_Tithwa_Generation_PT15M
+</pasted_content id="f33a">
+
+"
+
+## 22:10 assistant (smp-india)
+
+This means `mappings.json` can't stay a single list for every environment. Let me check how the publisher decides which TSDB environment it writes to.
+
+## 22:11 assistant (smp-india)
+
+I'm not on VPN, so I can't reach TSDB from here. I'll set up a read-only probe for you to run, covering Mateo's four new Tithwa UAT IDs and Tuticorin's eight IDs, in both environments:
+
+## 22:11 assistant (discovery/scr-1273-tsdb)
+
+Mateo's correction means `mappings.json` needs separate UAT and prod IDs. I haven't changed any code yet; we should check the IDs first.
+
+Nothing is broken right now: Tithwa isn't enabled, and `enabled_sites.json` only lists Tuticorin and the three solar sites. But publishing can't support Tithwa until the IDs differ by environment.
+
+**Step 1: verify, on VPN.** Paste this in your terminal. It's read-only and checks the 12 IDs in both UAT and prod:
+
+```bash
+cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && .venv/bin/python ../discovery/scr-1273-tsdb/probe_ids.py uat; .venv/bin/python ../discovery/scr-1273-tsdb/probe_ids.py prod
+```
+
+What I expect:
+- **Mateo's 4 Tithwa IDs** should resolve in UAT and 404 in prod.
+- **Tuticorin's 8 IDs** are the open question. If they 404 in prod, Tuticorin has separate prod IDs too, and we need them from Mateo.
+
+**Step 2: the fix, after the probe.** Each mapping row would get one ID per environment:
+
+```json
+"quarter_hour_series_id": {"uat": "f81fd472-…", "prod": "594cb143-…"}
+```
+
+- The publisher already knows which environment it writes to, so it would pass that to `load_mappings`.
+- Rows where both environments share an ID would repeat it. A bit verbose, but explicit, and it avoids a "default plus overrides" rule that's easy to misread.
+- The loader would refuse to load if any row is missing an ID for the requested environment. That way a missing prod ID fails loudly at load time, instead of publishing to the wrong series.
+- I'd write it test-first, and the test pinning Mateo's IDs would cover both environments.
+
+Tell me when the probe has run (I can read your terminal) and whether the per-environment design works for you.
+
+## 22:31 user (discovery/scr-1273-tsdb)
+
+Hold on... 9/10 of the time, UAT and Prod ids should be exactly the same as ids are supposedly deterministic. I think this is just an edge case. Do you feel it's worthwhile to add adjust for this case? Or is there a diff way to approach this?
+
+## 22:32 assistant (discovery/scr-1273-tsdb)
+
+Agreed. If IDs are deterministic (derived from the series metadata), then "same ID in UAT and prod" is the rule, and Tithwa broke it only because Mateo changed the metadata when he created the prod series. So it's better to fix the data than to complicate the code.
+
+**The other way:** ask Mateo to create the four Tithwa series in UAT **with exactly the same metadata as prod**. Deterministic IDs then come out identical to the prod ones we already have in `mappings.json`:
+- **No code change.** The rule "one ID for both environments" stays true. It's already written in the Darwin contract README, and the per-environment design isn't needed.
+- His four new UAT IDs become leftovers he can deactivate. We never publish to them.
+
+Per-environment mappings would make every row twice as long and add a loader rule, all to support an exception the system isn't supposed to have. I'd only build that if mismatched IDs turn out to be common, and one case isn't evidence of that.
+
+Message for Mateo:
+
+```
+Thanks Mateo! Since the IDs are deterministic, could you create the 4 Tithwa series in UAT with exactly the same metadata as prod? That way they get the same IDs as prod, which is what we already have mapped:
+
+- 594cb143-ca32-5895-a53c-2e198e68dba0 : Tithwa_Generation_PT15M
+- eb62a97c-c424-5ef0-81a1-795fc7076061 : Tithwa_Generation_PT1M
+- 43a7132b-e013-5cea-8a62-e17fbd319f65 : Tithwa_WindSpeed_PT15M
+- 4381f101-34b8-5e4b-9b47-f580a88dd9b8 : Tithwa_WindDirection_PT15M
+
+The 4 UAT ones you just sent can be deactivated, we won't publish to them.
+```
+
+The probe I prepared is still worth running on VPN, for Tuticorin specifically. Its eight IDs were only ever checked in UAT. By the same rule they should exist in prod with the same IDs, but if they 404 there, Mateo needs to create them in prod too, before Tuticorin publishes to prod. After his fix, re-running the probe also confirms the Tithwa IDs match.
+
+## 22:34 user (discovery/scr-1273-tsdb)
+
+<bash-input>cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && .venv/bin/python ../discovery/scr-1273-tsdb/probe_ids.py uat; .venv/bin/python ../discovery/scr-1273-tsdb/probe_ids.py prod</bash-input><bash-stdout>direnv: loading ~/repos/smp/smp-india/.envrc
+direnv: loading ~/repos/smp/.envrc
+direnv: export +AIRFLOW_HOME +AIRFLOW_VAR_MS_EMAIL_ENABLED +AIRFLOW_VAR_MS_EMAIL_RECIPIENT +AIRFLOW_VAR_MS_SHARED_MAILBOX_EMAIL +AIRFLOW__CORE__DAGS_FOLDER +AIRFLOW__CUSTOM__TASK_OUTPUT_ROOT +PYTHONPATH +SMP_SERVICE_APP_OKTA_CLIENT_ID +SMP_SERVICE_APP_OKTA_CLIENT_SECRET +SMP_SERVICE_APP_OKTA_UAT_CLIENT_ID +SMP_SERVICE_APP_OKTA_UAT_CLIENT_SECRET +UV_INDEX_SMP_CORE_DEV_PASSWORD +UV_INDEX_SMP_CORE_DEV_USERNAME +UV_SYSTEM_CERTS
+
+===== UAT =====
+OK   Tithwa_WindDirection_PT15M           deg    PT15M active=True latest=None  name=darwin_IN_Gujarat_Tithwa_WindDirection_PT15M
+OK   Tithwa_Generation_PT1M               MW     PT1M  active=True latest=None  name=darwin_IN_Gujarat_Tithwa_Generation_PT1M
+OK   Tithwa_WindSpeed_PT15M               m/s    PT15M active=True latest=None  name=darwin_IN_Gujarat_Tithwa_WindSpeed_PT15M
+OK   Tithwa_Generation_PT15M              MW     PT15M active=True latest=None  name=darwin_IN_Gujarat_Tithwa_Generation_PT15M
+OK   TUTICORIN INSE3 ActivePower 1M       MW     PT1M  active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_Generation_PT1M
+OK   TUTICORIN INSE3 ActivePower 15M      MW     PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_Generation_PT15M
+OK   TUTICORIN INSE3 WindSpeed 15M        m/s    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_WindSpeed_PT15M
+OK   TUTICORIN INSE3 WindDirection 15M    deg    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_WindDirection_PT15M
+OK   TUTICORIN INSE4 ActivePower 1M       MW     PT1M  active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_Generation_PT1M
+OK   TUTICORIN INSE4 ActivePower 15M      MW     PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_Generation_PT15M
+OK   TUTICORIN INSE4 WindSpeed 15M        m/s    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_wind_speed_100m_PT15M
+OK   TUTICORIN INSE4 WindDirection 15M    deg    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_WindDirection_PT15M
+Saved /Users/qn5792/repos/smp/discovery/scr-1273-tsdb/uat-ids-probe-143405.json
+
+===== PROD =====
+ERR  Tithwa_WindDirection_PT15M           http=404 Error: Object (Timeseries 1161ac32-ab2c-524f-9299-020ac7562c46) does not exist - [0.49.2] Request "GET" @ https://tsdb.gems.myengie.com/api/v1/timeseries/1161ac32-ab2c-524f-9299-020ac7562c46 params={}
+ERR  Tithwa_Generation_PT1M               http=404 Error: Object (Timeseries 3c900c0b-0a89-5440-96a4-a8d23ade70f4) does not exist - [0.49.2] Request "GET" @ https://tsdb.gems.myengie.com/api/v1/timeseries/3c900c0b-0a89-5440-96a4-a8d23ade70f4 params={}
+ERR  Tithwa_WindSpeed_PT15M               http=404 Error: Object (Timeseries e33fd648-f3d5-5558-907e-ef4a185faa65) does not exist - [0.49.2] Request "GET" @ https://tsdb.gems.myengie.com/api/v1/timeseries/e33fd648-f3d5-5558-907e-ef4a185faa65 params={}
+ERR  Tithwa_Generation_PT15M              http=404 Error: Object (Timeseries f81fd472-6e57-5fae-91d6-da98e77c11cb) does not exist - [0.49.2] Request "GET" @ https://tsdb.gems.myengie.com/api/v1/timeseries/f81fd472-6e57-5fae-91d6-da98e77c11cb params={}
+OK   TUTICORIN INSE3 ActivePower 1M       MW     PT1M  active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_Generation_PT1M
+OK   TUTICORIN INSE3 ActivePower 15M      MW     PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_Generation_PT15M
+OK   TUTICORIN INSE3 WindSpeed 15M        m/s    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_WindSpeed_PT15M
+OK   TUTICORIN INSE3 WindDirection 15M    deg    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE3_WindDirection_PT15M
+OK   TUTICORIN INSE4 ActivePower 1M       MW     PT1M  active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_Generation_PT1M
+OK   TUTICORIN INSE4 ActivePower 15M      MW     PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_Generation_PT15M
+OK   TUTICORIN INSE4 WindSpeed 15M        m/s    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_WindSpeed_PT15M
+OK   TUTICORIN INSE4 WindDirection 15M    deg    PT15M active=True latest=None  name=darwin_IN_South_Tamil_Nadu_INSE4_WindDirection_PT15M
+Saved /Users/qn5792/repos/smp/discovery/scr-1273-tsdb/prod-ids-probe-143411.json
+~/repos/smp/smp-india  dev</bash-stdout><bash-stderr></bash-stderr>
+
+## 22:34 assistant (discovery/scr-1273-tsdb)
+
+Good news for Tuticorin, and the probe confirms the Tithwa picture.
+
+- **Tuticorin:** all eight IDs exist in **both** UAT and prod, active, with matching units and frequencies. Same IDs in both, so it follows the rule and prod publishing is safe.
+- **Tithwa:** Mateo's four new IDs exist in UAT only (404 in prod), as expected. So the ask to him stands: create the UAT series so their IDs match prod.
+
+**One oddity worth adding to the message:** Tuticorin INSE4 wind speed has the **same ID** in both environments, but a **different name**:
+- UAT: `darwin_IN_South_Tamil_Nadu_INSE4_wind_speed_100m_PT15M`
+- prod: `darwin_IN_South_Tamil_Nadu_INSE4_WindSpeed_PT15M`
+
+So the ID doesn't come from the name alone. Some metadata changes alter it (Tithwa) and some don't (this one). Mateo will know which fields count, which is another reason to leave the fix to him rather than guess. And "100m" might hint at a hub-height wind speed, so it's worth confirming the UAT name is just stale and not a different measurement.
+
+Addition to the message for Mateo:
+
+```
+Also, a small one: Tuticorin INSE4 wind speed (7f13f05c-b6bb-55ad-8480-6b7da918258d) has the same ID in both envs, but UAT calls it "INSE4_wind_speed_100m_PT15M" and prod "INSE4_WindSpeed_PT15M". Is UAT's name just outdated, or is the 100m a different measurement?
+```
+
+Nothing to change in code: `mappings.json` already holds the prod Tithwa IDs, and Tithwa stays disabled until the UAT series match. The results are saved in `discovery/scr-1273-tsdb/`.
+
+## 22:38 user (discovery/scr-1273-tsdb)
+
+give me the full message for Mateo. Tighten it pls.
+
+For the UAT Prod mismatch, lay out first that, in all cases so far with our dealings in TSDB, both ids for UAT and Prod are the same.. so they're deterministic, in a way. Given the diff ids for Thitwa, we either:
+
+1. do a special handling for thitwa as it's the only set with differing IDs
+2. you recreating the timeseries with the same timeseries ids as prod (as with other assets)
+3. For UAT ONLY, intentionally skip thitwa so no special handling.
+
+## 22:38 assistant (discovery/scr-1273-tsdb)
+
+```
+Hi Mateo, thanks for the Tithwa IDs!
+
+So far, every series we've worked with in TSDB has had the same ID in UAT and prod, so we map one ID per series for both environments. Tithwa is the only exception (its UAT IDs differ from prod), so we see three options:
+
+1. Special handling for Tithwa: separate UAT and prod IDs, for this asset only
+2. You recreate the 4 Tithwa series in UAT with the same IDs as prod, like the other assets (our preference):
+   - 594cb143-ca32-5895-a53c-2e198e68dba0 : Tithwa_Generation_PT15M
+   - eb62a97c-c424-5ef0-81a1-795fc7076061 : Tithwa_Generation_PT1M
+   - 43a7132b-e013-5cea-8a62-e17fbd319f65 : Tithwa_WindSpeed_PT15M
+   - 4381f101-34b8-5e4b-9b47-f580a88dd9b8 : Tithwa_WindDirection_PT15M
+3. Skip Tithwa in UAT only, and publish it to prod only
+
+Which works best for you?
+
+Also a small one: Tuticorin INSE4 wind speed (7f13f05c-b6bb-55ad-8480-6b7da918258d) has the same ID in both envs, but UAT names it "INSE4_wind_speed_100m_PT15M" and prod "INSE4_WindSpeed_PT15M". Is the UAT name just outdated, or is the 100m a different measurement?
+```
+
+## 22:39 user (discovery/scr-1273-tsdb)
+
+can you fact check me on that though? the UAT === Prod claim for other timeseries
+
+## 22:39 assistant
+
+Partly. Here's what we've actually verified, and what's only inferred:
+
+**Verified by our probes, Darwin only:**
+
+| Series | Same ID in UAT and prod? |
+|---|---|
+| Khavda, Shapar, Raganesda (12) | Yes (probe on 10-02) |
+| Tuticorin (8) | Yes (today's probe) |
+| Tithwa (4) | No |
+
+So it's 20 of 24, and Tithwa is the only exception.
+
+**Indirect evidence, not checked:** I searched `smp-india`, `smp-japan` and `apac-tsdb-scraper` for any per-environment ID handling, like separate UAT and prod ID maps, and found none. All existing TSDB-writing code uses a single ID for both environments, which suggests the rule has held so far. But I didn't check that those series actually exist in both.
+
+So "every series we've worked with" overstates it. The safe version is about Darwin, which is what Mateo is dealing with anyway. Replace the first paragraph with:
+
+```
+So far, every Darwin series we've checked (Tuticorin, Khavda, Shapar, Raganesda) has had the same ID in UAT and prod, so we map one ID per series for both environments. Tithwa is the only exception, so we see three options:
+```
+
+The rest of the message stands.
+
+## 22:41 user
+
+no I mean for other dags too! IEX, Aurora, etc. Look at apac-tsdb-scraper, jic
+
+## 22:42 assistant (smp-india/dags/src/scripts)
+
+The claim holds up broadly. The fair version is "every series we hardcode uses one ID for both UAT and prod," not "it's always so."
+
+**Hardcoded, one ID for both environments** (the evidence for your claim):
+- **`smp-india` DAGs:** Khaba generation, IEX TSDB (target catalogue plus expanded historical), IEX REC, IEX bid stack, and Khavda forecasts. Each picks UAT or prod by stage (`dev`/`qa` → UAT, `prod` → prod; for example `khaba_generation.py:421`) but keeps **a single ID set**. Since these run in both environments, their IDs must exist in both.
+- **`apac-tsdb-scraper`:**
+  - IEX GDAM snapshot: 13 IDs, with a comment saying a UAT probe on 2026-09-29 verified all 13 against the prod set.
+  - IEX REC: 4 IDs, also one set for both.
+- **Darwin:** 20 of 24 checked by us. Tithwa is the only mismatch.
+
+**Not evidence either way:** most `apac-tsdb-scraper` scrapers (IEX API, IEX national, IEX RTM, HPX, Manikaran, Darwin CDH) don't hardcode IDs at all. They look series up in each environment's catalogue (`Timeseries.search_with_text(source=…)`), so they'd work even if the IDs differed.
+
+**Not checked:**
+- That every one of those hardcoded IDs actually exists in both environments. This is inferred from the code running in both, not probed.
+- Aurora: its folder only has a read probe, and I didn't look into which IDs it uses.
+
+Suggested first paragraph for Mateo:
+
+```
+So far, every TSDB series we use with fixed IDs (Darwin, Khaba, IEX, GDAM…) has had the same ID in UAT and prod, so we map one ID per series for both. Tithwa is the only exception, so we see three options:
+```
+
+## 22:43 user (smp-india/dags/src/scripts)
+
+give me the full updated message for Mateo
+
+## 22:43 assistant (smp-india/dags/src/scripts)
+
+```
+Hi Mateo, thanks for the Tithwa IDs!
+
+So far, every TSDB series we use with fixed IDs (Darwin, Khaba, IEX, GDAM…) has had the same ID in UAT and prod, so we map one ID per series for both. Tithwa is the only exception, so we see three options:
+
+1. Special handling for Tithwa: separate UAT and prod IDs, for this asset only
+2. You recreate the 4 Tithwa series in UAT with the same IDs as prod, like the other assets (our preference):
+   - 594cb143-ca32-5895-a53c-2e198e68dba0 : Tithwa_Generation_PT15M
+   - eb62a97c-c424-5ef0-81a1-795fc7076061 : Tithwa_Generation_PT1M
+   - 43a7132b-e013-5cea-8a62-e17fbd319f65 : Tithwa_WindSpeed_PT15M
+   - 4381f101-34b8-5e4b-9b47-f580a88dd9b8 : Tithwa_WindDirection_PT15M
+3. Skip Tithwa in UAT only, and publish it to prod only
+
+Which works best for you?
+
+Also a small one: Tuticorin INSE4 wind speed (7f13f05c-b6bb-55ad-8480-6b7da918258d) has the same ID in both envs, but UAT names it "INSE4_wind_speed_100m_PT15M" and prod "INSE4_WindSpeed_PT15M". Is the UAT name just outdated, or is the 100m a different measurement?
+```

@@ -1,12 +1,14 @@
 # Atlas Dashboard
 
-## Summary
+## Current State
 
-Atlas is a Dash Framework front-end application for graphs, tables, and maps. Francois Caffont built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer. By September 10, 2026, the active repo was being worked under `qrm-dms/atlas-dash-frontend` on branch `dm-898`.
+As of 2026-10-14. Atlas is a Dash Framework front-end application for graphs, tables, and maps. Francois Caffont built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer.
 
-The recommended operating model is tier zero: one lightweight Dash developer agent and Dash-specific standards generated through the governance curator, plus a bounded baseline audit. The first guardrail layer is now underway: focused business-behavior tests, a startup smoke test, Ruff lint/format checks, GitHub Actions validation, and contributor/agent setup guidance. A standing PO/dev/QA/architect agent fleet was considered overkill unless repeated failures prove a narrower specialized role is needed.
+DEV is down outside Brian's control. On October 13, the read-only DAC connectivity workflow still had working credentials, but the DEV `dashboard-atlas` ECS service no longer existed in the expected cluster; on September 24 it still existed but was scaled to 0 tasks. The observed redirect to the dashboards homepage is therefore probably platform fallback rather than Atlas app behavior. The suggested path was for Francois to reach out to CDH/DAC about whether the DEV service was removed or switched off.
 
-## Details
+PROD looked healthy in the October 13 probe: credentials worked, the PROD service was active with 1 of 1 tasks running, ALB routing and target health passed, and `/dashboard-atlas/health` returned 200. The probe did not check PROD data or signed-in chart behavior.
+
+## Background
 
 - The target is a safe path for Francois to keep building while an engineer consults on foundations and higher-risk changes.
 - The first engineering pass should check reproducible setup, secrets/configuration handling, access controls, data-to-UI correctness, dependencies, deployment, rollback, error handling, and whether another engineer can understand and change the code.
@@ -36,6 +38,7 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - September 24 Codex work completed Atlas PROD deployment preparation. PROD CDH already referenced the same Master Upstream and Master Downstream datasets and CSV paths as DEV, and the probe verified DEV and PROD could read identical June CSVs with matching hashes. PROD kept separate service credentials, AWS account, application bucket, ECS service, and runtime configuration.
 - The missing PROD CDH service-client binding was added with Brian's explicit approval. After that, PROD credential acquisition, shared CSV access, runtime discovery, ALB target health, and HTTPS `/health` passed. Seven verified PROD GitHub target variables were configured, and a PROD dry run passed backup, candidate preparation, and smoke tests without deploying or restarting the live application.
 - The next Atlas PROD step is the actual GitHub Actions rollout with `main`, `prod`, `code-and-data`, and `Deploy after validation` checked, followed by browser acceptance checks for login, charts, filters, and exports.
+- On October 13, DEV appeared removed or switched off at the platform layer while PROD remained healthy by DAC connectivity checks.
 
 ## Open Questions
 
@@ -47,6 +50,8 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - UNCERTAIN: Whether future stakeholder estimates should keep using the 30-minute collaboration-session cutoff as the headline, or report only recorded runtime for narrower auditability.
 - UNCERTAIN: Whether sharing the same source CSV datasets across Atlas DEV and PROD is the intended long-term operating model, even though the September 24 dry run proved it works technically.
 - UNCERTAIN: Whether the actual Atlas PROD rollout and browser acceptance checks have been completed after the successful September 24 dry run.
+- UNCERTAIN: Whether CDH/DAC intentionally removed, renamed, or switched off the Atlas DEV service.
+- UNCERTAIN: Whether Atlas PROD charts and data load correctly after Okta login; the October 13 PROD probe checked hosting health only.
 
 ## Sources
 
@@ -62,5 +67,6 @@ The recommended operating model is tier zero: one lightweight Dash developer age
 - `sources/codex-conversations/2026-09-18-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-24-codex-conversations.txt`
+- `sources/claude-conversations/2026-10-13-claude-atlas-dash-frontend-b943dd75.txt`
 
-Last Updated: 2026-09-25
+Last Updated: 2026-10-14
