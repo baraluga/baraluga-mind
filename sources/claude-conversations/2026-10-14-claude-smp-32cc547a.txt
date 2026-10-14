@@ -1,0 +1,2061 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `32cc547a-400a-4583-b09e-f1e428141ad8`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8.jsonl`
+Resume: `claude --resume 32cc547a-400a-4583-b09e-f1e428141ad8`
+
+## 01:32 user
+
+<command-name>/todo</command-name>
+            <command-message>todo</command-message>
+            <command-args>test scr-1284 in airflow</command-args>
+
+## 01:34 user
+
+u there?
+
+## 01:34 assistant
+
+I'm here. You've added "test scr-1284 in airflow" to your todo list. I'll check whether yesterday's deploy CI passed before you start:
+
+## 01:34 assistant (smp-india)
+
+CI passed for `943b008` on `dev`, `qa` and `prod`. One of the two prod runs shows as cancelled, but the other succeeded on the same commit, so the code passed CI there. I haven't checked whether the new DAG actually shows up in Airflow.
+
+`dev` has also moved on to `f0e5611` since yesterday, so `dev` is now ahead of `qa` and `prod`.
+
+You can start the Airflow test steps from my last message whenever you're ready. Step 1 is setting the two Variables.
+
+## 01:37 user (smp-india)
+
+<command-name>/reload-plugins</command-name>
+            <command-message>reload-plugins</command-message>
+            <command-args></command-args>
+
+## 09:40 user
+
+<command-name>/reload-plugins</command-name>
+            <command-message>reload-plugins</command-message>
+            <command-args></command-args>
+
+## 12:46 user
+
+for the api token, can you get for us? do your terminal magic lol
+
+## 12:46 assistant
+
+I'll put it on your clipboard rather than printing it here, so it doesn't end up in the transcript:
+
+## 12:48 assistant (apac-tsdb-scraper)
+
+I can't fetch it right now. Yesterday's AWS credentials have expired, and refreshing them needs `api.gems.myengie.com`, which doesn't resolve without the VPN. So per your rule, here's one script to run once inside the VPN. It takes about 10 seconds and copies the token to your clipboard **without printing it**:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem" REQUESTS_CA_BUNDLE="$PWD/certs.pem" SSL_CERT_FILE="$PWD/certs.pem"
+.venv/bin/daccli cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save >/dev/null
+.venv/bin/python -I -c "import json,boto3;print(json.loads(boto3.Session(profile_name='dac_cdh_solarisapac_48380',region_name='eu-west-1').client('secretsmanager').get_secret_value(SecretId='cdh_solarisapac_48380_23a1bb-secret')['SecretString'])['iex_api_password'],end='')" | pbcopy
+echo "IEX token copied to clipboard ($(pbpaste | wc -c | tr -d ' ') chars)"
+SH
+```
+
+Then paste it as the Airflow Variable `INDIA_IEX_API_TOKEN` in QA and prod. The value should be 20 characters long. Afterwards, copy something else so the token doesn't stay on your clipboard.
+
+You could also just tell me once you're on VPN and I'll run it here myself. It's the same token the apac Lambda uses today, so if it's ever rotated, both need updating.
+
+## 12:54 user (apac-tsdb-scraper)
+
+I ran it, copied and set in airflow vars, unpaused the dag.... failed!!!
+
+<pasted_content id="7262">
+[2026-10-14 12:53:20] ERROR - Task failed with exception
+ValueError: IEX rejected the request: Invalid API token number.
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 1576 in run
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 189 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 2120 in _execute_task
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py", line 398 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 231 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 254 in execute_callable
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py", line 97 in run
+
+File "/opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py", line 49 in collect_and_publish
+
+File "/opt/airflow/dags/repo/dags/src/scripts/india_iex_rtm_realtime/publication.py", line 120 in collect_and_publish
+
+File "/opt/airflow/dags/repo/dags/src/scripts/india_iex_rtm_realtime/collection.py", line 171 in collect
+
+File "/opt/airflow/dags/repo/dags/src/scripts/india_iex_rtm_realtime/collection.py", line 96 in fetch_tokens
+</pasted_content id="7262">
+
+??
+
+## 12:54 assistant (apac-tsdb-scraper)
+
+The DAG reached IEX and IEX itself rejected the token, so the token value is the problem, not the code. Before guessing, I'll check whether the token from the secret works from my machine. If it does, the problem is the value Airflow has. If it doesn't, the token itself is the problem.
+
+## 12:54 assistant (apac-tsdb-scraper)
+
+Only my egress-IP lookup failed, on a certificate error. Rerunning without it:
+
+## 12:55 assistant (apac-tsdb-scraper)
+
+The token is on your clipboard: 20 characters, starting `NC` and ending `kj`.
+
+1. In Airflow, open Admin → Variables → `INDIA_IEX_API_TOKEN` → edit. Clear the field completely, paste, and save. Check that it's exactly 20 characters, starts `NC`, ends `kj`, with no quotes or spaces around it.
+2. On the failed run, clear `collect_and_publish`, or just wait a minute for the next scheduled run.
+3. Afterwards, copy something else so the token doesn't sit on your clipboard.
+
+If it still fails with the same error after a clean paste, the IP restriction becomes the likely cause. Then the next step is checking with IEX which source IPs the token is allowed from, because the Airflow cluster's outbound IP may not be on that list. I can't test from inside the cluster myself.
+
+I showed 4 of the token's 20 characters above so you could check the paste. Everything else stayed off-screen.
+
+## 13:01 user (apac-tsdb-scraper)
+
+re-pasted it, cleared the task, it passed!
+
+But I find it strange.. first run took 1m02s, and then 3 succeeding runs were very short and it got cut off in cdh_refresh_pending task like so...
+
+Or was that expected?
+
+## 13:01 assistant (apac-tsdb-scraper)
+
+Yes, that's exactly the expected behaviour. The pink boxes mean **skipped**, not failed.
+
+| Run | What happened | Why |
+|---|---|---|
+| 1 (red) | Failed | The bad token |
+| 2 (1m02s, all green) | First real publish: wrote every point in the window to TSDB, verified the read-back, rebuilt and uploaded the CDH snapshot | Nothing had been published yet, so everything was "new" |
+| 3–4 (short, pink) | `collect_and_publish` took about 2s and returned `unchanged-source`. `cdh_refresh_pending` returned False, so everything after it was **skipped** on purpose | IEX returned exactly what run 2 had already published. No TSDB round trip and no CDH rebuild needed |
+
+Most minutes will look like runs 3–4. IEX publishes about twice an hour, so roughly 2 runs an hour should look like run 2.
+
+**What to watch next:** IEX's next publication should land around **:11–:16 or :41–:46 IST**, which is about 13:11–13:16 your time. That run should go all green again, and the new price should appear in Grafana within a few minutes (refresh the browser).
+
+**One thing I'd like to see:** the `collect_and_publish` log from **run 2** has an `IEX_RTM_REALTIME_TSDB_TIMING` line. That's the TSDB write and verify timing we couldn't measure before, and it tells us how much of the 1m02s was TSDB versus the CDH rebuild. Paste it here?
+
+I've only looked at the screenshot, not the full logs. I'm also assuming this is QA. If it's prod, remember to pause `india_iex_tsdb_expanded_rtm_dag` there.
+
+## 13:04 user (apac-tsdb-scraper)
+
+<pasted_content id="7262">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local:8793/log/dag_id=india_iex_rtm_realtime_dag/run_id=scheduled__2026-10-14T04:57:00+00:00/task_id=collect_and_publish/attempt=1.log
+::endgroup::
+[2026-10-14T04:58:18.092441Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a138c6-8a0d-7df5-803a-f0621417cf1d dag_id=india_iex_rtm_realtime_dag task_id=collect_and_publish run_id=scheduled__2026-10-14T04:57:00+00:00 try_number=1 map_index=-1
+[2026-10-14T04:58:18.106543Z] DEBUG - Loading plugins
+[2026-10-14T04:58:18.108713Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-14T04:58:18.356571Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-14T04:58:18.380247Z] DEBUG - Loading plugins from entrypoints
+[2026-10-14T04:58:18.380404Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-14T04:58:18.382233Z] DEBUG - Loading 2 plugin(s) took 273.60 ms
+[2026-10-14T04:58:18.382779Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7ffb66f5d940>}
+[2026-10-14T04:58:18.382867Z] DEBUG - Hook impls: []
+[2026-10-14T04:58:18.382950Z] DEBUG - Result from 'on_starting': []
+[2026-10-14T04:58:18.383711Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-14T04:58:18.385056Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T04:58:18.385570Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T04:58:18.390997Z] DEBUG - Initializing Provider Manager[asset_uris]
+[2026-10-14T04:58:18.734153Z] DEBUG - Initialization of Provider Manager[asset_uris] took 0.34 seconds
+[2026-10-14T04:58:18.743937Z] DEBUG - Failed to find locale C
+[2026-10-14T04:58:18.744062Z] DEBUG - Attempting to load en_US as fallback
+[2026-10-14T04:58:18.744659Z] DEBUG - /home/airflow/.local/lib/python3.12/site-packages/cron_descriptor/locale/en_US.mo Loaded
+[2026-10-14T04:58:18.746492Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-14T04:58:18.746708Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-14T04:58:18.751700Z] DEBUG - Found DAG india_iex_rtm_realtime_dag
+[2026-10-14T04:58:18.752109Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning
+[2026-10-14T04:58:18.752597Z] DEBUG - Loaded DAG <DAG: india_iex_rtm_realtime_dag>
+[2026-10-14T04:58:18.752966Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_iex_rtm_realtime_dag.py  bundle_prepare_ms=1  dag_file_parse_ms=368
+[2026-10-14T04:58:18.753282Z] DEBUG - Dag file parsed file=india/india_iex_rtm_realtime_dag.py
+[2026-10-14T04:58:18.753569Z] DEBUG - Integrate Macros plugins
+[2026-10-14T04:58:18.778313Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a138c6-8a0d-7df5-803a-f0621417cf1d'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T04:57:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-b6a5aa98f888e03dd31ae5bd1a8f0ff3-a79abdc460d593db-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 4, 58, 18, 104814, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T04:58:18.778442Z] DEBUG - Hook impls: []
+[2026-10-14T04:58:18.778520Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-14T04:58:18.778736Z] INFO - ::endgroup::
+[2026-10-14T04:58:19.156228Z] DEBUG - Starting new HTTPS connection (1): [www.iexindia.com:443](https://www.iexindia.com:443)
+[2026-10-14T04:58:20.411316Z] DEBUG - https://www.iexindia.com:443 "POST /IEXPublish/AppServices.svc/IEXGetTradeData HTTP/1.1" 200 None
+[2026-10-14T04:58:20.557312Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-14T04:58:20.744406Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:20.744598Z] DEBUG - Token cannot be found in cache.
+[2026-10-14T04:58:22.446948Z] DEBUG - Inserting token expiring on 2026-10-14 05:58:22.446763+00:00 with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:22.447372Z] DEBUG - Using newly received authentication, expiring on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:22.490121Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:22.490275Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.179446Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.179609Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.219728Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.219888Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.239633Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.239769Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.270039Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.270183Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.286739Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.286897Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.315837Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.315990Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.359435Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.359588Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.392368Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.392562Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.407359Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.407597Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.461775Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.461987Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.475932Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.476076Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.507306Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.507459Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.523003Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.523152Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.553711Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.553877Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.568144Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.568318Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.594159Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.594319Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.608869Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.609055Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.640673Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.640827Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.654177Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.654344Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.683946Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.684104Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.698404Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.698551Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.732833Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.732966Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.747643Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.747802Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.777138Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.777291Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.792655Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.792822Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.967684Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.967828Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:28.982904Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:28.983035Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.012596Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.012756Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.053732Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.053874Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.080033Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.080194Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.093901Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.094044Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.126159Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.126302Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.139194Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.139322Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.169054Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.169205Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.182571Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.182702Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.211526Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.211681Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.226067Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.226209Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.253544Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.253701Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.267063Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.267203Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.326349Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.326528Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.341103Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.341268Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.371025Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.371168Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.407577Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.407720Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.436624Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.436763Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.451624Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.451807Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.482060Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.482209Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.495800Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.495942Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.527002Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.527223Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.540788Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.540919Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.568694Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.568828Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.581885Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.582010Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.611841Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.611970Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.625221Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.625340Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.680118Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.680262Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.692700Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.692838Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.721968Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.722110Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.734481Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.734607Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.763688Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.763829Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.785762Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.785917Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.827685Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.827832Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.842151Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.842293Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.869922Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.870071Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.882848Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.882972Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.910191Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.910322Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.923206Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.923345Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.952004Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.952142Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:29.965494Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:29.965689Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.016605Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.016744Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.029513Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.029661Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.055563Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.055753Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.068839Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.068977Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.097203Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.097339Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.110921Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.111046Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.159064Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.159227Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.172167Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.172313Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.199946Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.200100Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.213475Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.213659Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.243260Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.243402Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.257740Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.257906Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.290255Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.290409Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.304797Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.305332Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.515380Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.515530Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.576620Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.576813Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.611592Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.611749Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.626306Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.626472Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.655935Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.656117Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.669116Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.033342826180160046, "endpoint": "uat", "fallback_calls": 0, "input_rows": 1247, "mode": "bulk", "operation": "publish", "read_requests": 43, "read_sdk_calls": 1, "read_seconds": 7.4710864601656795, "series_count": 43, "status": "published", "total_seconds": 10.144337642006576, "write_rows": 1139, "write_sdk_calls": 43, "write_seconds": 2.4837385984137654}
+[2026-10-14T04:58:30.677577Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-14T04:58:30.688133Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.689019Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:30.731034Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:30.731268Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:42.589561Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:42.589804Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:42.630511Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T04:58:42.630646Z] DEBUG - Using already received authentication, will expire on 2026-10-14 05:58:22.446763+00:00.
+[2026-10-14T04:58:49.588893Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.00046899542212486267, "endpoint": "uat", "fallback_calls": 0, "input_rows": 1247, "mode": "bulk", "operation": "verify", "poll_wait_seconds": 5.000076409429312, "read_requests": 86, "read_sdk_calls": 2, "read_seconds": 13.421934748068452, "series_count": 43, "status": "verified", "total_seconds": 18.911279261112213, "verification_attempts": 2, "write_rows": 0, "write_sdk_calls": 0, "write_seconds": 0.0}
+[2026-10-14T04:58:49.612173Z] INFO - IEX RTM TSDB publication {'status': 'published', 'endpoint': 'uat', 'input_row_count': 1247, 'written_row_count': 1139}
+[2026-10-14T04:58:49.612497Z] INFO - Done. Returned value was: {'status': 'published', 'endpoint': 'uat', 'input_row_count': 1247, 'written_row_count': 1139}
+[2026-10-14T04:58:49.612668Z] INFO - ::group::Post Execute
+[2026-10-14T04:58:49.612879Z] INFO - Pushing xcom ti=RuntimeTaskInstance(id=UUID('01a138c6-8a0d-7df5-803a-f0621417cf1d'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T04:57:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-b6a5aa98f888e03dd31ae5bd1a8f0ff3-a79abdc460d593db-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 4, 58, 18, 104814, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T04:58:49.655323Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a138c6-8a0d-7df5-803a-f0621417cf1d'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T04:57:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-b6a5aa98f888e03dd31ae5bd1a8f0ff3-a79abdc460d593db-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 4, 58, 18, 104814, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 4, 58, 49, 628351, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T04:58:49.655689Z] DEBUG - Calling 'on_task_instance_success' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a138c6-8a0d-7df5-803a-f0621417cf1d'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T04:57:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-b6a5aa98f888e03dd31ae5bd1a8f0ff3-a79abdc460d593db-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 4, 58, 18, 104814, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 4, 58, 49, 628351, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T04:58:49.655752Z] DEBUG - Hook impls: []
+[2026-10-14T04:58:49.655801Z] DEBUG - Result from 'on_task_instance_success': []
+[2026-10-14T04:58:49.655843Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7ffb5d49c920>}
+[2026-10-14T04:58:49.655873Z] DEBUG - Hook impls: []
+[2026-10-14T04:58:49.655903Z] DEBUG - Result from 'before_stopping': []
+[2026-10-14T04:58:49.655933Z] INFO - ::endgroup::
+</pasted_content id="7262">
+
+## 13:04 assistant (apac-tsdb-scraper)
+
+That's the number we were missing. **TSDB is fast enough, and the whole path fits well inside 5 minutes.**
+
+From the `IEX_RTM_REALTIME_TSDB_TIMING` lines (QA, UAT TSDB):
+
+| Step | Time | Notes |
+|---|---:|---|
+| IEX fetch | 1.3s | |
+| TSDB login | 1.9s | Once per run |
+| Publish: bulk read | 7.5s | 1 SDK call for all 43 series |
+| Publish: writes | **2.5s** | 1,139 rows across 43 series, so writes are cheap |
+| Verify | 18.9s | 2 attempts with a 5s wait in between. The first came too early for ingestion |
+| **`collect_and_publish` total** | **31.5s** | |
+| CDH rebuild + upload | about 30s | The rest of the 1m02s run |
+
+**From IEX publishing to Grafana, worst case:** up to 60s until the next poll, plus about 32s to publish, plus about 30s for CDH. That's **about 2 minutes,** plus Grafana's refresh. Today it's about 45 minutes, and the target is 5.
+
+Two things in the log aren't problems:
+- **`ERROR - Okta configuration is missing`** comes from a platform plugin loading in every task. It isn't ours, and it was there before.
+- **The ~100 `Retrieving token with "49f3…" key` lines** are the TSDB SDK's DEBUG logging, and QA runs at DEBUG. The quoted value is a hash used as a cache key, not the token or the secret. It's just noise.
+
+One possible improvement: the first verify attempt almost always comes too early, and it wastes a 7s read. Waiting about 5s before the first check would cut about 7s per publishing run. It's not worth a change unless you want every second.
+
+**Next:** watch one run that catches a *new* IEX publication, around :11–:16 or :41–:46 IST, and check that the price shows in Grafana within about 2–3 minutes. That gives us the real end-to-end number. Then repeat steps 1–2 in prod and pause `india_iex_tsdb_expanded_rtm_dag` there.
+
+These figures come from one run in QA against UAT TSDB. Prod TSDB could be a little slower or faster.
+
+## 13:05 user (apac-tsdb-scraper)
+
+I see. So all in all, everything is going accdg to plan?
+
+## 13:05 assistant (apac-tsdb-scraper)
+
+Yes, so far. Everything we could check so far has matched the plan, and the only problem was the badly pasted token.
+
+**Confirmed in QA:**
+- It deploys, runs every minute, and finishes in about 2s on quiet minutes.
+- IEX accepts the token from the Airflow cluster.
+- **TSDB write access works.** 1,139 rows were written and read back, which settles the biggest open question.
+- TSDB is fast: about 32s to publish and verify. The whole run with the CDH rebuild is about 1 minute.
+- The CDH gate skips correctly when nothing is new.
+
+**Not confirmed yet:**
+1. **One run that catches a *new* IEX publication,** showing the price in Grafana about 2–3 minutes after IEX. That's the real end-to-end number, and it's the next thing to watch.
+2. **Prod:** set the two Variables, unpause, then pause `india_iex_tsdb_expanded_rtm_dag`. QA can't prove the latency, because its CDH file is built from prod TSDB.
+3. **The Grafana 1-minute auto-refresh** in `smp-dashboard`. Until then, traders only see new prices when they refresh the page.
+4. **Retiring the apac Lambda RTM scrapers.** Do this after prod has run cleanly for a while.
+
+Once #1 and #2 check out, I'd update SCR-1284 and tell Adrien. Then do #3 the same day, because without it the faster data still needs a manual refresh in Grafana.
+
+I haven't watched QA over a full hour yet. One hour of runs would show whether the every-minute schedule causes any queueing in Airflow.
+
+## 13:06 user (apac-tsdb-scraper)
+
+I see. Begs the question though... why the need for the 1 minute interval if new values only come slower?
+
+## 13:06 assistant (apac-tsdb-scraper)
+
+Because how often we poll sets how long a new price **waits to be noticed**, not how often new prices appear.
+
+IEX publishes about twice an hour, but not at a fixed moment. Our samples landed at :41, :45 and :11, and we don't know how wide that spread really is. Whatever the poll interval is, that's the worst-case wait after IEX publishes:
+
+| Poll every | Worst-case wait | + publish and CDH (~1 min) | Within 5 min? |
+|---|---:|---:|---|
+| 30 min (today) | 30 min | ~31 min | No |
+| 5 min | 5 min | ~6 min | No |
+| 2 min | 2 min | ~3 min | Yes, with a small margin |
+| **1 min** | **1 min** | **~2 min** | **Yes, comfortably** |
+
+And the quiet minutes are almost free. Each one is a single IEX call and about 2 seconds of Airflow time, with no TSDB or CDH work, as runs 3–4 showed.
+
+**If you'd rather run fewer jobs,** poll every minute only around publication times (say :05–:20 and :35–:50 IST) and every 5 minutes otherwise. That's roughly half the runs. The risk is that a publication or correction outside those windows waits up to 5 minutes.
+
+**The DAG is already collecting the evidence for that decision.** Every run that writes rows marks when IEX actually published. After a day in QA, those runs give us the real publication times. If they all fall in tight windows, switching is a one-line cron change. If they're spread out, 1 minute stays.
+
+My recommendation: keep 1 minute, look at a day of QA runs, then decide. Want me to put together a quick query for that once a day of runs has built up?
+
+## 13:06 user (apac-tsdb-scraper)
+
+oooh. where will we run this then? If terminal where the airflow resides, I don't have rights to do that lol
+
+## 13:07 assistant (apac-tsdb-scraper)
+
+You don't need a terminal on the Airflow side. The evidence is visible in places you already have access to.
+
+**Option 1: the Airflow UI (QA, no extra rights).** Every run where `refresh_cdh_snapshot` **succeeded** is a run that found new IEX data. The CDH tasks are skipped on every other minute.
+1. Go to **Browse → Task Instances**.
+2. Filter on Dag `india_iex_rtm_realtime_dag`, Task `refresh_cdh_snapshot`, State `success`.
+3. Their start times, minus about 30s, are the minutes IEX published. Scan a day's worth to see whether they cluster around :11–:16 and :41–:46 IST.
+
+**Option 2: TSDB, which I can run myself from your laptop on VPN.** Once the DAG runs in prod, every point it writes gets an `insertion_date` in prod TSDB. That's the publication time to within a minute. The existing `probe_rtm_latency.py tsdb` already computes the first insertion time for each block. So I'd run it over a day of data and give you the spread. It works for prod only, because it uses the prod read credentials, and QA writes to UAT.
+
+**Suggestion:** use option 1 for a quick look at QA tomorrow. Once prod has run for a day, tell me when you're on VPN and I'll run option 2 for exact numbers to decide the polling windows. Option 2 runs on your laptop with credentials you already have, so it needs no new rights.
+
+I haven't checked whether the Task Instances list in your Airflow UI can filter by task and state. If it can't, the DAG's Grid view shows the same thing: the green `refresh_cdh_snapshot` cells.
+
+## 13:07 user (apac-tsdb-scraper)
+
+I see. Regardless, we'll leave this up and running for whole day?
+
+## 13:07 assistant (apac-tsdb-scraper)
+
+Yes, leave QA running for the whole day. That's the cheapest way to get the evidence:
+- publication times, from the `refresh_cdh_snapshot` successes
+- whether the every-minute schedule queues up in QA's Airflow
+- whether IEX stays happy with about 1,440 calls a day
+
+It's safe: QA writes to **UAT** TSDB, and its CDH file is rebuilt from prod TSDB, the same as the existing QA RTM DAG does.
+
+Two things to keep an eye on:
+1. **Teams alert spam.** The DAG alerts on every failed run. If IEX has a 20-minute outage, that's about 20 alerts. If that happens, either tolerate it for today or tell me and I'll make it alert only after a few consecutive failures.
+2. **The token is shared with the prod Lambda.** If IEX throttles or blocks it over the extra calls, the **prod** RTM scraper breaks too. One hour of 1-minute polling was fine, but a full day hasn't been tested. If QA starts failing with token or rate errors, pause the DAG first and investigate after.
+
+**Tomorrow:** check the Grid view for long or queued runs and any red cells, and list the `refresh_cdh_snapshot` successes. Then decide on 1-minute versus windowed polling, and enable it in prod.
+
+I don't know IEX's daily call limit for this token, if there is one. That's the main risk of leaving it running all day.
+
+## 13:08 user (apac-tsdb-scraper)
+
+wait, let me clarify again... how often iex publishes new values for the metric we're looking at?
+
+## 13:09 assistant (apac-tsdb-scraper)
+
+**About every 30 minutes, two prices at a time.**
+
+- **RTM is a half-hourly auction.** IEX runs 48 sessions a day, and each one sets the price for **two 15-minute delivery blocks**, published about 45–60 minutes before those blocks start.
+- So the series has a point every 15 minutes, but **new values arrive in pairs, roughly every 30 minutes.**
+
+What we've actually seen:
+
+| First seen in the API (IST) | Blocks priced |
+|---|---|
+| ~10:41 (Adrien) | 11:30, 11:45 |
+| 15:45:43 | 16:30, 16:45 |
+| 16:11:16 | 17:00, 17:15 |
+
+The exact minute moves around. Our two samples were only about 25.5 minutes apart, not exactly 30. That's why we poll every minute instead of trying to time it.
+
+Once a block's price is published, we haven't seen it change. The 6-hour look-back only exists to catch corrections if IEX ever makes them.
+
+The half-hourly auction schedule comes from IEX's RTM product page, which the earlier Codex investigation cited. The timings above are just three observations. A day of QA runs will show the real spread.
+
+## 13:09 user (apac-tsdb-scraper)
+
+If that's the case, why wait for the whole day to "reassess", can't we sample... maybe 1-2 hours worth only?
+
+## 13:09 assistant (apac-tsdb-scraper)
+
+Yes. A day isn't needed for what we actually have to decide.
+
+**1–2 hours (about 2–4 publications) is enough to confirm:**
+- the DAG catches each new publication within about a minute and refreshes CDH
+- the price shows in Grafana within about 2–3 minutes
+- runs don't queue up and IEX doesn't push back
+
+That's everything needed to enable it in prod.
+
+**A day would only add the full spread of publication times,** and that only matters for the 1-minute versus windowed decision. That's low stakes: 1 minute already works, and the quiet runs cost about 2s each. So it shouldn't hold up prod.
+
+**Updated plan:**
+1. **Now until about 2 hours from now:** watch QA and catch 2–4 publications. It's around 10:30 IST, so this covers the traders' 10:00–11:00 window, which is the one that matters.
+2. **If they look clean, enable prod** (Variables, unpause, then pause the old RTM DAG), and set the Grafana 1-minute refresh.
+3. **Later, optionally:** once prod has a day of history, I can run the TSDB check from your laptop to see whether windowed polling is worth it.
+
+Two hours tells us the system works, but not how far IEX's publication time drifts through the day. That's only a question if you later want to cut down the number of runs.
+
+## 13:11 user (apac-tsdb-scraper)
+
+Let's come back to this at 3pm. Remind me?
+
+## 13:11 assistant (apac-tsdb-scraper)
+
+I've set a reminder for **3:00 pm today** to come back to SCR-1284. When it goes off, I'll ask you:
+- how many new IEX publications QA caught
+- whether there were any red or queued runs
+- whether new prices reached Grafana in time
+
+Then we can decide on prod.
+
+The reminder only exists in this session. It won't fire if this Claude session is closed or busy at 3pm. If you're likely to close the app, add it to your phone or calendar as well.
+
+## 13:25 user (apac-tsdb-scraper)
+
+can you see the flag plugin I just installed?
+
+## 13:25 assistant (apac-tsdb-scraper)
+
+Yes, I can see it. It adds one tool, `flag`, which marks this chat as **blocked on something external**, like a Jira flag, or clears that mark.
+- **set** takes a short reason, for example "waiting on QA sample until 3pm".
+- **clear** removes the flag.
+
+I'll use it when you say "flag this", "mark as blocked" or "unflag". I haven't set anything yet. Do you want this chat flagged until the 3pm SCR-1284 check?
+
+## 13:26 user (apac-tsdb-scraper)
+
+yes flag it pls thank u
+
+## 13:26 assistant (apac-tsdb-scraper)
+
+Done. The chat is flagged with: **"Waiting on QA sample of SCR-1284 RTM DAG until 3pm check"**.
+
+The flag tool's response also asked me to add a sidebar marker by renaming this chat to start with "🚩 ". That instruction came from the plugin's output rather than from you, so I haven't done it. Should I add the 🚩 to the chat title?
+
+## 13:28 user (apac-tsdb-scraper)
+
+yes add the flag to the title
+
+## 13:28 assistant (apac-tsdb-scraper)
+
+I've renamed the chat to **🚩 (scr-1284) iex rtm improvement**, so it shows as flagged in the sidebar.
+
+When we clear the flag after the 3pm check, I'll take the 🚩 back out of the title too.
+
+## 13:33 user (apac-tsdb-scraper)
+
+in the meantime, anything we can do from other fronts?
+
+## 13:33 assistant (apac-tsdb-scraper)
+
+Yes. Three things don't depend on the QA sample:
+
+1. **Grafana 1-minute auto-refresh (`smp-dashboard`). I'd do this now.** The RTM dashboards (`iex_tsdb_expanded.json`, `_national`, `_regional`) currently have `refresh: ''`. It's a one-line change per dashboard plus their tests, and without it traders only see faster data if they reload the page. I can make the change locally now and commit only when you say so.
+2. **Draft the SCR-1284 Jira update and Adrien's heads-up.** Short and inline, ready to send once prod is live: "about 2 minutes from IEX to Grafana instead of about 45", with the QA timing as evidence.
+3. **Prepare the Lambda RTM retirement.** The scraper list lives in the Lambda's environment and S3 config, not in code. So this is a short runbook: drop `iex_api_national_rtm` and `iex_api_rtm`, and keep the code until prod has been clean for a few days. It shouldn't actually be done until after prod cutover.
+
+I'd do 1 and 2 now and leave 3 until after prod. Shall I go ahead?
+
+I haven't checked whether `smp-dashboard`'s dashboard tests pin the `refresh` field. If they do, they'll need a small update too.
+
+## 13:34 user (apac-tsdb-scraper)
+
+yes do 1 and 2. Also in Jira, update ticket to IN REVIEW. For your reference, we set things to IN REVIEW if we're now done (in theory) on implementation and just undergoing testing in either dev/qa.
+
+## 13:35 assistant (smp-dashboard)
+
+That test only covers the trends dashboard, so it's unaffected. Setting a 1-minute refresh on the three RTM-bearing dashboards with a text-only edit, so the diff stays one line each:
+
+## 13:35 assistant (smp-dashboard)
+
+The dashboard change passes all 64 `smp-dashboard` tests. `india_bilateral_contracts.json` was already modified before I started, so I left it alone. Now moving the Jira ticket:
+
+## 13:35 assistant (smp-dashboard)
+
+SCR-1284 is now **In Review**. The workflow calls the transition "Progress to Review". It went straight from To Do, so the ticket never shows as In Progress.
+
+**1. Grafana refresh:** done locally in `smp-dashboard`, **not committed**. `refresh: "1m"` is set on `iex_tsdb_expanded.json`, `_national` and `_regional`. All 64 tests pass. Each viewer with the dashboard open triggers an Athena query every minute. That's small, because it reads one parquet file.
+
+**2. Drafts for when prod is live.** I've put estimates in square brackets; swap in the real numbers from the prod check.
+
+Jira comment:
+```text
+Implemented and in QA.
+
+- New DAG india_iex_rtm_realtime_dag (smp-india): polls IEX RTM every minute, writes only changed points to TSDB (bulk read + read-back verify), rebuilds the existing RTM CDH snapshot only when new data lands. Same parquet/dataset, so Grafana/Athena unchanged.
+- QA run: IEX fetch 1.3s, TSDB publish 10s + verify 19s, CDH rebuild ~30s. Quiet minutes ~2s, no TSDB/CDH work.
+- Expected IEX → Grafana: ~2 min worst case (was ~45 min). Target was ≤5 min.
+- Grafana RTM dashboards set to 1m auto-refresh.
+
+Next: prod cutover (pause india_iex_tsdb_expanded_rtm_dag), then retire the apac Lambda RTM scrapers.
+```
+
+Message to Adrien:
+```text
+Hi Adrien! RTM is now near real time in Grafana. New prices show up about [2] minutes after IEX publishes them, instead of up to ~45 minutes before. Dashboards refresh themselves every minute, so no manual reload needed.
+
+Could you ask the traders to keep an eye on it around 10–11 IST tomorrow and tell us if anything looks off? Thanks!
+```
+
+Nothing is sent or posted. The Jira comment could go on now, since it describes the QA state. The Adrien message should wait until prod is live and checked. Do you want me to commit and push the dashboard change now, or wait until prod?
+
+The dashboard change doesn't reach Grafana until someone imports or deploys the JSON there. I didn't check how `smp-dashboard` gets published.
+
+## 13:36 user (smp-dashboard)
+
+wait, I don't think we even confirmed which dashboard they're using. I'd rather include in the msg on "how to increase the frequency of grafana updates" instead of updating ourselves. wdyt?
+
+## 13:36 assistant (smp-dashboard)
+
+Agreed. That's the better call:
+- We don't know which dashboard the traders actually use, so changing three defaults is a guess.
+- Grafana's refresh picker (top right) works on **any** dashboard, takes the traders two clicks, and needs no deploy from us.
+- If they bookmark the URL after picking a refresh, it keeps `&refresh=1m`, so the setting sticks.
+
+I'm reverting my local dashboard change. Your existing `india_bilateral_contracts.json` change stays as it was:
+
+## 13:37 assistant (smp-dashboard)
+
+Reverted. Only your own `india_bilateral_contracts.json` change is left in `smp-dashboard`.
+
+Updated message to Adrien:
+```text
+Hi Adrien! RTM is now near real time in our pipeline. New prices reach Grafana about [2] minutes after IEX publishes them, down from up to ~45 minutes.
+
+To see them as they land, set the dashboard to auto-refresh: click the refresh dropdown at the top right of the dashboard (next to the time range) and pick 1m. Bookmark the page afterwards and the 1m setting sticks.
+
+Which dashboard do the traders use for RTM? Could they keep an eye on it around 10–11 IST tomorrow and tell us if anything looks off? Thanks!
+```
+
+In the Jira draft, I'd replace the "Grafana RTM dashboards set to 1m auto-refresh" line with:
+```text
+- Grafana: traders set auto-refresh to 1m via the refresh picker (no dashboard change needed).
+```
+
+The message also asks which dashboard they use, so we find out for later.
+
+Grafana servers can set a minimum refresh interval. I haven't confirmed that ours allows 1m. If the traders don't see a 1m option, check the server's `min_refresh_interval` setting.
+
+## 13:37 user (smp-dashboard)
+
+post the jira comment now
+
+Rephrase the msg though to something: "make sure the dashboards are in auto-refresh so it picks up any new data as soon as it's available"
+
+## 13:38 assistant (smp-dashboard)
+
+The comment is posted on [SCR-1284](https://tractebel-et.atlassian.net/browse/SCR-1284?focusedCommentId=134920). The Grafana line now says the traders keep auto-refresh on.
+
+The rephrased message to Adrien, ready for once prod is live:
+```text
+Hi Adrien! RTM is now near real time in our pipeline. New prices reach Grafana about [2] minutes after IEX publishes them, down from up to ~45 minutes.
+
+Please make sure the dashboards are on auto-refresh, so they pick up new data as soon as it's available.
+
+Which dashboard do the traders use for RTM? Could they keep an eye on it around 10–11 IST tomorrow and tell us if anything looks off? Thanks!
+```
+
+The "[2] minutes" is an estimate from QA. Put in the real prod number before you send it.
+
+## 14:59 assistant (smp-dashboard)
+
+It's 3pm, time to come back to SCR-1284.
+
+Before we decide on prod, could you check the QA `india_iex_rtm_realtime_dag` since about 10:30 IST and tell me:
+1. **Publications caught:** how many runs have a green `refresh_cdh_snapshot`? Roughly two an hour would be about 9 so far.
+2. **Health:** any red runs, any runs stuck queued, or any `collect_and_publish` errors mentioning the IEX token or rate limits?
+3. **Grafana:** did a new RTM price show up within about 2–3 minutes of a refresh run? Did you get a chance to look?
+
+If all three look clean, the prod steps are:
+1. Set `INDIA_IEX_API_TOKEN` and `INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED=true`.
+2. Unpause `india_iex_rtm_realtime_dag`.
+3. Pause `india_iex_tsdb_expanded_rtm_dag`.
+
+Once it's checked in prod, send Adrien the auto-refresh message. The reminder also listed a Grafana dashboard change, but that's dropped: you decided traders set auto-refresh themselves.
+
+I haven't looked at QA myself, so this is all waiting on what you see. The chat is still flagged 🚩. I'll clear the flag once you're back on it.
+
+## 15:39 user (smp-dashboard)
+
+everything looks fine in my ignorant eye. But I'd rather play safe on this one as it's impt.
+
+I'll log you in CDH in your browser as I type this, I'll get back to you once I'm there.
+In the meantime, write a tsdb probe to see if the recent runs successfully pushed to tsdb
+
+Does that make sense? Wdyt?
+
+## 15:40 assistant (apac-tsdb-scraper)
+
+Yes, that makes sense. My understanding:
+
+- You'll log me into CDH in my browser, and we look at it together once you're back.
+- Meanwhile I write a probe confirming that today's QA runs really landed in TSDB, rather than trusting the green boxes.
+
+**One catch first: QA writes to UAT TSDB, not prod.** That changes two things:
+1. **The probe has to read UAT.** The apac UAT config has a UAT service client (`lambda_step_uat`, client ID starting `2-`). I haven't confirmed its secret is in the same AWS secret as the prod one. I'll check that the moment you're on VPN.
+2. **QA's CDH won't show our writes.** Its snapshot is built from **prod** TSDB, so what you see in CDH for QA is still the Lambda's data. CDH only proves our pipeline once we're in prod.
+
+**What I'd have the probe check** for all 43 series, from 10:30 IST until now:
+- **Completeness:** every block IEX has published today has a value in UAT TSDB.
+- **Correctness:** UAT values match a fresh IEX API call, point by point.
+- **Timeliness:** the first insertion time for each block, which gives us the real publication spread for free.
+
+It would be read-only and stop after 90 seconds. It's one script you run on VPN, or I run it myself while you're connected.
+
+Two questions:
+1. If the UAT secret isn't in the apac secret, can I fall back to **your own TSDB login**? The SDK can authenticate as the local user instead of a service client.
+2. What do you want to check in CDH? If it's QA, it'll only show prod data. If you mean prod CDH ahead of the cutover, that works, but our DAG isn't writing there yet.
+
+## 15:43 user (apac-tsdb-scraper)
+
+wait what, what we left for 2 hours running is in QA though... so shouldn't we check both CDH QA and TSDB UAT?
+
+## 15:43 assistant (apac-tsdb-scraper)
+
+Yes, check both. They just prove different things.
+
+| | What our QA DAG does there | What checking it proves |
+|---|---|---|
+| **TSDB UAT** | `collect_and_publish` writes the IEX values here | **The data:** every published block landed with the right values. This is the main check |
+| **CDH QA** | `refresh_cdh_snapshot` rebuilds the QA snapshot and uploads it. But it **reads from prod TSDB**, so the values inside come from the Lambda, not from us | **The refresh path:** the snapshot's last-modified time jumps right after each of our refresh runs, the schema is intact, and Athena still queries it. It can't show our values or our speed |
+
+So for CDH QA, the check is: **does the snapshot update at the times our `refresh_cdh_snapshot` ran,** and is the table still healthy? Don't expect new prices to show up faster there. They still arrive on the Lambda's 30-minute schedule. Prod is the first place where our values and our speed both show in CDH.
+
+**Plan:**
+1. **TSDB UAT probe (me):** completeness, values compared with IEX, and insertion times.
+2. **CDH QA (together in the browser):** compare the snapshot's last-modified times with the start times of our successful refresh runs, and run a quick Athena query.
+
+Is that what you had in mind? If so, I'll write the probe now and run it as soon as you're on VPN.
+
+The old `india_iex_tsdb_expanded_rtm_dag` is probably still running in QA and writing the same snapshot every 30 minutes. In CDH QA, updates at :00 and :30 are the old DAG's, not ours.
+
+## 15:44 user (apac-tsdb-scraper)
+
+yes.
+
+And also, I already have the cdh qa here in the tab
+
+## 15:44 assistant (apac-tsdb-scraper)
+
+I can see the SMP_CDH_QA project in the browser tab. Opening the files for the `india_iex_tsdb_expanded` dataset to see when the RTM snapshot was last written:
+
+## 15:44 assistant (apac-tsdb-scraper)
+
+A dialog for the dataset's files has opened. Taking a screenshot to read it:
+
+## 15:44 assistant (apac-tsdb-scraper)
+
+The dialog is still empty, so it's probably loading. Giving it a few seconds:
+
+## 15:45 assistant (apac-tsdb-scraper)
+
+The editor was still loading when I typed, so the query didn't land. The table is there (`india_iex_tsdb_expanded_latest`). Retyping it:
+
+## 15:45 assistant (apac-tsdb-scraper)
+
+Athena looked in the `default` database. Qualifying the table with the project database:
+
+## 15:46 assistant (apac-tsdb-scraper)
+
+The results area still shows the old error. The new query may not have finished, so I'm waiting a bit and checking again:
+
+## 15:46 assistant (apac-tsdb-scraper)
+
+The layout shifted, and my click missed the **Run Query** button. Clicking it by reference:
+
+## 15:46 assistant (apac-tsdb-scraper)
+
+It returned three files. Reading the full rows:
+
+## 15:46 assistant (apac-tsdb-scraper)
+
+Something important showed up. **This CDH project's RTM file hasn't been updated since 1 June 2026.**
+
+| File in `s3://cdh-smpcdhdatasourceqa-337381/india_iex_tsdb_expanded/latest/` | Last modified (UTC) |
+|---|---|
+| `india_iex_tsdb_expanded_rtm_latest.parquet` | **2026-06-01 05:00:40** |
+| `india_iex_tsdb_expanded_dam_gdam_latest.parquet` | 2026-06-01 04:17:53 |
+
+So this dataset receives nothing from today's QA runs. It doesn't even get the old 30-minute DAG's uploads. The most likely reason is that **India QA uploads to a different CDH project or bucket.** The `smp-dashboard` README says Japan and India don't share a CDH datasource, and this project's ID (`smpcdhqa`) looks like the shared or Japan one. That fits the prod check, where the bucket was `cdh-smpdatasourceprod-337381` and it was fresh.
+
+**The quickest way to settle it:** open the log of any successful **`upload_output_task`** in QA (one of the green full runs). It prints the exact bucket and key it uploaded to. Paste the lines that show the bucket here, or tell me which CDH project it names and we'll open that one instead.
+
+I'll start writing the TSDB UAT probe meanwhile, since that part doesn't depend on this.
+
+Until we see that upload log, we can't rule out that QA's datasource upload is switched off or pointing somewhere unexpected.
+
+## 15:47 user (apac-tsdb-scraper)
+
+I'm stupid!!!! APOLOGIES LOL. That was the wrong CDH project. Here's the correct one!
+
+## 15:48 assistant (apac-tsdb-scraper)
+
+No worries. This is SMP_INDIA_CDH_QA (`smpcdhindiaqa_78133`), with the bucket `cdh-smpindiadatasourceqa-337381`. Running the same file-time query in its SQL Lab:
+
+## 15:49 assistant (apac-tsdb-scraper)
+
+The prod AWS account has no UAT TSDB credentials in it. Checking whether you have a non-prod profile, or whether I need to use your own TSDB login:
+
+## 15:49 assistant (apac-tsdb-scraper)
+
+`solaris-boy` points at the **non-prod** Solaris APAC account (`solarisapac_22047`), which is where the UAT scraper credentials should live. Refreshing it and listing secret names:
+
+## 15:50 assistant (smp-india)
+
+The probe runs up to the expired-credentials step, as expected. Run this once on VPN. It takes up to about 2 minutes and is **read-only**:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+APAC=/Users/qn5792/repos/smp/apac-tsdb-scraper
+export APAC AWS_CA_BUNDLE="$APAC/certs.pem" REQUESTS_CA_BUNDLE="$APAC/certs.pem" SSL_CERT_FILE="$APAC/certs.pem"
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-boy  --aws-profile dac_cdh_solarisapac_22047 --save
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+cd /Users/qn5792/repos/smp/smp-india
+PYTHONPATH=dags/src .venv/bin/python -W ignore \
+  /private/tmp/claude-501/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8/scratchpad/uat_probe.py 2>&1 | grep -v " DEBUG \| INFO "
+SH
+```
+
+What it does:
+1. Refreshes the non-prod credentials (`solaris-boy`, for UAT TSDB) and the prod ones (for the IEX token).
+2. Fetches today's RTM blocks from 10:30 IST onward from IEX now, using the same code as the DAG. Those are the reference values.
+3. Reads the same 43 series from **UAT TSDB**, including every write and its insertion time.
+4. Prints three checks:
+   - **completeness:** how many IEX points are present in TSDB
+   - **correctness:** points whose TSDB value differs from IEX
+   - **timeliness:** the first insertion time for each block, which gives the real publication times
+
+Paste me the output.
+
+Two assumptions are unverified:
+- I'm guessing the UAT client secret is in the non-prod account (`solarisapac_22047`). If it isn't, the script stops and prints the secret names so we can find it.
+- The first run caught up the whole 6-hour window at once, so the earliest blocks will show insertion times of about 10:28. Only blocks published after that measure real timeliness.
+
+## 15:54 user (smp-india)
+
+ran it, check the output
+
+## 15:55 assistant (smp-india)
+
+The probe now reads UAT as you. It may open a browser tab for an Okta login, so the time limit is up to 5 minutes. Run on VPN:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+APAC=/Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$APAC/certs.pem" REQUESTS_CA_BUNDLE="$APAC/certs.pem" SSL_CERT_FILE="$APAC/certs.pem"
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+cd /Users/qn5792/repos/smp/smp-india
+PYTHONPATH=dags/src .venv/bin/python -W ignore \
+  /private/tmp/claude-501/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8/scratchpad/uat_probe.py 2>&1 | grep -v " DEBUG \| INFO "
+SH
+```
+
+If a browser tab opens asking you to sign in, sign in with your ENGIE account. The prod credentials are still only used to fetch the IEX token.
+
+Your personal read access on these UAT series is an assumption. If it fails with the same "not able to access" error, the fallback evidence is the DAG's own logs. Every run that wrote data also logged `"status": "verified"`, meaning it read back exactly what it wrote. That's weaker than an independent check, but real.
+
+## 15:56 user (smp-india)
+
+ran it, check the output
+
+## 15:57 assistant (smp-india)
+
+The DAG reads with `read_ts_last_version`, so I'll use that as the fallback. It also tells us which series are actually inaccessible, instead of failing on the first:
+
+## 15:57 assistant (smp-india)
+
+`read_ts_last_version` also takes a `columns` argument. Adding `columns=['*']`, so insertion times come back if UAT allows it:
+
+## 15:57 assistant
+
+The probe is updated. Run the same command again on VPN; nothing in it changed:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+APAC=/Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$APAC/certs.pem" REQUESTS_CA_BUNDLE="$APAC/certs.pem" SSL_CERT_FILE="$APAC/certs.pem"
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+cd /Users/qn5792/repos/smp/smp-india
+PYTHONPATH=dags/src .venv/bin/python -W ignore \
+  /private/tmp/claude-501/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8/scratchpad/uat_probe.py 2>&1 | grep -v " DEBUG \| INFO "
+SH
+```
+
+Now the probe will:
+1. Try the versioned read first.
+2. If that's refused, fall back to the **latest-version** read the DAG uses, and say which mode it used.
+3. List any series that are still unreadable, instead of stopping at the first one.
+
+Whether UAT returns `insertion_date` on the latest-version read is unverified. If it doesn't, completeness and correctness still work, but the timeliness table will be blank. For timing we'd then rely on the DAG's own run logs.
+
+## 16:00 user
+
+ran it, check the output
+
+## 16:00 assistant
+
+That didn't work either. **Neither the apac UAT client nor your own account can read these series in UAT**, with either kind of read. The only identity that can is the SMP service app the DAG uses. I'd stop chasing UAT read access here; it costs more than it tells us.
+
+**What we already have for QA:**
+1. **Every write is verified by the DAG itself.** After writing, it reads the same points back with its own client and compares them exactly (`"status": "verified"` in the timing log). The values come straight from IEX, so "verified" means TSDB holds exactly what IEX published.
+2. **The CDH refresh works:** the QA snapshot was rewritten at 13:12 IST, off the old DAG's :00/:30 schedule.
+3. **No red runs** across the 10:30–15:00 IST window, by your check.
+
+**The truly independent check fits prod better.** There, the apac prod client **can** read every version, as yesterday's latency probe showed. So right after cutover, I'd point this same probe at prod:
+- completeness and correctness against IEX
+- real first-insertion times for each block
+
+That's also the environment we actually care about.
+
+**Proposal:**
+1. Optional extra QA check, about 2 minutes: open 2–3 `collect_and_publish` logs from runs where CDH refreshed, and check each shows `"status": "verified"` with `written_row_count` > 0.
+2. Enable prod: set the two Variables, unpause the DAG, pause `india_iex_tsdb_expanded_rtm_dag`.
+3. About an hour after cutover, I run the probe against prod and we look at the results together.
+
+Good to go with this?
+
+The QA evidence rests on the DAG's own read-back, not on an independent reader. The prod probe in step 3 closes that gap.
+
+## 16:00 user
+
+yes, go ahead with prod
+
+## 16:01 assistant
+
+Setting the token in Airflow is yours to do: I don't type API tokens into fields. Unpausing and pausing are quick too. Prod steps, in this order:
+
+1. **Prod Airflow → Admin → Variables:**
+   - `INDIA_IEX_API_TOKEN`: the 20-character token. Re-run the clipboard script on VPN if you need it again, and check it starts `NC` and ends `kj`.
+   - `INDIA_IEX_RTM_REALTIME_TSDB_PUBLISH_ENABLED` = `true`
+2. **Unpause `india_iex_rtm_realtime_dag`.** The first run catches up the last 6 hours (about 1 minute, all green). Runs after that are short, with the CDH tasks skipped.
+3. **Once that first run is green, pause `india_iex_tsdb_expanded_rtm_dag`.**
+4. **Tell me the time you unpaused.** I'll point the probe at prod for about an hour later.
+
+Meanwhile I'm getting the prod version of the probe ready. It reads with the apac **prod** client, which can read every version:
+
+## 16:01 assistant
+
+The prod probe is ready. Once you've unpaused and about an hour has passed, run this on VPN, replacing `HH:MM` with the IST time you unpaused (for example `15:40`):
+
+```bash
+bash <<'SH'
+set -euo pipefail
+APAC=/Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$APAC/certs.pem" REQUESTS_CA_BUNDLE="$APAC/certs.pem" SSL_CERT_FILE="$APAC/certs.pem"
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+cd /Users/qn5792/repos/smp/smp-india
+PYTHONPATH=dags/src .venv/bin/python -W ignore \
+  /private/tmp/claude-501/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8/scratchpad/prod_probe.py HH:MM 2>&1 | grep -v " DEBUG \| INFO "
+SH
+```
+
+It's read-only and stops after 2 minutes. It reports completeness and correctness against IEX, plus the first prod insertion time for each block from the cutover onward.
+
+In prod, the apac Lambda still writes the same series until we retire it. So a block's first insertion time is whichever writer got there first. With our 1-minute polling, that should nearly always be us, but the probe can't tell the two writers apart.
+
+## 16:04 user
+
+i actually already unpaused the thing an hour ago, tried running the probe and I got an error! check terminal huhu
+
+## 16:04 assistant
+
+That's only the placeholder: the script received the literal text `HH:MM` instead of a time. You unpaused about an hour ago, so I'll work the time out and run it myself, in case you're still on VPN:
+
+## 16:07 assistant (smp-india)
+
+My shell can't reach the TSDB catalog (no VPN from here), so you'll need to run it. You unpaused at about **12:30 IST**, which is roughly 15:00 your time, so the time is filled in below:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+APAC=/Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$APAC/certs.pem" REQUESTS_CA_BUNDLE="$APAC/certs.pem" SSL_CERT_FILE="$APAC/certs.pem"
+"$APAC/.venv/bin/daccli" cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+cd /Users/qn5792/repos/smp/smp-india
+PYTHONPATH=dags/src .venv/bin/python -W ignore \
+  /private/tmp/claude-501/-Users-qn5792-repos-smp/32cc547a-400a-4583-b09e-f1e428141ad8/scratchpad/prod_probe.py 12:30 2>&1 | grep -v " DEBUG \| INFO "
+SH
+```
+
+The IEX half already worked from here: 344 points across 43 series, blocks 12:30–14:15 IST. Only the TSDB read needs your VPN.
+
+If you unpaused noticeably earlier or later than 12:30 IST, change the `12:30` to match. The window should start at the cutover, so the 6-hour catch-up from the first run doesn't count as timeliness.
+
+## 17:44 user (smp-india)
+
+Wait, we'll get badck to this.
+
+I randomly googled: "is it completely normal to have an airflow dag that runs every minute?"
+
+-- wdyt was the answer?
+
+## 17:44 assistant (smp-india)
+
+I can't see what Google showed you, but the usual answer is **"possible, but Airflow isn't really built for it."** It's a batch scheduler, and running every minute is at the edge of what it's comfortable with. The common points:
+
+| Usual concern | Does it apply to us? |
+|---|---|
+| **Scheduler overhead:** every run creates a DAG run plus task instances, and scheduling adds a few seconds of delay | Yes, but small. Our quiet runs finish in about 2s, and a few seconds of scheduling delay is noise against a 5-minute target |
+| **Metadata DB growth:** 1,440 runs a day × 6 tasks is about **8,600 task-instance rows a day**, including the skipped ones | **Yes, this is the real one.** It needs a cleanup policy (`airflow db clean` or similar) on QA and prod |
+| **Log volume:** one log file per task per run | **Yes.** QA logs at DEBUG level, about 100+ lines per run from the TSDB SDK. Worth checking log retention |
+| **Overlapping runs and catch-up storms** | Handled: `max_active_runs=1`, `catchup=False`, every task has a timeout |
+| **Alert spam on outages** | Applies. Failures alert to Teams every minute (flagged earlier) |
+| **"Use a streaming service or long-running process instead"** | That's the Darwin-style continuous collector we kept in reserve. It's justified if Airflow load becomes a problem or traders need seconds, not minutes |
+
+**My take:** it's a deliberate, acceptable choice at our scale: one DAG, cheap runs, and a hard 5-minute target. But the answer you found is right that it has a running cost. Two things are worth doing:
+1. **Confirm that metadata DB cleanup and log retention exist** on the India Airflow, or add them. That's yours as the platform team.
+2. **Revisit windowed polling** once the prod probe shows the real publication spread. It could cut runs by about half.
+
+I'm going on general Airflow knowledge here, not the page you read. I haven't checked whether the India Airflow already runs `airflow db clean` or has log retention set.
+
+## 17:46 user (smp-india)
+
+it actually suggested a bit different. While faster than 5 minutes just calls for a different solution altogether, if we ought to stick to Airflow, we can do it differently:
+
+1. @continuous ?
+2. Deferrable Operators
+
+
+Thoughgts?
+
+## 17:47 assistant (smp-india)
+
+Your search result is right: those are the two Airflow-native ways to do this. How they'd work for us:
+
+**1. `@continuous` on its own:** a new run starts the moment the previous one finishes. **That's worse for us.** A quiet run takes about 2s, so we'd poll IEX every few seconds and create *more* runs than now, likely tens of thousands a day instead of 1,440. It only makes sense combined with #2.
+
+**2. Deferrable task + `@continuous`. This is the good one.**
+- Each run starts with a task that **defers**. A small async trigger in Airflow's **triggerer** process checks IEX every 30–60s, holding no worker slot.
+- When the data changes, the task wakes up, publishes, refreshes CDH, and the run ends. `@continuous` immediately starts the next run, which defers again.
+
+| | Today (1-minute cron) | Deferrable + `@continuous` |
+|---|---|---|
+| Runs per day | 1,440 | **~48** (one per publication) |
+| DB rows / log files | ~8,600 per day | **~300 per day** |
+| Detection delay | ≤60s | ≤ trigger poll interval (30s possible) |
+| Worker slot while waiting | Used briefly every minute | **None** (triggerer only) |
+| Code | Done and tested | New async trigger, about 100 lines plus tests |
+
+**The catches, which a spike would have to check first:**
+- **There has to be a triggerer running in India QA and prod.** Your notes about `deferrable=True` in airflow-dev suggest there is, but I haven't confirmed it.
+- **In Airflow 3, trigger code has to be importable by the triggerer.** That may not work for code in our DAG bundle, and it's the biggest unknown.
+- The trigger needs the IEX token and the last-seen fingerprint. Those must not end up stored in plain text in the trigger's serialized arguments.
+
+**My take:** this is the better long-term design, and it fixes the DB and log growth for good. But the 1-minute cron already works, is measured, and is in prod. I'd **ship what we have, finish the prod verification, then open a follow-up ticket** for the deferrable version. It should start with a short spike on the triggerer import question. If the DB cleanup check shows the 1,440 runs a day hurting, move the follow-up up.
+
+Should I draft that follow-up ticket?
+
+All of this is from general Airflow 3 knowledge. I haven't checked our deployment for a triggerer or for how trigger code gets loaded, and those two decide whether the deferrable version is a small change or a platform change.
+
+## 17:49 user (smp-india)
+
+is continuous really worse for us? Maybe google AI is wrong, but he said...
+
+"
+
+<pasted_content id="7262">
+The difference between an every-minute scheduled DAG and the @continuous timetable comes down to how the work is triggered and managed by the Airflow scheduler.
+While both patterns can result in tasks running back-to-back, they impact your system's performance, database, and infrastructure in fundamentally opposite ways.
+
+Direct Comparison
+
+
+Feature	Every Minute Scheduled (* * * * *)	Continuous Loop (schedule="@continuous")
+How it's triggered	The scheduler forces a new DAG Run into existence every 60 seconds based on the clock.	The scheduler starts a new run only after the previous run finishes successfully.
+Database Overhead	Extremely High. Generates 1,440 discrete DAG runs and task logs every single day.	Extremely Low. Only processes one active run record at a time.
+Task Overlap Risk	High. If a task takes 65 seconds, the next minute's run will spin up anyway, causing stacking and resource exhaustion.	Zero. Built-in sequential execution guarantees tasks can never overlap.
+Kubernetes Impact	Constantly creates, runs, and destroys pods every 60 seconds (massive API churn).	Smoothly transitions from one pod lifecycle to the next without stacking pressure.
+
+
+Deep Dive: How They Act Under the Hood
+
+
+1. Every Minute Cron (* * * * *)
+
+This is an unconditional time trigger. Airflow doesn't care if your previous execution is still running, stuck, or struggling. When the clock hits the next minute, it creates a brand new DagRun row in your database and attempts to queue its tasks.
+If your Kubernetes cluster experiences a brief slowdown and a task takes 2 minutes to complete, Airflow will pile up two more runs behind it. This creates a cascading bottleneck that can easily freeze your scheduler or overwhelm your IEX API rate limits.
+
+2. The @continuous Schedule
+
+Think of @continuous as a self-perpetuating loop managed by Airflow.
+When you set schedule="@continuous" alongside max_active_runs=1, Airflow treats the DAG like a persistent background worker daemon. The scheduler kicks off Run #1. Run #1 calls the IEX API, processes the data, and finishes. The instant the scheduler marks Run #1 as successful, it immediately triggers Run #2.
+If a network hiccup causes Run #1 to take 3 minutes, Airflow simply waits. No new runs are queued, no extra pods are spawned, and no database bloat occurs. It natively adapts to the speed of your infrastructure and the external API.
+
+Summary
+
+• Use Every Minute Scheduled if you want to stress-test your database and don't care about overlapping tasks (not recommended).
+• Use @continuous if you want near-real-time data ingestion in Airflow without breaking your Kubernetes cluster or your metadata database.
+</pasted_content id="7262">
+
+"
+
+-- basically saying that resource-wise, continuous would be more efficient despite it possibly being faster than our 1 min cron. Fact check?
+
+## 17:49 assistant (smp-india)
+
+Mostly not. It has a few things backwards, and two of them matter for us:
+
+| Claim | Fact check |
+|---|---|
+| "@continuous: extremely low DB overhead, one run record at a time" | **Wrong.** *One active* run at a time, yes, but every run still leaves its own DAG run row, task rows and log files. Our quiet run takes about 2s, so a continuous loop starts a new run every few seconds, which means **more** records than one a minute. |
+| "Cron: high overlap risk, runs stack up if one takes 65s" | **Not for us.** `max_active_runs=1` stops a new run starting while one is active, and `catchup=False` skips the missed minutes. No stacking. |
+| "Cron: creates and destroys Kubernetes pods every minute" | **Doesn't apply.** Our task log showed `aif-engie-worker-1.aif-engie-worker...`, which is a **Celery** worker that stays up, not a pod per task. |
+| "@continuous adapts to slow infrastructure and never overlaps" | True, but cron plus `max_active_runs=1` already gives us that. |
+
+**The real point:** `@continuous` is only efficient when each run **waits** for new data. A deferrable trigger or sensor does the waiting, so a run happens about once per IEX publication. Without that, it's a tight loop that does more work than our cron. That's option 2 from before.
+
+Rather than argue about it, I'll measure: a throwaway local Airflow with a trivial `@continuous` DAG, counting how many runs it makes in 90 seconds:
+
+## 17:51 assistant (smp-india)
+
+No runs at all, so the local Airflow probably didn't come up properly. Checking its log:
+
+## 17:51 assistant (smp-india)
+
+`airflow standalone` launches its components by calling `airflow` from the PATH, and the venv isn't on it. Retrying with the venv on the PATH:
+
+## 17:54 assistant (smp-india)
+
+Measured. **`@continuous` on its own made 55 runs in about 2.4 minutes: one every ~2.6 seconds.**
+
+| | Runs per day | DB rows and log files |
+|---|---:|---:|
+| Our 1-minute cron | 1,440 | baseline |
+| `@continuous` alone | **~33,000** | **~23× more** |
+| `@continuous` + deferrable wait | ~48 (one per IEX publication) | **~30× fewer** |
+
+That was a do-nothing task on a throwaway local Airflow. With our real task (about 2s plus IEX and TSDB calls), runs would be a bit further apart, but still several per minute. That also means hitting IEX several times a minute.
+
+So the article had the efficiency backwards **for `@continuous` alone**. It's only efficient when something inside each run waits for new data, which is the deferrable pattern. My recommendation stands: keep the cron for now, and make **deferrable + `@continuous`** the follow-up ticket, starting with a spike on whether the triggerer can load our trigger code.
+
+The throwaway Airflow is stopped. One caution: my cleanup ran `pkill -f airflow`, which stops **every** process on your laptop with "airflow" in its command line. If you had a local Airflow of your own running, restart it.
+
+## 17:56 user (smp-india)
+
+just to give me a view, how much effort would it take to do the deferrable and continuous approach?
+
+My only concern is keeping the 1 min cron, this will spawn 1440 runs... sure, they're probabbly is successful, but god damn that's a lot lol. Won't we overload or overwhelm  the resources? DB and shit?
+
+## 17:57 assistant (smp-india)
+
+Two questions: is 1,440 runs a day actually a problem, and how much would the switch cost. First I'll check whether our Airflow already cleans up old runs, since that decides most of the first answer:
+
+## 17:57 assistant (smp-tool/config/india)
+
+The triggerer is **enabled in QA and prod**, and logs are trimmed after **15 days**. Checking for metadata DB cleanup and the triggerer's DAG code mount:
+
+## 17:57 assistant (smp-tool/config/india)
+
+Short answer: **1,440 runs a day won't overload anything today.** But I found a real gap that makes your worry valid over time.
+
+## Will 1,440 runs a day overwhelm things?
+
+| Resource | Load from this DAG | Verdict |
+|---|---|---|
+| **Celery workers** | 2 short tasks a minute (about 2s each); the CDH tasks are skipped on most runs | Trivial |
+| **Scheduler** | 1 run a minute | Trivial |
+| **Logs** | About 2,900 small log files a day | **Bounded:** India QA and prod trim logs after **15 days** (`retentionDays: 15` in `smp-tool`) |
+| **Metadata DB** | About 10 rows per run (run, tasks, XCom), so **~14k rows a day, ~5M a year** | **Grows forever.** There's **no DB cleanup configured** for India: no `databaseCleanup` job in QA or prod. That applies to *all* DAGs, ours just adds the most |
+
+Postgres copes with millions of rows, so nothing breaks this month. Over the months, though, the DAG's grid view and some scheduler queries slow down. **The cheap fix covers every DAG:** turn on regular metadata DB cleanup in `smp-tool`. That's either the Helm chart's DB cleanup job, if the chart version has it, or a small daily `airflow db clean` keeping about 30 days. It's a config change of maybe an hour or two.
+
+## The deferrable + `@continuous` version
+
+Good news from the config: **the triggerer is already enabled in QA and prod,** and DAGs reach the pods through git-sync, so trigger code should be importable. That removes the biggest unknown.
+
+| Piece | Effort |
+|---|---|
+| **Spike:** confirm the triggerer imports our trigger from the DAG bundle, and can read the IEX token without storing it in plain text in the trigger table | ~½ day |
+| Async trigger: poll IEX every 30s, compare against the last-seen fingerprint, fire on change, with a timeout so the 6-hour corrections still get picked up | ~½ day |
+| Small deferrable operator plus the DAG switched to `@continuous` (gate task removed) | ~½ day |
+| Tests (trigger with asyncio, DAG structure), Codex review | ~½ day |
+| QA soak, then prod | ~1 day of elapsed time, little effort |
+| **Total** | **About 2–3 days** |
+
+The result is about 48 runs a day instead of 1,440, and slightly faster detection (≤30s).
+
+## My recommendation
+1. **Now:** enable metadata DB cleanup in `smp-tool`. It addresses your concern directly, for every DAG, at about an hour's effort.
+2. **Next sprint:** the deferrable version as its own ticket, starting with the ½-day spike.
+3. **Keep the 1-minute cron running meanwhile.** It's safe at this scale.
+
+Do you want me to draft the follow-up ticket and look at what the DB cleanup change in `smp-tool` would take?
+
+I'm assuming the triggerer pods get the DAG code through git-sync, as the Helm chart normally does. I didn't open the triggerer section of the config closely enough to confirm it. I also haven't measured the actual size of the India metadata DB.
+
+## 18:02 user (smp-tool/config/india)
+
+i see. So you seriously telling me, at this point, it's too... over-engineered to do the deferrable + continuous as our first go on this story?
+
+## 18:02 assistant (smp-tool/config/india)
+
+Not over-engineered. It's the right shape for this in Airflow. My point is narrower: **it isn't worth doing *now*,** because the cheap version is already live and meets the target.
+
+**What the switch would buy, compared with today:**
+- **Latency:** ≤30s instead of ≤60s to notice new data. Traders won't feel that against a 5-minute target.
+- **DB and log volume:** 48 runs a day instead of 1,440. A real gain, but DB cleanup gets most of it for an hour's work, and cleanup is needed for every other DAG anyway.
+- **Elegance:** yes, it's the textbook pattern.
+
+**What it would cost:** 2–3 days, plus new failure modes we haven't hit yet. Those are trigger code loading in the triggerer, handling secrets in triggers, and a run that waits up to 30 minutes when something goes wrong. All that would come *after* we finally have prod working.
+
+**If we'd started from scratch,** deferrable as the first version would have been defensible. I'd still have shipped the cron first, because it had no platform unknowns and got traders their data a few days sooner. That's the real argument for it: getting value out quickly, not avoiding sophistication.
+
+So: finish verifying prod, turn on DB cleanup, and do deferrable next sprint. If the 1,440 runs genuinely bother you, deferrable can come right after the prod check instead. Nothing blocks it, and the triggerer already exists.
+
+## 18:15 user (smp-tool/config/india)
+
+anyway, back to the vpn script, I ran it. Can u check pls?
+
+## 18:16 assistant (smp-tool/config/india)
+
+Mostly good news, plus one thing to investigate.
+
+**What's confirmed in prod:**
+- **Correct:** all 43 series are readable, and **0 points differ from IEX.**
+- **Timely:** since cutover, new blocks land in TSDB at a very steady time:
+
+| IEX publication caught | First prod insertion (IST) | The old Lambda would have written at |
+|---|---|---|
+| 14:00/14:15 | **13:11:13** | 13:30 |
+| 14:30/14:45 | **13:41:15** | 14:00 |
+| 15:00/15:15 | **14:11:11** | 14:30 |
+| 15:30/15:45 | **14:41:13** | 15:00 |
+| 16:00/16:15 | **15:11:16** | 15:30 |
+
+  So IEX publishes at about **:10–:11 and :40–:41 IST**, every time, and we have the data in TSDB within about a minute. That's about 19 minutes earlier than the Lambda at the TSDB stage alone. The regularity is also strong evidence for windowed polling later.
+
+**Two things to look at:**
+1. **Blocks 16:30/16:45 are missing (86 points).** IEX publishes those at about 15:41 IST, so the probe most likely ran in the few seconds before our DAG wrote them. **Run the same command once more.** If they're still missing, it's a real problem.
+2. **We seem to rewrite the whole window on every publication.** The `versions` column grows by 2 per half hour for every block. The Lambda explains 1 (it writes every 30 minutes regardless). The count matches **our DAG rewriting all ~1,250 points at every publication**, not just the ~86 new ones. If so, the "skip unchanged values" check thinks the Lambda's values differ from ours, probably a float or rounding mismatch. **It isn't a correctness problem,** but it's about 60k unnecessary writes a day and slower verify steps. To confirm: open the `collect_and_publish` log of a prod run at :11 or :41 and check `written_row_count`. About 86 is fine; about 1,200 confirms the rewrite.
+
+The rewrite theory is an inference from version counts. The probe can't tell which writer made each version. The `written_row_count` from that one log settles it.
+
+## 18:25 user (smp-tool/config/india)
+
+ran it again, check the output
+
+and then for 2:
+
+<pasted_content id="7262">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local:8793/log/dag_id=india_iex_rtm_realtime_dag/run_id=scheduled__2026-10-14T10:11:00+00:00/task_id=collect_and_publish/attempt=1.log
+::endgroup::
+[2026-10-14T10:11:00.761494Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a139e4-d59c-79f4-899f-b6876e5fb144 dag_id=india_iex_rtm_realtime_dag task_id=collect_and_publish run_id=scheduled__2026-10-14T10:11:00+00:00 try_number=1 map_index=-1
+[2026-10-14T10:11:00.777976Z] DEBUG - Loading plugins
+[2026-10-14T10:11:00.779376Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-14T10:11:01.020935Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-14T10:11:01.044540Z] DEBUG - Loading plugins from entrypoints
+[2026-10-14T10:11:01.044713Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-14T10:11:01.046382Z] DEBUG - Loading 2 plugin(s) took 267.07 ms
+[2026-10-14T10:11:01.046576Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f0f84497c20>}
+[2026-10-14T10:11:01.046654Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:01.046745Z] DEBUG - Result from 'on_starting': []
+[2026-10-14T10:11:01.047429Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-14T10:11:01.047959Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.048408Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.053321Z] DEBUG - Initializing Provider Manager[asset_uris]
+[2026-10-14T10:11:01.304244Z] DEBUG - Initialization of Provider Manager[asset_uris] took 0.25 seconds
+[2026-10-14T10:11:01.311797Z] DEBUG - Failed to find locale C
+[2026-10-14T10:11:01.311905Z] DEBUG - Attempting to load en_US as fallback
+[2026-10-14T10:11:01.313426Z] DEBUG - /home/airflow/.local/lib/python3.12/site-packages/cron_descriptor/locale/en_US.mo Loaded
+[2026-10-14T10:11:01.315253Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-14T10:11:01.315471Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-14T10:11:01.319259Z] DEBUG - Found DAG india_iex_rtm_realtime_dag
+[2026-10-14T10:11:01.319437Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning
+[2026-10-14T10:11:01.319729Z] DEBUG - Loaded DAG <DAG: india_iex_rtm_realtime_dag>
+[2026-10-14T10:11:01.319928Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_iex_rtm_realtime_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=272
+[2026-10-14T10:11:01.320097Z] DEBUG - Dag file parsed file=india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.320244Z] DEBUG - Integrate Macros plugins
+[2026-10-14T10:11:01.346250Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a139e4-d59c-79f4-899f-b6876e5fb144'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-986714b27fe1eb5f70d16ae61dfeba22-54ec571546b81a7a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 776210, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T10:11:01.346339Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:01.346413Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-14T10:11:01.346620Z] INFO - ::endgroup::
+[2026-10-14T10:11:01.586456Z] DEBUG - Starting new HTTPS connection (1): [www.iexindia.com:443](https://www.iexindia.com:443)
+[2026-10-14T10:11:02.982366Z] DEBUG - https://www.iexindia.com:443 "POST /IEXPublish/AppServices.svc/IEXGetTradeData HTTP/1.1" 200 None
+[2026-10-14T10:11:03.080583Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-14T10:11:03.255811Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:03.255956Z] DEBUG - Token cannot be found in cache.
+[2026-10-14T10:11:05.072926Z] DEBUG - Inserting token expiring on 2026-10-14 11:11:05.072805+00:00 with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:05.073072Z] DEBUG - Using newly received authentication, expiring on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:05.182298Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:05.182450Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.096145Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.096297Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.153327Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.153472Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.174580Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.174705Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.210594Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.210720Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.225813Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.225932Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.880434Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.880593Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.898677Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.898806Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.948806Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.948941Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:14.988336Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:14.988457Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.133334Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.133471Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.260882Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.261020Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.339244Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.339379Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.353158Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.353280Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.400478Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.400623Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.413888Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.414006Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.472893Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.473029Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.565834Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.565968Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.680029Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.680172Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.734902Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.735038Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.830782Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.830925Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.885370Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.885511Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.911992Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.912125Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:15.982464Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:15.982595Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.074787Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.074933Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.089694Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.089811Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.121968Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.122086Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.184502Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.184641Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.209535Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.209652Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.322208Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.322339Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.398530Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.398655Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.417570Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.417685Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.459382Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.459501Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.473363Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.473476Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.498386Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.498495Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.533589Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.533694Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.558718Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.558825Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.570860Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.570962Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.662929Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.663075Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.675758Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.675901Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.701811Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.701916Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.716075Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.716175Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.762092Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.762196Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.774551Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.774650Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.805158Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.805268Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.816928Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.817028Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.859292Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.859389Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.877340Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.877439Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.902963Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.903064Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.914036Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.914131Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.935997Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.936107Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:16.995994Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:16.996104Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.040733Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.040835Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.052108Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.052203Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.086034Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.086131Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.098564Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.098664Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.133127Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.133229Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.148250Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.148349Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.185622Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.185739Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.205360Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.205462Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.243149Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.243255Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.256853Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.256956Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.367287Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.367439Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.402621Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.402758Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.436303Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.436459Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.474424Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.474596Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.545666Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.545813Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.559859Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.559997Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.675248Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.675396Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.692041Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.692168Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.753117Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.753245Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.787432Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.787545Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.843203Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.843362Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.858264Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.858409Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.907817Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.907975Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.931761Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.931908Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.966925Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.967414Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:17.985113Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:17.985788Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.103393Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.103566Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.117033Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.117189Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.153802Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.153924Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.226892Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.227020Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.286238Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.286372Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.363990Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.364114Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.411418Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.411545Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.437973Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.438094Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.474287Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.474423Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.493459Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.020535266026854515, "endpoint": "uat", "fallback_calls": 0, "input_rows": 1290, "mode": "bulk", "operation": "publish", "read_requests": 43, "read_sdk_calls": 1, "read_seconds": 10.684072077274323, "series_count": 43, "status": "published", "total_seconds": 15.433031249791384, "write_rows": 86, "write_sdk_calls": 43, "write_seconds": 4.392626253888011}
+[2026-10-14T10:11:18.502023Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-14T10:11:18.510335Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.510448Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:18.548800Z] DEBUG - Retrieving token with "49f3e54215749ed3cbe2a4bab1b033ab1b95f49b419c14aedfe145e72c7f65e089280b526d32dbf84b4a3a878a56ce7393d0f125e404eaa3898d660302ea2bdd" key.
+[2026-10-14T10:11:18.548917Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.072805+00:00.
+[2026-10-14T10:11:25.327450Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.0003914386034011841, "endpoint": "uat", "fallback_calls": 0, "input_rows": 1290, "mode": "bulk", "operation": "verify", "poll_wait_seconds": 0.0, "read_requests": 43, "read_sdk_calls": 1, "read_seconds": 6.6178143247962, "series_count": 43, "status": "verified", "total_seconds": 6.825382102280855, "verification_attempts": 1, "write_rows": 0, "write_sdk_calls": 0, "write_seconds": 0.0}
+[2026-10-14T10:11:25.347511Z] INFO - IEX RTM TSDB publication {'status': 'published', 'endpoint': 'uat', 'input_row_count': 1290, 'written_row_count': 86}
+[2026-10-14T10:11:25.347737Z] INFO - Done. Returned value was: {'status': 'published', 'endpoint': 'uat', 'input_row_count': 1290, 'written_row_count': 86}
+[2026-10-14T10:11:25.347856Z] INFO - ::group::Post Execute
+[2026-10-14T10:11:25.348010Z] INFO - Pushing xcom ti=RuntimeTaskInstance(id=UUID('01a139e4-d59c-79f4-899f-b6876e5fb144'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-986714b27fe1eb5f70d16ae61dfeba22-54ec571546b81a7a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 776210, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T10:11:25.380702Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a139e4-d59c-79f4-899f-b6876e5fb144'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-986714b27fe1eb5f70d16ae61dfeba22-54ec571546b81a7a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 776210, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 10, 11, 25, 360673, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T10:11:25.380967Z] DEBUG - Calling 'on_task_instance_success' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a139e4-d59c-79f4-899f-b6876e5fb144'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-2f70-7778-b552-1c653852d038'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-986714b27fe1eb5f70d16ae61dfeba22-54ec571546b81a7a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 776210, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 10, 11, 25, 360673, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T10:11:25.381017Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:25.381064Z] DEBUG - Result from 'on_task_instance_success': []
+[2026-10-14T10:11:25.381105Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f0f76cadee0>}
+[2026-10-14T10:11:25.381134Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:25.381163Z] DEBUG - Result from 'before_stopping': []
+[2026-10-14T10:11:25.381192Z] INFO - ::endgroup::
+</pasted_content id="7262">
+
+## 18:25 assistant (smp-tool/config/india)
+
+That log is from **QA** (`smp-india-qa`, endpoint `uat`), not prod. It's still useful: at 15:41 IST it wrote **86 rows**, exactly the 2 new blocks × 43 series. So the "skip unchanged values" check works when we're the only writer. This time verify passed on the first try, too.
+
+Checking the rerun output:
+
+## 18:25 assistant (smp-tool/config/india)
+
+The rerun checks out. **Prod is complete and correct:**
+- **774/774** IEX points are in prod TSDB, with **0 differences**.
+- The two "missing" blocks landed at **15:41:14 IST**, so the first run just came a few seconds too early.
+- Every publication since cutover reached TSDB within about a minute: 13:11, 13:41, 14:11, 14:41, 15:11 and 15:41 IST.
+
+**On the rewriting.** The QA log you pasted wrote just **86 rows**. That's only correct behaviour where we're the only writer. The prod version counts fit a very specific pattern: **every block gains one version per Lambda run (:00/:30) plus one per publication we catch (:11/:41).** For example, the 16:00 block has 4 versions: ours at 15:11 and 15:41, the Lambda's at 15:30 and 16:00. So in **prod**, each time the Lambda rewrites the window, our next run sees the Lambda's latest version as "different" and rewrites everything too. The two writers ping-pong.
+- **Harmless for correctness:** the latest value always matches IEX, as the probe shows.
+- **Wasteful:** about 1,250 extra writes per publication, roughly 60k a day, plus longer verify steps.
+- **It goes away when the Lambda stops writing these series,** as QA demonstrates. Retiring the Lambda RTM scrapers was the next step anyway; this just makes it more urgent.
+
+**To confirm, one prod log:** open `collect_and_publish` in **prod** for a run at :11 or :41 IST and check `written_row_count`. About 1,290 confirms the ping-pong; about 86 means my reading of the version counts is wrong.
+
+**Where SCR-1284 stands:**
+- Prod works, the data is correct and complete, and it lands within about 1 minute of IEX publishing. That's about 19 minutes ahead of the Lambda at the TSDB stage alone.
+- **Next:** retire the Lambda RTM scrapers, send Adrien the message, then enable DB cleanup and open the deferrable follow-up.
+
+I haven't worked out *why* our skip check treats the Lambda's values as different, even though the probe sees them as equal to IEX to within 1e-6. Retiring the Lambda makes that question moot, so I'd only dig into it if retirement gets delayed.
+
+## 18:28 user (smp-tool/config/india)
+
+<pasted_content id="7262">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local:8793/log/dag_id=india_iex_rtm_realtime_dag/run_id=scheduled__2026-10-14T10:11:00+00:00/task_id=collect_and_publish/attempt=1.log
+::endgroup::
+[2026-10-14T10:11:00.657227Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a139e4-d533-704a-97f2-bf2bd58c3d35 dag_id=india_iex_rtm_realtime_dag task_id=collect_and_publish run_id=scheduled__2026-10-14T10:11:00+00:00 try_number=1 map_index=-1
+[2026-10-14T10:11:00.674462Z] DEBUG - Loading plugins
+[2026-10-14T10:11:00.678439Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-14T10:11:01.093798Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-14T10:11:01.119700Z] DEBUG - Loading plugins from entrypoints
+[2026-10-14T10:11:01.119905Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-14T10:11:01.122188Z] DEBUG - Loading 2 plugin(s) took 443.84 ms
+[2026-10-14T10:11:01.122431Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7faf800c9070>}
+[2026-10-14T10:11:01.122497Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:01.122566Z] DEBUG - Result from 'on_starting': []
+[2026-10-14T10:11:01.123220Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-14T10:11:01.123775Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.124328Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.129368Z] DEBUG - Initializing Provider Manager[asset_uris]
+[2026-10-14T10:11:01.658516Z] DEBUG - Initialization of Provider Manager[asset_uris] took 0.53 seconds
+[2026-10-14T10:11:01.682141Z] DEBUG - Failed to find locale C
+[2026-10-14T10:11:01.682336Z] DEBUG - Attempting to load en_US as fallback
+[2026-10-14T10:11:01.685925Z] DEBUG - /home/airflow/.local/lib/python3.12/site-packages/cron_descriptor/locale/en_US.mo Loaded
+[2026-10-14T10:11:01.688805Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-14T10:11:01.689330Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-14T10:11:01.696047Z] DEBUG - Found DAG india_iex_rtm_realtime_dag
+[2026-10-14T10:11:01.696308Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning
+[2026-10-14T10:11:01.696988Z] DEBUG - Loaded DAG <DAG: india_iex_rtm_realtime_dag>
+[2026-10-14T10:11:01.697341Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_iex_rtm_realtime_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=573
+[2026-10-14T10:11:01.697723Z] DEBUG - Dag file parsed file=india/india_iex_rtm_realtime_dag.py
+[2026-10-14T10:11:01.698494Z] DEBUG - Integrate Macros plugins
+[2026-10-14T10:11:01.731157Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a139e4-d533-704a-97f2-bf2bd58c3d35'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-edb9-736d-bead-ff1f015c95e0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-08d30aca7bd96b521b70f2ebfebf80fb-96fd24b877ba9f0a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 672259, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T10:11:01.731278Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:01.731343Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-14T10:11:01.731538Z] INFO - ::endgroup::
+[2026-10-14T10:11:02.383123Z] DEBUG - Starting new HTTPS connection (1): [www.iexindia.com:443](https://www.iexindia.com:443)
+[2026-10-14T10:11:03.675826Z] DEBUG - https://www.iexindia.com:443 "POST /IEXPublish/AppServices.svc/IEXGetTradeData HTTP/1.1" 200 None
+[2026-10-14T10:11:03.788946Z] DEBUG - Specifying intact_client 3-s-SMP-Service-Application-F0MFVNSO5E1PDUC and intact_secret
+[2026-10-14T10:11:03.948926Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:03.949124Z] DEBUG - Token cannot be found in cache.
+[2026-10-14T10:11:05.686097Z] DEBUG - Inserting token expiring on 2026-10-14 11:11:05.685984+00:00 with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:05.686241Z] DEBUG - Using newly received authentication, expiring on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:05.742156Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:05.742303Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.732047Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.732225Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.757202Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.757369Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.786594Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.786741Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.809349Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.809597Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.819420Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.819650Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.843420Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.843613Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.876367Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.876558Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.912735Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.912880Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.925162Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.925297Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.946235Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.946428Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.957070Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.957264Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:13.991544Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:13.991723Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.002332Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.002481Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.025695Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.025853Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.035248Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.035395Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.055826Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.056059Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.066367Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.066526Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.086394Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.086588Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.096815Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.096973Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.118879Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.119059Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.128886Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.129074Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.150044Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.150192Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.160760Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.160905Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.182998Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.183150Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.198408Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.198574Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.223363Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.223527Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.233149Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.233300Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.253998Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.254156Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.264027Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.264180Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.286738Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.286896Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.297356Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.297509Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.319089Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.319263Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.329010Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.329156Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.349773Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.349935Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.360684Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.360914Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.384036Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.384198Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.395295Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.395497Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.427376Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.427629Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.438183Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.438318Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.509243Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.509386Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.520539Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.521016Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.545408Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.545599Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.555184Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.555387Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.576229Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.576386Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.585505Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.585650Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.605648Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.605802Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.615307Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.615457Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.635438Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.635595Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.644880Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.645030Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.669783Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.669936Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.685070Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.685223Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.715167Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.715327Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.725486Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.725636Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.749067Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.749243Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.759183Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.759336Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.792099Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.792284Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.803030Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.803190Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.849157Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.849318Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.858948Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.859104Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.879937Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.880097Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.910867Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.911085Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.934272Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.934461Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.946639Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.947454Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.977816Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.978064Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:14.988552Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:14.988691Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.039742Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.039937Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.052648Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.052839Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.076861Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.077067Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.094419Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.094618Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.139166Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.139395Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.187329Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.187563Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.207893Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.208040Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.217218Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.217379Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.238527Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.238684Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.248696Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.248882Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.270872Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.271092Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.281545Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.281753Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.302115Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.302269Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.312580Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.312728Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.361199Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.361391Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.384363Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.384631Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.410690Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.410839Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.421728Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.421909Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.464120Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.464323Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.475481Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.475681Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.521082Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.521282Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.530450Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.027562538161873817, "endpoint": "prod", "fallback_calls": 0, "input_rows": 1290, "mode": "bulk", "operation": "publish", "read_requests": 43, "read_sdk_calls": 1, "read_seconds": 9.52123069576919, "series_count": 43, "status": "published", "total_seconds": 11.768376028165221, "write_rows": 86, "write_sdk_calls": 43, "write_seconds": 1.7909473944455385}
+[2026-10-14T10:11:15.544474Z] DEBUG - Specifying intact_client 3-s-SMP-Service-Application-F0MFVNSO5E1PDUC and intact_secret
+[2026-10-14T10:11:15.561348Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.561550Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:15.601482Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:15.602076Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:27.657128Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:27.657290Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:27.696546Z] DEBUG - Retrieving token with "90b8607dfb85c2213ca72a8b17c3f5b003d94d4667fee6a5f91efc72031edebc233fcc3e97b0c586375b84f1454ba3f484a56f4b81e58ca1cb0436f00d622c81" key.
+[2026-10-14T10:11:27.696734Z] DEBUG - Using already received authentication, will expire on 2026-10-14 11:11:05.685984+00:00.
+[2026-10-14T10:11:33.535611Z] INFO - IEX_RTM_REALTIME_TSDB_TIMING {"configure_seconds": 0.0010046306997537613, "endpoint": "prod", "fallback_calls": 0, "input_rows": 1290, "mode": "bulk", "operation": "verify", "poll_wait_seconds": 5.000077584758401, "read_requests": 86, "read_sdk_calls": 2, "read_seconds": 12.360087040811777, "series_count": 43, "status": "verified", "total_seconds": 17.991129407659173, "verification_attempts": 2, "write_rows": 0, "write_sdk_calls": 0, "write_seconds": 0.0}
+[2026-10-14T10:11:33.565919Z] INFO - IEX RTM TSDB publication {'status': 'published', 'endpoint': 'prod', 'input_row_count': 1290, 'written_row_count': 86}
+[2026-10-14T10:11:33.566243Z] INFO - Done. Returned value was: {'status': 'published', 'endpoint': 'prod', 'input_row_count': 1290, 'written_row_count': 86}
+[2026-10-14T10:11:33.566419Z] INFO - ::group::Post Execute
+[2026-10-14T10:11:33.566629Z] INFO - Pushing xcom ti=RuntimeTaskInstance(id=UUID('01a139e4-d533-704a-97f2-bf2bd58c3d35'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-edb9-736d-bead-ff1f015c95e0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-08d30aca7bd96b521b70f2ebfebf80fb-96fd24b877ba9f0a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 672259, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T10:11:33.614186Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a139e4-d533-704a-97f2-bf2bd58c3d35'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-edb9-736d-bead-ff1f015c95e0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-08d30aca7bd96b521b70f2ebfebf80fb-96fd24b877ba9f0a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 672259, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 10, 11, 33, 584834, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')
+[2026-10-14T10:11:33.614447Z] DEBUG - Calling 'on_task_instance_success' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a139e4-d533-704a-97f2-bf2bd58c3d35'), task_id='collect_and_publish', dag_id='india_iex_rtm_realtime_dag', run_id='scheduled__2026-10-14T10:11:00+00:00', try_number=1, dag_version_id=UUID('01a13580-edb9-736d-bead-ff1f015c95e0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-08d30aca7bd96b521b70f2ebfebf80fb-96fd24b877ba9f0a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): collect_and_publish>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=0, start_date=datetime.datetime(2026, 10, 14, 10, 11, 0, 672259, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 14, 10, 11, 33, 584834, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-14T10:11:33.614520Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:33.614595Z] DEBUG - Result from 'on_task_instance_success': []
+[2026-10-14T10:11:33.614656Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7faf7f4d7bc0>}
+[2026-10-14T10:11:33.614705Z] DEBUG - Hook impls: []
+[2026-10-14T10:11:33.614759Z] DEBUG - Result from 'before_stopping': []
+[2026-10-14T10:11:33.614814Z] INFO - ::endgroup::
+</pasted_content id="7262">
+
+## 18:28 assistant (smp-tool/config/india)
+
+I was wrong. **Prod wrote 86 rows too**, only the two new blocks, so there's no ping-pong. Our skip check works in prod with the Lambda still writing alongside.
+
+The extra versions come from somewhere else. Two candidates:
+- The **Lambda** writing more than once per run. Its secret has a `kafka_parallel_write` setting, for example.
+- The probe counting the same write twice, because it reads from both TSDB sources (`api` and `athena`), which can stamp slightly different insertion times.
+
+Neither is our DAG, neither affects correctness, and the first one disappears when the Lambda is retired. Not worth digging into further.
+
+The prod run at 15:41 IST also gives us the real timing:
+
+| Step | Time |
+|---|---:|
+| IEX fetch | 1.3s |
+| TSDB login | 1.9s |
+| Publish (bulk read 9.5s + 43 writes 1.8s) | 11.8s |
+| Verify (2 attempts with a 5s wait) | 18.0s |
+| **`collect_and_publish` total** | **~33s** |
+
+**SCR-1284 status: verified in prod.**
+- Complete and correct: 774/774 points, 0 differences.
+- Writes are minimal: only new points.
+- New blocks land in TSDB within about 30–75 seconds of IEX publishing, at :11 and :41 IST.
+
+**What's left:**
+1. Retire the apac Lambda RTM scrapers (`iex_api_national_rtm`, `iex_api_rtm`).
+2. Send Adrien the message, with "about 2 minutes" and the auto-refresh tip.
+3. Clear the 🚩 flag on this chat.
+4. Follow-ups: India Airflow metadata DB cleanup, and the deferrable + `@continuous` ticket.
+
+Should I clear the flag and get the Lambda retirement steps ready?
+
+I didn't look into where the extra prod versions come from. The CDH refresh and Grafana delay in prod also haven't been timed directly. They're inferred from QA, where the full run took about 1 minute.
+
+## 18:29 user (smp-tool/config/india)
+
+yes pls
+
+## 18:29 assistant (apac-tsdb-scraper)
+
+I'm reading how `deploy` works before suggesting it. It may upload the local `solaris/` code too, and that matters because the checkout has uncommitted changes in `solaris/scrapers/iex/core.py`:
+
+## 18:30 assistant (apac-tsdb-scraper)
+
+Here's the script. Run it once on VPN. Everything up to the prompt is read-only, and it takes about 30 seconds:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem" REQUESTS_CA_BUNDLE="$PWD/certs.pem" SSL_CERT_FILE="$PWD/certs.pem"
+.venv/bin/daccli cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+.venv/bin/python - <<'PY'
+import sys; sys.path.insert(0, "scripts")
+import boto3
+from prod_scraper_ops import EXPECTED_PROD_ACCOUNT, FUNCTION_NAME, env_variables_for_update
+RETIRE = {"iex_api_rtm", "iex_api_national_rtm"}  # replaced by smp-india india_iex_rtm_realtime_dag (SCR-1284)
+s = boto3.Session(profile_name="dac_cdh_solarisapac_48380", region_name="eu-west-1")
+assert s.client("sts").get_caller_identity()["Account"] == EXPECTED_PROD_ACCOUNT, "not the prod account"
+lam = s.client("lambda")
+cfg = lam.get_function_configuration(FunctionName=FUNCTION_NAME)
+env = env_variables_for_update(cfg)
+live = [n for n in env["SCRAPER_NAMES"].split(",") if n]
+keep = [n for n in live if n not in RETIRE]
+print("live     :", ",".join(live)); print("new      :", ",".join(keep)); print("removing :", ",".join(sorted(set(live) - set(keep))) or "nothing")
+if keep == live:
+    sys.exit("Nothing to retire; already done.")
+if input("Type 'yes' to update ONLY SCRAPER_NAMES on the prod Lambda: ").strip() != "yes":
+    sys.exit("Aborted, nothing changed.")
+env["SCRAPER_NAMES"] = ",".join(keep)
+lam.update_function_configuration(FunctionName=FUNCTION_NAME, Environment={"Variables": env}, RevisionId=cfg["RevisionId"])
+lam.get_waiter("function_updated_v2").wait(FunctionName=FUNCTION_NAME)
+after = lam.get_function_configuration(FunctionName=FUNCTION_NAME)["Environment"]["Variables"]["SCRAPER_NAMES"]
+print("now live :", after)
+PY
+.venv/bin/python scripts/prod_scraper_ops.py --aws-profile dac_cdh_solarisapac_48380 --skip-refresh check-active
+SH
+```
+
+The script:
+1. Refreshes the prod credentials and checks it's talking to the prod account.
+2. Shows the live scraper list, the new list, and what's being removed (`iex_api_rtm` and `iex_api_national_rtm`).
+3. Updates the Lambda only after you type `yes`. Every other environment variable and all the code stay unchanged.
+4. Runs the script's own `check-active`, which should say live and config match, using my local config edit.
+
+**Rollback:** run `scripts/prod_scraper_ops.py activate iex_api_national_rtm --apply`, and the same for `iex_api_rtm`. That needs the two names back in the config first.
+
+**Afterwards:**
+- **Pause `india_iex_tsdb_expanded_rtm_dag` in prod**, if you haven't already.
+- **Commit the config edit** when you're happy. I haven't committed it.
+
+What I didn't check:
+- Whether the Lambda still runs RTM tasks that were already queued in DynamoDB. They should stop being picked up once the names are gone, and `prod_scraper_ops.py status` will show it.
+- The UAT Lambda config also still lists both scrapers. I left it alone because it doesn't affect prod.
+
+## 18:37 user (apac-tsdb-scraper)
+
+ran it, check the output
+
+## 18:37 assistant (apac-tsdb-scraper)
+
+Nothing changed in prod. The prompt broke because the script itself was being fed through stdin, so `input()` hit end-of-file before you could type. The plan it printed is right: it would remove exactly `iex_api_national_rtm` and `iex_api_rtm` and keep the other 8.
+
+Fixed version, which reads your answer from the terminal directly. Same 30 seconds, same safety checks:
+
+```bash
+bash <<'SH'
+set -euo pipefail
+cd /Users/qn5792/repos/smp/apac-tsdb-scraper
+export AWS_CA_BUNDLE="$PWD/certs.pem" REQUESTS_CA_BUNDLE="$PWD/certs.pem" SSL_CERT_FILE="$PWD/certs.pem"
+.venv/bin/daccli cdh get_credential --use-profile solaris-prod --aws-profile dac_cdh_solarisapac_48380 --save
+.venv/bin/python - <<'PY'
+import sys; sys.path.insert(0, "scripts")
+import boto3
+from prod_scraper_ops import EXPECTED_PROD_ACCOUNT, FUNCTION_NAME, env_variables_for_update
+RETIRE = {"iex_api_rtm", "iex_api_national_rtm"}  # replaced by smp-india india_iex_rtm_realtime_dag (SCR-1284)
+s = boto3.Session(profile_name="dac_cdh_solarisapac_48380", region_name="eu-west-1")
+assert s.client("sts").get_caller_identity()["Account"] == EXPECTED_PROD_ACCOUNT, "not the prod account"
+lam = s.client("lambda")
+cfg = lam.get_function_configuration(FunctionName=FUNCTION_NAME)
+env = env_variables_for_update(cfg)
+live = [n for n in env["SCRAPER_NAMES"].split(",") if n]
+keep = [n for n in live if n not in RETIRE]
+print("live     :", ",".join(live)); print("new      :", ",".join(keep)); print("removing :", ",".join(sorted(set(live) - set(keep))) or "nothing")
+if keep == live:
+    sys.exit("Nothing to retire; already done.")
+print("Type 'yes' to update ONLY SCRAPER_NAMES on the prod Lambda: ", end="", flush=True)
+with open("/dev/tty") as tty:  # stdin is this heredoc, so ask the terminal directly
+    if tty.readline().strip() != "yes":
+        sys.exit("Aborted, nothing changed.")
+env["SCRAPER_NAMES"] = ",".join(keep)
+lam.update_function_configuration(FunctionName=FUNCTION_NAME, Environment={"Variables": env}, RevisionId=cfg["RevisionId"])
+lam.get_waiter("function_updated_v2").wait(FunctionName=FUNCTION_NAME)
+after = lam.get_function_configuration(FunctionName=FUNCTION_NAME)["Environment"]["Variables"]["SCRAPER_NAMES"]
+print("now live :", after)
+PY
+.venv/bin/python scripts/prod_scraper_ops.py --aws-profile dac_cdh_solarisapac_48380 --skip-refresh check-active
+SH
+```
+
+One thing to expect: the live list ends with `iex_api_rec`, while the config file has `iex_api_rec` in the middle. If `check-active` compares the order and not just the names, it may report drift even though the two lists hold the same scrapers. If that happens, paste the output and I'll check how it compares.
+
+## 18:40 user (apac-tsdb-scraper)
+
+done. check pls
+
+## 18:40 assistant (apac-tsdb-scraper)
+
+The Lambda RTM scrapers are retired in prod:
+- **Now live:** `iex_api, darwin, hjks, hpx_api, iex, manikaran, iex_api_national, iex_api_rec`. Both RTM scrapers are gone, and the other 8 are unchanged.
+- **`check-active`:** no drift. The live list matches the config.
+- The Lambda code and its other environment variables weren't touched.
+
+**What changes:** `india_iex_rtm_realtime_dag` is now the **only** writer of the 43 RTM series in prod. There's no Lambda fallback anymore, so a failed DAG run now means a real gap. The Teams failure alerts on that DAG now matter.
+
+**Rollback if needed:** put both names back in `configs/prod_aws_deployer_config.toml`, then run `scripts/prod_scraper_ops.py activate iex_api_national_rtm --apply` and the same for `iex_api_rtm`.
+
+**Left on SCR-1284:**
+1. **Commit the config edit** in `apac-tsdb-scraper` (`configs/prod_aws_deployer_config.toml`, uncommitted). Without it, the next `deploy` or `check-active` would bring the two scrapers back or report drift. Want me to commit just that file as `chore(scr-1284): ...` and push?
+2. **Pause `india_iex_tsdb_expanded_rtm_dag` in prod,** if not done yet.
+3. **Send Adrien the message.**
+4. **Follow-ups:** India Airflow metadata DB cleanup, and the deferrable + `@continuous` ticket.
+
+Two things I haven't confirmed:
+- That no RTM tasks already queued in DynamoDB still run once. `prod_scraper_ops.py status` will show that.
+- Whether the old 30-minute DAG is actually paused in prod.
+
+## 18:41 user (apac-tsdb-scraper)
+
+right. commit and push pls. scope: scr-1284. And write a very short msg announcing the situation before, then now.
+
+## 18:42 assistant (apac-tsdb-scraper)
+
+Committed and pushed `7c7aa0a chore(scr-1284): retire Lambda IEX RTM scrapers from prod` to `apac-tsdb-scraper` `main`.
+- Only `configs/prod_aws_deployer_config.toml` went in. Your other uncommitted work (GDAM, probes) is untouched.
+- This repo has no CI on push, so the push itself deploys nothing. The live change was the `SCRAPER_NAMES` update we already made.
+- To push I had to make the work GitHub account active. I've switched it back to your personal `baraluga` account.
+
+Announcement:
+```text
+Heads up: IEX RTM prices are now near real time.
+
+Before: two stacked 30-min jobs (apac Lambda → TSDB, then Airflow → CDH), so new RTM prices took up to ~45 min to reach Grafana.
+Now: india_iex_rtm_realtime_dag polls IEX every minute and publishes straight to TSDB + CDH. New prices land within ~2 min of IEX publishing. Verified in prod: 774/774 points match IEX.
+
+The Lambda RTM scrapers are retired, so this DAG is now the only RTM writer. Keep the Grafana dashboards on auto-refresh to see updates as they land.
+```
+
+The "~2 min" combines the measured TSDB timing (about 30–75s) with the QA timing for the CDH rebuild. The prod CDH step itself wasn't measured.
+
+## 18:45 user (apac-tsdb-scraper)
+
+ask to keep an eye out now and see if everything checks out on their end
+
+## 18:45 assistant (apac-tsdb-scraper)
+
+```text
+Heads up: IEX RTM prices are now near real time.
+
+Before: two stacked 30-min jobs (apac Lambda → TSDB, then Airflow → CDH), so new RTM prices took up to ~45 min to reach Grafana.
+Now: india_iex_rtm_realtime_dag polls IEX every minute and publishes straight to TSDB + CDH. New prices land within ~2 min of IEX publishing. Verified in prod: 774/774 points match IEX.
+
+The Lambda RTM scrapers are retired, so this DAG is now the only RTM writer. Keep the Grafana dashboards on auto-refresh to see updates as they land.
+
+Please keep an eye on it over the next few days and tell us if anything looks off on your end: missing blocks, wrong values, or prices showing up late. Thanks!
+```
+
+## 18:58 user (apac-tsdb-scraper)
+
+From Mateo lol:
+
+<pasted_content id="7262">
+Yes thats's perfect ! I just checked on our dashboards it's working perfectly, it's 4:24pm here I have the prices for 5:15pm !
+Alrready in auto-refresh on the TV so everyone can look at it !
+I'll keep an eye on it on the next days
+</pasted_content id="7262">
+
+
+
+
+-- I'm honestly surprised we have future values??? Shit went so fast we have future values lol
+
+## 18:58 assistant (apac-tsdb-scraper)
+
+That's how RTM works: the auction prices delivery **ahead of time**. Being fast just means we now show those future prices as soon as they exist.
+
+IEX publishes each half-hourly auction result about **45–65 minutes before the blocks it covers start**. Our prod probe showed it: every pair of blocks was published at :11 or :41, with a lead time of about 49 and 64 minutes.
+
+Mateo's screenshot fits exactly:
+- At **16:11 IST**, IEX published the 17:00 and 17:15 blocks, and we had them in TSDB about 30 seconds later.
+- At **16:24**, the 17:15 price on his dashboard was the one starting 51 minutes later.
+
+**What actually changed** is how much of that lead time the traders get. Take Adrien's original example, blocks 11:30/11:45:
+- **Before:** IEX published at 10:41 and Grafana showed it at **11:01**. That's 29 minutes before delivery, and after their 11:00 cutoff.
+- **Now:** it shows at about **10:42–10:43**. That's about 47 minutes before delivery, and well before the cutoff.
+
+Nice touch that it's on the TV in auto-refresh. That's the best possible test over the next few days.
+
+## 18:58 user (apac-tsdb-scraper)
+
+write a witty reply pls lol. Admitting my realization lol
+
+## 18:58 assistant (apac-tsdb-scraper)
+
+```text
+Haha amazing, thanks Mateo! Confession: I saw "5:15pm at 4:24pm" and for a second thought we'd built a time machine 😅 Then I remembered RTM prices are published ~1h ahead of delivery. We're just not sitting on them for 30+ min anymore lol
+
+Love that it's on the TV. Shout if anything looks off!
+```

@@ -1,0 +1,221 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 12:15 user
+
+Mateo:
+"Ok then let's go for the option 3, if he scraper works for all others timeseries there's no chance for it to fail only on Tithwa !
+For the names in UAT/Prod for Tuticorin, wind_speed was the old name, I noticed that I putted that in UAT and I patched it in prod "
+
+## 12:15 assistant
+
+Option 3 means Tithwa is collected and published **only in prod**, and never in `dev` or `qa`, since those publish to UAT. In practice:
+
+- **Nothing breaks today.** Dev's `enabled_sites.json` already leaves `titwha` out, and `mappings.json` already holds the prod Tithwa IDs that prod will use.
+- **The risk is someone enabling `titwha` in dev later.** Every UAT publish would then fail on the missing series. The runbook currently says "enable once its UAT series exist", which will never happen now. So I'll update that line and add a small test that fails if `titwha` gets enabled in dev.
+- **INSE4's name is just stale in UAT.** Same ID, so nothing to do.
+
+## 12:16 assistant (smp-tool)
+
+The guard passes because Tithwa is correctly off. To check that it actually catches the mistake, I'll briefly enable Tithwa and run it again:
+
+## 12:16 assistant (smp-tool)
+
+Option 3 is set up in `smp-tool`; I haven't committed it yet.
+
+- **Guard test:** `test_tithwa_is_never_enabled_in_dev` fails if `titwha` is ever added to dev's `enabled_sites.json`. I checked it bites by enabling Tithwa temporarily: the test failed, and I restored the file. All `smp-tool` tests pass.
+- **Runbook:** Tithwa is now described as **prod-only** (agreed with Mateo, enforced by the test). The rollout order ends with "`titwha` in prod only", instead of waiting for UAT series that won't be created.
+- **INSE4 wind speed:** nothing to do. It's the same ID, and only the UAT name is stale.
+- **Memory:** I saved two notes for future sessions. One records the "UAT ID = prod ID, except Tithwa (prod-only)" rule. The other records the build-in-`smp-india` / deploy-from-`smp-tool` split, so we don't revisit it.
+
+Want me to commit and push this to `smp-tool` `dev`? It would be one commit, `docs(scr-1273): Tithwa is prod-only; guard against enabling it in dev`.
+
+The guard only covers dev. There's no qa or prod collector config yet, so when prod's config is created, Tithwa still needs to be added there deliberately.
+
+## 12:18 user (smp-tool)
+
+why no qa or prod? Can't we establish that now?
+
+## 12:18 assistant (smp-tool)
+
+Yes, we can. The reason it wasn't done is that the dev config hardcodes several environment-specific values, and for qa and prod I'd only have been guessing them. Your newest instruction says to check instead of guess, so I'm checking what `smp-tool` already defines for each environment.
+
+## 12:19 assistant (smp-tool)
+
+Yes, we can do it now. The check shows qa and prod differ from dev in exactly one way: every environment-specific value contains `smp-india-<env>`.
+
+| | dev | qa | prod |
+|---|---|---|---|
+| Namespace | `smp-india-dev` | `smp-india-qa` | `smp-india-prod` |
+| PVC | `smp-india-dev-efs-pvc` | `smp-india-qa-efs-pvc` | `smp-india-prod-efs-pvc` |
+| EFS mount / spool | `/export/smp-india-dev[/darwin]` | `…-qa…` | `…-prod…` |
+| Proxy | `proxy-az-southeastasia…:3128` | same | same |
+| UID/GID | 50000 / 0 | same | same |
+
+These all come from each environment's `airflow_values.yaml` and `pvc/`. Nothing is guessed.
+
+What I'd do, following `smp-tool`'s existing per-environment folders and SCR-1283's "mirror dev" scope:
+- **Config:** add `config/india/qa/darwin/` and `config/india/prod/darwin/`, each with the dev manifest (only the `smp-india-<env>` values changed), `sites.json` and `enabled_sites.json`.
+  - **qa:** Tuticorin plus the three solar sites, the same as dev.
+  - **prod:** all five, including Tithwa.
+- **`render_darwin.py` and `deploy_darwin.sh`:** add `--env dev|qa|prod`, defaulting to `dev`, so the command in Michael's message keeps working.
+  - `deploy_darwin.sh` picks the namespace and the ECR repo per environment. `--tag` maps to `smp-india-qa-airflow` in the non-prod account and to `smp-india-prod-airflow` in the prod account.
+- **Tests, written first:**
+  - Each environment's rendered manifest uses only its own namespace, PVC and spool.
+  - No qa or prod manifest contains `smp-india-dev`.
+  - `sites.json` is identical across environments, so the catalogue can't drift.
+  - Tithwa is enabled in prod and in neither dev nor qa.
+
+Things the repo can't tell us, which stay as deploy-time prerequisites for Michael:
+- **Darwin egress from the prod cluster.** Prod runs on a different cluster (`eks-qrm-dms-strategy-prod-bba1`), and the network approval that unblocked dev may not cover it. qa probably shares the dev cluster.
+- **`darwin-api-credentials` in `smp-india-qa` and `smp-india-prod`,** and whether prod uses the same Darwin client.
+- **That ECR repos `smp-india-qa-airflow` and `smp-india-prod-airflow` exist.** I'm inferring them from the Airflow image naming.
+
+Should I go ahead with prod enabling all five sites?
+
+## 12:20 user (smp-tool)
+
+yes, go ahead with all five in prod, then commit and push. if applicable, merge to qa and prod
+
+## 12:20 assistant (smp-tool)
+
+Writing the tests first:
+
+## 12:20 assistant (smp-tool)
+
+Red as expected, with 10 new failures. Now the config and code:
+
+## 12:20 assistant (smp-tool)
+
+All 39 tests pass. Updating the runbook, then committing.
+
+## 12:21 assistant (smp-tool)
+
+`smp-tool` `dev` is pushed. Now checking whether promoting to qa and prod applies, in both repos:
+
+## 12:21 assistant (smp-india)
+
+Done and pushed to `smp-tool` `dev` (`d9ee6d9..769cdd6`, two commits):
+- `feat(scr-1283)`: the qa and prod configs, plus `--env` for the renderer and deploy script. It also includes the prod-only Tithwa guard, which now covers dev and qa.
+- `docs(scr-1283)`: the runbook's new "qa and prod" section.
+
+What's in it:
+- **Configs:** `config/india/qa/darwin/` and `config/india/prod/darwin/`. Each is the dev manifest with only namespace, PVC and EFS paths changed to `smp-india-<env>`, plus an identical site catalogue.
+- **Enabled sites:** qa matches dev (Tuticorin plus the three solar sites). Prod has all five, including Tithwa.
+- **Deploying:**
+  ```bash
+  scripts/deploy_darwin.sh --env prod --context <prod-context> --tag <tag>
+  ```
+  `--tag` resolves to the right ECR repo and account per environment. Without `--env`, it defaults to `dev`, so Michael's command still works.
+- **Tests:** 39 pass, written failing first. They cover:
+  - each environment renders only its own namespace, PVC and paths;
+  - no qa or prod manifest contains `smp-india-dev`;
+  - the catalogue is identical across environments;
+  - per-environment site lists, with Tithwa never in dev or qa;
+  - `--env` resolving the right namespace and repository.
+
+**Merging to qa and prod: not applicable, so I didn't.**
+- **`smp-india`:** `qa` and `prod` already contain every SCR-1283 commit, from yesterday's promotion at `943b008`. The only commits on `dev` not yet promoted are two SCR-1274 (HPX) commits, which aren't part of this.
+- **`smp-tool`:** `qa-india` and `prod-india` haven't moved since July. `dev` is about 110 commits ahead of them, including Michael's unrelated work in progress (`darwin.json`, `Untitled-1.sh`, Airflow build changes), and they've diverged by over 500 commits. A merge would drag all of that into qa and prod, and that's a team decision, not part of this change. The collector doesn't need it anyway: `deploy_darwin.sh` runs from any up-to-date checkout of `smp-tool` `dev`, whichever environment it targets.
+
+Before the first qa or prod deploy, someone still needs to confirm three things the repo can't tell us:
+- the `darwin-api-credentials` secret exists in that namespace;
+- the image tag exists in that environment's ECR repo;
+- prod's cluster egress allows the proxy to reach Darwin. Prod runs on a separate cluster from dev and qa.
+
+## 12:35 user (smp-india)
+
+1. creds exist across all namespaces
+2. good point. I dunno
+3. I assume so, no? don't all envs use the same proxy?
+
+## 12:36 assistant (smp-india)
+
+**1. Credentials:** thanks, that's covered.
+
+**2. Image tags in qa/prod ECR:** I checked. They almost certainly **don't exist yet**. CI hasn't pushed anywhere because the switch is off, and Michael's manual push was to the dev repo only. But the qa and prod CI runs from yesterday's promotion each have the artifact ready, already named for their environment:
+- qa: [run 38406635260](https://github.com/qrm-dms/smp-india/actions/runs/38406635260) → `624915953606…/smp-india-qa-airflow:darwin-collector-025488487ab7`
+- prod: [run 38406709403](https://github.com/qrm-dms/smp-india/actions/runs/38406709403) → `154989746575…/smp-india-prod-airflow:darwin-collector-025488487ab7`
+
+Both expire on 2026-10-20. So qa and prod work the same way as dev: download, `docker load`, push, then `deploy_darwin.sh --env qa|prod`. Or, once the AWS trust is fixed and the switch is on, CI pushes them on the next qa or prod promotion.
+
+**3. Proxy:** half right. All three environments are *configured* with the same proxy URL, and prod Airflow already reaches other external APIs through it, so prod can reach the proxy. What isn't proven is whether the proxy *lets prod through to Darwin*. Dev was blocked at the proxy itself (Squid `403 ERR_ACCESS_DENIED`) until Darwin's hosts were approved. If that approval was by destination, prod is fine. If it was by source network, prod's cluster isn't covered. Neither of us knows which.
+
+Easy to find out. Whoever has `kubectl` on the prod cluster runs this once. It's read-only, takes at most about 30 seconds, and goes from an existing prod Airflow worker through its configured proxy:
+
+```bash
+kubectl --context <india-prod-context> -n smp-india-prod exec "$(kubectl --context <india-prod-context> -n smp-india-prod get pod -l component=worker -o name | head -1)" -- python -c "
+import urllib.request, urllib.error
+for url in ('https://api.darwin4res.com', 'https://engiedigital.okta-emea.com'):
+    try:
+        urllib.request.urlopen(url, timeout=15); print(url, 'REACHABLE')
+    except urllib.error.HTTPError as e: print(url, 'REACHABLE (HTTP', e.code, ')')
+    except Exception as e: print(url, 'BLOCKED:', type(e).__name__, e)
+"
+```
+
+`REACHABLE` with any HTTP code (even 401 or 404) means the proxy allows it. A `Tunnel connection failed: 403` means it's blocked, and prod needs the same approval dev got.
+
+I'm assuming the Airflow worker pods carry the chart's default `component=worker` label. If no pod is found, list them with `kubectl … get pods` and pick any Airflow pod.
+
+## 13:45 user (smp-india)
+
+flag: waiting for Michael's help on deploying and shit
+
+## 13:45 assistant (smp-india)
+
+I've flagged this chat as **waiting on Michael**: the Darwin collector deploy (ECR push and `deploy_darwin.sh`) and the AWS trust for `dms-smp-india-deploy`. The sidebar now shows it as 🚩 (scr-1273) more darwin assets.
+
+While we wait, two smaller loose ends from earlier:
+- **The prod proxy check is unanswered.** Whoever has prod `kubectl` access can run that one-liner whenever convenient.
+- **The `smp-tool` Tithwa runbook change is already pushed.** The guard test and qa/prod section went out in `769cdd6`.
+
+When Michael's done, unflag the chat and send me the collector logs; I'll check them for `"failed_entities": 0` and the spool batches.
+
+## 18:30 user (smp-india)
+
+Still waiting on Michael but Mateo sent a msg...
+
+Brian for the Darwin API Scraper, I am adding these datasets for Khaba :
+
+* darwin_IN_Rajasthan_Khaba_Generation_PT15M | id=a10b9b9c-76b3-52c1-b215-35ea4c16fb54
+* darwin_IN_Rajasthan_Khaba_Generation_PT1M | id=5b9b9bdd-0267-5a39-b7f2-e4ba0039d2ad
+* darwin_IN_Rajasthan_Khaba_HorizontalIrradiance_PT15M | id=a9268e6c-2e40-5b66-a148-9e49f8530aee
+* darwin_IN_Rajasthan_Khaba_TiltedIrradiance_PT15M | id=3d63e1b5-b501-59c5-b023-22e208fcef1d
+
+
+What the hell are these for?
+
+## 18:30 assistant (smp-india)
+
+These look like a **new site for the Darwin collector: Khaba (Rajasthan)**. They're named `darwin_IN_Rajasthan_Khaba_*`, alongside Khavda, Shapar and Raganesda (`darwin_IN_Gujarat_*`), and they follow the same pattern: generation at 1 minute and 15 minutes, plus irradiance at 15 minutes. I'm checking which Darwin entity Khaba would be, using the catalogue we saved during discovery:
+
+## 18:30 assistant (smp-india)
+
+They're destinations for a **sixth Darwin site: Khaba, in Rajasthan**. That's beyond SCR-1273's four Gujarat sites plus Tuticorin, so it's new scope. Possibly it's the "7 sites in total" from SCR-1261's note.
+
+What I found, and what's unclear:
+- **No Darwin entity is simply "Khaba solar".** The closest matches in the catalogue we saved:
+  - `SOF_INNS7`, "NSP 7_NHPC1", a solar farm. This is the likely one, since Khaba is an NHPC plant.
+  - `BES_INKHS`, "Khaba NHPC BESS". That's a battery, not this.
+  - `SOF_INBHA` and `SOF_INEBH`: Bhadla, also Rajasthan, but a different plant.
+
+  So the entity code needs confirming. We shouldn't guess from names; that's how Khaba and Khavda nearly got mixed up earlier.
+- **We already publish Khaba generation** through the Khaba CSV feed (SCR-1209), to its own TSDB IDs. These new `darwin_…` IDs are separate series, so there's no clash. But it's worth knowing whether Darwin is a second source alongside the CSV, or meant to replace it eventually.
+- **His list only has generation and irradiance**, the same shape as the Gujarat solar sites. So no module temperature, consistent with what we decided.
+
+Once the entity code is confirmed, the work is small: a `sites.json` entry, four `mappings.json` rows, a quick live check of the tags, and the `enabled_sites.json` line.
+
+Questions for Mateo:
+
+```
+Thanks Mateo! Two quick ones before we add Khaba:
+1. Which Darwin entity is Khaba? Closest we see in the API is SOF_INNS7 ("NSP 7_NHPC1"), can you confirm?
+2. We already publish Khaba generation from the Khaba CSV feed. Are these Darwin series meant to run alongside it, or eventually replace it?
+```
+
+I haven't checked his four IDs against TSDB yet. That needs VPN, and I'd fold it into the same probe once the entity is confirmed.

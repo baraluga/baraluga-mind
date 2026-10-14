@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-14. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
+As of 2026-10-15. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)
@@ -14,8 +14,9 @@ As of 2026-10-14. These are the India data products built on [[smp-platform]]. S
 **In flight or pending:**
 - `SCR-1286`: October IEX Green DAM/GDAM gap fix, pushed to [[apac-tsdb-scraper]]. Lou confirmed it works; closure still pending.
 - `SCR-1284`: production evidence showed most RTM delay comes from two independent 30-minute schedules: `apac-tsdb-scraper` publishes IEX RTM into TSDB, then an India DAG copies TSDB to CDH. Adrien said near-real-time is mandatory but they are not bidding on RTM yet. The favoured design is RTM-only: move the scraper into `smp-india`, poll the API frequently, and write TSDB and CDH in parallel. Open design choice is a simple one-minute Airflow DAG versus a continuous [[darwin-collector]] style service, depending on the accepted API-to-Grafana delay target.
+- The QA IEX RTM DAG polls once a minute and skips downstream work when nothing is new. First observed CDH delivery was 1 minute 2 seconds; the expected API-to-Grafana delay is up to about five minutes. The team will propose a five-to-ten-minute default interval with increased frequency during the critical trading window.
 - The GDAM Grafana panel queries the empty `india_iex_tsdb_dashboard_latest` table, while the data sits in `india_iex_tsdb_expanded_latest` (2026-10-09). This looks like a stale panel reference unless the live panel has already changed.
-- `SCR-1274`: HPX national scraper scope expanded from 12 to 32 PT15M series: prices for DAM/GDAM/RTM/HPDAM; four volume metrics for DAM, RTM, and HPDAM; and a GDAM technology breakdown. Step 1 added HPDAM, switched from MCV to purchase bid, sell bid, cleared volume, and scheduled volume, and added publication-frequency metadata. The remaining blockers are Mateo's actual TSDB IDs and his answer on which four GDAM technology columns he wants, because the source has total-only purchase bid.
+- `SCR-1274`: HPX national scraper scope is now confirmed as 33 PT15M series: five each for DAM, RTM, and HPDAM; GDAM has price, total-only purchase bid, and sell bid/MCV/cleared/scheduled volume for total, solar, non-solar, and hydro. Code and docs are on `dev`; TSDB publication remains disabled pending Mateo's IDs, and QA is the first enabled environment.
 - Khaba `SCR-1288`: Michael's `index_col=False` fix handles the October 9 inverter expansion and trailing-delimiter parse shift from October 10 onward. Follow-up hardening added a regression test, clearer field-count errors, and a "last row wins" rule for rare conflicting duplicate minute readings after preserving the existing all-zero safeguard. Brian confirmed the October 9-12 backfills succeeded; October 8 remained a possible follow-up.
 - Khaba scheduling: both realtime and minute DAGs now use a four-hour IST source-transition window and fail fast after that. The old minute DAG six-hour rescheduling sensor was removed because the known missing-file window should be skipped rather than treated as a long outage wait.
 - Darwin assets for Tuticorin and four Gujarat sites are moving from access-blocked design to rollout. See [[darwin-collector]].
@@ -63,6 +64,7 @@ As of 2026-10-14. These are the India data products built on [[smp-platform]]. S
 - 2026-09: IEX bid stack, price history, Manikaran forecasts, and bilateral contracts delivered.
 - 2026-10-07: Sprint 3 closes with bid-stack TSDB, the geomap, and the bilateral dashboard.
 - 2026-10-13: Khaba source parsing and missing-file handling hardened after the October 9 inverter expansion, and HPX `SCR-1274` scope expanded to include HPDAM plus 32 total TSDB series.
+- 2026-10-14: Mateo confirmed the GDAM field contract, taking `SCR-1274` to 33 total series; rollout remains inert until TSDB IDs and explicit publishing enablement.
 
 ## Open Questions
 
@@ -71,7 +73,6 @@ As of 2026-10-14. These are the India data products built on [[smp-platform]]. S
 - UNCERTAIN: Whether the live GDAM panel already diverged from the checked-in query.
 - UNCERTAIN: Whether the one-minute Khaba path passed stakeholder validation after QA.
 - UNCERTAIN: Whether October 8 Khaba needed the same backfill as October 9-12.
-- UNCERTAIN: Which four GDAM technology columns Mateo wants for `SCR-1274`; the source does not expose purchase bid by technology.
 - UNCERTAIN: What exact delay target Adrien will accept for `SCR-1284` RTM.
 
 ## Sources
@@ -95,5 +96,9 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-13-claude-smp-8ce08f10.txt`
 - `sources/claude-conversations/2026-10-13-claude-smp-e3dc30e8.txt`
 - `sources/codex-conversations/2026-10-13-codex-conversations.txt`
+- `sources/meetings/2026-10-14-0945-granola-daily-standup.md`
+- `sources/meetings/2026-10-14-1415-granola-daily-standup.md`
+- `sources/claude-conversations/2026-10-14-claude-smp-8ce08f10.txt`
+- `sources/claude-conversations/2026-10-14-claude-smp-bb0d20e1.txt`
 
-Last Updated: 2026-10-14
+Last Updated: 2026-10-15

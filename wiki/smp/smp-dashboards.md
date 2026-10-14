@@ -2,11 +2,12 @@
 
 ## Current State
 
-As of 2026-10-07. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
+As of 2026-10-15. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
 
 - **India geomap:** delivered. It shows realtime market price and volume by region, with max/min/average and current-slot views and a freshness indicator. The Plotly prototype was replaced by native Grafana geomap, and colour settings live in the dashboard JSON, so the same JSON imports into production. Mateo expects three maps (price/volume sets joined by region codes such as `N1`–`N3`), using fixed scales: yellow to red, price 0–10,000, volume up to last year's maximum plus 10%.
 - **Bilateral contracts (`SCR-1275`):** a table of all contracts with a region legend, freshness, and anomaly indicators. Still needs validation. It consumes `SCR-1278`'s validated tables rather than fixing scraper behaviour in dashboard code, and it must show source differences explicitly (see [[smp-india]]).
 - **IEX `DAM/GDAM/RTM MCP & Volume Trends`:** the main India market dashboard. It includes `Khaba Generation vs Forecast` (panel 18), the `SCR-1257` historical MCP heatmap, and the `SCR-1243` bid-stack curves. The bid-stack curves use separate buy/sell axes because the values are already cumulative, plus an estimated crossing marker; Mateo's QA feedback was pending.
+- **Portable map panels:** Mateo's copied map panels failed because panel-only copies omit dashboard-level Grafana variables and shared-query panel references. The POC now makes map, freshness, zone-table, and price-stat panels self-contained with direct Athena queries and safe defaults. Treat independent panel pasting as the preferred pattern where it does not remove needed controls.
 - **Grafana usage (`SCR-1252`):** SMP runs Grafana OSS, so Enterprise Usage Insights isn't available. The cheapest first answer is active-user counts from the org-users API (`lastSeenAt`) or Okta logs, going deeper only if usage justifies it.
 - **Not urgent:** Matteo's KPI dashboard (end of year; flat CDH output if its shape is unknown) and the Grafana + JupyterLab integration, waiting on Nilo (see [[smp-jupyter-dag-authoring]]).
 
@@ -41,6 +42,7 @@ As of 2026-10-07. Grafana dashboard work across SMP Japan and India. India data 
 - 2026-07-17: reusable HJKS 2Y `As of` look-back selector pattern (`SCR-1202`).
 - 2026-09-03: India IEX heatmap added; India prod CDH role-refresh fix.
 - 2026-10-07: India geomap and bilateral-contract dashboard delivered.
+- 2026-10-14: the IEX map POC was revised so every panel works when copied independently; the corrected import was tested in Mateo's dashboard.
 
 ## Open Questions
 
@@ -70,6 +72,8 @@ As of 2026-10-07. Grafana dashboard work across SMP Japan and India. India data 
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-07-granola-sprint-review.md`
+- `sources/meetings/2026-10-14-1441-granola-mateo-call.md`
+- `sources/claude-conversations/2026-10-14-claude-smp-bde564a1.txt`
 - Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-15

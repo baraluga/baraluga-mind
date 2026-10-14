@@ -1,0 +1,301 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/8ce08f10-6bc0-4bbc-9efe-04ea0036aaac.jsonl`
+Resume: `claude --resume 8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+
+## 00:00 assistant (smp-india)
+
+My own greps are clean. `volume_mcv` appears nowhere in the repo, and every `validate_mapping` caller passes the new market argument. Codex is still reviewing, and I'll wait for its report before committing.
+
+## 00:06 assistant (smp-india)
+
+Codex found no runtime bugs and three test gaps. All three are cheap to fix, so I'll look at the relevant tests.
+
+## 00:06 assistant (smp-india/dags/test/scripts/india_hpx_national)
+
+I'll close all three gaps.
+
+## 00:07 assistant (smp-india)
+
+One file needs formatting. I'll fix that, then run a quick mutation check that the new sell-bid test actually fails when the field is wrong.
+
+## 00:07 assistant (smp-india)
+
+The macOS `sed` rejected my command, so the mutation didn't run. I'll redo it with Python.
+
+## 00:08 assistant (smp-india)
+
+The mutation was caught: swapping `mw_total` for `mw_solar` fails the new test. The full suite is at 1146 passed, 0 failed, and lint is clean. Codex's three gaps are closed, so I'll commit and push.
+
+## 00:09 assistant (smp-india)
+
+Both commits are pushed to `origin/dev`:
+- `df7526e`: the code, tests and fixtures
+- `f0e5611`: the docs and DATA_CATALOGUE
+
+I made two commits instead of three. The test files mix all three changes, so a split into HPDAM, metrics and frequency would leave intermediate commits that fail tests. The pre-commit hooks passed.
+
+Codex's review found no runtime bugs, and I fixed its three test gaps before committing:
+- **GDAM sell bid:** the test now uses distinct values for the total and each technology. I swapped `mw_total` for `mw_solar` and the test failed, as it should.
+- **HPDAM collisions:** the cross-market ID and name collision tests now include HPDAM in both directions.
+- **Extra mapping fields:** a test now checks that they're rejected.
+
+The final full suite was 1146 passed, 0 failed, with 91.33% coverage and clean lint.
+
+## How to test it
+
+**1. Local (already green)**
+```bash
+cd /Users/qn5792/repos/smp/smp-india && .venv/bin/python -m pytest dags/test/ -q
+```
+
+**2. airflow-dev (manual, source-only)**
+1. Wait for dev to pick up `f0e5611`. Dev has no auto-schedule and publishing is off, so nothing writes to the TSDB.
+2. In the UI, unpause `india_hpx_national_dam_gdam` and `india_hpx_national_rtm`. Dev is manual, so you need to trigger them yourself.
+3. Trigger `india_hpx_national_dam_gdam` with no params. Expect:
+   - **Today:** DAM, GDAM and HPDAM collectors succeed. In XCom, `block_count` is 96 and `row_count` is 480 (96 blocks × 5 metrics).
+   - **Tomorrow:** all three markets log `status=pending` and their chains show as skipped, if you trigger before about 13:00 IST. The DAG run itself ends successful.
+   - **HPDAM:** all values are zero, which is expected and valid.
+   - **Downstream tasks:** they report `disabled`.
+4. Trigger `india_hpx_national_rtm`. Expect yesterday at 96 blocks and today as a partial prefix, plus `volume_cleared` and `volume_scheduled` in the metrics.
+5. If a run fails, check that the worker can reach `api.hpxindia.com`. Local runs never proved that, and it's the one thing that could still surprise us.
+
+**3. The 13:00 IST check**
+After 13:00 IST, trigger the DAM/GDAM DAG again. Watching tomorrow's chains go from pending to 96 blocks is the observation we still don't have. Then promote dev to qa, unpause there, and let one weekday run.
+
+**4. Can't be tested yet**
+- TSDB publication and readback, until Mateo's IDs arrive.
+- The GDAM technology breakdown, until he answers.
+- What a single daily write (PT24H) should do. The field is validated and carried, but the write behavior is unchanged.
+
+## 12:15 user
+
+short btw, he replied: "Hello Brian ! Yes you're right, sorry for the confusion ! I fogot that purchase bid is not splitted"
+
+## 12:15 assistant
+
+His reply settles that purchase bid has no technology split. It doesn't say which four columns he wants per technology, and it exposes a count problem.
+
+- **The count doesn't add up.** His 32 was 4 prices + 12 volumes (DAM, RTM, HPDAM) + 16 GDAM volumes. If the GDAM 16 are 4 technologies × 4 split columns, there is no room for the total purchase bid, which would make 33.
+- **My guess:** the four columns are sell bid, MCV, cleared volume and scheduled volume, and GDAM purchase bid is either dropped or a 33rd series. "You're right" probably confirms my MCV guess, but it could also mean curtailment, so I wouldn't build on it.
+
+I can't settle this from the source, so I'd send him one more yes/no:
+
+```
+No worries! To lock the GDAM list: per technology (total/solar/non-solar/hydro) I'll do sell bid, MCV, cleared volume, scheduled volume = 16. Purchase bid for GDAM (total only) is then either skipped, or a 17th series. Which do you prefer?
+```
+
+Once he answers, adding the 12 technology series to `collection.py` and the mapping is a small change. I'll write the tests first, then have Codex review it. I haven't touched any code or the ticket for this.
+
+## 13:10 user
+
+Mateo: "Yes exactly, sell bid, MCV, cleared volume, scheduled volume + Purchase bid total only = 17"
+
+## 13:10 assistant
+
+Mateo's answer gives GDAM 17 volume series, which brings the total to 33, not the 32 he quoted. I'll flag that after the change. First I'll read how metrics flow through the code so I can add the GDAM technology series.
+
+## 13:10 assistant (smp-india/dags)
+
+I'll write the new tests first. These are the parts of the existing tests I need to see.
+
+## 13:10 assistant (smp-india/dags/test/scripts/india_hpx_national)
+
+I'll update the tests first so they describe the new GDAM contract: 18 metrics, with one source field per series.
+
+## 13:11 assistant (smp-india)
+
+The tests fail for the expected reason: `metrics_for` doesn't exist yet. Now the implementation.
+
+## 13:11 assistant (smp-india/dags/src/scripts/india_hpx_national)
+
+I need to import the new constants into `collection.py`, then run everything.
+
+## 13:11 assistant (smp-india)
+
+The remaining failure is a test bug. It edits `volume_scheduled`, which GDAM no longer has, so I'll point it at `price`, which every market has.
+
+## 13:12 assistant (smp-india)
+
+Everything is green: 1149 passed. Next I'll find the doc statements that are now wrong.
+
+## 13:12 assistant (smp-india)
+
+The docs are updated. Now I'll hand Codex the diff for adversarial review, as agreed.
+
+## 13:13 assistant (smp-india)
+
+The GDAM technology breakdown is implemented, tested and documented in the working tree, uncommitted. Codex's adversarial review is running now, and I'll apply or reject its findings when it reports.
+
+**What changed**
+- GDAM now has **18 metrics**: price, total-only purchase bid, and sell bid, MCV, cleared and scheduled volume for total, solar, non-solar and hydro. Each reads its own source field (`mw_*`, `mcv_*`, `clevol_*`, `schedvol_*`).
+- DAM, RTM and HPDAM stay at 5 metrics.
+- GDAM curtailment is not ingested.
+- Mapping validation, publication and collection now pick the metric set per market.
+- A new test gives every GDAM field a distinct value and checks that each series reads the right one.
+
+**Checks**
+- Full suite: 1149 passed, 0 failed, 91.35% coverage.
+- Ruff and format are clean, and the catalogue check passes.
+
+**The count is 33, not 32.** That's 3 markets × 5 metrics = 15, plus GDAM's 18 (17 volumes and 1 price). Mateo's 32 was written before he added the GDAM total purchase bid. I wrote 33 into the runbook, catalogue and POC notes. Worth a one-line heads-up to him so the catalog he provisions has 33 series.
+
+I'll commit and push after the review, if you want me to.
+
+## 13:18 assistant (smp-india)
+
+Both findings are valid. I'll look at the runbook table, then fix both.
+
+## 13:19 assistant (smp-india)
+
+Both of Codex's findings are fixed, and the full suite passes with 1151 tests and lint clean. Everything is still uncommitted.
+
+- **Swapped series IDs in publication:** the existing tests gave every volume the same value, so they couldn't tell series apart. I added a test where each metric has a distinct value and must land on its own series ID, for both DAM and GDAM. I then swapped the IDs for `volume_mcv_solar` and `volume_cleared_solar` in `build_batch`, and the new test failed. I restored the file afterwards.
+- **Runbook table:** it paired GDAM's total fields with unsuffixed names, which the validator would reject. It's now two tables, one for DAM, RTM and HPDAM and one for GDAM, using the `<tech>` suffix pattern.
+
+The rest of Codex's review came back clean:
+- no leftover five-metric assumptions
+- all 18 source fields exist in both captures
+- cross-market collision checks hold
+- an in-memory end-to-end run published 1,728 rows to 18 IDs
+
+I'll commit and push when you say so. I'd make it two commits, code with tests and then docs, as before.
+
+## 13:25 user (smp-india)
+
+commit and push it
+
+So to clarify, now that MAteo confirmed a "17th" series will be made, we should now expect 33 timeseries ids?
+
+## 13:25 assistant (smp-india)
+
+Both commits are pushed to `origin/dev`:
+- `15988d4`: the GDAM code and tests
+- `1b5d309`: the docs
+
+**Is it 33 timeseries IDs?** Yes, by the per-market list. Mateo's 32 was written before the GDAM total purchase bid was added.
+
+| Market | Series |
+|---|---|
+| DAM | 5 |
+| RTM | 5 |
+| HPDAM | 5 |
+| GDAM | 18 |
+| **Total** | **33** |
+
+- DAM, RTM and HPDAM each get price, purchase bid, sell bid, cleared volume and scheduled volume.
+- GDAM gets price, the total-only purchase bid, and sell bid, MCV, cleared and scheduled volume for total, solar, non-solar and hydro. That's 1 + 1 + 16.
+- His quoted split was 4 prices + 12 volumes + 17 GDAM volumes. That also adds up to 33.
+- One thing to double-check with him: his original message said 4 price series, so he's counting GDAM price as one of those. Make sure the catalog he provisions has 33 and not 32.
+
+Want a short message to him that confirms the 33 and lists the 18 GDAM names, so the series names he creates line up with our metric names?
+
+## 13:28 user (smp-india)
+
+nah. he should be competent enough. what's next for us? waiting game for him to create the TSIds?
+
+## 13:29 assistant (smp-india)
+
+Mostly yes, but there's some useful work in the meantime. Nothing we do now needs his IDs.
+
+**While we wait**
+1. **Dev run of the new code.** Trigger both DAGs in airflow-dev, source-only, and check XCom: GDAM should show `row_count` 1728, and the others 480. This is the first real check that the worker can reach HPX with the new fields and HPDAM.
+2. **QA observation.** Promote dev to qa and unpause the DAM/GDAM DAG for one weekday. It's still the only way to see the 13:00 IST empty-to-full transition on the real source. Do it soon, since each day that passes without it is a lost observation.
+3. **Update the Jira ticket.** The description still says 32 series and "GDAM column choice pending". I'd change it to 33 and the confirmed columns. Want me to do that?
+
+**When his IDs land**
+- I'll fill `catalog_mapping.json` directly, 33 entries across uat, and run the tests.
+- Then comes the first real publication test in UAT with the write flag on: require `verified` readback, repeat it to check unchanged points are skipped, and only then consider prod.
+- Prod activation stays a separate explicit request, as before.
+
+**One open design question**
+Does PT24H mean "one write per day"? I think we already behave that way: DAM, GDAM and HPDAM write the whole day's 96 blocks once the data is complete, then reconcile in the evening. If so, no code change is needed. I can't confirm it from our side, so I'd check it against how Mateo's catalog treats those series once they exist.
+
+So the realistic next move is items 1 and 2, which are both manual steps on your side. Want the Jira update?
+
+## 13:29 user (smp-india)
+
+Ah. for #1, this is different from the testing we did earlier in dev? I think at this point, we can safely merge to qa, even in prod. I' ll only enable the thing in qa
+
+## 13:30 assistant (smp-india)
+
+Yes, it's different. The earlier dev run used the old code: three markets and the old four-metric set. The new code adds HPDAM, switches the volume fields, and makes GDAM 18 metrics. Parsing is already tested against real payload samples, so the dev re-run would mostly prove one thing: that the worker can reach the HPDAM endpoint. QA would show the same on its first run, so skipping the dev re-run is reasonable.
+
+Merging to prod looks safe as long as it stays inert:
+- The checked-in mapping is empty and `INDIA_HPX_NATIONAL_TSDB_PUBLISH_ENABLED` defaults to false. Even if a prod DAG got unpaused, it could only collect from the source, not write.
+- The DAGs are created paused. If prod already has them unpaused from the earlier promotion, they'd start source-only polling from the prod worker. That's harmless, but I haven't checked the prod state.
+
+Do you want me to do the dev → qa → prod merges and push, or will you do them like last time? I'd merge dev into qa first and prod after, without changing any Airflow Variables. Enabling publishing in QA stays your step, once Mateo's IDs are in.
+
+## 13:31 user (smp-india)
+
+yes, merge dev to qa then prod.
+
+Add comment to jira ticket saying our progress and then, reflag with "waiting for HPX Timeseries, 33 as now clarified", set to BLOCKED.
+
+## 13:31 assistant (smp-india)
+
+QA is 4 commits behind dev and prod matches QA. Before merging I'll check what those 4 commits are.
+
+## 13:31 assistant (smp-india)
+
+The 4 commits are exactly our SCR-1274 work, so I'll merge dev into qa and push.
+
+## 13:32 assistant (smp-india)
+
+QA is done. Now prod.
+
+## 13:33 assistant (smp-india)
+
+QA and prod are merged and pushed. Now the Jira updates: the comment, the flag and the Blocked status.
+
+## 13:33 assistant (smp-india)
+
+The comment and flag went through, but the transition to Blocked was rejected. I'll try it by name to see what Jira wants.
+
+## 13:33 assistant (smp-india)
+
+From In Progress, the transition is named "Blockage" (id 31).
+
+## 13:33 assistant (smp-india)
+
+Everything is done.
+
+**Git**
+- **QA:** dev merged into qa (`2978857`) and pushed.
+- **Prod:** qa merged into prod (`ecd4920`) and pushed.
+- The merge carried only our 4 SCR-1274 commits. QA and prod were identical before, so nothing else was promoted.
+- I returned the local checkout to `dev`.
+- Nothing changed in Airflow, so publishing stays off and the mapping is empty on every environment.
+
+**Jira SCR-1274**
+- **Comment:** added. It lists the progress, says everything is promoted with publishing off, and states "Waiting for HPX Timeseries, 33 as now clarified", with the per-market breakdown.
+- **Flag:** set again with the same option the earlier flag used. I didn't re-read the ticket to confirm it shows as flagged, so take a quick look.
+- **Status:** Blocked. The first attempt failed because I used the wrong transition ID, and the right one from In Progress is called "Blockage".
+
+The ticket description is now stale: it still says 32 series and "GDAM column choice pending". I left it alone since you didn't ask for that change. Want me to update it to 33 and the confirmed columns?
+
+## 13:35 user (smp-india)
+
+yes, update the description to 33
+
+## 13:35 assistant (smp-india)
+
+The SCR-1274 description now says 33 series. I replaced the old scope-update section with the confirmed breakdown:
+- DAM, RTM and HPDAM have 5 series each, which is 15.
+- GDAM has 18: price, the total-only purchase bid, and sell bid, MCV, cleared and scheduled volume for total, solar, non-solar and hydro.
+- Data frequency is PT15M. Publication frequency is PT24H for DAM, GDAM and HPDAM and PT15M for RTM.
+
+The original DAM/GDAM/RTM text is unchanged. The ticket is still Blocked, and I didn't re-check the flag.
+
+## 13:44 user (smp-india)
+
+thanks. flag this sessoin as we're waiting for timeseries ids pls
+
+## 13:44 assistant (smp-india)
+
+This session is flagged as "Waiting for Mateo to create the 33 HPX timeseries IDs (SCR-1274)". I also renamed it in the sidebar to "🚩 (SCR-1274) hpx".
+
+Once Mateo's IDs arrive, the next step is to fill `catalog_mapping.json` for UAT and run the first publish with readback.

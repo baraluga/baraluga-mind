@@ -1,0 +1,103 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `050fd176-3f4b-4ba2-8a42-fc2fb7b29c78`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/050fd176-3f4b-4ba2-8a42-fc2fb7b29c78.jsonl`
+Resume: `claude --resume 050fd176-3f4b-4ba2-8a42-fc2fb7b29c78`
+
+## 14:38 user
+
+From carlos of SMP JAPAN..
+
+Can you make out the image he shared? Wdyt?
+
+## 14:38 assistant
+
+Yes, I can read it, and I think Carlos is right that nothing is missing.
+
+**What the chart shows** (one interconnector, `HOKKAIDO_TOHOKU`):
+- **X-axis (START):** the delivery time.
+- **Y-axis (FCST):** when that version was inserted into TSDB.
+- **Flat lines:** full-day versions. Each delivery day has two, inserted about D-2 and D-1. His red labels mark the insert day: delivery Oct 13 has versions from Oct 11 and 12, Oct 14 from Oct 12 and 13, Oct 15 from Oct 13 and 14.
+- **Diagonal dots:** frequent intraday updates for the next few hours, as you'd expect.
+
+**What looked wrong:** Oct 16 (D+2 when he posted) has no line at all. But its D-2 version is an Oct 14 insert, and he posted at 12:55 SGT on Oct 14, before that day's publish. The D-2 versions in the chart sit around mid-afternoon on their insert day, which fits his "3pm insertion" guess. So the gap is just timing.
+
+**What would actually be a bug:** if Oct 16 still has only one flat line (or none) after the afternoon run, it's a real problem. Then I'd check that run's logs and the TSDB write for that day.
+
+A short reply you could send:
+
+```
+Agree it looks fine. D+2's first version only lands with today's afternoon insert, so it won't show before ~3pm. Ping us if Oct 16 is still missing after that and we'll check the run.
+```
+
+I didn't check the live DAG schedule or query TSDB. The interconnector DAGs my search found are archived, and I didn't track down which one runs now. If you want proof rather than Carlos's word, I can write you a TSDB query to run on the VPN after 3pm.
+
+## 14:39 user
+
+ooooh that'd be perfect. let's
+
+## 14:39 assistant (smp-japan)
+
+I've confirmed the 14 series IDs match the tags in Carlos's chart. Next I'm writing a read-only query based on your existing OCCTO probe.
+
+## 14:40 assistant (smp-japan)
+
+The check is ready. Run it on the VPN after 3pm SGT (Carlos is in Singapore, so his "3pm" is presumably 3pm SGT, which is 4pm JST):
+
+```bash
+cd /Users/qn5792/repos/smp/smp-japan && .venv/bin/python - <<'EOF'
+# Read-only: list TSDB versions of OCCTO interconnector Available Capacity for delivery D..D+2 (JST).
+from uuid import uuid3, NAMESPACE_DNS
+import pandas as pd
+from engie_tsdb.catalog import Config
+from engie_tsdb.data import read_ts
+
+R = [("Hokkaido","Tohoku"),("Tohoku","Tokyo"),("Tokyo","Chubu"),("Kansai","Chugoku"),
+     ("Kansai","Shikoku"),("Chugoku","Shikoku"),("Chugoku","Kyushu")]
+IDS = {str(uuid3(NAMESPACE_DNS, f"OCCTO/{a}-{b}:Interconnection, Available Capacity")): f"{a}->{b}"
+       for p in R for a, b in (p, p[::-1])}
+today = pd.Timestamp.now(tz="Asia/Tokyo").normalize()
+Config.set(catalog_endpoint="prod", client_name="d2_version_check", log_level="WARNING",
+           read_data_methods=["api", "athena"])  # no creds -> interactive Okta login
+df = read_ts(timeseries=list(IDS), start_application_date=today.tz_convert("UTC"),
+             end_application_date=(today + pd.Timedelta(days=3)).tz_convert("UTC") - pd.Timedelta(microseconds=1),
+             start_forecast_date=(today - pd.Timedelta(days=4)).tz_convert("UTC"),
+             end_forecast_date=pd.Timestamp.now(tz="UTC"),
+             columns=["*"], drop_duplicates=False, max_rows=1_000_000)
+print(f"now JST {pd.Timestamp.now(tz='Asia/Tokyo'):%Y-%m-%d %H:%M}; {len(df):,} rows")
+if df.empty:
+    raise SystemExit("NO ROWS at all for D..D+2 -> real problem")
+df["series_id"] = df.series_id.astype(str)
+df["route"] = df.series_id.map(IDS)
+df["day"] = pd.to_datetime(df.application_date, utc=True).dt.tz_convert("Asia/Tokyo").dt.date
+df["version"] = pd.to_datetime(df.forecast_date, utc=True).dt.tz_convert("Asia/Tokyo").dt.strftime("%m-%d %H:%M")
+# Full-day versions = one forecast_date covering all 48 half-hours of a day.
+v = df.groupby(["day", "route", "version"]).size().rename("pts").reset_index()
+full = v[v.pts >= 46]
+print("\nFull-day versions per delivery day (JST version stamps):")
+print(full.groupby(["day", "route"]).version.apply(", ".join).unstack(0).fillna("-").to_string())
+d2 = (today + pd.Timedelta(days=2)).date()
+ok = full[full.day == d2].route.nunique()
+print(f"\nVERDICT D+2 {d2}: {ok}/{len(IDS)} routes have a full-day version ->",
+      "FINE" if ok == len(IDS) else "MISSING, check the afternoon run")
+EOF
+```
+
+**What it does:** it asks you to log in to Okta once in the browser. Then it runs one read-only query against prod TSDB, which should finish in well under a minute. It prints a table for today, D+1 and D+2: one row per route, one column per delivery day, listing every version that covers a full day.
+
+**How to read it:** if Carlos is right, the last line says `VERDICT D+2 2026-10-16: 14/14 … FINE`, and that column shows a version stamped Oct 14. If it says `MISSING`, the table shows which routes have no version, so we know where to look.
+
+**What I checked:** the 14 series IDs match the tags in Carlos's chart (`de4a6…`, `c0efc…`, `93ffd…`). I ran the script on fake data with one route missing D+2, and it flagged that route correctly.
+
+**Not tested against real TSDB:** that needs the VPN. One risk is that the query has no time limit, because macOS doesn't come with `timeout`. If it hangs, Ctrl-C it.
+
+## 14:55 user (smp-japan)
+
+wait how did you know he is in Singapore? Lol
+
+## 14:55 assistant (smp-japan)
+
+The screenshot gives it away: his display name is "DEL VAL TALENS Carlos (ENGIE ENERGY MANAGEMENT **SGP**)". SGP is the country code for Singapore, so I guessed he means 3pm Singapore time.
+
+It's only a guess from that org tag, though. He could be travelling, or using Tokyo time because he works on the Japan desk. Either way it changes little: if the check says MISSING at 3pm Singapore time, run it again an hour later before raising it.

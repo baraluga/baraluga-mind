@@ -1,0 +1,34 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `bb0d20e1-40bf-45ae-a2c4-75c43a1c3bd7`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/bb0d20e1-40bf-45ae-a2c4-75c43a1c3bd7.jsonl`
+Resume: `claude --resume bb0d20e1-40bf-45ae-a2c4-75c43a1c3bd7`
+
+## 14:20 user
+
+i saw khaba dag skipping all tasks, wth? Anything we did recently that could've affected it?
+
+## 14:20 assistant (smp-india)
+
+Prime suspects: 714b4f9 ("fail fast instead of six-hour sensor wait") and 28af02a (transition window). Let's look.
+
+## 14:21 assistant (smp-india)
+
+Yes. Two of our commits from yesterday (13 Oct, 14:41, both mine) make this happen, and in the overnight window it's by design.
+
+**The cause:** in both the minute DAG and the realtime DAG, the first task checks for today's Khaba file in S3. If the file isn't there yet and the run is inside the "day-transition window" after IST midnight, the task raises a skip. Airflow then skips every task downstream, so the whole run shows as skipped. The check is in [khaba_generation.py:476-487](dags/src/scripts/khaba_generation_tsdb/khaba_generation.py:476).
+
+- **28af02a** widened that window from **20 minutes to 240 minutes** (00:00–04:00 IST), because Khaba's daily file usually lands within about 4 hours of midnight.
+  - Before, a run after 00:20 IST with no file **failed** (red). Now it **skips** (pink) until 04:00 IST.
+- **714b4f9** replaced the minute DAG's 6-hour sensor with that same check. Before, an early run **waited** for the file. Now it **skips** the run and tries again 5 minutes later.
+
+**Timing:** neither commit was in the 13 Oct 14:27 prod merge. Both went into prod in today's merge at 13:32 +0800 (11:02 IST). Dev has had them since yesterday afternoon.
+
+**So:**
+- **Skips between 00:00 and 04:00 IST:** expected. Today's file just hadn't landed yet. Once it lands, the next run picks it up.
+- **Skips after 04:00 IST:** not explained by this. After 04:00 a missing file fails the run instead. The other likely cause is someone setting the Airflow Variable `KHABA_GENERATION_SOURCE_TRANSITION_WINDOW_MINUTES` to a larger value. A run where only the verify task skips is something else: read-back turned off or no publication manifest. That never skips the whole run.
+
+Which environment and IST times did you see the skips at? If they're inside 00:00–04:00, nothing is broken. If not, send me one skipped run's `check_source` log line (it gives the window size and the S3 key) and I'll take it from there.
+
+I didn't look at the Airflow UI, the S3 timestamps for when today's file landed, or the Variable's actual value; all of those need the VPN. The trade-off of the change is that a file that never arrives now only alerts at 04:00 IST, not at 00:20.

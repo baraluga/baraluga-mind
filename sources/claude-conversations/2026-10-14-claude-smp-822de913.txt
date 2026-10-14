@@ -1,0 +1,806 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `822de913-6a35-4648-9e65-956b7e2d3853`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853.jsonl`
+Resume: `claude --resume 822de913-6a35-4648-9e65-956b7e2d3853`
+
+## 13:39 user
+
+are we ready to work on scr-1289?
+
+## 13:40 assistant (smp-india)
+
+Yes, we're ready. Here's what's set up and what the ticket asks for.
+
+**[SCR-1289](https://tractebel-et.atlassian.net/browse/SCR-1289): "Recent REC data are not available in the dashboard"**
+- It's a Major bug, status New, with no assignee. Francois raised it on 12 Oct and there are no comments yet.
+- **Symptom:** the Grafana REC dashboard (`india-iex-rec-tsdb`) isn't showing recent data. Meanwhile `india_iex_rec_tsdb_dag` runs all green, so something is failing without being reported.
+- **What's asked:** fix the data gap, and add a way to catch this kind of silent failure.
+
+**Local state:** `smp-india` is on `dev`, clean and up to date with origin. The data catalogue gives the path as IEX API → apac-tsdb-scraper (`iex_api_rec` scraper) → TSDB → `india_iex_rec_tsdb_dag` → CDH `india_iex_rec_tsdb/latest` → Grafana.
+
+**Two inconsistencies in the ticket:**
+1. It says a Lambda scrapes the data. The catalogue says apac-tsdb-scraper does. The catalogue is more likely to be current.
+2. The Grafana link points to **QA** and the Airflow link points to **prod**. We need to confirm which environment is actually stale.
+
+**Proposed first step:** find where the data stops, working back through each stage:
+1. Check the latest timestamp in the CDH parquet.
+2. Check the latest point of the REC series in TSDB.
+3. Check whether the scraper is still writing.
+
+My guess is that the IEX REC source changed, or the scraper returns empty results that the DAG writes without complaint. Steps 1–3 need the VPN, so I'd write one self-contained script for you to run once. While you do that, I'll read the DAG and scraper code locally and look for places where an empty result is accepted without an error.
+
+Shall I go ahead?
+
+I haven't read the DAG or scraper code yet. Everything above comes from the ticket and the catalogue.
+
+## 13:41 user (smp-india)
+
+confident enough now to estimate?
+
+## 13:41 assistant (apac-tsdb-scraper)
+
+Yes, with a range. I've now read the code for both layers, and the root cause is still unknown, but I can see the likely places it hides.
+
+**What the code shows**
+- **Both layers drop empty data without an error.** The scraper ([provider.py](apac-tsdb-scraper/solaris/scrapers/iex_api_rec/provider.py)) returns an empty frame and only logs at INFO when the IEX API returns no rows. The DAG ([india_iex_rec_tsdb.py](smp-india/dags/src/scripts/india_iex_rec_tsdb_dag/india_iex_rec_tsdb.py)) catches `DataNotAvailableException`, writes an empty or old parquet, and the run still ends green. That's why the DAG runs green while the dashboard is stale.
+- **The ticket is right about the Lambda.** The scraper runs as an apac-tsdb-scraper Lambda (`lambda_step_prod`, prod config `rec_lookback_days = 60`).
+- **There's already a probe script**, [probe_iex_api_rec.py](apac-tsdb-scraper/scripts/probe_iex_api_rec.py), which hits the IEX API directly. That saves time on diagnosis.
+
+**Estimate: 1.5–3 days**
+
+| Part | Effort |
+|---|---|
+| Find which layer stopped (probe the API, check TSDB's latest point, check the CDH parquet; needs VPN) | 0.5 d |
+| Fix: if the API response shape or date format changed, it's small. If the Lambda isn't running or has auth trouble, it's mostly deploy work in smp-tool | 0.25–1 d |
+| Detection: fail or alert when the result is empty or the newest REC point is older than N days, in both the scraper and the DAG, with tests | 0.5–1 d |
+| Backfill the gap, and deploy across two repos (scraper image tag, then smp-india) | 0.25–0.5 d |
+
+**What would push it to the top of the range:** the IEX REC product being retired or changed on their side, or the Lambda deploy path needing smp-tool changes. If the probe shows the API is returning data and the fault is in parsing, it lands near 1.5 d.
+
+**How to tighten it:** run the diagnosis step first. That turns the range into a firm number.
+
+I haven't run anything against the API, TSDB or CDH yet, so the root cause is a guess. One more possibility: REC only trades in certain sessions, so "missing recent data" could partly be expected gaps. Diagnosis will show that too.
+
+## 13:42 user (apac-tsdb-scraper)
+
+if we diagnose inside vpn, we can be more precise with the estimate, you saying?
+
+## 13:42 assistant (apac-tsdb-scraper)
+
+Yes. Of the ~1.5 days of spread in the estimate, about 1 day comes from not knowing which layer broke, and the diagnosis is what settles that. Once we know where the data stops, the estimate narrows to roughly ±0.25 d:
+
+- **IEX API returns nothing recent:** either REC sessions haven't happened or IEX changed something on their side. Fix is small or nothing; detection plus a note to Francois.
+- **API has data but TSDB doesn't:** the Lambda isn't running or fails to parse the response. This is the scraper fix or deploy path, the top of the range.
+- **TSDB has data but CDH or Grafana doesn't:** the DAG read window or the upload is at fault. Smp-india fix only, low end.
+
+The detection work (failing when the result is empty or stale) happens in every case, so it's already a fixed part of the number.
+
+Do you want me to write the single VPN script now? It would run the probe against the IEX API, read the latest point of the 4 REC series in TSDB, and check the timestamp of the CDH parquet. It should finish in under 2 minutes.
+
+## 13:42 user (apac-tsdb-scraper)
+
+yes, write the vpn script
+
+## 13:43 assistant
+
+Still gathering details: I've found the AWS accounts and secrets, and I'm checking the QA bucket name before writing the script.
+
+## 13:43 assistant (apac-tsdb-scraper)
+
+Writing the script now. It's read-only throughout and has a hard 3-minute cap.
+
+## 13:44 assistant (apac-tsdb-scraper)
+
+The script is written and checked locally: it parses, the imports resolve, and the config keys exist. Run this once on the VPN:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && daccli cdh get_credential --use_profile solaris-prod --save && daccli cdh get_credential --use-profile smp_india_prod --save --aws-profile khaba_probe_prod && daccli cdh get_credential --use-profile smp_india_qa --save --aws-profile khaba_probe_qa && python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_diagnose.py 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_out.txt
+```
+
+It reads only and never prints secrets. The three credential refreshes may each prompt for Okta, and after that the script stops itself at 3 minutes. Each check runs on its own, so if one fails the others still run.
+
+1. **IEX API:** fetches REC from the last 120 days and lists the delivery dates returned. This tells us whether IEX has recent REC data at all.
+2. **Lambda:** shows the `iex_api_rec` task states in DynamoDB and the last 7 days of CloudWatch log lines.
+3. **TSDB prod:** shows the last application and insertion dates for each of the 4 series, plus the last 12 delivery dates.
+4. **CDH parquet, prod and QA:** shows when the file was last written and the newest date per field. The QA check is there because the Grafana link in the ticket points to QA.
+
+When it's finished, just say "done". I'll read the output file from my side, give you a firm estimate, and then fix it.
+
+- **Assumption:** this reuses the Khaba probe AWS profiles for the CDH reads, and their roles may not have read access to the REC key. If so, check 4 will show `AccessDenied` and we'll switch profiles.
+- **Not covered:** the prod Airflow task logs. The parquet contents should stand in for them.
+
+## 13:48 user (apac-tsdb-scraper)
+
+done
+
+## 13:49 assistant (apac-tsdb-scraper)
+
+Found it: the REC scraper stopped running on 25 July. The DAG runs green because it re-publishes the July data still sitting in TSDB.
+
+| Layer | Latest REC delivery date |
+|---|---|
+| IEX API | **30 Sep** (6 sessions since July) |
+| TSDB prod | 8 Jul |
+| CDH prod and QA (both rewritten today at 00:30) | 8 Jul |
+
+The DynamoDB task table shows where the scraper stopped. The last two `iex_api_rec` tasks, for 24 and 25 July, are stuck in `Waiting` and were never attempted (`tr_nb=0`). No task exists after 25 July, and the Lambda logged nothing for REC in the last 7 days. The QA and prod dashboards are equally stale, since both read the same TSDB.
+
+**Likely cause (not confirmed):** a Darwin prod-config deploy (`5258e66`) went out on 23 July, one day before the tasks stall. `deploy --apply` rewrites the Lambda's list of active scrapers, so REC may have been dropped from it. Confirming this needs one more small VPN check of the Lambda's environment and Step Function, about 10 minutes.
+
+**Firm estimate: about 1 day**
+- **0.25 d:** confirm the cause and put REC back in the scraper schedule. This is a deploy step through `prod_scraper_ops.py`, with no scraper code change.
+- **0.25 d:** backfill. The scraper's default 60-day lookback misses the 29 Jul and 12 Aug sessions, so the backfill needs at least 80 days.
+- **0.5 d:** detection. The DAG would fail when the newest REC date is more than 25 days old. REC trades about every two weeks and the longest gap seen is 21 days, so 25 days avoids false alarms. The failure would raise the existing Teams alert, with tests.
+
+The 1.5–3 d range is gone because the code turned out to be fine. The work is a deploy, a backfill and one guard.
+
+Should I start with the Lambda config check?
+
+I didn't check whether other scrapers dropped off the Lambda list along with REC. The config check will show that too. I also saved this diagnosis to memory.
+
+## 13:50 user (apac-tsdb-scraper)
+
+I'd rather confirm everything ifrst before doing anything
+
+## 13:51 assistant (apac-tsdb-scraper)
+
+Agreed. I'll write a second read-only VPN script that confirms the cause before we change anything. First I'm reading how the scraper Lambda decides which scrapers to schedule, so the script checks the right things.
+
+## 13:51 assistant (apac-tsdb-scraper)
+
+Almost done mapping it. The Lambda's `SCRAPER_NAMES` env var controls which scrapers run, and an existing UAT probe already shows how to inspect the deployed code. Reusing that:
+
+## 13:52 assistant (apac-tsdb-scraper)
+
+Ready. Run this once on the VPN. It reads only, never prints secrets, and stops after 3 minutes:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && daccli cdh get_credential --use_profile solaris-prod --save && python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_confirm.py 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_confirm_out.txt
+```
+
+Each section answers one question:
+
+1. **Lambda config:** is `iex_api_rec` still in the live `SCRAPER_NAMES`, and how does that list differ from what the repo would deploy?
+2. **Deployed config and code in S3:** does the live config still have the REC section, and does the deployed code still include the scraper package? It also lists the dates the config was rewritten.
+3. **CloudTrail:** who changed the Lambda since 10 July, and when. This is the direct test of whether the 23 July deploy did it.
+4. **EventBridge and Step Functions:** what triggers the workflow, and whether the recent runs are healthy.
+5. **DynamoDB:** the newest task for each scraper. This shows whether only REC stopped, and gives full detail on the failed REC task.
+6. **Lambda logs:** REC log lines from 22–27 July, plus any "Could not find scrapper" errors (the framework's spelling). It also prints how long logs are kept.
+
+Just say "done" when it's finished.
+
+- **CloudTrail:** it usually hides environment variable values, so section 3 may show who changed the Lambda and when, but not the scraper list itself.
+- **Logs:** if they're only kept a few weeks, the July window in section 6 will come back empty.
+
+The S3 config versions in section 2 and the DynamoDB tasks in section 5 should still settle the question either way.
+
+## 13:53 user (apac-tsdb-scraper)
+
+<bash-input>cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && daccli cdh get_credential --use_profile solaris-prod --save && python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_confirm.py 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_confirm_out.txt</bash-input><bash-stdout>clcd ~/repos/smp/apac-tsdb-scraperle ssource .venv/bin/activatehon dacclite/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_confirm.py 2&gt;&amp;4648tee65-956b7e2d3853/sc
+ratchpad/scr1289_confirm_out.txt
+
+daccli error: ConnectionError(HTTPSConnectionPool(host='api.gems.myengie.com', port=443): Max retries exceeded with url: /apiforcdh/cdh/myproject/credentials/uri:cart:337381:solarisapac:solarisapac_48380?project_role_arn=arn%3Aaws%3Aiam%3A%3A058264493473%3Arole%2Fcdh_solarisapac_48380 (Caused by NameResolutionError("HTTPSConnection(host='api.gems.myengie.com', port=443): Failed to resolve 'api.gems.myengie.com' ([Errno 8] nodename nor servname provided, or not known)")))
+┗━&gt;in execute_api_call, line 511, at utils.py
+~/repos/smp/apac-tsdb-scraper  main*</bash-stdout><bash-stderr></bash-stderr>
+
+## 13:53 assistant (apac-tsdb-scraper)
+
+That didn't run because the machine couldn't look up `api.gems.myengie.com`, so the credential refresh never started. All `*.myengie.com` hosts need the corporate VPN, which means it isn't connected (or hasn't finished connecting) on whatever ran the command.
+
+Nothing ran and nothing changed. Connect the VPN, then run the same command again, preferably from your own terminal rather than through `!` here, so it picks up the VPN's DNS. When it's finished, say "done".
+
+## 13:59 user (apac-tsdb-scraper)
+
+done
+
+## 13:59 assistant (apac-tsdb-scraper)
+
+Confirmed: `iex_api_rec` is missing from the Lambda's live `SCRAPER_NAMES`, and it is the only scraper missing.
+
+| Check | Result |
+|---|---|
+| Live `SCRAPER_NAMES` | Missing `iex_api_rec`. Every other scraper is present. |
+| Deployed code (8 Oct) and config (28 Sep) | Both still include REC, so the scraper is deployed but never called. |
+| Triggers | Both EventBridge rules are enabled, and the last 100 runs all succeeded. |
+| Last REC task created | 22 Jul at 00:00 UTC, for dates up to 24 Jul. The 25 Jul task must have come from the 23 Jul run. No REC tasks were created after that. |
+| Other scrapers | All have tasks up to 16 Oct. Only REC stopped. |
+| The one failed REC task (18 Jun) | An unrelated single failure from early on. |
+
+**How REC was dropped:** the live list is exactly the scraper list from before REC was added, in the same order (commit `f3ec20a`, April). So between 23 and 24 July, something rewrote `SCRAPER_NAMES` from an old copy of that list. The deploy script's note says it "intentionally does not update the CloudFormation stack". My reading is that REC was activated in June by editing the Lambda's env directly, which the stack (`apac_scrapers_stack`) doesn't know about. Then a stack-level deploy around 23 July, probably while shipping the Darwin fix, reset the env from the stack's own older list.
+
+That last step is still an inference. CloudTrail was denied for your role (`AccessDenied`), so we can't see who made the change. The stack's own event history should settle it. That's a 20-second read of `describe_stacks` and `describe_stack_events` for 22–25 July.
+
+Should I write that script? Either way, the fix plan barely changes, apart from one important addition: REC has to go into the stack's scraper list as well as the Lambda env. Otherwise the next stack deploy will drop it again.
+
+## 14:00 user (apac-tsdb-scraper)
+
+so everything clear now?
+
+## 14:00 assistant (apac-tsdb-scraper)
+
+Almost everything. One thing is still open, and it only affects the stack-config part of the fix, not the rest.
+
+**Confirmed from data:**
+- The REC dashboard is stale because no REC data reaches TSDB after 8 July. The IEX API has 6 newer sessions, up to 30 Sep.
+- The scraper stopped because `iex_api_rec` is missing from the live Lambda's `SCRAPER_NAMES`. It's the only scraper missing, while the code and config still include it.
+- The drop happened between 23 and 24 July. The live list matches the old pre-REC list exactly.
+- The DAG stays green because it re-publishes the July data in TSDB and never checks how old it is.
+
+**Not yet confirmed: what rewrote the list.** My best guess is a CloudFormation stack deploy that reset the env from the stack's older list. CloudTrail is blocked for your role, so we can't see who made the change. The stack's event history would prove or rule out the guess.
+
+**Why it matters:** if it was the stack, the fix must add REC to the stack's scraper list too. Otherwise the next stack deploy silently drops REC again. Re-adding it to the Lambda env would also fix things today, so this only decides whether the fix holds.
+
+Two options:
+
+1. **Close the gap first:** a 20-second VPN script reading the stack events for 22–25 July, then I fix.
+2. **Proceed now:** treat the stack as the cause and write REC into both the stack and the Lambda env. That's safe either way.
+
+I'd go with option 1, since you wanted everything confirmed first and it costs one quick run. Shall I write it?
+
+## 14:00 user (apac-tsdb-scraper)
+
+yes, write the stack events script
+
+## 14:01 assistant (apac-tsdb-scraper)
+
+The script is ready and compiles. It only reads (`describe_*` and `get_template`), and stops itself after 90 seconds. Run it in your own terminal with the VPN connected:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && daccli cdh get_credential --use_profile solaris-prod --save && python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_stack.py 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_stack_out.txt
+```
+
+It answers three questions:
+
+1. **Which stack owns the Lambda, and when was it last updated?** It prints the stack name and the stack's settings that mention scrapers, names, image, code or config. Other settings, including secrets, show as `<hidden>`. It looks the stack up through the Lambda itself, because `apac_scrapers_stack` isn't a valid CloudFormation name, so the real one differs.
+2. **What scraper list does the stack hold?** It prints the `SCRAPER_NAMES` lines from the stack template.
+3. **Did the stack update on 23–24 July?** It lists every stack create and update event since 1 June.
+
+**How to read the result:**
+- If there's a stack update on 23–24 July and the template's list has no REC, the stack theory is confirmed.
+- If there's no stack event then, something else rewrote the env. Then we ask whoever deployed on 23 July, which per git was you, with the Darwin Athena fix.
+
+Say "done" when it's finished.
+
+## 14:12 user (apac-tsdb-scraper)
+
+<bash-input>cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && daccli cdh get_credential --use_profile solaris-prod --save && python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_stack.py 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_stack_out.txt</bash-input><bash-stdout>i cd ~/repos/smp/apac-tsdb-scraper solsource .venv/bin/activaten /pdaccli/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-464python /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_stack.py 2&gt;&amp;48-9tee-956b7e2d3853/scratchpad/scr
+1289_stack_out.txt
+
+credentials are saved in aws credentials,profile=default
+
+===== 1. Stack owning the Lambda =====
+FAILED: ClientError AccessDenied An error occurred (AccessDenied) when calling the DescribeStackResources operation: User: arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792 is not authorized to perform: cloudformati
+~/repos/smp/apac-tsdb-scraper  main*</bash-stdout><bash-stderr></bash-stderr>
+
+## 14:12 assistant (apac-tsdb-scraper)
+
+Failed to authenticate. API Error: 403 Internet Security by Zscaler
+
+## 14:12 user (apac-tsdb-scraper)
+
+done
+
+## 14:12 assistant (apac-tsdb-scraper)
+
+CloudFormation reads are blocked for your role too, so AWS can't tell us what rewrote the list. Checking locally whether the deploy tooling itself would write that old list:
+
+## 14:13 assistant
+
+That's an important find. Let me see the context around that note:
+
+## 14:13 assistant
+
+That's everything we can confirm from our side. The one remaining unknown is who reset the scraper list on 23–24 July, and we can't prove it with our access.
+
+**Confirmed:**
+- The live Lambda's `SCRAPER_NAMES` doesn't include `iex_api_rec`. REC is the only scraper missing.
+- The live list matches the April pre-REC list exactly (`f3ec20a`), in the same order.
+- REC tasks stopped after the 23 July creation run. Everything downstream has been stale since 8 July.
+- The DAG stays green because it re-publishes old TSDB data without checking its age.
+
+**What can rewrite the list:** I read the sfw tooling. A full `sfw scraper deploy` sets `SCRAPER_NAMES` from whatever deployer config it's run with. `deploy-code` and our `prod_scraper_ops` both leave the env alone. So someone most likely ran a full deploy on 23–24 July from a checkout whose deployer config predated REC. Your local checkout includes REC, so it wasn't run from here.
+
+**Noticed earlier but not followed up:** your own `RTM_RECOVERY.md` change on 8 Sep (`9fbc719`) already notes that REC "was absent from the live production scraper list". It deliberately kept REC out of scope, so this was spotted a month ago and nobody acted on it.
+
+**Can't prove:** who ran that deploy. Your role is blocked from both CloudTrail and CloudFormation. The 23 July CloudTrail events also drop out of the 90-day window around 21 Oct, so if you want proof, ask someone with CloudTrail access this week. A message for Mateo and Adrien:
+
+```
+Hi both — quick one for SCR-1289. iex_api_rec dropped out of the prod scraper Lambda's SCRAPER_NAMES around 23–24 Jul (live list = the old pre-REC list). Did either of you run a full `sfw scraper deploy` on the prod stack around then? If not, could someone with CloudTrail access check UpdateFunctionConfiguration on cdh_solarisapac_48380_23a1bb_scraping_handler for 23–24 Jul? Logs age out ~21 Oct.
+```
+
+None of this changes the fix: re-add REC to the live list, backfill with a lookback of at least 80 days, and add a freshness check to the DAG. One addition for "detect similar issues": a check that fails if the live `SCRAPER_NAMES` differs from the repo's deployer config. That would have caught this on 24 July.
+
+Do you want me to start on the fix, or wait for the India team's answer?
+
+## 14:34 user
+
+or maybe it's something on our end? IIRC, I was the one who did the rec scraper. Can't we infer from the git history?
+
+## 14:34 assistant
+
+Good idea. Git history plus your local traces (reflog, shell history, past Claude sessions) could show it. Checking all of them for 23–24 July:
+
+## 14:35 assistant (apac-tsdb-scraper)
+
+Unexpected: `main` doesn't include REC in the deployer config, even though the file on disk does. Checking:
+
+## 14:35 assistant (apac-tsdb-scraper)
+
+Git can't settle it, and as far as it shows, our own tooling isn't to blame. (The `rec_in_deployer=0` above was a bug in my loop. `main` does include REC, as the direct check shows.)
+
+**What git and your local traces show:**
+- **Timing:** the list changed between 00:00 UTC on 23 July and 00:00 UTC on 24 July. Your Darwin Athena fix (`5258e66`) was committed at 09:40 UTC on 23 July, inside that window. It changed `prod_sfw_config.toml`, so it probably had to be deployed that day.
+- **Every deploy path on `main` keeps REC** from 16 June onward:
+  - `prod_scraper_ops.py deploy --apply`, the documented path then, rewrites `SCRAPER_NAMES` from the repo config, and that config includes REC.
+  - A full `sfw scraper deploy` with `configs/prod_aws_deployer_config.toml` also includes REC.
+  - `sfw scraper deploy-code` doesn't touch the env at all.
+  - `deploy_lambda_step_prod.py` targets a different, older Lambda.
+- **No local trace of what ran:** the reflog shows only the two commits that day, the shell history has no timestamps, and there's no Claude session from 23 July.
+- **Where the old list exists:** the live list is the exact pre-16-June list. On the remote, only branches older than REC carry it (`json_logging` from Joyce, 3 Jun; `hpx-test` from Mateo, January), plus any local checkout that hadn't pulled since mid-June.
+
+**My read:** the timing points at the 23 July Darwin deploy, but our committed tooling would have kept REC. So either that deploy ran from somewhere with the old config (another machine, an old clone, a hand-written command), or someone else deployed the same day.
+
+**Do you remember how you shipped the Darwin workgroup fix?** If it was `prod_scraper_ops deploy --apply` from this checkout, it wasn't us, and the CloudTrail question goes to the India team. If it was anything else, it was probably us, and the fix plus the drift check covers it.
+
+None of this changes the fix. It only decides who we tell.
+
+## 14:36 user (apac-tsdb-scraper)
+
+hmmmmmm. Can you check codex chats? I'm pretty sure I did this with Codex back then.
+
+## 14:36 assistant
+
+The 23 July Codex session found the Darwin bug, committed and pushed the fix, and stopped there: no deploy in it. One last place to check is your shell history around those `sfw` commands:
+
+## 14:37 assistant
+
+I checked your Codex chats from those days, and they show you didn't remove REC.
+
+- **The 23 July Codex session** (from 13:41 local time) found the Darwin Athena workgroup bug. It then committed and pushed `5258e66` plus a docs commit, and ended at 09:55 UTC with "Committed and pushed to `origin/main`." Codex did say the fix needed a stack redeploy, but the session never ran one.
+- **The other 60-odd Codex sessions on 23–24 July** contain no deploy command of any kind (`deploy --apply`, `sfw scraper deploy`, `deploy-code`, `update_function`, `daccli lambda`).
+- **Your shell history** has only `sfw scraper deploy-code` runs, all against UAT (`solaris-boy`), and no full `sfw scraper deploy`. `deploy-code` only uploads code and config to S3; it never touches `SCRAPER_NAMES`. The history has no timestamps, so these can't be dated.
+- **The Claude sessions** have nothing from 23 July.
+
+So the only change on our side that day was a git push, and a push doesn't deploy anything.
+
+That leaves something outside our tooling resetting the list between 00:00 UTC on 23 July and 00:00 UTC on 24 July. The likeliest is someone running a full deploy from a checkout older than 16 June. It could also be a platform or stack operation. Only CloudTrail can say which, and that needs the India team or someone with CloudTrail access before the logs age out around 21 Oct. The message I drafted earlier for Mateo and Adrien still applies as written.
+
+One side effect: the Darwin Athena fix may never have reached prod in July. The live config was rewritten on 28 Sep from a later commit, so it's live now, but Darwin may have been running on the UAT workgroup for those two months. I've noted it here but haven't looked into it.
+
+The fix plan is unchanged. Do you want me to start, or send the message first?
+
+## 16:08 user
+
+really... but I did work on the iex rec right? Double check against mind palace and jira. If wala talaga, edi wala haha
+
+## 16:08 assistant
+
+Jira confirms you built it. Checking SCR-1103 for how REC was activated in prod:
+
+## 16:09 assistant
+
+Yes, you built it. But nothing in the mind palace or Jira shows you removing it, so it really looks like it wasn't you.
+
+**Your REC work, as recorded:**
+- **Jira:** you were assigned SCR-1108 ("create iex_api_rec scraper"), under the SCR-1103 story. You asked Mateo about the polling schedule on 10 Jun, and he said daily. On 22 Jun, Francois said "this seems to be working" and asked about a backfill, which became SCR-1165.
+- **Git:** you activated REC in prod on 15 June (`b4f0b54`), added it to the deployer config with the deploy helpers on 16 June (`a262001`), and wrote `prod_scraper_ops` on 17–18 June. REC then ran in prod until 23 July.
+- **Mind palace:** `wiki/smp/smp-dashboards.md` records the India IEX REC dashboard going live in prod on 2026-07-01. The 1 July SMP review notes say the same.
+
+**23 July, from the mind palace's digest of that Codex session (`sources/codex-conversations/2026-07-23-codex-conversations.md`):** you asked Codex "how sure are we that the other scrapers do indeed point to the 48380? Especially the most recent scraper, IEX REC?" Codex only checked the repo config. After that the session committed and pushed the Darwin fix, with no deploy and no change to the Lambda.
+
+**Removal:** nothing in Jira, the mind palace, Codex, Claude sessions or your shell history touches `SCRAPER_NAMES` on 23–24 July. Your only part was building and activating REC in June.
+
+So it wasn't you. Whoever reset the list used a pre-June list, which only CloudTrail can identify. The message to Mateo and Adrien stands if you want the answer before the logs age out around 21 Oct. Otherwise, should I start the fix?
+
+I didn't read the 14 June sessions where REC was first activated. They aren't relevant to the July removal.
+
+## 16:10 user
+
+go ahead with the fix. But before that, let's update jira with the accurate estimate pls. Refine the description, if applicable.
+
+## 16:11 assistant (apac-tsdb-scraper)
+
+Writing the scraper side. First, the REC replay task:
+
+## 16:11 assistant (apac-tsdb-scraper)
+
+Now the three `prod_scraper_ops.py` subcommands. Checking the dispatch and helpers they plug into:
+
+## 16:12 assistant (apac-tsdb-scraper)
+
+`pytest-asyncio` isn't installed, and I also want to drop the `noqa` suppression. Switching to `asyncio.run` and importing through the `scripts` package, as the other tests do:
+
+## 16:13 assistant (apac-tsdb-scraper)
+
+The dry runs behave as expected. The one ruff finding is an import-order issue that was already in `core.py` on `HEAD`, so I've left it alone. Now the smp-india freshness guard:
+
+## 16:13 assistant (smp-india)
+
+Mixed row lengths there would break the DataFrame. I'll keep that fixture to a single recent row:
+
+## 16:13 assistant (smp-india)
+
+`uv` tries to sync from Artifactory, which needs the VPN. The existing venv has everything installed, so I'll run without syncing:
+
+## 16:13 assistant (smp-india)
+
+My `ensure_fresh` import landed out of alphabetical order. Letting ruff sort it, then running the full suite to check the coverage floor:
+
+## 16:14 assistant (smp-india)
+
+Both repos are green: smp-india has 1155 tests passing at 91% coverage, and apac-tsdb-scraper has 339. Now documenting the new behaviour where people will look for it:
+
+## 16:14 assistant (smp-india)
+
+Code is done in both repos and nothing is committed. Before the prod run, here is what changed:
+
+**apac-tsdb-scraper**
+- `prod_scraper_ops.py` gets three subcommands:
+  - `activate <scraper> --apply` appends one scraper to the live `SCRAPER_NAMES`. It changes nothing else and uploads no code. If the env changed since it was read (`RevisionId`), it fails instead of overwriting.
+  - `replay-rec --end-date … --apply` runs a one-off REC task over the 60 days ending on that date.
+  - `check-active` exits non-zero if the live list differs from the deployer config. This is the drift check from the plan.
+- `iex_api_rec/core.py` gets a `get_replay_task_props` method, wired through `upsert_scraper_task.py`. The replay task carries the same properties as a normal task, so the Lambda code already in prod runs it. A test checks that.
+- New tests in [test_iex_api_rec_core.py](apac-tsdb-scraper/test/test_iex_api_rec_core.py) and [test_prod_scraper_ops.py](apac-tsdb-scraper/test/test_prod_scraper_ops.py), plus a README section. The full suite passes: 339 tests.
+
+**smp-india**
+- [india_iex_rec_tsdb.py](smp-india/dags/src/scripts/india_iex_rec_tsdb_dag/india_iex_rec_tsdb.py) gets `ensure_fresh`. When TSDB is empty or the newest REC row is over 25 days old, the extract task fails and the Teams alert fires, and nothing stale gets re-published. Today's data is 98 days old.
+- Four new tests. Two existing fixtures were 29 days old, so I moved them to recent dates. Also a catalogue note. Everything passes: 1155 tests, 91% coverage, ruff and the catalogue check.
+
+**Prod run.** On the VPN, in your own terminal, this changes prod. It adds `iex_api_rec` to the Lambda's scraper list, runs today's REC task (fetching 15 Aug onward), then replays the window ending 14 Aug (fetching 16 Jun to 14 Aug, which includes the missed 29 Jul and 12 Aug sessions). The checks before and after are read-only:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python scripts/prod_scraper_ops.py refresh-creds && { python scripts/prod_scraper_ops.py --skip-refresh check-active; python scripts/prod_scraper_ops.py --skip-refresh activate iex_api_rec --apply && python scripts/prod_scraper_ops.py --skip-refresh schedule-run iex_api_rec && python scripts/prod_scraper_ops.py --skip-refresh replay-rec --end-date 2026-08-14 --apply && python scripts/prod_scraper_ops.py --skip-refresh check-active; } 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_apply_out.txt
+```
+
+The first `check-active` should report `iex_api_rec` as missing, and the last should pass. Expect about 5–10 minutes, since each task runs through the Step Function. Say "done" and I'll check TSDB and CDH.
+
+- **Not covered by this run:** two things are still separate steps.
+  - The DAG fix has to be committed and reach prod Airflow.
+  - The dashboard only refreshes when the DAG runs (08:30 SGT, or trigger it by hand).
+- **Not automated:** nothing schedules `check-active`. It's a command to run after deploys. Scheduling it would need something with access to the Solaris AWS account.
+
+## 16:19 user (smp-india)
+
+<bash-input>cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python scripts/prod_scraper_ops.py refresh-creds && { python scripts/prod_scraper_ops.py --skip-refresh check-active; python scripts/prod_scraper_ops.py --skip-refresh activate iex_api_rec --apply && python scripts/prod_scraper_ops.py --skip-refresh schedule-run iex_api_rec && python scripts/prod_scraper_ops.py --skip-refresh replay-rec --end-date 2026-08-14 --apply && python scripts/prod_scraper_ops.py --skip-refresh check-active; } 2>&1 | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_apply_out.txt</bash-input><bash-stdout>frcd ~/repos/smp/apac-tsdb-scraperod_ssource .venv/bin/activateesh python scripts/prod_scraper_ops.pyscr
+aper_ops.py --s{ python scripts/prod_scraper_ops.pypply &amp;&amp; python scripts/prod_scpython scripts/prod_scraper_ops.pyle-run iex_api_rec &amp;&amp; python scripts/prod_scrapepython scripts/prod_scraper_ops.py --end-date
+ 2026-08-14 --apply &amp;&amp; python scrpython scripts/prod_scraper_ops.pyfresh check-active; } 2&gt;&amp;1 | tee /pri
+vate/tmp/claude-501/-Uspython scripts/prod_scraper_ops.py-4648-9e65-956b7e2d3853/scratc} 2&gt;&amp;scr1tee_appl
+y_out.txt
+
++ /Users/qn5792/repos/smp/apac-tsdb-scraper/.venv/bin/python /Users/qn5792/repos/smp/apac-tsdb-scraper/scripts/refresh_daccli_credentials.py --dac-profile solaris-prod --aws-profile default --aws-region eu-west-1
+Available DAC profiles:
++ /Users/qn5792/repos/smp/apac-tsdb-scraper/.venv/bin/daccli list_profile
+profile file found: ~/.dac/
+solaris-boy             | uri:cart:337381:solarisapacnoprod:solarisapac_22047
+solaris-prod            | uri:cart:337381:solarisapac:solarisapac_48380
+smp-japan-prod          | uri:cart:337381:engieapacprod:smpcdhprd_51218
+smp-japan-qa            | uri:cart:337381:engieapacpreprod:smpcdhqa_11767
+smp_india_qa            | uri:cart:337381:engieindianoprod:smpcdhindiaqa_78133
+smp_india_prod          | uri:cart:337381:engieindiaprod:smpcdhindiaprod_53443
+Refreshing DAC credentials for profile: solaris-prod
++ /Users/qn5792/repos/smp/apac-tsdb-scraper/.venv/bin/daccli cdh get_credential --use_profile solaris-prod --save
+credentials are saved in aws credentials,profile=default
+Checking AWS STS with boto3 profile: default
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+Done.
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+scraper_drift=
+{
+  "missing_in_lambda": [
+    "iex_api_rec"
+  ],
+  "unexpected_in_lambda": []
+}
+Live SCRAPER_NAMES differs from the deployer config.
+Plan: append 'iex_api_rec' to cdh_solarisapac_48380_23a1bb_scraping_handler SCRAPER_NAMES, preserving every other variable.
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+Activated 'iex_api_rec'. Active scrapers: iex_api,darwin,hjks,hpx_api,iex,iex_api_rtm,manikaran,iex_api_national_rtm,iex_api_national,iex_api_rec
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+workflow_execution=arn:aws:states:eu-west-1:058264493473:execution:cdh_solarisapac_48380_23a1bb_scraper_workflow:prod-ops-create-iex_api_rec-20261014T081926849753Z
+workflow_status=SUCCEEDED
+selected_task=
+{
+  "task_id": "61d59f1f7a115e84d831beced8bf75cb08cb5bed",
+  "scraper_name": "iex_api_rec",
+  "state": "Waiting",
+  "tr_nb": 0,
+  "short_description": "iex_api_rec : product_code=16, day=2026-10-15",
+  "earliest_processing_time": "2026-10-15T07:00:00+00:00",
+  "latest_processing_time": "2026-10-15T07:33:00+00:00"
+}
+workflow_execution=arn:aws:states:eu-west-1:058264493473:execution:cdh_solarisapac_48380_23a1bb_scraper_workflow:prod-ops-execute-iex_api_rec-20261014T081934957856Z
+workflow_status=SUCCEEDED
+task_after=
+{
+  "task_id": "61d59f1f7a115e84d831beced8bf75cb08cb5bed",
+  "scraper_name": "iex_api_rec",
+  "state": "Completed",
+  "tr_nb": 2,
+  "short_description": "iex_api_rec : product_code=16, day=2026-10-15",
+  "earliest_processing_time": "2026-10-15T07:00:00+00:00",
+  "latest_processing_time": "2026-10-15T07:33:00+00:00"
+}
+REC replay: 60-day lookback ending 2026-08-14
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+&gt;&gt;&gt;&gt;&gt; DynamoDB table: cdh_solarisapac_48380_23a1bb-tasks
+&gt;&gt;&gt;&gt;&gt; Scraper name: iex_api_rec
+&gt;&gt;&gt;&gt;&gt; Config class: IEXAPIRECConfig | TaskLogic class: IEXAPIRECTaskLogic
+&gt;&gt;&gt;&gt;&gt; Generating task properties for current time: 2026-10-14T08:19:45.170600+00:00
+Task properties: {'earliest_processing_time': datetime.datetime(2026, 10, 14, 8, 19, 45, 170600, tzinfo=datetime.timezone.utc), 'properties': {'ref_execution_time': datetime.datetime(2026, 10, 14, 8, 19, 45, 170600, tzinfo=datetime.timezone.utc), 'today': Timestamp('2026-08-14 00:00:00+0530', tz='Asia/Kolkata')}, 'task_id_components': ['2026-10-14 08:19:45.170600+00:00', '2026-08-14 00:00:00+05:30'], 'short_description': 'iex_api_rec replay: product_code=16, end=2026-08-14'}
+INSERT task_id e9bd842369f497ce695166d978ea3633ef972d52: DbOk(data=True)
+Done. inserted=1, updated=0, skipped=0
+workflow_execution=arn:aws:states:eu-west-1:058264493473:execution:cdh_solarisapac_48380_23a1bb_scraper_workflow:prod-ops-replay-rec-20261014T081946407362Z
+workflow_status=SUCCEEDED
+replay_task_after=
+{
+  "task_id": "e9bd842369f497ce695166d978ea3633ef972d52",
+  "scraper_name": "iex_api_rec",
+  "state": "Completed",
+  "tr_nb": 2,
+  "short_description": "iex_api_rec replay: product_code=16, end=2026-08-14",
+  "earliest_processing_time": "2026-10-14T08:19:45.170600+00:00",
+  "latest_processing_time": "2026-10-14T08:52:45.170600+00:00"
+}
+STS OK account=058264493473 arn=arn:aws:sts::058264493473:assumed-role/cdh_solarisapac_48380/QN5792
+scraper_drift=
+{
+  "missing_in_lambda": [],
+  "unexpected_in_lambda": []
+}
+Live SCRAPER_NAMES matches the deployer config.
+~/repos/smp/apac-tsdb-scraper  main*</bash-stdout><bash-stderr></bash-stderr>
+
+## 16:19 assistant (smp-india)
+
+Failed to authenticate. API Error: 403 Internet Security by Zscaler
+
+## 16:20 user (smp-india)
+
+try again
+
+## 16:20 assistant (smp-india)
+
+That run worked from start to finish, so there's nothing to redo. I'm reading "try again" as "now verify it". Every step reported `SUCCEEDED` / `Completed`, and the final drift check is clean. Your `!` command just reached AWS, so the VPN is up from this shell, and I'll run the read-only diagnosis from the start of this session myself to confirm the data landed in TSDB:
+
+## 16:21 assistant (apac-tsdb-scraper)
+
+No need to try again: the prod fix ran cleanly. All I still need is confirmation that the data reached TSDB.
+
+| Step | Result |
+|---|---|
+| Drift check, before | Reported `iex_api_rec` missing, as expected |
+| `activate` | REC is back in the live `SCRAPER_NAMES`; nothing else changed |
+| `schedule-run` | Task `61d59…` completed; it fetches 16 Aug to 15 Oct, which covers 27 Aug, 9 Sep and 30 Sep |
+| `replay-rec` to 14 Aug | Task `e9bd8…` completed; it fetches 16 Jun to 14 Aug, which covers 29 Jul and 12 Aug |
+| Drift check, after | Clean |
+
+My shell can't resolve the VPN-only `tsdb.gems.myengie.com`, so please run this read-only TSDB check from your terminal (about a minute):
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python -c "import runpy; g = runpy.run_path('/private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_diagnose.py'); g['check_tsdb'](g['solaris_session']())" 2>&1 | grep -v -i warning | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_tsdb_after.txt
+```
+
+If it worked, each of the 4 series should show a last delivery date of 30 Sep, and the list of recent dates should include 29 Jul, 12 Aug, 27 Aug and 9 Sep.
+
+Say "done" when you've run it. CDH and Grafana stay on the old data until `india_iex_rec_tsdb_dag` runs again (08:30 SGT tomorrow, or trigger it in prod Airflow). The new freshness guard isn't in prod until the smp-india change is committed and deployed. Nothing is committed yet.
+
+## 16:27 user (apac-tsdb-scraper)
+
+<bash-input>cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python -c "import runpy; g = runpy.run_path('/private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_diagnose.py'); g['check_tsdb'](g['solaris_session']())" 2>&1 | grep -v -i warning | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_tsdb_after.txt</bash-input><bash-stdout>n cd ~/repos/smp/apac-tsdb-scraperpathsource .venv/bin/activate/-Uspython5792"import runpy; g = runpy.run_path('/private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_diagnose.py'); g['check_tsdb'](g['solaris_session']())" 2&gt;&amp;-smpgrepde913
+-6a35-4648-9tee-956b7e2d3853/scratchpad/scr1289_tsdb_after.txt
+
+
+===== 3. TSDB prod (4 REC series, last 365 days) =====
+Cleared_Volume: rows=23 last_application=2026-09-29T18:30:00+00:00 last_insertion=2026-10-14T08:19:50.628999949+00:00
+   last_12_delivery_dates_ist=['2026-04-08', '2026-04-29', '2026-05-13', '2026-05-29', '2026-06-10', '2026-06-24', '2026-07-08', '2026-07-29', '2026-08-12', '2026-08-27', '2026-09-09', '2026-09-30']
+Total_Sell: rows=23 last_application=2026-09-29T18:30:00+00:00 last_insertion=2026-10-14T08:19:50.628999949+00:00
+   last_12_delivery_dates_ist=['2026-04-08', '2026-04-29', '2026-05-13', '2026-05-29', '2026-06-10', '2026-06-24', '2026-07-08', '2026-07-29', '2026-08-12', '2026-08-27', '2026-09-09', '2026-09-30']
+Total_Buy: rows=23 last_application=2026-09-29T18:30:00+00:00 last_insertion=2026-10-14T08:19:50.628999949+00:00
+   last_12_delivery_dates_ist=['2026-04-08', '2026-04-29', '2026-05-13', '2026-05-29', '2026-06-10', '2026-06-24', '2026-07-08', '2026-07-29', '2026-08-12', '2026-08-27', '2026-09-09', '2026-09-30']
+Clearing_Price: rows=23 last_application=2026-09-29T18:30:00+00:00 last_insertion=2026-10-14T08:19:50.628999949+00:00
+   last_12_delivery_dates_ist=['2026-04-08', '2026-04-29', '2026-05-13', '2026-05-29', '2026-06-10', '2026-06-24', '2026-07-08', '2026-07-29', '2026-08-12', '2026-08-27', '2026-09-09', '2026-09-30']
+~/repos/smp/apac-tsdb-scraper  main*</bash-stdout><bash-stderr></bash-stderr>
+
+## 16:27 assistant (apac-tsdb-scraper)
+
+Failed to authenticate. API Error: 403 Internet Security by Zscaler
+
+## 16:28 user (apac-tsdb-scraper)
+
+g
+
+## 16:28 assistant
+
+TSDB is fixed: all 4 REC series now have 23 rows, up to 30 Sep. The 5 missing sessions (29 Jul, 12 Aug, 27 Aug, 9 Sep and 30 Sep) are all there, inserted today at 08:19 UTC by the two tasks.
+
+To get the fix fully into prod:
+
+1. **Refresh CDH and Grafana.** Trigger `india_iex_rec_tsdb_dag` in prod Airflow now, or wait for its 08:30 SGT run tomorrow. It reads TSDB, so the dashboard picks up the new data either way. This runs the current DAG code, so the freshness guard isn't involved yet.
+2. **Commit.** Nothing is committed yet, and your rule is no commits unless you ask. If you want them, I'd make micro commits:
+   - apac-tsdb-scraper, on `main`: one for the REC replay (`core.py`, `upsert_scraper_task.py` and the test), one for the `activate`/`replay-rec`/`check-active` commands (`prod_scraper_ops.py`, its tests and the README).
+   - smp-india, on `dev`: one for the freshness guard (the script, its tests and the catalogue note).
+
+   I'd stage only these files. Your uncommitted GDAM work in apac-tsdb-scraper stays untouched.
+
+Should I commit?
+
+The Jira ticket can move to done once the dashboard shows 30 Sep. Who reset the scraper list is still unknown, and the CloudTrail logs that would show it age out around 21 Oct.
+
+## 16:29 user
+
+yes, commit and push pls. scope: scr-1289.
+
+OH BEFORE THAT, final review from codex pls. just to be sure we cover all our bases. Once okay, THEN commit and push. I'll retrigger the dag
+
+## 16:29 assistant
+
+Starting the Codex review now. I'll give it the exact SCR-1289 diff in both repos and the full context, and ask for an adversarial pass.
+
+## 16:39 assistant (apac-tsdb-scraper)
+
+The formatting issue is in my new method, since `HEAD` was clean, so formatting the file only touches my lines. The import-order finding was already there before this change. Applying all four fixes:
+
+## 16:39 assistant (apac-tsdb-scraper)
+
+Scraper side done: 343 tests pass and ruff is clean. Now smp-india: null dates, the reference time, and the upload trigger rule.
+
+## 16:40 assistant (smp-india)
+
+Codex is re-checking the fixes now. I'll commit and push as soon as it confirms. You can retrigger the DAG right away if you like: the backfilled TSDB data is already there, and the current prod DAG will publish it.
+
+## 16:43 user (smp-india)
+
+<task-notification>
+<task-id>af1470d84da0aa8c2</task-id>
+<tool-use-id>toolu_01PyPrTMqSW6SjLDa7jd61Qy</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/tasks/af1470d84da0aa8c2.output</output-file>
+<status>completed</status>
+<summary>Agent "Codex adversarial review SCR-1289" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>**OK to commit.** Codex found all four findings fixed and no remaining defects.
+
+- **Environment guard:** `env_variables_for_update` at `/Users/qn5792/repos/smp/apac-tsdb-scraper/scripts/prod_scraper_ops.py:479` rejects an `Environment.Error` or missing `SCRAPER_NAMES` before `activate` writes anything.
+- **Freshness check:** `ensure_fresh` at `/Users/qn5792/repos/smp/smp-india/dags/src/scripts/india_iex_rec_tsdb_dag/india_iex_rec_tsdb.py:375` now rejects a `NaT` latest date. It measures age against the normalized reference time, so the 12h lookahead no longer counts.
+- **Upload trigger rule:** In `/Users/qn5792/repos/smp/smp-india/dags/src/india/india_iex_rec_tsdb_dag.py:72`, both the upload task and `end_task` use `ALL_SUCCESS`.
+  - **Extraction failure:** a terminal failure turns upload and `end_task` into `upstream_failed`. Publication is blocked, and the DAG still fails and fires its callback.
+  - **Skipped upstream:** skips propagate as `skipped` without failure alerts.
+  - **Successful runs:** these complete normally, including CDH-disabled runs.
+
+38 focused tests passed, both format checks pass, and ruff passes on the India files. The one `I001` import-order failure in `solaris/scrapers/iex_api_rec/core.py` is the same at `HEAD`, so this change didn't introduce it.
+
+I didn't check the reported full-suite totals (343 scraper, 1157 smp-india), live scheduler behaviour, or Teams delivery. No edits or AWS calls were made.</result>
+<usage><subagent_tokens>27459</subagent_tokens><tool_uses>1</tool_uses><duration_ms>208912</duration_ms></usage>
+</task-notification>
+
+## 16:43 assistant (smp-india)
+
+Codex says OK to commit. Checking the push setup for both repos first, since the earlier `git fetch` on apac-tsdb-scraper failed authentication:
+
+## 16:44 assistant (apac-tsdb-scraper)
+
+Both commits are in, and only the SCR-1289 files were staged. Pushing with the work account's token, which is what the plain pull just failed on:
+
+## 16:44 assistant (apac-tsdb-scraper)
+
+The scraper repo is pushed. Next, smp-india on `dev`:
+
+## 16:45 assistant
+
+Codex reviewed the changes, and everything is now committed and pushed under scr-1289. You can retrigger `india_iex_rec_tsdb_dag` in prod whenever you're ready; the backfilled TSDB data is already in place for it to publish.
+
+Codex's first pass found four issues, all fixed before committing:
+- **Lambda env update:** `activate` could have wiped the Lambda's other variables if AWS returned an incomplete read. It now refuses to update in that case.
+- **Leftover parquet:** a failed run could still upload leftover parquet to CDH. The DAG's upload now only runs after a successful extraction (`ALL_SUCCESS`).
+- **Missing dates:** rows with no dates slipped past the freshness check. They now fail it.
+- **Early alert:** the 25-day limit was measured from run time plus the 12h read lookahead, so it would have alerted about 12 hours early. It's now measured from run time.
+
+On the re-check Codex said OK to commit with nothing remaining. All tests pass in both repos (343 scraper, 1157 smp-india).
+
+| Repo | Commits |
+|---|---|
+| apac-tsdb-scraper `main` | `fbd4faf` REC replay over a chosen window · `8129f42` the `activate`, `replay-rec` and `check-active` commands |
+| smp-india `dev` | `371bb91` the DAG now fails on empty data or data over 25 days old · `5919db9` CDH publishing only after a successful extraction |
+
+Only the SCR-1289 files were committed. Your uncommitted GDAM work in apac-tsdb-scraper is untouched.
+
+- **Retrigger:** the run you trigger uses the DAG code currently in prod. The new checks reach prod Airflow only once `dev` is promoted through your usual deploy flow.
+- **Not scheduled:** nothing runs `check-active` automatically. It's a command to run after prod scraper deploys.
+- **Still unknown:** who reset the scraper list in July. The CloudTrail logs that would show it age out around 21 Oct.
+- **Jira:** SCR-1289 can move to done once the dashboard shows 30 Sep.
+
+## 16:45 user
+
+Thanks. I’m curious, are we using the ponytail plugin accordingly?
+
+## 16:46 assistant
+
+Mostly yes. Ponytail is a set of rules for working: the smallest complete change, reuse before adding, a test for any real new logic, a `ponytail:` comment on any shortcut with a known limit, and replies that end with what was skipped or risky. Against those rules:
+
+**Where we followed it**
+- **Reuse over new code:**
+  - The REC backfill copies the existing replay pattern (`persist_tasks`, `run_workflow`), so no new mechanism was needed.
+  - `activate` reuses the same env-preserving update that `deploy` already did.
+  - The DAG guard is one small function placed before the existing save.
+- **No change where none was needed:** the prod fix was a single env change, with no code or config upload. The replay worked with the Lambda code already deployed, so nothing had to be redeployed.
+- **Deletion beats addition:** pulling out `execute_replay_task` removed two copies of the same ~20 lines.
+- **Tests for the real logic:** the drift comparison, the env guard, the replay properties and every freshness edge case each have a test.
+- **Throwaway work stayed out of the repos:** the four diagnosis scripts lived in the scratchpad.
+- **Skipped/risk lines:** I ended most replies with them.
+
+**Where we drifted**
+- **Missing `ponytail:` comment:** `check-active` isn't scheduled anywhere, so it only catches drift if someone remembers to run it. That limit is in the README and my messages, but not in the code where the rule wants it. One line would fix it.
+- **Over-long replies:** some were longer than "one read for a busy human", like the root-cause tables and the Codex findings recap.
+- **Four separate VPN round trips:** the diagnosis took four probe runs. You asked for full confirmation, so most were justified, but the CloudFormation probe could have been folded into the second run.
+- **Missed early by me, caught by Codex:** the four review findings were edge cases the rules say to check up front ("correct on edge cases"), especially the incomplete env read, which could have caused data loss.
+
+Should I add the `ponytail:` comment on `check-active` as a tiny follow-up commit?
+
+## 16:47 user
+
+What is this comment, specifically?
+
+## 16:47 assistant
+
+It would be one line just above `check_active` in `scripts/prod_scraper_ops.py`:
+
+```python
+# ponytail: manual only; nothing schedules it, so drift is caught only if someone runs it after a deploy. Upgrade to a scheduled check (e.g. an EventBridge rule in the solaris account) if the list drifts again.
+def check_active(args: argparse.Namespace) -> None:
+```
+
+It records the limit where the next person reading the code will see it. Today that limit is only in the README and this chat. The `ponytail:` prefix also makes it show up when you run `/ponytail-debt`, which lists all such deferred shortcuts.
+
+## 16:48 user
+
+Ah. Nah, skip it. Thanks. Anything else on this?
+
+## 16:48 assistant
+
+Skipped. Only a few loose ends remain:
+
+1. **Retrigger the DAG and check the dashboard.** It should show 30 Sep. If it still shows 8 Jul after a green run, tell me and I'll look at the CDH side.
+2. **Close SCR-1289** once the dashboard is confirmed. I can add a short closing comment if you want: what broke, what changed, and the commit hashes.
+3. **Promote smp-india `dev` to prod** through your usual flow. Until then, prod runs the old DAG without the freshness check.
+4. **Ask who reset the scraper list, if you care.** Only CloudTrail can answer, and its logs age out around 21 Oct. The message for Mateo and Adrien is earlier in this chat.
+5. **Darwin, Jul–Sep (optional):** the Darwin workgroup fix was pushed on 23 July but only reached prod with the 28 Sep config. Darwin may have been reading the UAT Athena workgroup for those two months. That's worth a separate ticket if anyone relies on that data.
+
+Items 1 and 3 are the only ones needed to finish this ticket. The others are optional.
+
+## 19:00 user
+
+flag ticket pls for tomorrow's testing and finalization before sending for validation.
+
+In the meantime, let's make sure this is already promoted through qa and prod
+
+## 19:01 assistant
+
+I'll flag the ticket first. Before touching promotion, I'll read how smp-india gets to QA and prod.
+
+## 19:01 user
+
+[Request interrupted by user for tool use]
+
+## 19:01 user
+
+sorry to interrupt. Flag this session I mean!
+
+## 19:01 assistant (smp-india)
+
+QA and prod are each missing only our two SCR-1289 commits, but neither can be fast-forwarded from `dev`. Checking what they hold that `dev` doesn't:
+
+## 19:03 assistant
+
+The SCR-1289 fix is now promoted to QA and prod. Both are on the same code as `dev` and nothing else came along.
+
+| Branch | Commit | Matches `dev` |
+|---|---|---|
+| `qa` | `9b2c109` Merge dev into qa | yes |
+| `prod` | `aa0ff60` Merge qa into prod | yes |
+
+- **How I promoted:** the same merge pair you used earlier today. Only the two SCR-1289 commits were new on `dev`, so that's all that went up. The repo's pre-push check ran its tests and passed.
+- **When it's live:** India Airflow pulls the `qa` and `prod` branches automatically, so the new checks should be live within minutes.
+- **Retriggering:** the DAG run you retrigger will include the freshness check. It will pass, because the newest REC data (30 Sep) is 14 days old.
+- **Your working tree:** smp-india has uncommitted NOC DAG work, probably SCR-1290 from another session. My first attempt stopped before touching it, so I did the merges in a temporary worktree, now removed. `dev`, its working tree and that work are all as they were.
+- **Flag:** this chat is flagged for tomorrow's testing and finalization. I've noted in memory that "flag this" means this chat, not the Jira ticket.

@@ -1,0 +1,1518 @@
+# Claude Conversation - 2026-10-14
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `bde564a1-7d45-4692-a424-1be602cbcfd3`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/bde564a1-7d45-4692-a424-1be602cbcfd3.jsonl`
+Resume: `claude --resume bde564a1-7d45-4692-a424-1be602cbcfd3`
+
+## 14:54 user
+
+Mateo's asking for help on his dashboard in grafana. Here it is exported:
+
+<pasted_content id="006c">
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 26,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9,
+      "panels": [],
+      "title": "Trend – Past Days (Daily evolution)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "bfq7nkxjvbj0gd"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FF9830",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 1,
+      "interval": "15m",
+      "maxDataPoints": 1573,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "timezone": [
+          "Asia/Kolkata"
+        ],
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bficmsrgc0zk0c"
+          },
+          "format": 1,
+          "rawSQL": "SELECT\r\n  CAST(application_date AS timestamp) AS ts,\r\n  MAX(CASE WHEN market = 'DAM'  THEN value END) AS \"DAM MCP Price\",\r\n  MAX(CASE WHEN market = 'GDAM' THEN value END) AS \"GDAM MCP Price\",\r\n  MAX(CASE WHEN market = 'RTM'  THEN value END) AS \"RTM MCP Price\"\r\nFROM india_iex_tsdb_expanded_latest\r\nWHERE level = 'national'\r\n  AND technology = 'total'\r\n  AND metric = 'price'\r\n  AND market IN ('DAM', 'GDAM', 'RTM')\r\n  AND value IS NOT NULL\r\nGROUP BY application_date\r\nORDER BY ts",
+          "refId": "A",
+          "table": "india_iex_tsdb_expanded_latest"
+        }
+      ],
+      "title": "MCP Last 7 days",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "bfq7nkxjvbj0gd"
+      },
+      "description": "Metric volume_bid_sell, RTM. Each zone shows its own newest value in the range; grey = missing or stale. Colours follow Colour by.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 2,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "rgba(128, 128, 128, 0.5)",
+                  "index": 0,
+                  "text": "No current value"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "No current value",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgba(255, 255, 204, 0.75)",
+                "value": 0
+              },
+              {
+                "color": "rgba(255, 237, 160, 0.75)",
+                "value": 1
+              },
+              {
+                "color": "rgba(254, 217, 118, 0.75)",
+                "value": 2
+              },
+              {
+                "color": "rgba(254, 178, 76, 0.75)",
+                "value": 3
+              },
+              {
+                "color": "rgba(253, 141, 60, 0.75)",
+                "value": 4
+              },
+              {
+                "color": "rgba(252, 78, 42, 0.75)",
+                "value": 5
+              },
+              {
+                "color": "rgba(227, 26, 28, 0.75)",
+                "value": 6
+              },
+              {
+                "color": "rgba(189, 0, 38, 0.75)",
+                "value": 7
+              },
+              {
+                "color": "rgba(128, 0, 38, 0.75)",
+                "value": 8
+              },
+              {
+                "color": "rgba(30, 64, 175, 0.7)",
+                "value": 10
+              },
+              {
+                "color": "rgba(59, 130, 246, 0.65)",
+                "value": 11
+              },
+              {
+                "color": "rgba(147, 197, 253, 0.6)",
+                "value": 12
+              },
+              {
+                "color": "rgba(226, 232, 240, 0.55)",
+                "value": 13
+              },
+              {
+                "color": "rgba(253, 186, 116, 0.6)",
+                "value": 14
+              },
+              {
+                "color": "rgba(249, 115, 22, 0.65)",
+                "value": 15
+              },
+              {
+                "color": "rgba(194, 65, 12, 0.7)",
+                "value": 16
+              },
+              {
+                "color": "rgba(68, 1, 84, 0.6)",
+                "value": 20
+              },
+              {
+                "color": "rgba(59, 82, 139, 0.6)",
+                "value": 21
+              },
+              {
+                "color": "rgba(33, 145, 140, 0.6)",
+                "value": 22
+              },
+              {
+                "color": "rgba(94, 201, 98, 0.6)",
+                "value": 23
+              },
+              {
+                "color": "rgba(181, 222, 43, 0.6)",
+                "value": 24
+              },
+              {
+                "color": "rgba(253, 231, 37, 0.6)",
+                "value": 25
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Map band"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Data as of"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 6,
+        "x": 0,
+        "y": 11
+      },
+      "id": 11,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "OpenStreetMap",
+          "noRepeat": true,
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": false,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": true,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "dataStyle": {
+                "color": {
+                  "field": "Map band"
+                }
+              },
+              "idField": "region",
+              "rules": [],
+              "src": "data:application/geo+json;base64,eyJ0eXBlIjoiRmVhdHVyZUNvbGxlY3Rpb24iLCJmZWF0dXJlcyI6W3sidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3NC41MjcsMjkuOTQzXSxbNzQuNTYxLDI5Ljg3XSxbNzQuNDc3LDI5Ljc0NV0sWzc0LjYxNiwyOS43NTJdLFs3NC41NDMsMjkuNDY4XSxbNzQuNjA0LDI5LjMyN10sWzc0Ljg1MSwyOS40MDRdLFs3NC45NjIsMjkuMjhdLFs3NS4xMiwyOS4yMjNdLFs3NS4zNCwyOS4yODNdLFs3NS4zODksMjkuMjYxXSxbNzUuMzkxLDI5LjA2M10sWzc1LjUyMSwyOS4wMDRdLFs3NS40NzMsMjguOTIzXSxbNzUuNTYxLDI4LjYxM10sWzc1LjkzLDI4LjM1OV0sWzc2LjA5NSwyOC4xNTFdLFs3NS45NDYsMjguMTA4XSxbNzUuOTcxLDI3Ljg1Ml0sWzc2LjIyNSwyNy44MzNdLFs3Ni4xNiwyNy45OThdLFs3Ni4zNTcsMjguMTQ0XSxbNzYuNDc2LDI4LjE0OV0sWzc2LjU0NSwyNy45NjRdLFs3Ni42NjgsMjguMDE0XSxbNzYuNjU3LDI4LjA4OV0sWzc2Ljg3NSwyOC4yMThdLFs3Ni45NzEsMjguMTM4XSxbNzYuOTQzLDI3Ljg1NF0sWzc2Ljg5NCwyNy43MThdLFs3Ni45NzksMjcuNjU0XSxbNzcuMDg2LDI3LjczOF0sWzc3LjA0NSwyNy44MjJdLFs3Ny4yNTIsMjcuNzkxXSxbNzcuNDUxLDI3Ljg3MV0sWzc3LjU0MSwyNy45ODJdLFs3Ny40NzQsMjguMDg3XSxbNzcuNTE2LDI4LjIwNl0sWzc3LjQ3OCwyOC40MTldLFs3Ny4zNDUsMjguNTEzXSxbNzcuMTc0LDI4LjQwNV0sWzc3LjEyMSwyOC40OTZdLFs3Ni44OCwyOC41MDVdLFs3Ni44NCwyOC41ODJdLFs3Ni45NjgsMjguN10sWzc2Ljk1MSwyOC44MThdLFs3Ny4yMjgsMjguODgxXSxbNzcuMTM0LDI5LjA5NV0sWzc3LjE2MSwyOS4zMzJdLFs3Ny4wODcsMjkuNTkzXSxbNzcuMTU2LDI5LjY5OF0sWzc3LjEyNSwyOS43N10sWzc3LjI3NiwzMC4wMzhdLFs3Ny40MDYsMzAuMDg5XSxbNzcuNjA0LDMwLjM2OV0sWzc3LjU3NCwzMC40MTNdLFs3Ny44MTksMzAuNTA4XSxbNzcuNzA0LDMwLjc2Nl0sWzc3LjgwNiwzMC44NTNdLFs3Ny44MDcsMzEuMDI3XSxbNzcuOTA4LDMxLjE1NF0sWzc4LjM4NCwzMS4yODJdLFs3OC40ODQsMzEuMTk5XSxbNzguODEsMzEuMTk4XSxbNzguODksMzEuMDk3XSxbNzkuMDA2LDMxLjExOV0sWzc4Ljg4MiwzMS4yODddLFs3OC43OTIsMzEuMzA1XSxbNzguNzk4LDMxLjQ0M10sWzc4LjcyLDMxLjUwN10sWzc4Ljg0NywzMS42MDhdLFs3OC43MDYsMzEuNzc0XSxbNzguNzc2LDMxLjk4N10sWzc4LjYxMiwzMi4xMTldLFs3OC42MDksMzIuMjE0XSxbNzguNDU1LDMyLjI0Ml0sWzc4LjUzNSwzMi40MTRdLFs3OC40NTQsMzIuNDUyXSxbNzguNDQyLDMyLjU3XSxbNzguNjE4LDMyLjU5Nl0sWzc4Ljc2OCwzMi42ODZdLFs3OC44MjYsMzIuNDM4XSxbNzguOTc4LDMyLjMzOV0sWzc5LjExNCwzMi4zODRdLFs3OS4xMywzMi40NzFdLFs3OS4zMTcsMzIuNTldLFs3OS40NDcsMzIuNTMyXSxbNzkuNjI1LDMyLjczN10sWzc5LjMzNCwzMy4wMTZdLFs3OS40NTMsMzMuMjU4XSxbNzguOTkyLDMzLjMzXSxbNzguOTMyLDMzLjQzM10sWzc4LjkxOCwzMy42MzNdLFs3OS4xMDQsMzMuNjEzXSxbNzguOTA0LDMzLjk3Nl0sWzc5LjAxMywzNC4wNV0sWzc5LjQxOCwzNC4wMTRdLFs3OS41MSwzNC4yMV0sWzc5LjU4MywzNC4yMzhdLFs3OS41MDcsMzQuNDc0XSxbNzkuODExLDM0LjQ5N10sWzc5Ljc3LDM0LjYyMl0sWzc5Ljg1OSwzNC42ODhdLFs4MC4wNjcsMzQuNzE0XSxbODAuMDcyLDM0LjgyOF0sWzgwLjE2OSwzNC45ODhdLFs4MC4xODIsMzUuMTY2XSxbODAuMzI3LDM1LjQ3Ml0sWzgwLjI5MywzNS42MDJdLFs4MC4xMTQsMzUuNjc3XSxbNzkuOTk4LDM1LjgzN10sWzc5Ljg2NywzNS43ODJdLFs3OS40MjQsMzUuODk1XSxbNzkuMzg1LDM1Ljk5XSxbNzkuMjQsMzUuOTg2XSxbNzkuMTM4LDM1LjgzOF0sWzc4Ljk1NywzNS44OTFdLFs3OC42NTcsMzUuODUzXSxbNzguNTIsMzUuNzYzXSxbNzguNDIyLDM1Ljc4NV0sWzc4LjE5NiwzNS42NjZdLFs3OC4xMzYsMzUuNTM4XSxbNzcuOTY2LDM1LjU3NF0sWzc3LjkwNSwzNS40NjldLFs3Ny43MzYsMzUuNTIzXSxbNzcuNzI0LDM1LjQ3N10sWzc3LjQ0OSwzNS40NjJdLFs3Ny40MzcsMzUuNjQxXSxbNzcuMzU3LDM1LjcxN10sWzc3LjE3NCwzNS43MzFdLFs3Ny4xMTgsMzUuNzk2XSxbNzYuOTM0LDM1Ljc4NF0sWzc2LjcyMiwzNS45NTNdLFs3Ni44LDM2LjA0OF0sWzc2LjYzNiwzNi4xODRdLFs3Ni40MzEsMzYuMjUyXSxbNzYuMzUxLDM2LjM1OV0sWzc2LjI1NCwzNi4zNDddLFs3Ni4wNjgsMzYuNDc3XSxbNzUuNzQ3LDM2LjU4OF0sWzc1LjYxNSwzNi43NjFdLFs3NS40NzgsMzYuODA2XSxbNzUuMzQ0LDM3LjA1MV0sWzc1LjIwOCwzNy4wMzZdLFs3NS4wODYsMzYuOTQyXSxbNzQuOTEzLDM2LjkwOF0sWzc0LjgzMywzNy4wMjRdLFs3NC43MDgsMzcuMDc3XSxbNzQuNTgxLDM3LjA0M10sWzc0LjU3OCwzNi45NDhdLFs3NC40MjgsMzYuOTg5XSxbNzQuMjYsMzYuODg2XSxbNzQuMTczLDM2LjkwM10sWzc0LjA1MSwzNi44MDZdLFs3My44NzgsMzYuODk0XSxbNzMuNjg5LDM2LjkxMV0sWzczLjcyNiwzNi44MzJdLFs3My44NjMsMzYuNzg4XSxbNzMuOSwzNi43MDZdLFs3My43LDM2LjY4NF0sWzczLjQzNSwzNi43NDRdLFs3My4wODQsMzYuNjgyXSxbNzMuMTEyLDM2LjYwOV0sWzcyLjk5MSwzNi40NTddLFs3Mi43NzgsMzYuMzA5XSxbNzIuNTk2LDM2LjI2NF0sWzcyLjUzMSwzNi4wNzJdLFs3Mi41OTUsMzYuMDI3XSxbNzIuNTMzLDM1LjkxN10sWzcyLjY5LDM1LjgzMl0sWzcyLjgzLDM1Ljg4N10sWzcyLjkyOSwzNS44NDVdLFs3My4wNzgsMzUuODg2XSxbNzMuMTUyLDM1Ljg0Ml0sWzczLjEzOSwzNS43MThdLFs3My40MDYsMzUuNTYzXSxbNzMuNjM1LDM1LjU3MV0sWzczLjc4NSwzNS41MjRdLFs3My43LDM1LjM1OF0sWzczLjcxNCwzNS4yMjhdLFs3My45MTYsMzUuMjEyXSxbNzQuMTMzLDM1LjEwN10sWzc0LjA3MywzNC45NDFdLFs3My45MTcsMzQuODE0XSxbNzMuNzMxLDM0Ljc3MV0sWzczLjYzOSwzNC41NjZdLFs3My40NDcsMzQuNTc0XSxbNzMuNCwzNC4zNTldLFs3My40OTIsMzQuMjJdLFs3My41MTQsMzQuMDA2XSxbNzMuNTg1LDMzLjg5OV0sWzczLjU2MSwzMy42MjFdLFs3My42MywzMy41MzhdLFs3My41NTgsMzMuMzY4XSxbNzMuNjg4LDMzLjA4OF0sWzczLjgwNiwzMi45NzFdLFs3My45NTcsMzIuOTg3XSxbNzMuOTg3LDMyLjkzNV0sWzc0LjE3NywzMi44ODNdLFs3NC4zODMsMzIuNzU4XSxbNzQuNjMxLDMyLjc2N10sWzc0LjY1MSwzMi41N10sWzc0LjcxMSwzMi40NzhdLFs3NC44NiwzMi40OTJdLFs3NC45NDcsMzIuNDQ3XSxbNzUuMDI3LDMyLjQ5Nl0sWzc1LjMzMiwzMi4zMjddLFs3NS41MzksMzIuMzM2XSxbNzUuNjg3LDMyLjM5MV0sWzc1LjgzNCwzMi41MTJdLFs3NS45MzIsMzIuMzk5XSxbNzUuNzczLDMyLjI5XSxbNzUuNjE4LDMyLjIzN10sWzc1LjY2MSwzMi4xMzddLFs3NS42MDEsMzIuMDkzXSxbNzUuODkyLDMxLjk2Ml0sWzc2LjAxOCwzMS42MzJdLFs3Ni4wOTgsMzEuNTM2XSxbNzYuMjE0LDMxLjI5OV0sWzc2LjM3MiwzMS40MDhdLFs3Ni40MzIsMzEuMzI3XSxbNzYuNjEyLDMxLjI1XSxbNzYuNjI1LDMwLjk5OV0sWzc2Ljc2NiwzMC45MjFdLFs3Ni44NTcsMzAuNzk1XSxbNzYuNzEyLDMwLjc2Ml0sWzc2Ljc1MiwzMC42ODVdLFs3Ni45MjYsMzAuNjFdLFs3Ni44ODYsMzAuNDNdLFs3Ni43NDksMzAuNDI5XSxbNzYuNjIzLDMwLjI2NV0sWzc2LjY0LDMwLjE1XSxbNzYuNTQ3LDMwLjA3Nl0sWzc2LjM5OSwzMC4xMTZdLFs3Ni4yNDksMzAuMDg1XSxbNzYuMTc4LDI5Ljk0Ml0sWzc2LjI0NCwyOS44NTJdLFs3NS45ODQsMjkuNzI3XSxbNzUuNzc5LDI5LjgyMl0sWzc1LjYxNywyOS43NDRdLFs3NS40NjIsMjkuODA4XSxbNzUuMjQyLDI5LjU0Nl0sWzc1LjE2OCwyOS42NjddLFs3NS4yNDIsMjkuNzU1XSxbNzUuMTE1LDI5Ljg3OV0sWzc0Ljk5LDI5Ljg2OF0sWzc0LjgwNiwyOS45OTJdLFs3NC42NDcsMjkuOTA0XSxbNzQuNTI3LDI5Ljk0M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6Ik4xIiwicmVnaW9uIjoiTm9ydGgifSwiaWQiOiJOMSJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3OC44ODIsMzEuMjg3XSxbNzkuMDA2LDMxLjExOV0sWzc4Ljg5LDMxLjA5N10sWzc4LjgxLDMxLjE5OF0sWzc4LjQ4NCwzMS4xOTldLFs3OC4zODQsMzEuMjgyXSxbNzcuOTA4LDMxLjE1NF0sWzc3LjgwNywzMS4wMjddLFs3Ny44MDYsMzAuODUzXSxbNzcuNzA0LDMwLjc2Nl0sWzc3LjgxOSwzMC41MDhdLFs3Ny41NzQsMzAuNDEzXSxbNzcuNjA0LDMwLjM2OV0sWzc3LjQwNiwzMC4wODldLFs3Ny4yNzYsMzAuMDM4XSxbNzcuMTI1LDI5Ljc3XSxbNzcuMTU2LDI5LjY5OF0sWzc3LjA4NywyOS41OTNdLFs3Ny4xNjEsMjkuMzMyXSxbNzcuMTM0LDI5LjA5NV0sWzc3LjIyOCwyOC44ODFdLFs3Ni45NTEsMjguODE4XSxbNzYuOTY4LDI4LjddLFs3Ni44NCwyOC41ODJdLFs3Ni44OCwyOC41MDVdLFs3Ny4xMjEsMjguNDk2XSxbNzcuMTc0LDI4LjQwNV0sWzc3LjM0NSwyOC41MTNdLFs3Ny40NzgsMjguNDE5XSxbNzcuNTE2LDI4LjIwNl0sWzc3LjQ3NCwyOC4wODddLFs3Ny41NDEsMjcuOTgyXSxbNzcuNDUxLDI3Ljg3MV0sWzc3LjI1MiwyNy43OTFdLFs3Ny4wNDUsMjcuODIyXSxbNzcuMDg2LDI3LjczOF0sWzc2Ljk3OSwyNy42NTRdLFs3Ni44OTQsMjcuNzE4XSxbNzYuOTQzLDI3Ljg1NF0sWzc2Ljk3MSwyOC4xMzhdLFs3Ni44NzUsMjguMjE4XSxbNzYuNjU3LDI4LjA4OV0sWzc2LjY2OCwyOC4wMTRdLFs3Ni41NDUsMjcuOTY0XSxbNzYuNDc2LDI4LjE0OV0sWzc2LjM1NywyOC4xNDRdLFs3Ni4xNiwyNy45OThdLFs3Ni4yMjUsMjcuODMzXSxbNzUuOTcxLDI3Ljg1Ml0sWzc1Ljk0NiwyOC4xMDhdLFs3Ni4wOTUsMjguMTUxXSxbNzUuOTMsMjguMzU5XSxbNzUuNTYxLDI4LjYxM10sWzc1LjQ3MywyOC45MjNdLFs3NS41MjEsMjkuMDA0XSxbNzUuMzkxLDI5LjA2M10sWzc1LjM4OSwyOS4yNjFdLFs3NS4zNCwyOS4yODNdLFs3NS4xMiwyOS4yMjNdLFs3NC45NjIsMjkuMjhdLFs3NC44NTEsMjkuNDA0XSxbNzQuNjA0LDI5LjMyN10sWzc0LjU0MywyOS40NjhdLFs3NC42MTYsMjkuNzUyXSxbNzQuNDc3LDI5Ljc0NV0sWzc0LjU2MSwyOS44N10sWzc0LjUyNywyOS45NDNdLFs3My44OTYsMjkuOTc0XSxbNzMuOTczLDMwLjE5OF0sWzczLjgwNiwzMC4wNjhdLFs3My4zOTcsMjkuOTQ2XSxbNzMuMjgyLDI5LjU3Ml0sWzcyLjk0NSwyOS4wMjhdLFs3Mi43MzIsMjguOTQ4XSxbNzIuNDA0LDI4Ljc4M10sWzcyLjI5OSwyOC42N10sWzcyLjIwNiwyOC4zOTRdLFs3MS45MjgsMjguMTIyXSxbNzEuODk4LDI3Ljk2Ml0sWzcxLjY2NiwyNy44NzhdLFs3MS4zODMsMjcuODcyXSxbNzEuMjA1LDI3LjgzNV0sWzcwLjkwNiwyNy43MV0sWzcwLjc1OSwyNy43MjFdLFs3MC42NzcsMjcuOTIyXSxbNzAuNTA1LDI4LjAzN10sWzcwLjM3MiwyOC4wMTJdLFs3MC4xMzIsMjcuODA2XSxbNzAuMDI2LDI3LjU2M10sWzY5Ljg2MywyNy40MDJdLFs2OS41ODcsMjcuMTg0XSxbNjkuNTEzLDI3LjAxXSxbNjkuNTEsMjYuNzQ0XSxbNjkuODg2LDI2LjU3OV0sWzcwLjA1NiwyNi42MDFdLFs3MC4xNzQsMjYuNTUxXSxbNzAuMTc1LDI2LjI1Ml0sWzcwLjA4MywyNi4wODNdLFs3MC4xLDI1LjkzOF0sWzcwLjI2OCwyNS43MTRdLFs3MC4zODcsMjUuNjc0XSxbNzAuNjA5LDI1LjcxNV0sWzcwLjY3NCwyNS42NzZdLFs3MC42NjUsMjUuMzk3XSxbNzAuODg4LDI1LjE0OF0sWzcwLjkzNywyNC45MzldLFs3MS4xMTIsMjQuNjc2XSxbNzEuMjg4LDI0LjYxNl0sWzcxLjQ3OCwyNC42OF0sWzcxLjY1NSwyNC42MzldLFs3MS44MDIsMjQuNjcyXSxbNzEuOTI2LDI0LjYzNl0sWzcyLjA4NSwyNC43MDddLFs3Mi4xNjUsMjQuNjIxXSxbNzIuMzM5LDI0LjZdLFs3Mi40NDQsMjQuNTA4XSxbNzIuNDU3LDI0LjQxNV0sWzcyLjUzNywyNC41Ml0sWzcyLjY4MSwyNC40NjVdLFs3Mi43MzMsMjQuMzY0XSxbNzIuOTc4LDI0LjM3M10sWzcyLjk2OSwyNC40NTNdLFs3My4wODYsMjQuNDk4XSxbNzMuMDc3LDI0LjM5N10sWzczLjE1MiwyNC4zNTRdLFs3My4wNjcsMjQuMTk1XSxbNzMuMjM5LDI0LjAwNF0sWzczLjMyNSwyNC4wNzddLFs3My40MDUsMjQuMDQxXSxbNzMuNDIsMjMuOTI1XSxbNzMuMzU0LDIzLjg1Ml0sWzczLjU2OSwyMy42NTNdLFs3My42NTYsMjMuNjIxXSxbNzMuNjMzLDIzLjQ2OV0sWzczLjcxMywyMy40MTRdLFs3My44MzMsMjMuNDM2XSxbNzMuODksMjMuMzM2XSxbNzMuOTYyLDIzLjM4MV0sWzc0LjEzOSwyMy4yNjZdLFs3NC4xMjgsMjMuMTc2XSxbNzQuMjc0LDIzLjE1OF0sWzc0LjMyNCwyMy4wNjFdLFs3NC4zODUsMjMuMTExXSxbNzQuNTM5LDIzLjEwM10sWzc0Ljc0NCwyMy4yMTFdLFs3NC41MjMsMjMuMzIxXSxbNzQuNTc1LDIzLjQyM10sWzc0LjkwNCwyMy42MjVdLFs3NC45NCwyMy43NjVdLFs3NC45MDIsMjMuODczXSxbNzQuOTc4LDI0LjAzN10sWzc0Ljg2OCwyNC4yNDNdLFs3NC43NDcsMjQuMjUzXSxbNzQuODU1LDI0LjQyNF0sWzc0LjcxOCwyNC41MDhdLFs3NC43ODcsMjQuNTg2XSxbNzQuODA5LDI0Ljc4MV0sWzc0Ljg5LDI0LjYzNF0sWzc0Ljk5OSwyNC42ODRdLFs3NC45ODIsMjQuNzY0XSxbNzQuODYxLDI0Ljc5OV0sWzc0Ljg0MywyNC45NjldLFs3NC45MjQsMjQuODc4XSxbNzUuMTE5LDI0Ljg4Ml0sWzc1LjE5MywyNS4wMzNdLFs3NS4zNSwyNS4wMzRdLFs3NS4yOTUsMjQuODU4XSxbNzUuMzk4LDI0Ljg0Ml0sWzc1LjE5MywyNC43NzRdLFs3NS4yMjgsMjQuNzE4XSxbNzUuNDU1LDI0LjY4MV0sWzc1LjY0NiwyNC42ODVdLFs3NS43NTcsMjQuNzYyXSxbNzUuODM4LDI0LjcyNV0sWzc1LjgyNSwyNC42MTNdLFs3NS45MDcsMjQuNTc2XSxbNzUuOTA5LDI0LjQ1NV0sWzc1Ljc4OSwyNC40NzJdLFs3NS43MzgsMjQuMzM1XSxbNzUuODE4LDI0LjIzOV0sWzc1Ljc1MiwyNC4xNDhdLFs3NS44MzcsMjQuMDU3XSxbNzUuNzAyLDIzLjk2N10sWzc1LjY3MSwyNC4wMThdLFs3NS41MjEsMjQuMDI1XSxbNzUuNDU5LDIzLjkyMV0sWzc1LjU4NCwyMy43OTVdLFs3NS42OTMsMjMuNzc2XSxbNzUuNzMxLDIzLjg1M10sWzc1Ljk4NywyMy45NF0sWzc1Ljk2MiwyNC4wMTVdLFs3Ni4xMjcsMjQuMDg4XSxbNzYuMTE4LDI0LjE5NV0sWzc2LjE4NiwyNC4zMjldLFs3Ni4yMDUsMjQuMjE3XSxbNzYuMzQsMjQuMjQ0XSxbNzYuNTA1LDI0LjIwM10sWzc2LjY5NSwyNC4yODRdLFs3Ni42NzgsMjQuMjA0XSxbNzYuODAyLDI0LjExN10sWzc2Ljk0NiwyNC4yMDZdLFs3Ni44NjMsMjQuMjczXSxbNzYuODQ2LDI0LjQ4Nl0sWzc2LjkxOCwyNC41NDNdLFs3Ni45NzgsMjQuNDYxXSxbNzcuMDU1LDI0LjUyNl0sWzc3LjA2NSwyNC42NDRdLFs3Ni45NjQsMjQuNzU3XSxbNzYuODU2LDI0Ljc0Ml0sWzc2LjgwMywyNC44MDldLFs3Ni45NDIsMjQuODU5XSxbNzYuODYyLDI0Ljk2MV0sWzc2Ljg3NywyNS4wNDFdLFs3Ny4wODIsMjUuMDU4XSxbNzcuMTc1LDI1LjExMl0sWzc3LjM3NiwyNS4xMDVdLFs3Ny40MTQsMjUuMjJdLFs3Ny4zNTUsMjUuMjYzXSxbNzcuMzcxLDI1LjQwOF0sWzc3LjMxMiwyNS40MzFdLFs3Ny4yMDksMjUuMzA2XSxbNzcuMDg0LDI1LjMzN10sWzc2LjkzLDI1LjI4M10sWzc2LjU5OCwyNS4zOTRdLFs3Ni41MTYsMjUuNTI4XSxbNzYuNTMxLDI1LjgxMl0sWzc2LjYzMiwyNS45XSxbNzYuNzc5LDI1LjkzOV0sWzc2LjkwMiwyNi4wOTRdLFs3Ny4yMDQsMjYuMjNdLFs3Ny40MzksMjYuNDA0XSxbNzcuNTI0LDI2LjQwN10sWzc3LjgzMywyNi41NjFdLFs3Ny44OTgsMjYuNjU1XSxbNzguMDk1LDI2LjY3OV0sWzc4LjExNiwyNi43OTddLFs3OC4zOTUsMjYuODE3XSxbNzguNTc4LDI2Ljc0OF0sWzc4LjgxNiwyNi43NjJdLFs3OC45OTMsMjYuNjc3XSxbNzguOTg4LDI2LjU5M10sWzc5LjEyOSwyNi40NF0sWzc5LjExNiwyNi4zMjFdLFs3OS4wMTgsMjYuMjQ4XSxbNzkuMDAzLDI2LjA2N10sWzc4Ljk0OCwyNi4wMjZdLFs3OC43NjMsMjUuNzJdLFs3OC44MSwyNS42MTldLFs3OC42NTgsMjUuNTZdLFs3OC40OTQsMjUuNTc5XSxbNzguNDE5LDI1LjUzNF0sWzc4LjMwMSwyNS4zNjJdLFs3OC40NDMsMjUuMTY1XSxbNzguMzQsMjUuMDg3XSxbNzguMzM0LDI0Ljk5NV0sWzc4LjE3MiwyNC44NzhdLFs3OC4yNzcsMjQuNjYyXSxbNzguMjI3LDI0LjUzNF0sWzc4LjM2NiwyNC4zODZdLFs3OC4zOTUsMjQuMjY5XSxbNzguNTAyLDI0LjM5XSxbNzguNzg5LDI0LjE3N10sWzc4Ljg4OCwyNC4yMjddLFs3OC45OTQsMjQuNDIzXSxbNzguOTE1LDI0LjQ1OF0sWzc4Ljk0NiwyNC41NTddLFs3OC44ODMsMjQuNjQxXSxbNzguNzg0LDI0LjU4OV0sWzc4Ljc3MSwyNC44NTddLFs3OC42MzIsMjQuOTYyXSxbNzguNTc4LDI1LjI1M10sWzc4LjUwMywyNS4yOV0sWzc4LjY0MywyNS40MzVdLFs3OC43NzUsMjUuMzUzXSxbNzguNzMzLDI1LjQ4NF0sWzc4Ljg0OCwyNS40M10sWzc4Ljg0MiwyNS41MTNdLFs3OC45MzksMjUuNTU3XSxbNzguODg0LDI1LjM0NF0sWzc4Ljg4MiwyNS4xNTddLFs3OC45OTQsMjUuMjczXSxbNzkuMTQ0LDI1LjExNV0sWzc5LjMxNCwyNS4xMzZdLFs3OS4yNjMsMjUuMjczXSxbNzkuMywyNS4zMzhdLFs3OS40NDcsMjUuMjQ1XSxbNzkuMzg0LDI1LjE0M10sWzc5LjQ4MywyNS4wOF0sWzc5LjU2OSwyNS4xNzJdLFs3OS44NDQsMjUuMDk0XSxbNzkuODUxLDI1LjIyN10sWzgwLjAwMywyNS4yNjddLFs4MC4wMzQsMjUuMzQyXSxbODAuMTMxLDI1LjMzNF0sWzgwLjI2NCwyNS40MjRdLFs4MC4zMTEsMjUuMjg2XSxbODAuNDMyLDI1LjE3OF0sWzgwLjI3NCwyNS4wMjZdLFs4MC40NTcsMjQuOTgxXSxbODAuNTA3LDI1LjA4NF0sWzgwLjc4MywyNS4wNzZdLFs4MC43MzUsMjUuMTM3XSxbODAuOTA0LDI1LjE1OV0sWzgwLjgxMiwyNC45MjNdLFs4MC45NSwyNC45NjRdLFs4MS4yMTUsMjQuOTMzXSxbODEuMjY2LDI1LjE0XSxbODEuMzM1LDI1LjE2OV0sWzgxLjQ5OSwyNS4wNzddLFs4MS41MTksMjUuMTg2XSxbODEuNzkzLDI1LjAwNF0sWzgxLjkwOCwyNC45OF0sWzgxLjkwOCwyNC44ODFdLFs4Mi4yNTYsMjQuNzQ5XSxbODIuMjM1LDI0LjY3MV0sWzgyLjQwMiwyNC41OTFdLFs4Mi40MjgsMjQuNzAyXSxbODIuNTM5LDI0LjY0OF0sWzgyLjY3MSwyNC42OTddLFs4Mi43NzQsMjQuNjQyXSxbODIuNzEzLDI0LjM4MV0sWzgyLjc3MywyNC4zMDhdLFs4Mi43MjgsMjQuMTM2XSxbODIuODEsMjMuOTYzXSxbODIuOTU0LDIzLjg3MV0sWzgzLjE0MSwyMy44ODVdLFs4My4zMywyNC4xMDJdLFs4My40NDgsMjQuMzcxXSxbODMuNDAyLDI0LjUwM10sWzgzLjUwMywyNC41MjVdLFs4My41NDQsMjQuNjI4XSxbODMuMzkxLDI0Ljc4OV0sWzgzLjM1MSwyNS4wMDldLFs4My4zNTQsMjUuMTg5XSxbODMuNDA5LDI1LjI0Nl0sWzgzLjgwOCwyNS40MDldLFs4My44NzYsMjUuNTE4XSxbODQuMDgxLDI1LjYzNl0sWzg0LjE1NCwyNS43MjddLFs4NC4yMDYsMjUuNjddLFs4NC41NjEsMjUuNjg0XSxbODQuNjM1LDI1LjcyOF0sWzg0LjUzNCwyNS44NzZdLFs4NC4yMDcsMjUuOTk5XSxbODQuMDEsMjYuMTc0XSxbODQuMTc3LDI2LjI2NV0sWzg0LjE3NiwyNi4zNzNdLFs4My45MTEsMjYuNDVdLFs4My45NCwyNi41MjVdLFs4NC4wNDgsMjYuNTM2XSxbODQuMDg4LDI2LjYzNl0sWzg0LjI4NSwyNi42XSxbODQuNDIsMjYuNjI2XSxbODQuMjYsMjYuODA3XSxbODQuMDQ0LDI2LjkzMV0sWzgzLjk4NywyNy4xOThdLFs4My44NjQsMjcuMzQ0XSxbODMuNjE1LDI3LjQ2OV0sWzgzLjQwOSwyNy40NzldLFs4My4zODgsMjcuMzc2XSxbODMuMjk2LDI3LjMzNF0sWzgzLjE4OCwyNy40NTRdLFs4My4wMzUsMjcuNDQ5XSxbODIuOTI5LDI3LjUwMV0sWzgyLjczNSwyNy41MDNdLFs4Mi43MDksMjcuNzE2XSxbODIuNDQ5LDI3LjY4XSxbODIuMDcsMjcuOTIzXSxbODEuOTY4LDI3LjkyOV0sWzgxLjg5OSwyNy44NTRdLFs4MS42OTksMjcuOTg4XSxbODEuNDc4LDI4LjA4M10sWzgxLjQ0NCwyOC4xNjJdLFs4MS4zMTgsMjguMTQ1XSxbODEuMjExLDI4LjM2MV0sWzgxLjA4LDI4LjM4OV0sWzgwLjcxNCwyOC41NjldLFs4MC41OSwyOC42OF0sWzgwLjUwMywyOC42NjRdLFs4MC41MjMsMjguNTU1XSxbODAuMzc3LDI4LjYyOV0sWzgwLjExOCwyOC44MjhdLFs4MC4wNTksMjguOTE2XSxbODAuMTQ1LDI5LjEwM10sWzgwLjI3MSwyOS4xNDddLFs4MC4zMTgsMjkuMzAxXSxbODAuMjQyLDI5LjQ0Ml0sWzgwLjQyLDI5LjYzXSxbODAuMzY5LDI5Ljc1XSxbODAuNDkzLDI5Ljc5NV0sWzgwLjYwNCwyOS45NThdLFs4MC42NzgsMjkuOTU5XSxbODAuODA0LDMwLjA4OV0sWzgxLjAzMiwzMC4yNDZdLFs4MC44MjcsMzAuMzE0XSxbODAuNjA2LDMwLjQ3MV0sWzgwLjU0OCwzMC40NDhdLFs4MC4yMDksMzAuNTg4XSxbODAuMjQ5LDMwLjc0M10sWzgwLjEyNSwzMC43ODFdLFs3OS43NTMsMzEuMDA2XSxbNzkuNjAxLDMwLjkzOV0sWzc5LjQxLDMxLjEwN10sWzc5LjMxOCwzMS4xMzZdLFs3OS4xMzksMzEuNDMzXSxbNzkuMDIzLDMxLjQyN10sWzc4Ljg4MiwzMS4yODddXV19LCJwcm9wZXJ0aWVzIjp7InpvbmUiOiJOMiIsInJlZ2lvbiI6Ik5vcnRoIn0sImlkIjoiTjIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbNzQuNTI3LDI5Ljk0M10sWzc0LjY0NywyOS45MDRdLFs3NC44MDYsMjkuOTkyXSxbNzQuOTksMjkuODY4XSxbNzUuMTE1LDI5Ljg3OV0sWzc1LjI0MiwyOS43NTVdLFs3NS4xNjgsMjkuNjY3XSxbNzUuMjQyLDI5LjU0Nl0sWzc1LjQ2MiwyOS44MDhdLFs3NS42MTcsMjkuNzQ0XSxbNzUuNzc5LDI5LjgyMl0sWzc1Ljk4NCwyOS43MjddLFs3Ni4yNDQsMjkuODUyXSxbNzYuMTc4LDI5Ljk0Ml0sWzc2LjI0OSwzMC4wODVdLFs3Ni4zOTksMzAuMTE2XSxbNzYuNTQ3LDMwLjA3Nl0sWzc2LjY0LDMwLjE1XSxbNzYuNjIzLDMwLjI2NV0sWzc2Ljc0OSwzMC40MjldLFs3Ni44ODYsMzAuNDNdLFs3Ni45MjYsMzAuNjFdLFs3Ni43NTIsMzAuNjg1XSxbNzYuNzEyLDMwLjc2Ml0sWzc2Ljg1NywzMC43OTVdLFs3Ni43NjYsMzAuOTIxXSxbNzYuNjI1LDMwLjk5OV0sWzc2LjYxMiwzMS4yNV0sWzc2LjQzMiwzMS4zMjddLFs3Ni4zNzIsMzEuNDA4XSxbNzYuMjE0LDMxLjI5OV0sWzc2LjA5OCwzMS41MzZdLFs3Ni4wMTgsMzEuNjMyXSxbNzUuODkyLDMxLjk2Ml0sWzc1LjYwMSwzMi4wOTNdLFs3NS42NjEsMzIuMTM3XSxbNzUuNjE4LDMyLjIzN10sWzc1Ljc3MywzMi4yOV0sWzc1LjkzMiwzMi4zOTldLFs3NS44MzQsMzIuNTEyXSxbNzUuNjg3LDMyLjM5MV0sWzc1LjUzOSwzMi4zMzZdLFs3NS4zMzIsMzIuMzI3XSxbNzUuMzcyLDMyLjI4XSxbNzUuMjYxLDMyLjEwMl0sWzc1LjAxMiwzMi4wMzZdLFs3NC44NzUsMzIuMDUxXSxbNzQuODE5LDMxLjk1OV0sWzc0LjY3NywzMS45MjZdLFs3NC40ODcsMzEuNzE1XSxbNzQuNjUzLDMxLjQ1NV0sWzc0LjU1MiwzMS4zNjRdLFs3NC41MSwzMS4xMzJdLFs3NC42ODksMzEuMTI4XSxbNzQuMzI1LDMwLjg1XSxbNzQuMjY1LDMwLjcyNV0sWzczLjk5MywzMC41MTRdLFs3My44OCwzMC4zNl0sWzczLjk3MywzMC4xOThdLFs3My44OTYsMjkuOTc0XSxbNzQuNTI3LDI5Ljk0M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6Ik4zIiwicmVnaW9uIjoiTm9ydGgifSwiaWQiOiJOMyJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiTXVsdGlQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbW1s4NC4wMDksMjIuNTI2XSxbODQuMTQyLDIyLjQ3Ml0sWzg0LjE5NywyMi4zNzhdLFs4NC40LDIyLjM0Nl0sWzg0LjUwMywyMi40Ml0sWzg0Ljc1OSwyMi40NDddLFs4NC45MDksMjIuNDIzXSxbODUuMDU3LDIyLjQ4Nl0sWzg1LjExOCwyMi4zMThdLFs4NS4wMjQsMjIuMTA5XSxbODUuMjM5LDIyLjAwOV0sWzg1LjI4MSwyMi4wOV0sWzg1LjQxMiwyMi4xNjJdLFs4NS41OTksMjIuMDc4XSxbODUuNzMsMjIuMDY1XSxbODUuODA3LDIyLjExNl0sWzg1Ljc2NiwyMS45OTVdLFs4NS45MTQsMjEuOThdLFs4Ni4wMzEsMjIuMTkzXSxbODUuOTczLDIyLjUwNl0sWzg2LjA2OSwyMi41NTZdLFs4Ni4xMjQsMjIuNDg5XSxbODYuMjgzLDIyLjQ0OF0sWzg2LjM2OCwyMi4zNDRdLFs4Ni40OTksMjIuMzQ2XSxbODYuNzI3LDIyLjIxN10sWzg2LjcyMiwyMi4xNDddLFs4Ni45NiwyMi4wODhdLFs4Ny4wMjgsMjIuMDM4XSxbODcuMDAyLDIxLjkxM10sWzg3LjA5OSwyMS44NjZdLFs4Ny4xNjMsMjEuOTY5XSxbODcuMjM2LDIxLjk1N10sWzg3LjI3NywyMS44MDVdLFs4Ny40NDQsMjEuNzY4XSxbODcuNDg2LDIxLjYxXSxbODcuODA2LDIxLjcwOV0sWzg3Ljk4NywyMS44NzFdLFs4OC4wNiwyMi4wMThdLFs4OC4xODcsMjIuMTA1XSxbODguMTQ2LDIxLjk1OV0sWzg4LjI1NywyMS41NTddLFs4OC4zMDIsMjEuNjc5XSxbODguMjU2LDIxLjgwMV0sWzg4LjQ2LDIxLjkyOV0sWzg4LjQ5OCwyMS44NzVdLFs4OC42MDcsMjEuOTE4XSxbODguNTk5LDIxLjk4Ml0sWzg5LjAwOCwyMS45MDNdLFs4OS4wNjYsMjEuOTQyXSxbODkuMDQyLDIyLjA5Ml0sWzg5LjA5NSwyMi4xNDldLFs4OC45ODQsMjIuMzMxXSxbODkuMDAxLDIyLjQyOV0sWzg4LjkxMiwyMi43NThdLFs4OC45NywyMi44NDRdLFs4OC44NiwyMi45NDRdLFs4OC44NjksMjMuMV0sWzg4Ljk3OSwyMy4xOTNdLFs4OC43MTksMjMuMjU1XSxbODguNzY1LDIzLjQ0OF0sWzg4LjU2MiwyMy42MzZdLFs4OC41OTksMjMuODY5XSxbODguNzM1LDIzLjkxNV0sWzg4Ljc0MSwyNC4yNTRdLFs4OC42ODMsMjQuMzI0XSxbODguNTU5LDI0LjMwOF0sWzg4LjM0MiwyNC40MzhdLFs4OC4xMjQsMjQuNTE3XSxbODguMDI0LDI0LjY4OF0sWzg4LjIyMiwyNC45Nl0sWzg4LjI2MywyNC44OTJdLFs4OC40NCwyNS4wMTVdLFs4OC40NDQsMjUuMTk4XSxbODguNTc4LDI1LjE3N10sWzg4LjgzMSwyNS4yMDVdLFs4OC45MjIsMjUuMTY2XSxbODkuMDA5LDI1LjI5NF0sWzg4Ljg0LDI1LjM2M10sWzg4LjgsMjUuNTI0XSxbODguNjQ2LDI1LjQ3OV0sWzg4LjQ0NiwyNS42MTVdLFs4OC40NTUsMjUuNjYzXSxbODguMjY5LDI1Ljc4MV0sWzg4LjE1MiwyNS43NzZdLFs4OC4wODcsMjUuOTE3XSxbODguMTg1LDI2LjA2NF0sWzg4LjE3NywyNi4xNDhdLFs4OC4zNTEsMjYuMjIyXSxbODguNDQ0LDI2LjM2MV0sWzg4LjUxNywyNi4zNTJdLFs4OC40NjEsMjYuNDY3XSxbODguMzMxLDI2LjQ4Nl0sWzg4LjQxLDI2LjYzMV0sWzg4LjQzLDI2LjU0Nl0sWzg4LjYyOCwyNi40MzldLFs4OC43MjMsMjYuMzEyXSxbODguODcxLDI2LjIzNF0sWzg5LjA2MywyNi4yNl0sWzg4LjkxMSwyNi4zN10sWzg4Ljk1NywyNi40NTldLFs4OS4wOSwyNi4zOTJdLFs4OS4xNTQsMjYuMTQxXSxbODkuMzU3LDI2LjAwOF0sWzg5LjUzMiwyNi4wMDRdLFs4OS42NDYsMjYuMDYzXSxbODkuNjM1LDI2LjIyM10sWzg5LjcyLDI2LjE2Nl0sWzg5Ljc4MSwyNi4zNTNdLFs4OS44NTYsMjYuMzg1XSxbODkuODUyLDI2LjY5N10sWzg5LjYwOSwyNi43MjhdLFs4OS42NCwyNi43NzddLFs4OS40NTQsMjYuNzk4XSxbODkuMzcsMjYuODU3XSxbODkuMTI5LDI2LjgwN10sWzg5LjAxOCwyNi45MzddLFs4OC44ODEsMjYuOTU3XSxbODguODY0LDI3LjExXSxbODguNzQ2LDI3LjE0Ml0sWzg4LjgwMywyNy4yNDhdLFs4OC45MTMsMjcuMjldLFs4OC43NzcsMjcuNDY5XSxbODguNzcsMjcuNTcxXSxbODguODQ4LDI3LjY2OF0sWzg4Ljg4MywyNy44OV0sWzg4Ljc1NiwyOC4wNzZdLFs4OC42MjksMjguMTI0XSxbODguMzg5LDI3Ljk3OV0sWzg4LjE0NSwyNy45NjRdLFs4OC4xOTYsMjcuODU0XSxbODguMTQzLDI3LjY2M10sWzg4LjA0NywyNy40NzVdLFs4OC4wMDksMjcuMTQxXSxbODguMTg2LDI2Ljc3NF0sWzg4LjA5OSwyNi40NTZdLFs4Ny45OTcsMjYuMzY1XSxbODcuODk5LDI2LjQ3OV0sWzg3LjY3NywyNi40MzZdLFs4Ny41ODgsMjYuMzgyXSxbODcuNDY0LDI2LjQ0XSxbODcuMzQsMjYuMzQ4XSxbODcuMDkxLDI2LjQ1MV0sWzg3LjA3MSwyNi41ODddLFs4Ni44MzQsMjYuNDM5XSxbODYuNzMsMjYuNDIzXSxbODYuMzk2LDI2LjU5NF0sWzg2LjIzMiwyNi41OTNdLFs4Ni4wMjgsMjYuNjY2XSxbODUuODU5LDI2LjU3XSxbODUuNzMyLDI2LjY1NF0sWzg1LjczNSwyNi43OTZdLFs4NS41NzUsMjYuODYxXSxbODUuMzM0LDI2Ljc0Ml0sWzg1LjIxMiwyNi43NThdLFs4NS4xOTMsMjYuODY3XSxbODUuMDI5LDI2Ljg1OV0sWzg0Ljk2MSwyNi45NjFdLFs4NC42NDUsMjcuMDQ2XSxbODQuNjksMjcuMjIyXSxbODQuNjIsMjcuMzM5XSxbODQuMjc5LDI3LjM5Nl0sWzg0LjEwNiwyNy41MjFdLFs4NC4wNDYsMjcuNDQ2XSxbODMuODMyLDI3LjQzMV0sWzgzLjg2NCwyNy4zNDRdLFs4My45ODcsMjcuMTk4XSxbODQuMDQ0LDI2LjkzMV0sWzg0LjI2LDI2LjgwN10sWzg0LjQyLDI2LjYyNl0sWzg0LjI4NSwyNi42XSxbODQuMDg4LDI2LjYzNl0sWzg0LjA0OCwyNi41MzZdLFs4My45NCwyNi41MjVdLFs4My45MTEsMjYuNDVdLFs4NC4xNzYsMjYuMzczXSxbODQuMTc3LDI2LjI2NV0sWzg0LjAxLDI2LjE3NF0sWzg0LjIwNywyNS45OTldLFs4NC41MzQsMjUuODc2XSxbODQuNjM1LDI1LjcyOF0sWzg0LjU2MSwyNS42ODRdLFs4NC4yMDYsMjUuNjddLFs4NC4xNTQsMjUuNzI3XSxbODQuMDgxLDI1LjYzNl0sWzgzLjg3NiwyNS41MThdLFs4My44MDgsMjUuNDA5XSxbODMuNDA5LDI1LjI0Nl0sWzgzLjM1NCwyNS4xODldLFs4My4zNTEsMjUuMDA5XSxbODMuMzkxLDI0Ljc4OV0sWzgzLjU0NCwyNC42MjhdLFs4My41MDMsMjQuNTI1XSxbODMuNDAyLDI0LjUwM10sWzgzLjQ0OCwyNC4zNzFdLFs4My4zMywyNC4xMDJdLFs4My41MDgsMjQuMDMxXSxbODMuNTY5LDIzLjg2N10sWzgzLjcwOCwyMy44MTddLFs4My43NzcsMjMuNjA4XSxbODMuOTQsMjMuNTcxXSxbODQuMDMsMjMuNl0sWzgzLjk2OSwyMy4zNjddLFs4NC4wNTEsMjMuMzc1XSxbODQuMDMyLDIzLjE1OF0sWzg0LjEzMywyMy4wODNdLFs4NC4xNDksMjIuOTY1XSxbODQuMzgsMjIuOTcyXSxbODQuMjM4LDIyLjY5Ml0sWzg0LjAyNCwyMi41OTJdLFs4NC4wMDksMjIuNTI2XV1dLFtbWzg5LjA5MywyMS42MzhdLFs4OS4wMTIsMjEuODA3XSxbODguOTU3LDIxLjc2Nl0sWzg5LjA0MiwyMS42MV0sWzg5LjA5MywyMS42MzhdXV0sW1tbODguOTY1LDIxLjgwN10sWzg4Ljk2OCwyMS45MDldLFs4OC44MzgsMjEuOTA5XSxbODguOTAxLDIxLjc2Ml0sWzg4Ljk2NSwyMS44MDddXV0sW1tbODguODU1LDIxLjYzN10sWzg4Ljg2LDIxLjc2M10sWzg4Ljc4OCwyMS43NDJdLFs4OC44NTUsMjEuNjM3XV1dLFtbWzg4Ljc4NCwyMS43NTddLFs4OC44MjEsMjEuODY4XSxbODguNzE0LDIxLjkwMl0sWzg4LjY5MywyMS43NDFdLFs4OC43NDYsMjEuNjYyXSxbODguNzg0LDIxLjc1N11dXSxbW1s4OC4xMzcsMjEuNjc4XSxbODguMTcxLDIxLjczOF0sWzg4LjEzMywyMS44NzNdLFs4OC4wODQsMjEuNzkzXSxbODguMTExLDIxLjc5MV0sWzg4LjEzOCwyMS43NTRdLFs4OC4xMzcsMjEuNjc4XV1dLFtbWzg4LjA2NSwyMS42MzZdLFs4OC4xNDcsMjEuNjQ1XSxbODguMTAzLDIxLjc4NV0sWzg4LjAzMywyMS42ODhdLFs4OC4wNjUsMjEuNjM2XV1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IkUxIiwicmVnaW9uIjoiRWFzdCJ9LCJpZCI6IkUxIn0seyJ0eXBlIjoiRmVhdHVyZSIsImdlb21ldHJ5Ijp7InR5cGUiOiJQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbWzg0Ljc2NSwxOS4wNzddLFs4NC44NDgsMTkuMjAxXSxbODUuMzA3LDE5LjU2Ml0sWzg1LjY3OSwxOS43NDVdLFs4Ni4zNTUsMTkuOTQ4XSxbODYuNTIsMjAuMTddLFs4Ni43NzEsMjAuMzI0XSxbODYuNzMzLDIwLjM5NV0sWzg2Ljc3NiwyMC41MjJdLFs4Ny4wNTYsMjAuNzE1XSxbODYuODQxLDIxLjE1OF0sWzg2Ljk0NSwyMS4zNTNdLFs4Ny4xNDgsMjEuNTA5XSxbODcuMzkzLDIxLjU0M10sWzg3LjQ4NiwyMS42MV0sWzg3LjQ0NCwyMS43NjhdLFs4Ny4yNzcsMjEuODA1XSxbODcuMjM2LDIxLjk1N10sWzg3LjE2MywyMS45NjldLFs4Ny4wOTksMjEuODY2XSxbODcuMDAyLDIxLjkxM10sWzg3LjAyOCwyMi4wMzhdLFs4Ni45NiwyMi4wODhdLFs4Ni43MjIsMjIuMTQ3XSxbODYuNzI3LDIyLjIxN10sWzg2LjQ5OSwyMi4zNDZdLFs4Ni4zNjgsMjIuMzQ0XSxbODYuMjgzLDIyLjQ0OF0sWzg2LjEyNCwyMi40ODldLFs4Ni4wNjksMjIuNTU2XSxbODUuOTczLDIyLjUwNl0sWzg2LjAzMSwyMi4xOTNdLFs4NS45MTQsMjEuOThdLFs4NS43NjYsMjEuOTk1XSxbODUuODA3LDIyLjExNl0sWzg1LjczLDIyLjA2NV0sWzg1LjU5OSwyMi4wNzhdLFs4NS40MTIsMjIuMTYyXSxbODUuMjgxLDIyLjA5XSxbODUuMjM5LDIyLjAwOV0sWzg1LjAyNCwyMi4xMDldLFs4NS4xMTgsMjIuMzE4XSxbODUuMDU3LDIyLjQ4Nl0sWzg0LjkwOSwyMi40MjNdLFs4NC43NTksMjIuNDQ3XSxbODQuNTAzLDIyLjQyXSxbODQuNCwyMi4zNDZdLFs4NC4xOTcsMjIuMzc4XSxbODQuMTQyLDIyLjQ3Ml0sWzg0LjAwOSwyMi41MjZdLFs4NC4wMDUsMjIuMzc0XSxbODMuODY2LDIyLjM0M10sWzgzLjc1OCwyMi4yNF0sWzgzLjYyOCwyMi4yMDRdLFs4My41MzcsMjIuMDQ0XSxbODMuNTc2LDIxLjgzMV0sWzgzLjQ5MywyMS44MThdLFs4My4zMzgsMjEuNTAyXSxbODMuMzksMjEuMzQzXSxbODMuMjc0LDIxLjM3N10sWzgzLjE5OCwyMS4xNDVdLFs4My4xMzksMjEuMTA5XSxbODIuOTQyLDIxLjE2MV0sWzgyLjYzNywyMS4xNDhdLFs4Mi42MywyMS4wNF0sWzgyLjQ4OCwyMC45MDldLFs4Mi40NTUsMjAuODI3XSxbODIuMzQsMjAuODQ3XSxbODIuMzc3LDIwLjYzMl0sWzgyLjMzNCwyMC41NjldLFs4Mi40MzgsMjAuNDM0XSxbODIuNDAxLDIwLjA1NV0sWzgyLjcxOCwxOS45ODldLFs4Mi43MDQsMTkuODMyXSxbODIuNTgzLDE5Ljc3OV0sWzgyLjYwNCwxOS44NjZdLFs4Mi40MTgsMTkuOTA0XSxbODIuMzQ1LDE5LjgzNl0sWzgyLjI2OSwxOS45NzVdLFs4MS45NDYsMjAuMTA1XSxbODEuODY1LDIwLjAyN10sWzgxLjg1MiwxOS45MjNdLFs4Mi4wNiwxOS43OTZdLFs4Mi4wMjksMTkuNTA4XSxbODIuMTc4LDE5LjQzN10sWzgyLjE2OCwxOS4xMzZdLFs4Mi4yMTksMTkuMDk1XSxbODIuMjQ2LDE4LjkxOV0sWzgyLjE3NSwxOC45MDFdLFs4Mi4xNTYsMTguNzg1XSxbODEuOTY1LDE4LjY5M10sWzgxLjk2MywxOC41OTVdLFs4MS43NjksMTguNDE4XSxbODEuNTMxLDE4LjI2NV0sWzgxLjQ0OCwxNy44ODldLFs4MS4zOTYsMTcuODJdLFs4MS42MTksMTcuODI0XSxbODEuODA4LDE3Ljk1Nl0sWzgyLjA3NSwxOC4wNzZdLFs4Mi4yNjUsMTcuOTk2XSxbODIuMzQyLDE4LjA1OV0sWzgyLjMxNCwxOC4xODVdLFs4Mi4zOTEsMTguMzI3XSxbODIuMzYzLDE4LjQyMl0sWzgyLjQ3MiwxOC41NDNdLFs4Mi41NDEsMTguNF0sWzgyLjYwNSwxOC4zODJdLFs4Mi41OTcsMTguMjY1XSxbODIuNzY5LDE4LjMzOF0sWzgyLjgxNCwxOC40NTJdLFs4Mi45NzUsMTguMzY0XSxbODMuMDc1LDE4LjQwNF0sWzgzLjAxOSwxOC40NTddLFs4Mi45OTksMTguNjIxXSxbODMuMTM3LDE4Ljc4Nl0sWzgzLjIxNywxOC43NDhdLFs4My40MDQsMTguODQ1XSxbODMuMzA5LDE5XSxbODMuNDYsMTguOTU2XSxbODMuNjMyLDE5LjE0MV0sWzgzLjc0NiwxOC45OTddLFs4My43OTMsMTkuMDE5XSxbODMuODk1LDE4LjgxN10sWzg0LjAzNiwxOC44MTddLFs4NC4wOTIsMTguNzZdLFs4NC4zMTksMTguNzg4XSxbODQuNDQ4LDE5LjAwNF0sWzg0LjYwMSwxOS4xMjhdLFs4NC43MDksMTkuMTZdLFs4NC43NjUsMTkuMDc3XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiRTIiLCJyZWdpb24iOiJFYXN0In0sImlkIjoiRTIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODIuODEsMjMuOTYzXSxbODIuNzI4LDI0LjEzNl0sWzgyLjc3MywyNC4zMDhdLFs4Mi43MTMsMjQuMzgxXSxbODIuNzc0LDI0LjY0Ml0sWzgyLjY3MSwyNC42OTddLFs4Mi41MzksMjQuNjQ4XSxbODIuNDI4LDI0LjcwMl0sWzgyLjQwMiwyNC41OTFdLFs4Mi4yMzUsMjQuNjcxXSxbODIuMjU2LDI0Ljc0OV0sWzgxLjkwOCwyNC44ODFdLFs4MS45MDgsMjQuOThdLFs4MS43OTMsMjUuMDA0XSxbODEuNTE5LDI1LjE4Nl0sWzgxLjQ5OSwyNS4wNzddLFs4MS4zMzUsMjUuMTY5XSxbODEuMjY2LDI1LjE0XSxbODEuMjE1LDI0LjkzM10sWzgwLjk1LDI0Ljk2NF0sWzgwLjgxMiwyNC45MjNdLFs4MC45MDQsMjUuMTU5XSxbODAuNzM1LDI1LjEzN10sWzgwLjc4MywyNS4wNzZdLFs4MC41MDcsMjUuMDg0XSxbODAuNDU3LDI0Ljk4MV0sWzgwLjI3NCwyNS4wMjZdLFs4MC40MzIsMjUuMTc4XSxbODAuMzExLDI1LjI4Nl0sWzgwLjI2NCwyNS40MjRdLFs4MC4xMzEsMjUuMzM0XSxbODAuMDM0LDI1LjM0Ml0sWzgwLjAwMywyNS4yNjddLFs3OS44NTEsMjUuMjI3XSxbNzkuODQ0LDI1LjA5NF0sWzc5LjU2OSwyNS4xNzJdLFs3OS40ODMsMjUuMDhdLFs3OS4zODQsMjUuMTQzXSxbNzkuNDQ3LDI1LjI0NV0sWzc5LjMsMjUuMzM4XSxbNzkuMjYzLDI1LjI3M10sWzc5LjMxNCwyNS4xMzZdLFs3OS4xNDQsMjUuMTE1XSxbNzguOTk0LDI1LjI3M10sWzc4Ljg4MiwyNS4xNTddLFs3OC44ODQsMjUuMzQ0XSxbNzguOTM5LDI1LjU1N10sWzc4Ljg0MiwyNS41MTNdLFs3OC44NDgsMjUuNDNdLFs3OC43MzMsMjUuNDg0XSxbNzguNzc1LDI1LjM1M10sWzc4LjY0MywyNS40MzVdLFs3OC41MDMsMjUuMjldLFs3OC41NzgsMjUuMjUzXSxbNzguNjMyLDI0Ljk2Ml0sWzc4Ljc3MSwyNC44NTddLFs3OC43ODQsMjQuNTg5XSxbNzguODgzLDI0LjY0MV0sWzc4Ljk0NiwyNC41NTddLFs3OC45MTUsMjQuNDU4XSxbNzguOTk0LDI0LjQyM10sWzc4Ljg4OCwyNC4yMjddLFs3OC43ODksMjQuMTc3XSxbNzguNTAyLDI0LjM5XSxbNzguMzk1LDI0LjI2OV0sWzc4LjM2NiwyNC4zODZdLFs3OC4yMjcsMjQuNTM0XSxbNzguMjc3LDI0LjY2Ml0sWzc4LjE3MiwyNC44NzhdLFs3OC4zMzQsMjQuOTk1XSxbNzguMzQsMjUuMDg3XSxbNzguNDQzLDI1LjE2NV0sWzc4LjMwMSwyNS4zNjJdLFs3OC40MTksMjUuNTM0XSxbNzguNDk0LDI1LjU3OV0sWzc4LjY1OCwyNS41Nl0sWzc4LjgxLDI1LjYxOV0sWzc4Ljc2MywyNS43Ml0sWzc4Ljk0OCwyNi4wMjZdLFs3OS4wMDMsMjYuMDY3XSxbNzkuMDE4LDI2LjI0OF0sWzc5LjExNiwyNi4zMjFdLFs3OS4xMjksMjYuNDRdLFs3OC45ODgsMjYuNTkzXSxbNzguOTkzLDI2LjY3N10sWzc4LjgxNiwyNi43NjJdLFs3OC41NzgsMjYuNzQ4XSxbNzguMzk1LDI2LjgxN10sWzc4LjExNiwyNi43OTddLFs3OC4wOTUsMjYuNjc5XSxbNzcuODk4LDI2LjY1NV0sWzc3LjgzMywyNi41NjFdLFs3Ny41MjQsMjYuNDA3XSxbNzcuNDM5LDI2LjQwNF0sWzc3LjIwNCwyNi4yM10sWzc2LjkwMiwyNi4wOTRdLFs3Ni43NzksMjUuOTM5XSxbNzYuNjMyLDI1LjldLFs3Ni41MzEsMjUuODEyXSxbNzYuNTE2LDI1LjUyOF0sWzc2LjU5OCwyNS4zOTRdLFs3Ni45MywyNS4yODNdLFs3Ny4wODQsMjUuMzM3XSxbNzcuMjA5LDI1LjMwNl0sWzc3LjMxMiwyNS40MzFdLFs3Ny4zNzEsMjUuNDA4XSxbNzcuMzU1LDI1LjI2M10sWzc3LjQxNCwyNS4yMl0sWzc3LjM3NiwyNS4xMDVdLFs3Ny4xNzUsMjUuMTEyXSxbNzcuMDgyLDI1LjA1OF0sWzc2Ljg3NywyNS4wNDFdLFs3Ni44NjIsMjQuOTYxXSxbNzYuOTQyLDI0Ljg1OV0sWzc2LjgwMywyNC44MDldLFs3Ni44NTYsMjQuNzQyXSxbNzYuOTY0LDI0Ljc1N10sWzc3LjA2NSwyNC42NDRdLFs3Ny4wNTUsMjQuNTI2XSxbNzYuOTc4LDI0LjQ2MV0sWzc2LjkxOCwyNC41NDNdLFs3Ni44NDYsMjQuNDg2XSxbNzYuODYzLDI0LjI3M10sWzc2Ljk0NiwyNC4yMDZdLFs3Ni44MDIsMjQuMTE3XSxbNzYuNjc4LDI0LjIwNF0sWzc2LjY5NSwyNC4yODRdLFs3Ni41MDUsMjQuMjAzXSxbNzYuMzQsMjQuMjQ0XSxbNzYuMjA1LDI0LjIxN10sWzc2LjE4NiwyNC4zMjldLFs3Ni4xMTgsMjQuMTk1XSxbNzYuMTI3LDI0LjA4OF0sWzc1Ljk2MiwyNC4wMTVdLFs3NS45ODcsMjMuOTRdLFs3NS43MzEsMjMuODUzXSxbNzUuNjkzLDIzLjc3Nl0sWzc1LjU4NCwyMy43OTVdLFs3NS40NTksMjMuOTIxXSxbNzUuNTIxLDI0LjAyNV0sWzc1LjY3MSwyNC4wMThdLFs3NS43MDIsMjMuOTY3XSxbNzUuODM3LDI0LjA1N10sWzc1Ljc1MiwyNC4xNDhdLFs3NS44MTgsMjQuMjM5XSxbNzUuNzM4LDI0LjMzNV0sWzc1Ljc4OSwyNC40NzJdLFs3NS45MDksMjQuNDU1XSxbNzUuOTA3LDI0LjU3Nl0sWzc1LjgyNSwyNC42MTNdLFs3NS44MzgsMjQuNzI1XSxbNzUuNzU3LDI0Ljc2Ml0sWzc1LjY0NiwyNC42ODVdLFs3NS40NTUsMjQuNjgxXSxbNzUuMjI4LDI0LjcxOF0sWzc1LjE5MywyNC43NzRdLFs3NS4zOTgsMjQuODQyXSxbNzUuMjk1LDI0Ljg1OF0sWzc1LjM1LDI1LjAzNF0sWzc1LjE5MywyNS4wMzNdLFs3NS4xMTksMjQuODgyXSxbNzQuOTI0LDI0Ljg3OF0sWzc0Ljg0MywyNC45NjldLFs3NC44NjEsMjQuNzk5XSxbNzQuOTgyLDI0Ljc2NF0sWzc0Ljk5OSwyNC42ODRdLFs3NC44OSwyNC42MzRdLFs3NC44MDksMjQuNzgxXSxbNzQuNzg3LDI0LjU4Nl0sWzc0LjcxOCwyNC41MDhdLFs3NC44NTUsMjQuNDI0XSxbNzQuNzQ3LDI0LjI1M10sWzc0Ljg2OCwyNC4yNDNdLFs3NC45NzgsMjQuMDM3XSxbNzQuOTAyLDIzLjg3M10sWzc0Ljk0LDIzLjc2NV0sWzc0LjkwNCwyMy42MjVdLFs3NC41NzUsMjMuNDIzXSxbNzQuNTIzLDIzLjMyMV0sWzc0Ljc0NCwyMy4yMTFdLFs3NC41MzksMjMuMTAzXSxbNzQuMzg1LDIzLjExMV0sWzc0LjMyNCwyMy4wNjFdLFs3NC4zNzgsMjIuOTA3XSxbNzQuNDYxLDIyLjkwOF0sWzc0LjQ2NSwyMi44MTZdLFs3NC4zODQsMjIuNjQ3XSxbNzQuMjc3LDIyLjY0Nl0sWzc0LjEzNSwyMi41Ml0sWzc0LjExOSwyMi40MTldLFs3NC4yNywyMi40MTNdLFs3NC4xOSwyMi4zMl0sWzc0LjA3MiwyMi4zNjFdLFs3NC4xMTYsMjIuMjE2XSxbNzQuMTA0LDIxLjk5OF0sWzc0LjI4MSwyMS45MzNdLFs3NC40MzIsMjIuMDNdLFs3NC41MjQsMjEuOTEyXSxbNzQuNTEzLDIxLjcxOV0sWzc0LjU4MiwyMS42NjVdLFs3NS4wNTIsMjEuNTY2XSxbNzUuMTA4LDIxLjQ2Ml0sWzc1LjIwNywyMS40MTNdLFs3NS40OTYsMjEuMzg3XSxbNzYuMDk2LDIxLjM3MV0sWzc2LjE5MiwyMS4wODddLFs3Ni4zOCwyMS4wNzVdLFs3Ni40OTMsMjEuMTk0XSxbNzYuNjIzLDIxLjE4NV0sWzc2LjYyMSwyMS4zMzJdLFs3Ni43OTYsMjEuNDg5XSxbNzYuNzk5LDIxLjU5NV0sWzc2Ljg5NywyMS41OTZdLFs3Ny4wMDgsMjEuNjhdLFs3Ny4yODEsMjEuNzU5XSxbNzcuNDc5LDIxLjc3XSxbNzcuNTYyLDIxLjY2Nl0sWzc3LjU3NSwyMS41MjZdLFs3Ny40MjYsMjEuNTM4XSxbNzcuNDkyLDIxLjM3NF0sWzc3LjUzMSwyMS40MTldLFs3Ny43MSwyMS4zNTddLFs3Ny44MDEsMjEuNDA5XSxbNzcuOTAyLDIxLjM3N10sWzc4LjE3NiwyMS40OTldLFs3OC4xODIsMjEuNTU3XSxbNzguNDE3LDIxLjYwMV0sWzc4LjQzMiwyMS41MTVdLFs3OC41ODUsMjEuNDg3XSxbNzguOTM3LDIxLjQ4Nl0sWzc4LjkxNywyMS41OTFdLFs3OS4xMDMsMjEuNjAxXSxbNzkuMjIxLDIxLjY5NF0sWzc5LjQ5NiwyMS42NzRdLFs3OS41NCwyMS41NDNdLFs3OS43MzMsMjEuNjAzXSxbNzkuODYzLDIxLjUzMV0sWzgwLjAwMSwyMS41MzRdLFs4MC4xOTMsMjEuNjM1XSxbODAuMzc2LDIxLjUyM10sWzgwLjM5NiwyMS40MDVdLFs4MC42NiwyMS4zMzRdLFs4MC43MzUsMjEuNDYxXSxbODAuNzQ3LDIxLjc1Nl0sWzgwLjgzOSwyMS44XSxbODAuODMyLDIxLjkwOV0sWzgwLjkwOCwyMi4xMV0sWzgxLjAxMSwyMi4wOTVdLFs4MS4wMjMsMjIuMjI5XSxbODEuMTE4LDIyLjI5MV0sWzgxLjExLDIyLjQzNl0sWzgxLjE5NCwyMi40OTFdLFs4MS40MjgsMjIuNDhdLFs4MS42NiwyMi41N10sWzgxLjY0NywyMi42MTNdLFs4MS43OTQsMjIuNzY2XSxbODEuNzc2LDIyLjg3NF0sWzgxLjk1LDIyLjk4M10sWzgxLjkyMSwyMy4wNDFdLFs4Mi4xNjEsMjMuMTQzXSxbODIuMTk5LDIzLjMxMl0sWzgyLjEwMiwyMy4zOThdLFs4MS45ODUsMjMuNDE1XSxbODEuOTIzLDIzLjUzM10sWzgxLjczNiwyMy41NjZdLFs4MS42MzksMjMuNDc4XSxbODEuNjIsMjMuNjUxXSxbODEuNjk2LDIzLjcyMV0sWzgxLjYxLDIzLjkwNF0sWzgxLjc3MywyMy44MTZdLFs4Mi4wMDksMjMuODYxXSxbODIuNTI1LDIzLjc4NF0sWzgyLjgxLDIzLjk2M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlcxIiwicmVnaW9uIjoiV2VzdCJ9LCJpZCI6IlcxIn0seyJ0eXBlIjoiRmVhdHVyZSIsImdlb21ldHJ5Ijp7InR5cGUiOiJNdWx0aVBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbWzc0LjIzNywxNS40ODNdLFs3NC4yODIsMTUuNTEzXSxbNzQuMjU0LDE1LjU2Nl0sWzc0LjI2NywxNS42MTddLFs3NC4yNTUsMTUuNjU0XSxbNzQuMjMyLDE1LjY2N10sWzc0LjIyNCwxNS42NTldLFs3NC4yMjksMTUuNjUzXSxbNzQuMjEzLDE1LjY0OV0sWzc0LjIxMiwxNS42NjFdLFs3NC4xOTYsMTUuNjY1XSxbNzQuMTksMTUuNjgxXSxbNzQuMTc1LDE1LjY3XSxbNzQuMTczLDE1LjY1Ml0sWzc0LjExOCwxNS42NTJdLFs3NC4xMjYsMTUuNzI0XSxbNzQuMzcxLDE1Ljc5NV0sWzc0LjM0NiwxNS44NTFdLFs3NC40NjMsMTYuMDRdLFs3NC41MDMsMTYuMjI1XSxbNzQuMzM0LDE2LjI2OV0sWzc0LjMxOCwxNi41NTRdLFs3NC4zNzksMTYuNTI4XSxbNzQuNDU1LDE2LjY0N10sWzc0LjU0NSwxNi42MzVdLFs3NC41NjksMTYuNTU0XSxbNzQuNjg5LDE2LjYxN10sWzc0LjY5MSwxNi43MTZdLFs3NC45MiwxNi43NzNdLFs3NC45MjIsMTYuOTNdLFs3NS4wODksMTYuOTUyXSxbNzUuMTgzLDE2Ljg0M10sWzc1LjI2NSwxNi44NjNdLFs3NS4yOCwxNi45NTddLFs3NS40NjYsMTYuOTg4XSxbNzUuNDg5LDE2Ljk0NF0sWzc1LjY2NiwxNi45OF0sWzc1LjY1NCwxNy4yNzRdLFs3NS41NzQsMTcuMzgzXSxbNzUuNjMzLDE3LjQ3N10sWzc1LjkyNiwxNy4zMjVdLFs3Ni4xMiwxNy4zN10sWzc2LjM0NSwxNy4zNTRdLFs3Ni4zMzIsMTcuNTk2XSxbNzYuNDIsMTcuNjA0XSxbNzYuNDg3LDE3LjcxNV0sWzc2LjYxMiwxNy43N10sWzc2LjY3MSwxNy42OTFdLFs3Ni43ODcsMTcuODMzXSxbNzYuNzM4LDE3Ljg1OV0sWzc2LjkxOSwxNy45MTZdLFs3Ni45NTIsMTguMTg4XSxbNzcuMTEzLDE4LjE1N10sWzc3LjI0MiwxOC40MTNdLFs3Ny40MTQsMTguMzkzXSxbNzcuMzY2LDE4LjMwN10sWzc3LjQ5MywxOC4yNjddLFs3Ny41OTYsMTguNTQ5XSxbNzcuNzM5LDE4LjU1N10sWzc3LjczLDE4LjY2N10sWzc3Ljg0LDE4LjgwNV0sWzc3Ljk0OSwxOC44NDNdLFs3Ny43NzIsMTguOTc5XSxbNzcuODYzLDE5LjMwNF0sWzc3Ljk0NCwxOS4zNDNdLFs3OC4wNTYsMTkuMjM3XSxbNzguMTc1LDE5LjIzOF0sWzc4LjE3MiwxOS4zNl0sWzc4LjMwNCwxOS40NTZdLFs3OC4yNjMsMTkuNjY1XSxbNzguMzY1LDE5Ljc4MV0sWzc4LjMwNywxOS45MTRdLFs3OC40MjMsMTkuODE4XSxbNzguNjA0LDE5LjgxOF0sWzc4Ljg0MSwxOS43NjJdLFs3OC44NTIsMTkuNjU5XSxbNzguOTU1LDE5LjY1Nl0sWzc4Ljk0NywxOS41NjJdLFs3OS4xOSwxOS40NTldLFs3OS4yNTEsMTkuNjE2XSxbNzkuNTAxLDE5LjUwN10sWzc5Ljc3OSwxOS42XSxbNzkuOTQ0LDE5LjQ3MV0sWzc5Ljk3NywxOS4zOTRdLFs3OS44NywxOS4wNDJdLFs3OS45MzgsMTkuMDQxXSxbNzkuOTYyLDE4Ljg2N10sWzc5LjkxNCwxOC44MjZdLFs4MC4xMTIsMTguNjgzXSxbODAuMjczLDE4LjcyM10sWzgwLjM1NCwxOC44MjddLFs4MC4yNzQsMTguOTMyXSxbODAuMzI4LDE5LjEzNV0sWzgwLjQ4NiwxOS4zNDFdLFs4MC41NzksMTkuNDAxXSxbODAuNjIzLDE5LjMwNl0sWzgwLjc2LDE5LjI5MV0sWzgwLjg1MywxOS4zNjRdLFs4MC44MTMsMTkuNDM0XSxbODAuODk2LDE5LjUxOV0sWzgwLjY3LDE5LjYwOV0sWzgwLjY3NiwxOS42OTldLFs4MC41ODcsMTkuNzQxXSxbODAuNTA2LDE5Ljg3MV0sWzgwLjU1MiwyMC4xMTFdLFs4MC40MywyMC4xMzZdLFs4MC4zOTgsMjAuMjQ0XSxbODAuNjI2LDIwLjMzM10sWzgwLjU5MSwyMC4zOTNdLFs4MC42MjYsMjAuNTY3XSxbODAuNDgxLDIwLjYxOF0sWzgwLjU4OCwyMC42ODNdLFs4MC41MzUsMjAuOTM0XSxbODAuNDQzLDIwLjk5NV0sWzgwLjQ2NCwyMS4xNzVdLFs4MC42NDMsMjEuMjVdLFs4MC42NiwyMS4zMzRdLFs4MC4zOTYsMjEuNDA1XSxbODAuMzc2LDIxLjUyM10sWzgwLjE5MywyMS42MzVdLFs4MC4wMDEsMjEuNTM0XSxbNzkuODYzLDIxLjUzMV0sWzc5LjczMywyMS42MDNdLFs3OS41NCwyMS41NDNdLFs3OS40OTYsMjEuNjc0XSxbNzkuMjIxLDIxLjY5NF0sWzc5LjEwMywyMS42MDFdLFs3OC45MTcsMjEuNTkxXSxbNzguOTM3LDIxLjQ4Nl0sWzc4LjU4NSwyMS40ODddLFs3OC40MzIsMjEuNTE1XSxbNzguNDE3LDIxLjYwMV0sWzc4LjE4MiwyMS41NTddLFs3OC4xNzYsMjEuNDk5XSxbNzcuOTAyLDIxLjM3N10sWzc3LjgwMSwyMS40MDldLFs3Ny43MSwyMS4zNTddLFs3Ny41MzEsMjEuNDE5XSxbNzcuNDkyLDIxLjM3NF0sWzc3LjQyNiwyMS41MzhdLFs3Ny41NzUsMjEuNTI2XSxbNzcuNTYyLDIxLjY2Nl0sWzc3LjQ3OSwyMS43N10sWzc3LjI4MSwyMS43NTldLFs3Ny4wMDgsMjEuNjhdLFs3Ni44OTcsMjEuNTk2XSxbNzYuNzk5LDIxLjU5NV0sWzc2Ljc5NiwyMS40ODldLFs3Ni42MjEsMjEuMzMyXSxbNzYuNjIzLDIxLjE4NV0sWzc2LjQ5MywyMS4xOTRdLFs3Ni4zOCwyMS4wNzVdLFs3Ni4xOTIsMjEuMDg3XSxbNzYuMDk2LDIxLjM3MV0sWzc1LjQ5NiwyMS4zODddLFs3NS4yMDcsMjEuNDEzXSxbNzUuMTA4LDIxLjQ2Ml0sWzc1LjA1MiwyMS41NjZdLFs3NC41ODIsMjEuNjY1XSxbNzQuNTEzLDIxLjcxOV0sWzc0LjUyNCwyMS45MTJdLFs3NC40MzIsMjIuMDNdLFs3NC4yODEsMjEuOTMzXSxbNzQuMTA0LDIxLjk5OF0sWzc0LjExNiwyMi4yMTZdLFs3NC4wNzIsMjIuMzYxXSxbNzQuMTksMjIuMzJdLFs3NC4yNywyMi40MTNdLFs3NC4xMTksMjIuNDE5XSxbNzQuMTM1LDIyLjUyXSxbNzQuMjc3LDIyLjY0Nl0sWzc0LjM4NCwyMi42NDddLFs3NC40NjUsMjIuODE2XSxbNzQuNDYxLDIyLjkwOF0sWzc0LjM3OCwyMi45MDddLFs3NC4zMjQsMjMuMDYxXSxbNzQuMjc0LDIzLjE1OF0sWzc0LjEyOCwyMy4xNzZdLFs3NC4xMzksMjMuMjY2XSxbNzMuOTYyLDIzLjM4MV0sWzczLjg5LDIzLjMzNl0sWzczLjgzMywyMy40MzZdLFs3My43MTMsMjMuNDE0XSxbNzMuNjMzLDIzLjQ2OV0sWzczLjY1NiwyMy42MjFdLFs3My41NjksMjMuNjUzXSxbNzMuMzU0LDIzLjg1Ml0sWzczLjQyLDIzLjkyNV0sWzczLjQwNSwyNC4wNDFdLFs3My4zMjUsMjQuMDc3XSxbNzMuMjM5LDI0LjAwNF0sWzczLjA2NywyNC4xOTVdLFs3My4xNTIsMjQuMzU0XSxbNzMuMDc3LDI0LjM5N10sWzczLjA4NiwyNC40OThdLFs3Mi45NjksMjQuNDUzXSxbNzIuOTc4LDI0LjM3M10sWzcyLjczMywyNC4zNjRdLFs3Mi42ODEsMjQuNDY1XSxbNzIuNTM3LDI0LjUyXSxbNzIuNDU3LDI0LjQxNV0sWzcyLjQ0NCwyNC41MDhdLFs3Mi4zMzksMjQuNl0sWzcyLjE2NSwyNC42MjFdLFs3Mi4wODUsMjQuNzA3XSxbNzEuOTI2LDI0LjYzNl0sWzcxLjgwMiwyNC42NzJdLFs3MS42NTUsMjQuNjM5XSxbNzEuNDc4LDI0LjY4XSxbNzEuMjg4LDI0LjYxNl0sWzcxLjExMiwyNC42NzZdLFs3MC45ODYsMjQuNTk1XSxbNzAuOTk4LDI0LjQ0NF0sWzcxLjEwMywyNC40MzZdLFs3MS4wNDksMjQuMzU2XSxbNzAuODc4LDI0LjMwMl0sWzcwLjkwNywyNC4yNTldLFs3MC43MTQsMjQuMjE1XSxbNzAuNTcxLDI0LjI1MV0sWzcwLjU3MywyNC40MjJdLFs3MC4xMSwyNC4yOTVdLFs3MC4wMjUsMjQuMTcxXSxbNjkuNzMyLDI0LjE3MV0sWzY5LjU5NCwyNC4yOTNdLFs2OS4zMTMsMjQuMjgxXSxbNjkuMTk0LDI0LjIzNl0sWzY5LjA5NSwyNC4yNzRdLFs2OS4wMDMsMjQuMjIzXSxbNjguOTQ2LDI0LjMwM10sWzY4Ljg1NywyNC4yMTRdLFs2OC43NjUsMjQuMjk2XSxbNjguNzUsMjMuOTcxXSxbNjguMzQ1LDIzLjk3Ml0sWzY4LjIwOCwyMy44NzVdLFs2OC4xMTksMjMuNjE2XSxbNjguMzEsMjMuNTc5XSxbNjguNDEzLDIzLjQ4Nl0sWzY4LjQ1OSwyMy4zNjddLFs2OC41ODgsMjMuMzM3XSxbNjguNTMyLDIzLjI4MV0sWzY4LjY1NywyMy4xNTFdLFs2OS4xOTUsMjIuODM5XSxbNjkuNDQ4LDIyLjc3OV0sWzY5LjcxMywyMi44MDZdLFs2OS45MzksMjIuODk4XSxbNzAuMDgsMjIuOTJdLFs3MC4yNDUsMjMuMTYzXSxbNzAuNDA4LDIzLjIxOF0sWzcwLjUwNSwyMy4xNzddLFs3MC43MTIsMjMuMjE0XSxbNzAuNzEzLDIzLjE1NV0sWzcwLjU3MiwyMy4wMzhdLFs3MC40MjgsMjIuODNdLFs3MC40MTQsMjIuOTI3XSxbNzAuMTIxLDIyLjU1NF0sWzcwLjAzOCwyMi41NjJdLFs2OS44NjIsMjIuNDYyXSxbNjkuNzAxLDIyLjQ2MV0sWzY5LjY1NiwyMi4zNl0sWzY5LjU0NCwyMi4zNzddLFs2OS4yNTUsMjIuMjY3XSxbNjkuMTM3LDIyLjE5NV0sWzY5LjE4OCwyMi40MTVdLFs2OS4wMDYsMjIuNDM5XSxbNjguOTM2LDIyLjMxMV0sWzY4Ljk1NiwyMi4yNDJdLFs2OS4yODIsMjEuODk2XSxbNjkuNjAzLDIxLjYzN10sWzcwLjA5OSwyMS4xMDhdLFs3MC40MjYsMjAuODYzXSxbNzAuNzQzLDIwLjcyXSxbNzAuODc0LDIwLjcwNF0sWzcxLjE0OSwyMC43NThdLFs3MS41MTEsMjAuOTQ1XSxbNzEuNzc5LDIxLjAzXSxbNzEuODMxLDIxLjA5OF0sWzcyLjExMiwyMS4yXSxbNzIuMDg0LDIxLjI0Nl0sWzcyLjIxMSwyMS40MjFdLFs3Mi4zMDksMjEuNjM5XSxbNzIuMTc3LDIxLjgwNF0sWzcyLjIyNSwyMi4wNTVdLFs3Mi4zMjQsMjIuMTQ0XSxbNzIuMzczLDIyLjMxNl0sWzcyLjQyNywyMi4yMV0sWzcyLjUxNywyMi4zMDZdLFs3Mi45MTEsMjIuMjY3XSxbNzIuNzU4LDIyLjE3NF0sWzcyLjU2NywyMi4xODJdLFs3Mi41MDksMjEuOTQ0XSxbNzIuNjE5LDIxLjgxXSxbNzIuNTUzLDIxLjY2Ml0sWzcyLjcyOCwyMS42ODZdLFs3Mi42MTIsMjEuNTg1XSxbNzIuNzA2LDIxLjUyN10sWzcyLjY1NCwyMS4zNDZdLFs3Mi42MDEsMjEuMzIzXSxbNzIuNjMyLDIxLjA4Ml0sWzcyLjcwMiwyMS4wOTZdLFs3Mi44NDMsMjAuNzc3XSxbNzIuODk4LDIwLjU4M10sWzcyLjg1NiwyMC40NjddLFs3Mi44OTEsMjAuMzczXSxbNzIuNzksMjAuMzUyXSxbNzIuNzQxLDIwLjI0N10sWzcyLjcyOSwxOS45OF0sWzcyLjY2NCwxOS45MzFdLFs3Mi43MTYsMTkuNTkzXSxbNzIuOCwxOS4zM10sWzcyLjc4MiwxOS4xNTldLFs3Mi44MjcsMTkuMDk2XSxbNzIuODA1LDE4Ljg5OV0sWzcyLjg2NCwxOC44MDVdLFs3Mi44NjYsMTguNjUyXSxbNzIuOTMxLDE4LjUzN10sWzcyLjkxMSwxOC4zNjZdLFs3My4wNTMsMTguMjcyXSxbNzMuMDY5LDE4LjIwOV0sWzcyLjkzNywxOC4yNzVdLFs3Mi45OSwxOC4wNTZdLFs3My4xMzYsMTcuNzA4XSxbNzMuMTQsMTcuNTY3XSxbNzMuMjQ5LDE3LjI5Nl0sWzczLjE5OSwxNy4zMDVdLFs3My4yODksMTcuMDc0XSxbNzMuMjgsMTYuOTA1XSxbNzMuMzUyLDE2LjYyM10sWzczLjMxOSwxNi41MTldLFs3My41MSwxNS45NDJdLFs3My41ODcsMTUuOTExXSxbNzMuNzAyLDE1LjY5MV0sWzczLjc2OCwxNS40OTFdLFs3My44OSwxNS40MjZdLFs3My45MDQsMTUuNDE2XSxbNzMuOTE5LDE1LjQyMV0sWzczLjkyNywxNS40MjNdLFs3My45MjksMTUuNDI0XSxbNzMuOTMxLDE1LjQyOF0sWzczLjkzNiwxNS40MzJdLFs3My45NDIsMTUuNDM0XSxbNzMuOTQ1LDE1LjQzMl0sWzczLjkzNiwxNS40MjFdLFs3My45MzYsMTUuNDJdLFs3My45MzUsMTUuNDEzXSxbNzMuOTM2LDE1LjQxMV0sWzczLjk0NywxNS40MDddLFs3My45NDksMTUuNDA1XSxbNzMuOTM5LDE1LjQwM10sWzczLjkzMiwxNS40MDJdLFs3My45NTgsMTUuMzk3XSxbNzMuOTYzLDE1LjM4N10sWzczLjk2OCwxNS4zNjldLFs3NC4xMSwxNS4yNjldLFs3NC4wOCwxNS40MDldLFs3NC4yMzcsMTUuNDgzXV0sW1s3Mi45NzcsMjAuMTgxXSxbNzIuOTEyLDIwLjI2OV0sWzczLjE2NiwyMC4yODNdLFs3My4wNiwyMC4yMjNdLFs3My4xMDcsMjAuMTU4XSxbNzMuMTk5LDIwLjE5NF0sWzczLjE3MSwyMC4wNTJdLFs3Mi45NiwyMC4xMzRdLFs3Mi45NzcsMjAuMTgxXV1dLFtbWzcyLjQ0MywyMS45NzZdLFs3Mi4zODksMjIuMDI3XSxbNzIuMjkzLDIxLjk3XSxbNzIuMzIxLDIxLjgyXSxbNzIuMzg4LDIxLjgxN10sWzcyLjQ0MywyMS45NzZdXV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiVzIiLCJyZWdpb24iOiJXZXN0In0sImlkIjoiVzIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODMuMzMsMjQuMTAyXSxbODMuMTQxLDIzLjg4NV0sWzgyLjk1NCwyMy44NzFdLFs4Mi44MSwyMy45NjNdLFs4Mi41MjUsMjMuNzg0XSxbODIuMDA5LDIzLjg2MV0sWzgxLjc3MywyMy44MTZdLFs4MS42MSwyMy45MDRdLFs4MS42OTYsMjMuNzIxXSxbODEuNjIsMjMuNjUxXSxbODEuNjM5LDIzLjQ3OF0sWzgxLjczNiwyMy41NjZdLFs4MS45MjMsMjMuNTMzXSxbODEuOTg1LDIzLjQxNV0sWzgyLjEwMiwyMy4zOThdLFs4Mi4xOTksMjMuMzEyXSxbODIuMTYxLDIzLjE0M10sWzgxLjkyMSwyMy4wNDFdLFs4MS45NSwyMi45ODNdLFs4MS43NzYsMjIuODc0XSxbODEuNzk0LDIyLjc2Nl0sWzgxLjY0NywyMi42MTNdLFs4MS42NiwyMi41N10sWzgxLjQyOCwyMi40OF0sWzgxLjE5NCwyMi40OTFdLFs4MS4xMSwyMi40MzZdLFs4MS4xMTgsMjIuMjkxXSxbODEuMDIzLDIyLjIyOV0sWzgxLjAxMSwyMi4wOTVdLFs4MC45MDgsMjIuMTFdLFs4MC44MzIsMjEuOTA5XSxbODAuODM5LDIxLjhdLFs4MC43NDcsMjEuNzU2XSxbODAuNzM1LDIxLjQ2MV0sWzgwLjY2LDIxLjMzNF0sWzgwLjY0MywyMS4yNV0sWzgwLjQ2NCwyMS4xNzVdLFs4MC40NDMsMjAuOTk1XSxbODAuNTM1LDIwLjkzNF0sWzgwLjU4OCwyMC42ODNdLFs4MC40ODEsMjAuNjE4XSxbODAuNjI2LDIwLjU2N10sWzgwLjU5MSwyMC4zOTNdLFs4MC42MjYsMjAuMzMzXSxbODAuMzk4LDIwLjI0NF0sWzgwLjQzLDIwLjEzNl0sWzgwLjU1MiwyMC4xMTFdLFs4MC41MDYsMTkuODcxXSxbODAuNTg3LDE5Ljc0MV0sWzgwLjY3NiwxOS42OTldLFs4MC42NywxOS42MDldLFs4MC44OTYsMTkuNTE5XSxbODAuODEzLDE5LjQzNF0sWzgwLjg1MywxOS4zNjRdLFs4MC43NiwxOS4yOTFdLFs4MC42MjMsMTkuMzA2XSxbODAuNTc5LDE5LjQwMV0sWzgwLjQ4NiwxOS4zNDFdLFs4MC4zMjgsMTkuMTM1XSxbODAuMjc0LDE4LjkzMl0sWzgwLjM1NCwxOC44MjddLFs4MC4yNzMsMTguNzIzXSxbODAuMzQzLDE4LjU5OF0sWzgwLjQ1NywxOC42M10sWzgwLjYzOCwxOC41MjNdLFs4MC44NjcsMTguMTRdLFs4MC45NTgsMTguMTc3XSxbODEuMDA4LDE3Ljc5OF0sWzgxLjE2OCwxNy44NTZdLFs4MS4zOTYsMTcuODJdLFs4MS40NDgsMTcuODg5XSxbODEuNTMxLDE4LjI2NV0sWzgxLjc2OSwxOC40MThdLFs4MS45NjMsMTguNTk1XSxbODEuOTY1LDE4LjY5M10sWzgyLjE1NiwxOC43ODVdLFs4Mi4xNzUsMTguOTAxXSxbODIuMjQ2LDE4LjkxOV0sWzgyLjIxOSwxOS4wOTVdLFs4Mi4xNjgsMTkuMTM2XSxbODIuMTc4LDE5LjQzN10sWzgyLjAyOSwxOS41MDhdLFs4Mi4wNiwxOS43OTZdLFs4MS44NTIsMTkuOTIzXSxbODEuODY1LDIwLjAyN10sWzgxLjk0NiwyMC4xMDVdLFs4Mi4yNjksMTkuOTc1XSxbODIuMzQ1LDE5LjgzNl0sWzgyLjQxOCwxOS45MDRdLFs4Mi42MDQsMTkuODY2XSxbODIuNTgzLDE5Ljc3OV0sWzgyLjcwNCwxOS44MzJdLFs4Mi43MTgsMTkuOTg5XSxbODIuNDAxLDIwLjA1NV0sWzgyLjQzOCwyMC40MzRdLFs4Mi4zMzQsMjAuNTY5XSxbODIuMzc3LDIwLjYzMl0sWzgyLjM0LDIwLjg0N10sWzgyLjQ1NSwyMC44MjddLFs4Mi40ODgsMjAuOTA5XSxbODIuNjMsMjEuMDRdLFs4Mi42MzcsMjEuMTQ4XSxbODIuOTQyLDIxLjE2MV0sWzgzLjEzOSwyMS4xMDldLFs4My4xOTgsMjEuMTQ1XSxbODMuMjc0LDIxLjM3N10sWzgzLjM5LDIxLjM0M10sWzgzLjMzOCwyMS41MDJdLFs4My40OTMsMjEuODE4XSxbODMuNTc2LDIxLjgzMV0sWzgzLjUzNywyMi4wNDRdLFs4My42MjgsMjIuMjA0XSxbODMuNzU4LDIyLjI0XSxbODMuODY2LDIyLjM0M10sWzg0LjAwNSwyMi4zNzRdLFs4NC4wMDksMjIuNTI2XSxbODQuMDI0LDIyLjU5Ml0sWzg0LjIzOCwyMi42OTJdLFs4NC4zOCwyMi45NzJdLFs4NC4xNDksMjIuOTY1XSxbODQuMTMzLDIzLjA4M10sWzg0LjAzMiwyMy4xNThdLFs4NC4wNTEsMjMuMzc1XSxbODMuOTY5LDIzLjM2N10sWzg0LjAzLDIzLjZdLFs4My45NCwyMy41NzFdLFs4My43NzcsMjMuNjA4XSxbODMuNzA4LDIzLjgxN10sWzgzLjU2OSwyMy44NjddLFs4My41MDgsMjQuMDMxXSxbODMuMzMsMjQuMTAyXV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiVzMiLCJyZWdpb24iOiJXZXN0In0sImlkIjoiVzMifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbNzMuODksMTUuNDI2XSxbNzMuNzg0LDE1LjQxNF0sWzczLjksMTUuMzE5XSxbNzMuOTgsMTUuMDUyXSxbNzQuMTI1LDE0LjgzN10sWzc0LjA5NSwxNC44XSxbNzQuMjUsMTQuNzM5XSxbNzQuMzE2LDE0LjUxOV0sWzc0LjM1NSwxNC41MDldLFs3NC40NywxNC4xODhdLFs3NC41MTUsMTMuOTg3XSxbNzQuNjA5LDEzLjg2MV0sWzc0LjY2NCwxMy42NTJdLFs3NC43MSwxMy4zMzJdLFs3NC44MjQsMTIuODUxXSxbNzQuODcsMTIuNzYxXSxbNzUuMTYxLDEyLjY3M10sWzc1LjIyLDEyLjU2OF0sWzc1LjQyMiwxMi4zNzNdLFs3NS41NzcsMTIuMTU3XSxbNzUuODAzLDEyLjA4XSxbNzUuODMsMTEuOTg0XSxbNzYuMDAzLDExLjkzMV0sWzc2LjExMiwxMS45NzldLFs3Ni4xMiwxMS44NV0sWzc2LjIwNywxMS44NjJdLFs3Ni4zNCwxMS43MzldLFs3Ni40MTEsMTEuNzU4XSxbNzYuNDMxLDExLjY2Nl0sWzc2LjUxMiwxMS43MDVdLFs3Ni41NywxMS42MThdLFs3Ni44MzUsMTEuNjRdLFs3Ni45MDksMTEuNzk1XSxbNzcuMTExLDExLjc3NF0sWzc3LjI5NCwxMS44MDldLFs3Ny40NSwxMS43OTZdLFs3Ny40OTMsMTEuOTQxXSxbNzcuNjY5LDExLjk0OV0sWzc3Ljc3NiwxMi4xMTldLFs3Ny43MzEsMTIuMThdLFs3Ny40NzIsMTIuMjFdLFs3Ny42MiwxMi4zODNdLFs3Ny41OTksMTIuNjY3XSxbNzcuNzQsMTIuNjc0XSxbNzcuNzk5LDEyLjg1Ml0sWzc3LjkyOSwxMi44OTFdLFs3OC4yMzEsMTIuNzYxXSxbNzguMzc5LDEyLjYyNV0sWzc4LjU1NSwxMi42OTldLFs3OC42MzQsMTIuOTMxXSxbNzguNjIxLDEyLjk5MV0sWzc4LjgxMywxMy4wODldLFs3OS4wMDQsMTMuMDg1XSxbNzkuMTg1LDEzLjAzXSxbNzkuMjI3LDEzLjE1OV0sWzc5LjMxLDEzLjExMl0sWzc5LjQ1MywxMy4yMzhdLFs3OS4zOTgsMTMuMzNdLFs3OS41MzcsMTMuMzM5XSxbNzkuNTQsMTMuMjcyXSxbNzkuNzk1LDEzLjI0Ml0sWzc5Ljc2OCwxMy4zMTRdLFs3OS45MzEsMTMuMzUyXSxbODAsMTMuNTQyXSxbODAuMjQyLDEzLjQ3Ml0sWzgwLjI2OCwxMy41NjRdLFs4MC4yNTUsMTMuNzc5XSxbODAuMTQ3LDE0LjA0MV0sWzgwLjEzLDE0LjIyXSxbODAuMTk2LDE0LjU4N10sWzgwLjExMiwxNC43NF0sWzgwLjA0NywxNS4wODNdLFs4MC4xMTEsMTUuMzQ2XSxbODAuMjA5LDE1LjQ3OV0sWzgwLjI0MywxNS42MTVdLFs4MC4zNjIsMTUuNzY0XSxbODAuNjQ5LDE1Ljg3OV0sWzgwLjc4MiwxNS44NjNdLFs4MC44MTYsMTUuNzEzXSxbODEuMDA4LDE1Ljc1NF0sWzgxLjAwNSwxNS44MzhdLFs4MS4xNDgsMTUuOTc5XSxbODEuMjE0LDE2LjIwOF0sWzgxLjI2OCwxNi4yNzldLFs4MS41MDMsMTYuMzU1XSxbODEuNzIsMTYuMzA3XSxbODIuMzEzLDE2LjU2Ml0sWzgyLjM2MSwxNi43MDVdLFs4Mi4zNTYsMTYuODU4XSxbODIuMjQ4LDE2LjkwNV0sWzgyLjI4OCwxNy4wMTNdLFs4Mi40NDMsMTcuMTc1XSxbODIuNzAzLDE3LjM0NF0sWzgyLjk5NSwxNy40NzVdLFs4My4yMzUsMTcuNjEyXSxbODMuNTY5LDE4LjAxXSxbODMuNzUxLDE4LjEyOV0sWzg0LjEyNiwxOC4zMTFdLFs4NC4xNDgsMTguMzc0XSxbODQuMzU1LDE4LjU1NV0sWzg0Ljc2NSwxOS4wNzddLFs4NC43MDksMTkuMTZdLFs4NC42MDEsMTkuMTI4XSxbODQuNDQ4LDE5LjAwNF0sWzg0LjMxOSwxOC43ODhdLFs4NC4wOTIsMTguNzZdLFs4NC4wMzYsMTguODE3XSxbODMuODk1LDE4LjgxN10sWzgzLjc5MywxOS4wMTldLFs4My43NDYsMTguOTk3XSxbODMuNjMyLDE5LjE0MV0sWzgzLjQ2LDE4Ljk1Nl0sWzgzLjMwOSwxOV0sWzgzLjQwNCwxOC44NDVdLFs4My4yMTcsMTguNzQ4XSxbODMuMTM3LDE4Ljc4Nl0sWzgyLjk5OSwxOC42MjFdLFs4My4wMTksMTguNDU3XSxbODMuMDc1LDE4LjQwNF0sWzgyLjk3NSwxOC4zNjRdLFs4Mi44MTQsMTguNDUyXSxbODIuNzY5LDE4LjMzOF0sWzgyLjU5NywxOC4yNjVdLFs4Mi42MDUsMTguMzgyXSxbODIuNTQxLDE4LjRdLFs4Mi40NzIsMTguNTQzXSxbODIuMzYzLDE4LjQyMl0sWzgyLjM5MSwxOC4zMjddLFs4Mi4zMTQsMTguMTg1XSxbODIuMzQyLDE4LjA1OV0sWzgyLjI2NSwxNy45OTZdLFs4Mi4wNzUsMTguMDc2XSxbODEuODA4LDE3Ljk1Nl0sWzgxLjYxOSwxNy44MjRdLFs4MS4zOTYsMTcuODJdLFs4MS4xNjgsMTcuODU2XSxbODEuMDA4LDE3Ljc5OF0sWzgwLjk1OCwxOC4xNzddLFs4MC44NjcsMTguMTRdLFs4MC42MzgsMTguNTIzXSxbODAuNDU3LDE4LjYzXSxbODAuMzQzLDE4LjU5OF0sWzgwLjI3MywxOC43MjNdLFs4MC4xMTIsMTguNjgzXSxbNzkuOTE0LDE4LjgyNl0sWzc5Ljk2MiwxOC44NjddLFs3OS45MzgsMTkuMDQxXSxbNzkuODcsMTkuMDQyXSxbNzkuOTc3LDE5LjM5NF0sWzc5Ljk0NCwxOS40NzFdLFs3OS43NzksMTkuNl0sWzc5LjUwMSwxOS41MDddLFs3OS4yNTEsMTkuNjE2XSxbNzkuMTksMTkuNDU5XSxbNzguOTQ3LDE5LjU2Ml0sWzc4Ljk1NSwxOS42NTZdLFs3OC44NTIsMTkuNjU5XSxbNzguODQxLDE5Ljc2Ml0sWzc4LjYwNCwxOS44MThdLFs3OC40MjMsMTkuODE4XSxbNzguMzA3LDE5LjkxNF0sWzc4LjM2NSwxOS43ODFdLFs3OC4yNjMsMTkuNjY1XSxbNzguMzA0LDE5LjQ1Nl0sWzc4LjE3MiwxOS4zNl0sWzc4LjE3NSwxOS4yMzhdLFs3OC4wNTYsMTkuMjM3XSxbNzcuOTQ0LDE5LjM0M10sWzc3Ljg2MywxOS4zMDRdLFs3Ny43NzIsMTguOTc5XSxbNzcuOTQ5LDE4Ljg0M10sWzc3Ljg0LDE4LjgwNV0sWzc3LjczLDE4LjY2N10sWzc3LjczOSwxOC41NTddLFs3Ny41OTYsMTguNTQ5XSxbNzcuNDkzLDE4LjI2N10sWzc3LjM2NiwxOC4zMDddLFs3Ny40MTQsMTguMzkzXSxbNzcuMjQyLDE4LjQxM10sWzc3LjExMywxOC4xNTddLFs3Ni45NTIsMTguMTg4XSxbNzYuOTE5LDE3LjkxNl0sWzc2LjczOCwxNy44NTldLFs3Ni43ODcsMTcuODMzXSxbNzYuNjcxLDE3LjY5MV0sWzc2LjYxMiwxNy43N10sWzc2LjQ4NywxNy43MTVdLFs3Ni40MiwxNy42MDRdLFs3Ni4zMzIsMTcuNTk2XSxbNzYuMzQ1LDE3LjM1NF0sWzc2LjEyLDE3LjM3XSxbNzUuOTI2LDE3LjMyNV0sWzc1LjYzMywxNy40NzddLFs3NS41NzQsMTcuMzgzXSxbNzUuNjU0LDE3LjI3NF0sWzc1LjY2NiwxNi45OF0sWzc1LjQ4OSwxNi45NDRdLFs3NS40NjYsMTYuOTg4XSxbNzUuMjgsMTYuOTU3XSxbNzUuMjY1LDE2Ljg2M10sWzc1LjE4MywxNi44NDNdLFs3NS4wODksMTYuOTUyXSxbNzQuOTIyLDE2LjkzXSxbNzQuOTIsMTYuNzczXSxbNzQuNjkxLDE2LjcxNl0sWzc0LjY4OSwxNi42MTddLFs3NC41NjksMTYuNTU0XSxbNzQuNTQ1LDE2LjYzNV0sWzc0LjQ1NSwxNi42NDddLFs3NC4zNzksMTYuNTI4XSxbNzQuMzE4LDE2LjU1NF0sWzc0LjMzNCwxNi4yNjldLFs3NC41MDMsMTYuMjI1XSxbNzQuNDYzLDE2LjA0XSxbNzQuMzQ2LDE1Ljg1MV0sWzc0LjM3MSwxNS43OTVdLFs3NC4xMjYsMTUuNzI0XSxbNzQuMTE4LDE1LjY1Ml0sWzc0LjE2NywxNS42NzJdLFs3NC4yMDMsMTUuNjYzXSxbNzQuMjI0LDE1LjY2OV0sWzc0LjI1MiwxNS42NTRdLFs3NC4yNDQsMTUuNjI2XSxbNzQuMjY0LDE1LjYxNl0sWzc0LjI0OSwxNS41NjhdLFs3NC4yNzksMTUuNTE4XSxbNzQuMjM3LDE1LjQ4M10sWzc0LjA4LDE1LjQwOV0sWzc0LjExLDE1LjI2OV0sWzczLjk2OCwxNS4zNjldLFs3My45NjMsMTUuMzg3XSxbNzMuOTU4LDE1LjM5N10sWzczLjkzMiwxNS40MDJdLFs3My45MzksMTUuNDAzXSxbNzMuOTQ5LDE1LjQwNV0sWzczLjk0NywxNS40MDddLFs3My45MzYsMTUuNDExXSxbNzMuOTM1LDE1LjQxM10sWzczLjkzNiwxNS40Ml0sWzczLjkzNiwxNS40MjFdLFs3My45NDUsMTUuNDMyXSxbNzMuOTQyLDE1LjQzNF0sWzczLjkzNiwxNS40MzJdLFs3My45MzEsMTUuNDI4XSxbNzMuOTI5LDE1LjQyNF0sWzczLjkyNywxNS40MjNdLFs3My45MTksMTUuNDIxXSxbNzMuOTA0LDE1LjQxNl0sWzczLjg5LDE1LjQyNl1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlMxIiwicmVnaW9uIjoiU291dGgifSwiaWQiOiJTMSJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiTXVsdGlQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbW1s3Ny4wOTgsOC4yOTJdLFs3Ny4zMzEsOC4xMjddLFs3Ny41NTYsOC4wNzddLFs3Ny41ODQsOC4xMzhdLFs3Ny43OTQsOC4xNjJdLFs3Ny44NDEsOC4yNTJdLFs3Ny45OTEsOC4zNV0sWzc4LjE0Myw4LjUwMl0sWzc4LjE2MSw4LjgwNV0sWzc4LjIyOCw4Ljk3NF0sWzc4LjQxNSw5LjExNF0sWzc4LjY1LDkuMTYxXSxbNzguNjY1LDkuMTk0XSxbNzguOTgxLDkuMjc0XSxbNzkuMTksOS4yODJdLFs3OS4zOTIsOS4xOV0sWzc5LjMxNCw5LjI3OV0sWzc5LjA2Nyw5LjI5OF0sWzc4LjkwMyw5LjQ2M10sWzc4Ljk4LDkuNjldLFs3OS4yNjYsMTAuMDM5XSxbNzkuMjI2LDEwLjEwMV0sWzc5LjMsMTAuMjY1XSxbNzkuMzgxLDEwLjMxNl0sWzc5Ljc2OCwxMC4yNzJdLFs3OS44NjIsMTAuMjgzXSxbNzkuODQzLDExLjM1MV0sWzc5Ljc2NiwxMS41MjJdLFs3OS43NjEsMTEuNjI0XSxbNzkuODc0LDEyLjA0M10sWzgwLjA1NywxMi4zMjZdLFs4MC4xMzgsMTIuNDExXSxbODAuMjU1LDEyLjc4M10sWzgwLjI2OCwxMi45NzldLFs4MC4zNDUsMTMuMjc2XSxbODAuMzI0LDEzLjQ1XSxbODAuMjY4LDEzLjU2NF0sWzgwLjI0MiwxMy40NzJdLFs4MCwxMy41NDJdLFs3OS45MzEsMTMuMzUyXSxbNzkuNzY4LDEzLjMxNF0sWzc5Ljc5NSwxMy4yNDJdLFs3OS41NCwxMy4yNzJdLFs3OS41MzcsMTMuMzM5XSxbNzkuMzk4LDEzLjMzXSxbNzkuNDUzLDEzLjIzOF0sWzc5LjMxLDEzLjExMl0sWzc5LjIyNywxMy4xNTldLFs3OS4xODUsMTMuMDNdLFs3OS4wMDQsMTMuMDg1XSxbNzguODEzLDEzLjA4OV0sWzc4LjYyMSwxMi45OTFdLFs3OC42MzQsMTIuOTMxXSxbNzguNTU1LDEyLjY5OV0sWzc4LjM3OSwxMi42MjVdLFs3OC4yMzEsMTIuNzYxXSxbNzcuOTI5LDEyLjg5MV0sWzc3Ljc5OSwxMi44NTJdLFs3Ny43NCwxMi42NzRdLFs3Ny41OTksMTIuNjY3XSxbNzcuNjIsMTIuMzgzXSxbNzcuNDcyLDEyLjIxXSxbNzcuNzMxLDEyLjE4XSxbNzcuNzc2LDEyLjExOV0sWzc3LjY2OSwxMS45NDldLFs3Ny40OTMsMTEuOTQxXSxbNzcuNDUsMTEuNzk2XSxbNzcuMjk0LDExLjgwOV0sWzc3LjExMSwxMS43NzRdLFs3Ni45MDksMTEuNzk1XSxbNzYuODM1LDExLjY0XSxbNzYuNTcsMTEuNjE4XSxbNzYuNTEyLDExLjcwNV0sWzc2LjQzMSwxMS42NjZdLFs3Ni4yMzMsMTEuNTY4XSxbNzYuMjQ3LDExLjQ2OF0sWzc2LjM0MiwxMS40NjhdLFs3Ni41NDgsMTEuMzU5XSxbNzYuNDU4LDExLjE4OF0sWzc2LjYyOSwxMS4xOTRdLFs3Ni43MDcsMTEuMjM4XSxbNzYuNzQ4LDExLjEzNV0sWzc2LjY1OSwxMC45MzFdLFs3Ni45MDEsMTAuODA4XSxbNzYuODM5LDEwLjU5Nl0sWzc2LjgzLDEwLjMwM10sWzc2Ljk4NCwxMC4yMjJdLFs3Ny4xNzYsMTAuMzU5XSxbNzcuMjg4LDEwLjIzMl0sWzc3LjI3NSwxMC4xMzFdLFs3Ny4yMDEsMTAuMTA3XSxbNzcuMjczLDkuOTY0XSxbNzcuMjE4LDkuOTA1XSxbNzcuMjIzLDkuNzNdLFs3Ny4xNjgsOS42MTVdLFs3Ny4zMjIsOS41OThdLFs3Ny40MTIsOS41MDldLFs3Ny4yODMsOS4yOTNdLFs3Ny4yNjgsOS4xNTNdLFs3Ny4xNDksOS4wMV0sWzc3LjI2NCw4Ljg0Ml0sWzc3LjE3OSw4LjczMV0sWzc3LjI4NCw4LjU0N10sWzc3LjIxNCw4LjUxMl0sWzc3LjE1OCw4LjMyOF0sWzc3LjA5OCw4LjI5Ml1dXSxbW1s3NS4yMjcsMTIuMDQ0XSxbNzUuMjYzLDEyLjAwM10sWzc1LjM5OCwxMi4xM10sWzc1LjIyMSwxMi4xMDFdLFs3NS4yMjcsMTIuMDQ0XV1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlMyIiwicmVnaW9uIjoiU291dGgifSwiaWQiOiJTMiJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3Ni40MzEsMTEuNjY2XSxbNzYuNDExLDExLjc1OF0sWzc2LjM0LDExLjczOV0sWzc2LjIwNywxMS44NjJdLFs3Ni4xMiwxMS44NV0sWzc2LjExMiwxMS45NzldLFs3Ni4wMDMsMTEuOTMxXSxbNzUuODMsMTEuOTg0XSxbNzUuODAzLDEyLjA4XSxbNzUuNTc3LDEyLjE1N10sWzc1LjQyMiwxMi4zNzNdLFs3NS4yMiwxMi41NjhdLFs3NS4xNjEsMTIuNjczXSxbNzQuODcsMTIuNzYxXSxbNzUuMjA0LDEyLjAwNl0sWzc1LjI1MiwxMi4wMDldLFs3NS4zNjYsMTEuODUzXSxbNzUuNTA4LDExLjczM10sWzc1LjYxOSwxMS40ODddLFs3NS42ODEsMTEuNDUxXSxbNzUuODMsMTEuMTE3XSxbNzUuOTIyLDEwLjc2MV0sWzc2LjExNywxMC4zMzRdLFs3Ni4yNiw5Ljg4M10sWzc2LjMxNiw5LjUwM10sWzc2LjM1Myw5LjM3N10sWzc2LjUxNyw5LjAxOF0sWzc2LjYxLDguODZdLFs3Ni45OTgsOC4zNzVdLFs3Ny4wOTgsOC4yOTJdLFs3Ny4xNTgsOC4zMjhdLFs3Ny4yMTQsOC41MTJdLFs3Ny4yODQsOC41NDddLFs3Ny4xNzksOC43MzFdLFs3Ny4yNjQsOC44NDJdLFs3Ny4xNDksOS4wMV0sWzc3LjI2OCw5LjE1M10sWzc3LjI4Myw5LjI5M10sWzc3LjQxMiw5LjUwOV0sWzc3LjMyMiw5LjU5OF0sWzc3LjE2OCw5LjYxNV0sWzc3LjIyMyw5LjczXSxbNzcuMjE4LDkuOTA1XSxbNzcuMjczLDkuOTY0XSxbNzcuMjAxLDEwLjEwN10sWzc3LjI3NSwxMC4xMzFdLFs3Ny4yODgsMTAuMjMyXSxbNzcuMTc2LDEwLjM1OV0sWzc2Ljk4NCwxMC4yMjJdLFs3Ni44MywxMC4zMDNdLFs3Ni44MzksMTAuNTk2XSxbNzYuOTAxLDEwLjgwOF0sWzc2LjY1OSwxMC45MzFdLFs3Ni43NDgsMTEuMTM1XSxbNzYuNzA3LDExLjIzOF0sWzc2LjYyOSwxMS4xOTRdLFs3Ni40NTgsMTEuMTg4XSxbNzYuNTQ4LDExLjM1OV0sWzc2LjM0MiwxMS40NjhdLFs3Ni4yNDcsMTEuNDY4XSxbNzYuMjMzLDExLjU2OF0sWzc2LjQzMSwxMS42NjZdXV19LCJwcm9wZXJ0aWVzIjp7InpvbmUiOiJTMyIsInJlZ2lvbiI6IlNvdXRoIn0sImlkIjoiUzMifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbOTIuMjEyLDI0LjUwNF0sWzkyLjA4MywyNC4zNzVdLFs5MS45MjIsMjQuMzM3XSxbOTEuOTExLDI0LjE0MV0sWzkxLjc0NywyNC4yNDVdLFs5MS43NTcsMjQuMTQ0XSxbOTEuNjYzLDI0LjIxM10sWzkxLjU4MSwyNC4wNzRdLFs5MS4zNzYsMjQuMTA2XSxbOTEuMzc5LDIzLjk3NF0sWzkxLjI4LDIzLjk4Ml0sWzkxLjIxOSwyMy44NzldLFs5MS4yMjEsMjMuNzQyXSxbOTEuMTY2LDIzLjc1XSxbOTEuMTYxLDIzLjU5NV0sWzkxLjI1NCwyMy40ODhdLFs5MS4zNDcsMjMuMTAyXSxbOTEuNDE2LDIzLjA4MV0sWzkxLjM4NiwyMy4yMjhdLFs5MS40NDksMjMuMjZdLFs5MS41NSwyMy4wMzldLFs5MS42MjcsMjIuOTU2XSxbOTEuODIyLDIzLjA4Nl0sWzkxLjc2NCwyMy4zMV0sWzkxLjk3NCwyMy40ODFdLFs5MS45MzcsMjMuNjkxXSxbOTIuMDc1LDIzLjY0N10sWzkyLjExOCwyMy43MzFdLFs5Mi4yNTUsMjMuNzI3XSxbOTIuNCwyMy4yMzZdLFs5Mi4zNDcsMjMuMjM3XSxbOTIuMzkyLDIzLjA1N10sWzkyLjM3MiwyMi45MzddLFs5Mi41MDcsMjIuNzM4XSxbOTIuNTg0LDIyLjI5OV0sWzkyLjU5OSwyMi4wMDZdLFs5Mi42OCwyMi4wMTJdLFs5Mi43MjUsMjIuMTQ4XSxbOTIuODU3LDIyLjA2N10sWzkyLjkwMywyMS45NDFdLFs5My4wNDIsMjIuMTk5XSxbOTMuMTk5LDIyLjI1Nl0sWzkzLjE4NSwyMi40MjhdLFs5My4wOTEsMjIuNzA0XSxbOTMuMTM2LDIyLjkxM10sWzkzLjEyNywyMy4wNDRdLFs5My4yOTQsMjMuMDA3XSxbOTMuMzg3LDIzLjE0NF0sWzkzLjM1NSwyMy4zNTJdLFs5My40MzYsMjMuNjc4XSxbOTMuMzkyLDIzLjc1N10sWzkzLjM5MywyMy45MjFdLFs5My4zMzMsMjMuOTc5XSxbOTMuMzQzLDI0LjA5Ml0sWzkzLjQxNywyNC4wNzJdLFs5My41LDIzLjk0NV0sWzkzLjYyNCwyNC4wMTFdLFs5My43NTgsMjQuMDAzXSxbOTMuODIsMjMuOTI0XSxbOTQuMDE5LDIzLjkyNl0sWzk0LjExNiwyMy44MzldLFs5NC4yMzcsMjQuMDM1XSxbOTQuMjYsMjQuMTY1XSxbOTQuNTQ1LDI0LjcxXSxbOTQuNjI4LDI0Ljc1Nl0sWzk0LjcxNCwyNC45MzZdLFs5NC43NDEsMjUuMTI3XSxbOTQuNTc2LDI1LjIxNF0sWzk0LjY4MywyNS40NjZdLFs5NC44MDYsMjUuNDkyXSxbOTUuMDUsMjUuNzkzXSxbOTUuMDA5LDI1Ljg2N10sWzk1LjE4NiwyNi4wNzNdLFs5NS4xMTgsMjYuMTAxXSxbOTUuMTMyLDI2LjM3OF0sWzk1LjA2MiwyNi40NV0sWzk1LjIzNCwyNi42ODJdLFs5NS4xODIsMjYuODYxXSxbOTUuMjMsMjYuODg0XSxbOTUuMTk1LDI3LjAzMV0sWzk0Ljk4MiwyNi45MTNdLFs5NC44OTEsMjYuOTNdLFs5NC44LDI2LjhdLFs5NC42OTQsMjYuNzMzXSxbOTQuNTM5LDI2LjcwNl0sWzk0LjQwNCwyNi42MTJdLFs5NC4zNzQsMjYuNTA3XSxbOTQuMjgxLDI2LjU0OV0sWzk0LjE4NSwyNi40NTldLFs5NC4wMDgsMjYuMTgzXSxbOTMuOTU0LDI1Ljk2OV0sWzkzLjk3OSwyNS45MTddLFs5My43OSwyNS44MTFdLFs5My43ODcsMjUuOTQ3XSxbOTMuNDgxLDI1LjY0NV0sWzkzLjMyNywyNS41NDVdLFs5My40NTUsMjUuNDM0XSxbOTMuNDcsMjUuMzA1XSxbOTMuMzU0LDI1LjE4N10sWzkzLjI0MiwyNS4wMDRdLFs5My4xOTEsMjQuODA0XSxbOTMuMTA1LDI0Ljc5Ml0sWzkzLjA0MiwyNC40MTNdLFs5Mi44MjYsMjQuMzc2XSxbOTIuNzY0LDI0LjUyMV0sWzkyLjY5LDI0LjM1NF0sWzkyLjYyMywyNC4zMzJdLFs5Mi40NjUsMjQuMTM2XSxbOTIuNDIyLDI0LjI1NV0sWzkyLjIwNiwyNC4yMzhdLFs5Mi4yNiwyNC4zNTldLFs5Mi4yMTIsMjQuNTA0XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiQTEiLCJyZWdpb24iOiJOb3J0aCBFYXN0In0sImlkIjoiQTEifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODkuNzIsMjYuMTY2XSxbODkuODg3LDI1Ljk0NV0sWzg5LjgzMywyNS44N10sWzg5Ljg4MSwyNS42MjldLFs4OS44MTQsMjUuMzddLFs5MC4xMTIsMjUuMjI0XSxbOTAuNTEsMjUuMTY4XSxbOTAuODY5LDI1LjE2XSxbOTEuMjY1LDI1LjIwN10sWzkxLjQ3MSwyNS4xMzZdLFs5MS42MDMsMjUuMTc0XSxbOTIuMDc1LDI1LjE4Nl0sWzkyLjQyNSwyNS4wM10sWzkyLjQ3NiwyNC44NjhdLFs5Mi4yMzcsMjQuOTAzXSxbOTIuMjk2LDI0LjczN10sWzkyLjIxMiwyNC41MDRdLFs5Mi4yNiwyNC4zNTldLFs5Mi4yMDYsMjQuMjM4XSxbOTIuNDIyLDI0LjI1NV0sWzkyLjQ2NSwyNC4xMzZdLFs5Mi42MjMsMjQuMzMyXSxbOTIuNjksMjQuMzU0XSxbOTIuNzY0LDI0LjUyMV0sWzkyLjgyNiwyNC4zNzZdLFs5My4wNDIsMjQuNDEzXSxbOTMuMTA1LDI0Ljc5Ml0sWzkzLjE5MSwyNC44MDRdLFs5My4yNDIsMjUuMDA0XSxbOTMuMzU0LDI1LjE4N10sWzkzLjQ3LDI1LjMwNV0sWzkzLjQ1NSwyNS40MzRdLFs5My4zMjcsMjUuNTQ1XSxbOTMuNDgxLDI1LjY0NV0sWzkzLjc4NywyNS45NDddLFs5My43OSwyNS44MTFdLFs5My45NzksMjUuOTE3XSxbOTMuOTU0LDI1Ljk2OV0sWzk0LjAwOCwyNi4xODNdLFs5NC4xODUsMjYuNDU5XSxbOTQuMjgxLDI2LjU0OV0sWzk0LjM3NCwyNi41MDddLFs5NC40MDQsMjYuNjEyXSxbOTQuNTM5LDI2LjcwNl0sWzk0LjY5NCwyNi43MzNdLFs5NC44LDI2LjhdLFs5NC44OTEsMjYuOTNdLFs5NC45ODIsMjYuOTEzXSxbOTUuMTk1LDI3LjAzMV0sWzk1LjIzLDI2Ljg4NF0sWzk1LjE4MiwyNi44NjFdLFs5NS4yMzQsMjYuNjgyXSxbOTUuNDMxLDI2LjddLFs5NS41NDMsMjYuODM1XSxbOTUuNzQ1LDI2Ljg5OF0sWzk1LjgwMiwyNy4wMTVdLFs5NS45NDYsMjcuMDUxXSxbOTYuMDIyLDI3LjE4XSxbOTYuMzA3LDI3LjI5NF0sWzk2LjUxOCwyNy4yODZdLFs5Ni42MDYsMjcuMzY2XSxbOTYuNzk3LDI3LjM0Nl0sWzk2Ljg4NCwyNy4yNl0sWzk2Ljg1NywyNy4xOTJdLFs5Ny4wNjIsMjcuMDk5XSxbOTcuMTY0LDI3LjE0Ml0sWzk2LjkwMywyNy40NTRdLFs5Ni44OTMsMjcuNTg4XSxbOTcuMDIyLDI3Ljc0Ml0sWzk3LjI1MywyNy45MDFdLFs5Ny4zODUsMjcuODg3XSxbOTcuNDA4LDI4LjAwNl0sWzk3LjMwOCwyOC4wNjJdLFs5Ny4zNzIsMjguMjE4XSxbOTcuMTIzLDI4LjM0OV0sWzk2Ljk5NCwyOC4zMV0sWzk2Ljg5NiwyOC4zOF0sWzk2Ljc3MiwyOC4zNjhdLFs5Ni42NjMsMjguNDZdLFs5Ni40NTcsMjguNDE0XSxbOTYuNDIxLDI4LjM0Nl0sWzk2LjI2NCwyOC40MTJdLFs5Ni4zNjYsMjguNDc1XSxbOTYuMzIzLDI4LjUyNl0sWzk2LjU4NSwyOC43MTddLFs5Ni42MDcsMjguNzk0XSxbOTYuNDc3LDI4Ljk5XSxbOTYuNTI1LDI5LjA3Nl0sWzk2LjM0NywyOS4wMjldLFs5Ni4xNjYsMjguOTAzXSxbOTYuMTI1LDI5LjA3OF0sWzk2LjM0NywyOS4xNjhdLFs5Ni4zNzYsMjkuMjgxXSxbOTYuMjM1LDI5LjI0MV0sWzk2LjA4MiwyOS40NjJdLFs5NS45NTgsMjkuMzgxXSxbOTUuNzc5LDI5LjM1NV0sWzk1LjU0NiwyOS4yMTRdLFs5NS40NTUsMjkuMDM1XSxbOTUuMjUxLDI5LjA2N10sWzk1LjAwNywyOS4xN10sWzk0LjgsMjkuMTY0XSxbOTQuNzY5LDI5LjI1Ml0sWzk0LjYzMSwyOS4zNDhdLFs5NC41NiwyOS4yMjldLFs5NC40MzQsMjkuMjI3XSxbOTQuMjE3LDI5LjA4NF0sWzk0LjE1NywyOC45NTRdLFs5My45OTcsMjguODQxXSxbOTMuOTIxLDI4LjY3XSxbOTMuODQ2LDI4LjcwN10sWzkzLjYwOSwyOC42NTVdLFs5My40OTgsMjguNjg0XSxbOTMuMzM1LDI4LjYzM10sWzkzLjI3OCwyOC41MDRdLFs5My4xODUsMjguNDRdLFs5My4xOTUsMjguMzE3XSxbOTMuMDI0LDI4LjNdLFs5Mi44NDEsMjguMTc5XSxbOTIuODAyLDI4LjIwMl0sWzkyLjY2NSwyOC4wNjJdLFs5Mi43NDEsMjcuOTg5XSxbOTIuNTYyLDI3LjgyXSxbOTIuMzA5LDI3Ljc3OV0sWzkyLjI1NywyNy44NjJdLFs5MS45MjEsMjcuNzE1XSxbOTEuODMsMjcuODA3XSxbOTEuNTcyLDI3Ljg2MV0sWzkxLjYzMSwyNy44MDFdLFs5MS41NjQsMjcuNTg0XSxbOTEuNjU1LDI3LjQ4M10sWzkyLjAyLDI3LjQ3OV0sWzkyLjA2LDI3LjMyN10sWzkyLjExOCwyNy4yOTJdLFs5Mi4wMjYsMjcuMTcxXSxbOTIuMTA0LDI3LjAwN10sWzkyLjEwMiwyNi44NjddLFs5MS45ODQsMjYuODU4XSxbOTEuODkzLDI2LjkxOV0sWzkxLjcyMSwyNi44MTJdLFs5MS40OTUsMjYuNzkxXSxbOTEuNDA4LDI2Ljg0XSxbOTEuMzM3LDI2Ljc4MV0sWzkxLjA5OCwyNi44MjJdLFs5MC42OTMsMjYuNzcxXSxbOTAuNDE4LDI2LjkwNF0sWzkwLjIzMSwyNi44NTldLFs5MC4xOTUsMjYuNzc0XSxbODkuODUyLDI2LjY5N10sWzg5Ljg1NiwyNi4zODVdLFs4OS43ODEsMjYuMzUzXSxbODkuNzIsMjYuMTY2XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiQTIiLCJyZWdpb24iOiJOb3J0aCBFYXN0In0sImlkIjoiQTIifV19",
+              "style": {
+                "color": {
+                  "fixed": "#808080"
+                },
+                "lineWidth": 1,
+                "opacity": 0.45
+              }
+            },
+            "name": "RTM clearing zones",
+            "tooltip": true,
+            "type": "dynamic-geojson"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 22.5,
+          "lon": 81.5,
+          "noRepeat": false,
+          "zoom": 3.6
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bfq7nkxjvbj0gd"
+          },
+          "format": 1,
+          "rawSQL": "-- One value per clearing zone for the RTM metric volume_bid_sell (template: build_dashboard.py fills\n-- volume_bid_sell, 0 and 6000 per map; Grafana fills ${...} at run time).\n--\n-- Window: the dashboard time range. \"Show\" (latest | avg | max | min) reduces it per zone.\n--   latest = each zone's own newest data point in the window (the zones may differ by a slot).\n--   \"Data as of\" = the OLDEST of those per-zone newest timestamps, i.e. how fresh the whole map is.\n-- \"Slot\" (newest | current): by default a range that ends \"now\" also includes the next one or two\n-- slots CDH already holds as cleared results; \"current\" caps the window at the present time.\n-- ts is the extractor's UTC helper (TSDB application date, YYYY-MM-DD HH:MM:SS).\nWITH win AS (\n  SELECT\n    CAST(from_unixtime(${__from} / 1000) AT TIME ZONE 'UTC' AS timestamp) AS from_ts,\n    CAST(from_unixtime(${__to} / 1000) AT TIME ZONE 'UTC' AS timestamp) AS to_raw,\n    CAST(current_timestamp AT TIME ZONE 'UTC' AS timestamp) AS now_ts\n), bounds AS (\n  SELECT\n    from_ts,\n    now_ts,\n    LEAST(to_raw, now_ts) AS age_ref,\n    CASE\n      WHEN ${slot:sqlstring} = 'current' THEN LEAST(to_raw, now_ts)\n      WHEN to_raw >= date_add('minute', -5, now_ts) THEN TIMESTAMP '2100-01-01 00:00:00'\n      ELSE to_raw\n    END AS to_ts\n  FROM win\n), zones(region) AS (\n  VALUES ('A1'), ('A2'), ('E1'), ('E2'), ('N1'), ('N2'), ('N3'),\n         ('S1'), ('S2'), ('S3'), ('W1'), ('W2'), ('W3')\n), ranked AS (\n  SELECT\n    region,\n    TRY_CAST(ts AS timestamp) AS delivery_time,\n    value,\n    unit,\n    ROW_NUMBER() OVER (\n      PARTITION BY region, ts\n      ORDER BY\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(publication_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(publication_date AS timestamp)\n        ) DESC NULLS LAST,\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(insertion_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(insertion_date AS timestamp)\n        ) DESC NULLS LAST,\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(silver_insertion_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(silver_insertion_date AS timestamp)\n        ) DESC NULLS LAST,\n        as_of_date DESC NULLS LAST,\n        \"$path\" DESC\n    ) AS revision_rank\n  FROM india_iex_tsdb_expanded_latest\n  WHERE level = 'regional'\n    AND market = 'RTM'\n    AND metric = 'volume_bid_sell'\n    AND region IN (SELECT region FROM zones)\n    AND TRY_CAST(ts AS timestamp) IS NOT NULL\n), observations AS (\n  SELECT * FROM ranked WHERE revision_rank = 1\n), in_window AS (\n  SELECT o.* FROM observations o CROSS JOIN bounds b\n  WHERE o.value IS NOT NULL\n    AND o.delivery_time >= b.from_ts\n    AND o.delivery_time <= b.to_ts\n), per_zone AS (\n  SELECT region, MAX(delivery_time) AS latest_ts,\n         AVG(value) AS avg_v, MAX(value) AS max_v, MIN(value) AS min_v,\n         COUNT(*) AS slots, MAX(unit) AS unit\n  FROM in_window GROUP BY region\n), snapshot AS (\n  SELECT\n    z.region,\n    p.latest_ts AS delivery_time,\n    MIN(p.latest_ts) OVER () AS data_as_of,\n    CASE ${agg:sqlstring}\n      WHEN 'avg' THEN p.avg_v\n      WHEN 'max' THEN p.max_v\n      WHEN 'min' THEN p.min_v\n      ELSE l.value\n    END AS price,\n    COALESCE(l.unit, p.unit) AS unit,\n    CASE WHEN ${agg:sqlstring} IN ('avg', 'max', 'min') THEN p.slots\n         WHEN l.value IS NOT NULL THEN 1 END AS slots,\n    CASE\n      WHEN p.latest_ts IS NULL THEN 'Missing'\n      WHEN date_diff('minute', p.latest_ts, (SELECT age_ref FROM bounds)) > 90 THEN 'Stale'\n      ELSE 'Available'\n    END AS status\n  FROM zones z\n  LEFT JOIN per_zone p ON p.region = z.region\n  LEFT JOIN in_window l ON l.region = z.region AND l.delivery_time = p.latest_ts\n), scored AS (\n  SELECT\n    snapshot.*,\n    AVG(CASE WHEN status = 'Available' THEN price END) OVER () AS avg_price,\n    MIN(CASE WHEN status = 'Available' THEN price END) OVER () AS min_price,\n    MAX(CASE WHEN status = 'Available' THEN price END) OVER () AS max_price\n  FROM snapshot\n), deviation AS (\n  SELECT\n    scored.*,\n    CASE WHEN status = 'Available' AND avg_price > 0\n         THEN (price - avg_price) / avg_price * 100 END AS dev_pct\n  FROM scored\n)\n-- \"Map band\" is a colour code the dashboard maps to colours (it is not a value):\n--   0-8   level: nine equal steps between 0 and 6000 (YlOrRd, 8 = at or above 6000)\n--   10-16 deviation from the zone average (13 = within +-0.1%)\n--   20-25 position between the lowest and highest zone (20 lowest, 25 highest)\nSELECT\n  region,\n  delivery_time AS \"Delivery time\",\n  price AS \"Value\",\n  unit AS \"Unit\",\n  slots AS \"Slots\",\n  dev_pct AS \"Vs average (%)\",\n  status AS \"Status\",\n  data_as_of AS \"Data as of\",\n  CASE WHEN status = 'Available' THEN\n    CASE ${colour:sqlstring}\n      WHEN 'relative' THEN\n        CASE WHEN dev_pct IS NULL THEN NULL\n             WHEN dev_pct <= -3 THEN 10 WHEN dev_pct <= -1 THEN 11 WHEN dev_pct < -0.1 THEN 12\n             WHEN dev_pct <= 0.1 THEN 13 WHEN dev_pct < 1 THEN 14 WHEN dev_pct < 3 THEN 15\n             ELSE 16 END\n      WHEN 'range' THEN\n        CASE WHEN max_price = min_price THEN 23\n             ELSE 20 + LEAST(5, CAST(FLOOR((price - min_price) / (max_price - min_price) * 6) AS integer)) END\n      ELSE\n        CASE WHEN price <= 0 THEN 0\n             ELSE LEAST(8, CAST(FLOOR((price - 0) / (6000 - 0) * 9) AS integer)) END\n    END\n  END AS \"Map band\"\nFROM deviation\nORDER BY region\n",
+          "refId": "A",
+          "table": "india_iex_tsdb_expanded_latest"
+        }
+      ],
+      "title": "RTM sell volume by clearing zone · ${agg:text}",
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "bfq7nkxjvbj0gd"
+      },
+      "description": "Metric volume_bid_purchase, RTM. Each zone shows its own newest value in the range; grey = missing or stale. Colours follow Colour by.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 2,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "rgba(128, 128, 128, 0.5)",
+                  "index": 0,
+                  "text": "No current value"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "No current value",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgba(255, 255, 204, 0.75)",
+                "value": 0
+              },
+              {
+                "color": "rgba(255, 237, 160, 0.75)",
+                "value": 1
+              },
+              {
+                "color": "rgba(254, 217, 118, 0.75)",
+                "value": 2
+              },
+              {
+                "color": "rgba(254, 178, 76, 0.75)",
+                "value": 3
+              },
+              {
+                "color": "rgba(253, 141, 60, 0.75)",
+                "value": 4
+              },
+              {
+                "color": "rgba(252, 78, 42, 0.75)",
+                "value": 5
+              },
+              {
+                "color": "rgba(227, 26, 28, 0.75)",
+                "value": 6
+              },
+              {
+                "color": "rgba(189, 0, 38, 0.75)",
+                "value": 7
+              },
+              {
+                "color": "rgba(128, 0, 38, 0.75)",
+                "value": 8
+              },
+              {
+                "color": "rgba(30, 64, 175, 0.7)",
+                "value": 10
+              },
+              {
+                "color": "rgba(59, 130, 246, 0.65)",
+                "value": 11
+              },
+              {
+                "color": "rgba(147, 197, 253, 0.6)",
+                "value": 12
+              },
+              {
+                "color": "rgba(226, 232, 240, 0.55)",
+                "value": 13
+              },
+              {
+                "color": "rgba(253, 186, 116, 0.6)",
+                "value": 14
+              },
+              {
+                "color": "rgba(249, 115, 22, 0.65)",
+                "value": 15
+              },
+              {
+                "color": "rgba(194, 65, 12, 0.7)",
+                "value": 16
+              },
+              {
+                "color": "rgba(68, 1, 84, 0.6)",
+                "value": 20
+              },
+              {
+                "color": "rgba(59, 82, 139, 0.6)",
+                "value": 21
+              },
+              {
+                "color": "rgba(33, 145, 140, 0.6)",
+                "value": 22
+              },
+              {
+                "color": "rgba(94, 201, 98, 0.6)",
+                "value": 23
+              },
+              {
+                "color": "rgba(181, 222, 43, 0.6)",
+                "value": 24
+              },
+              {
+                "color": "rgba(253, 231, 37, 0.6)",
+                "value": 25
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Map band"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Data as of"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 6,
+        "x": 6,
+        "y": 11
+      },
+      "id": 12,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "OpenStreetMap",
+          "noRepeat": true,
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": false,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": true,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "dataStyle": {
+                "color": {
+                  "field": "Map band"
+                }
+              },
+              "idField": "region",
+              "rules": [],
+              "src": "data:application/geo+json;base64,eyJ0eXBlIjoiRmVhdHVyZUNvbGxlY3Rpb24iLCJmZWF0dXJlcyI6W3sidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3NC41MjcsMjkuOTQzXSxbNzQuNTYxLDI5Ljg3XSxbNzQuNDc3LDI5Ljc0NV0sWzc0LjYxNiwyOS43NTJdLFs3NC41NDMsMjkuNDY4XSxbNzQuNjA0LDI5LjMyN10sWzc0Ljg1MSwyOS40MDRdLFs3NC45NjIsMjkuMjhdLFs3NS4xMiwyOS4yMjNdLFs3NS4zNCwyOS4yODNdLFs3NS4zODksMjkuMjYxXSxbNzUuMzkxLDI5LjA2M10sWzc1LjUyMSwyOS4wMDRdLFs3NS40NzMsMjguOTIzXSxbNzUuNTYxLDI4LjYxM10sWzc1LjkzLDI4LjM1OV0sWzc2LjA5NSwyOC4xNTFdLFs3NS45NDYsMjguMTA4XSxbNzUuOTcxLDI3Ljg1Ml0sWzc2LjIyNSwyNy44MzNdLFs3Ni4xNiwyNy45OThdLFs3Ni4zNTcsMjguMTQ0XSxbNzYuNDc2LDI4LjE0OV0sWzc2LjU0NSwyNy45NjRdLFs3Ni42NjgsMjguMDE0XSxbNzYuNjU3LDI4LjA4OV0sWzc2Ljg3NSwyOC4yMThdLFs3Ni45NzEsMjguMTM4XSxbNzYuOTQzLDI3Ljg1NF0sWzc2Ljg5NCwyNy43MThdLFs3Ni45NzksMjcuNjU0XSxbNzcuMDg2LDI3LjczOF0sWzc3LjA0NSwyNy44MjJdLFs3Ny4yNTIsMjcuNzkxXSxbNzcuNDUxLDI3Ljg3MV0sWzc3LjU0MSwyNy45ODJdLFs3Ny40NzQsMjguMDg3XSxbNzcuNTE2LDI4LjIwNl0sWzc3LjQ3OCwyOC40MTldLFs3Ny4zNDUsMjguNTEzXSxbNzcuMTc0LDI4LjQwNV0sWzc3LjEyMSwyOC40OTZdLFs3Ni44OCwyOC41MDVdLFs3Ni44NCwyOC41ODJdLFs3Ni45NjgsMjguN10sWzc2Ljk1MSwyOC44MThdLFs3Ny4yMjgsMjguODgxXSxbNzcuMTM0LDI5LjA5NV0sWzc3LjE2MSwyOS4zMzJdLFs3Ny4wODcsMjkuNTkzXSxbNzcuMTU2LDI5LjY5OF0sWzc3LjEyNSwyOS43N10sWzc3LjI3NiwzMC4wMzhdLFs3Ny40MDYsMzAuMDg5XSxbNzcuNjA0LDMwLjM2OV0sWzc3LjU3NCwzMC40MTNdLFs3Ny44MTksMzAuNTA4XSxbNzcuNzA0LDMwLjc2Nl0sWzc3LjgwNiwzMC44NTNdLFs3Ny44MDcsMzEuMDI3XSxbNzcuOTA4LDMxLjE1NF0sWzc4LjM4NCwzMS4yODJdLFs3OC40ODQsMzEuMTk5XSxbNzguODEsMzEuMTk4XSxbNzguODksMzEuMDk3XSxbNzkuMDA2LDMxLjExOV0sWzc4Ljg4MiwzMS4yODddLFs3OC43OTIsMzEuMzA1XSxbNzguNzk4LDMxLjQ0M10sWzc4LjcyLDMxLjUwN10sWzc4Ljg0NywzMS42MDhdLFs3OC43MDYsMzEuNzc0XSxbNzguNzc2LDMxLjk4N10sWzc4LjYxMiwzMi4xMTldLFs3OC42MDksMzIuMjE0XSxbNzguNDU1LDMyLjI0Ml0sWzc4LjUzNSwzMi40MTRdLFs3OC40NTQsMzIuNDUyXSxbNzguNDQyLDMyLjU3XSxbNzguNjE4LDMyLjU5Nl0sWzc4Ljc2OCwzMi42ODZdLFs3OC44MjYsMzIuNDM4XSxbNzguOTc4LDMyLjMzOV0sWzc5LjExNCwzMi4zODRdLFs3OS4xMywzMi40NzFdLFs3OS4zMTcsMzIuNTldLFs3OS40NDcsMzIuNTMyXSxbNzkuNjI1LDMyLjczN10sWzc5LjMzNCwzMy4wMTZdLFs3OS40NTMsMzMuMjU4XSxbNzguOTkyLDMzLjMzXSxbNzguOTMyLDMzLjQzM10sWzc4LjkxOCwzMy42MzNdLFs3OS4xMDQsMzMuNjEzXSxbNzguOTA0LDMzLjk3Nl0sWzc5LjAxMywzNC4wNV0sWzc5LjQxOCwzNC4wMTRdLFs3OS41MSwzNC4yMV0sWzc5LjU4MywzNC4yMzhdLFs3OS41MDcsMzQuNDc0XSxbNzkuODExLDM0LjQ5N10sWzc5Ljc3LDM0LjYyMl0sWzc5Ljg1OSwzNC42ODhdLFs4MC4wNjcsMzQuNzE0XSxbODAuMDcyLDM0LjgyOF0sWzgwLjE2OSwzNC45ODhdLFs4MC4xODIsMzUuMTY2XSxbODAuMzI3LDM1LjQ3Ml0sWzgwLjI5MywzNS42MDJdLFs4MC4xMTQsMzUuNjc3XSxbNzkuOTk4LDM1LjgzN10sWzc5Ljg2NywzNS43ODJdLFs3OS40MjQsMzUuODk1XSxbNzkuMzg1LDM1Ljk5XSxbNzkuMjQsMzUuOTg2XSxbNzkuMTM4LDM1LjgzOF0sWzc4Ljk1NywzNS44OTFdLFs3OC42NTcsMzUuODUzXSxbNzguNTIsMzUuNzYzXSxbNzguNDIyLDM1Ljc4NV0sWzc4LjE5NiwzNS42NjZdLFs3OC4xMzYsMzUuNTM4XSxbNzcuOTY2LDM1LjU3NF0sWzc3LjkwNSwzNS40NjldLFs3Ny43MzYsMzUuNTIzXSxbNzcuNzI0LDM1LjQ3N10sWzc3LjQ0OSwzNS40NjJdLFs3Ny40MzcsMzUuNjQxXSxbNzcuMzU3LDM1LjcxN10sWzc3LjE3NCwzNS43MzFdLFs3Ny4xMTgsMzUuNzk2XSxbNzYuOTM0LDM1Ljc4NF0sWzc2LjcyMiwzNS45NTNdLFs3Ni44LDM2LjA0OF0sWzc2LjYzNiwzNi4xODRdLFs3Ni40MzEsMzYuMjUyXSxbNzYuMzUxLDM2LjM1OV0sWzc2LjI1NCwzNi4zNDddLFs3Ni4wNjgsMzYuNDc3XSxbNzUuNzQ3LDM2LjU4OF0sWzc1LjYxNSwzNi43NjFdLFs3NS40NzgsMzYuODA2XSxbNzUuMzQ0LDM3LjA1MV0sWzc1LjIwOCwzNy4wMzZdLFs3NS4wODYsMzYuOTQyXSxbNzQuOTEzLDM2LjkwOF0sWzc0LjgzMywzNy4wMjRdLFs3NC43MDgsMzcuMDc3XSxbNzQuNTgxLDM3LjA0M10sWzc0LjU3OCwzNi45NDhdLFs3NC40MjgsMzYuOTg5XSxbNzQuMjYsMzYuODg2XSxbNzQuMTczLDM2LjkwM10sWzc0LjA1MSwzNi44MDZdLFs3My44NzgsMzYuODk0XSxbNzMuNjg5LDM2LjkxMV0sWzczLjcyNiwzNi44MzJdLFs3My44NjMsMzYuNzg4XSxbNzMuOSwzNi43MDZdLFs3My43LDM2LjY4NF0sWzczLjQzNSwzNi43NDRdLFs3My4wODQsMzYuNjgyXSxbNzMuMTEyLDM2LjYwOV0sWzcyLjk5MSwzNi40NTddLFs3Mi43NzgsMzYuMzA5XSxbNzIuNTk2LDM2LjI2NF0sWzcyLjUzMSwzNi4wNzJdLFs3Mi41OTUsMzYuMDI3XSxbNzIuNTMzLDM1LjkxN10sWzcyLjY5LDM1LjgzMl0sWzcyLjgzLDM1Ljg4N10sWzcyLjkyOSwzNS44NDVdLFs3My4wNzgsMzUuODg2XSxbNzMuMTUyLDM1Ljg0Ml0sWzczLjEzOSwzNS43MThdLFs3My40MDYsMzUuNTYzXSxbNzMuNjM1LDM1LjU3MV0sWzczLjc4NSwzNS41MjRdLFs3My43LDM1LjM1OF0sWzczLjcxNCwzNS4yMjhdLFs3My45MTYsMzUuMjEyXSxbNzQuMTMzLDM1LjEwN10sWzc0LjA3MywzNC45NDFdLFs3My45MTcsMzQuODE0XSxbNzMuNzMxLDM0Ljc3MV0sWzczLjYzOSwzNC41NjZdLFs3My40NDcsMzQuNTc0XSxbNzMuNCwzNC4zNTldLFs3My40OTIsMzQuMjJdLFs3My41MTQsMzQuMDA2XSxbNzMuNTg1LDMzLjg5OV0sWzczLjU2MSwzMy42MjFdLFs3My42MywzMy41MzhdLFs3My41NTgsMzMuMzY4XSxbNzMuNjg4LDMzLjA4OF0sWzczLjgwNiwzMi45NzFdLFs3My45NTcsMzIuOTg3XSxbNzMuOTg3LDMyLjkzNV0sWzc0LjE3NywzMi44ODNdLFs3NC4zODMsMzIuNzU4XSxbNzQuNjMxLDMyLjc2N10sWzc0LjY1MSwzMi41N10sWzc0LjcxMSwzMi40NzhdLFs3NC44NiwzMi40OTJdLFs3NC45NDcsMzIuNDQ3XSxbNzUuMDI3LDMyLjQ5Nl0sWzc1LjMzMiwzMi4zMjddLFs3NS41MzksMzIuMzM2XSxbNzUuNjg3LDMyLjM5MV0sWzc1LjgzNCwzMi41MTJdLFs3NS45MzIsMzIuMzk5XSxbNzUuNzczLDMyLjI5XSxbNzUuNjE4LDMyLjIzN10sWzc1LjY2MSwzMi4xMzddLFs3NS42MDEsMzIuMDkzXSxbNzUuODkyLDMxLjk2Ml0sWzc2LjAxOCwzMS42MzJdLFs3Ni4wOTgsMzEuNTM2XSxbNzYuMjE0LDMxLjI5OV0sWzc2LjM3MiwzMS40MDhdLFs3Ni40MzIsMzEuMzI3XSxbNzYuNjEyLDMxLjI1XSxbNzYuNjI1LDMwLjk5OV0sWzc2Ljc2NiwzMC45MjFdLFs3Ni44NTcsMzAuNzk1XSxbNzYuNzEyLDMwLjc2Ml0sWzc2Ljc1MiwzMC42ODVdLFs3Ni45MjYsMzAuNjFdLFs3Ni44ODYsMzAuNDNdLFs3Ni43NDksMzAuNDI5XSxbNzYuNjIzLDMwLjI2NV0sWzc2LjY0LDMwLjE1XSxbNzYuNTQ3LDMwLjA3Nl0sWzc2LjM5OSwzMC4xMTZdLFs3Ni4yNDksMzAuMDg1XSxbNzYuMTc4LDI5Ljk0Ml0sWzc2LjI0NCwyOS44NTJdLFs3NS45ODQsMjkuNzI3XSxbNzUuNzc5LDI5LjgyMl0sWzc1LjYxNywyOS43NDRdLFs3NS40NjIsMjkuODA4XSxbNzUuMjQyLDI5LjU0Nl0sWzc1LjE2OCwyOS42NjddLFs3NS4yNDIsMjkuNzU1XSxbNzUuMTE1LDI5Ljg3OV0sWzc0Ljk5LDI5Ljg2OF0sWzc0LjgwNiwyOS45OTJdLFs3NC42NDcsMjkuOTA0XSxbNzQuNTI3LDI5Ljk0M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6Ik4xIiwicmVnaW9uIjoiTm9ydGgifSwiaWQiOiJOMSJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3OC44ODIsMzEuMjg3XSxbNzkuMDA2LDMxLjExOV0sWzc4Ljg5LDMxLjA5N10sWzc4LjgxLDMxLjE5OF0sWzc4LjQ4NCwzMS4xOTldLFs3OC4zODQsMzEuMjgyXSxbNzcuOTA4LDMxLjE1NF0sWzc3LjgwNywzMS4wMjddLFs3Ny44MDYsMzAuODUzXSxbNzcuNzA0LDMwLjc2Nl0sWzc3LjgxOSwzMC41MDhdLFs3Ny41NzQsMzAuNDEzXSxbNzcuNjA0LDMwLjM2OV0sWzc3LjQwNiwzMC4wODldLFs3Ny4yNzYsMzAuMDM4XSxbNzcuMTI1LDI5Ljc3XSxbNzcuMTU2LDI5LjY5OF0sWzc3LjA4NywyOS41OTNdLFs3Ny4xNjEsMjkuMzMyXSxbNzcuMTM0LDI5LjA5NV0sWzc3LjIyOCwyOC44ODFdLFs3Ni45NTEsMjguODE4XSxbNzYuOTY4LDI4LjddLFs3Ni44NCwyOC41ODJdLFs3Ni44OCwyOC41MDVdLFs3Ny4xMjEsMjguNDk2XSxbNzcuMTc0LDI4LjQwNV0sWzc3LjM0NSwyOC41MTNdLFs3Ny40NzgsMjguNDE5XSxbNzcuNTE2LDI4LjIwNl0sWzc3LjQ3NCwyOC4wODddLFs3Ny41NDEsMjcuOTgyXSxbNzcuNDUxLDI3Ljg3MV0sWzc3LjI1MiwyNy43OTFdLFs3Ny4wNDUsMjcuODIyXSxbNzcuMDg2LDI3LjczOF0sWzc2Ljk3OSwyNy42NTRdLFs3Ni44OTQsMjcuNzE4XSxbNzYuOTQzLDI3Ljg1NF0sWzc2Ljk3MSwyOC4xMzhdLFs3Ni44NzUsMjguMjE4XSxbNzYuNjU3LDI4LjA4OV0sWzc2LjY2OCwyOC4wMTRdLFs3Ni41NDUsMjcuOTY0XSxbNzYuNDc2LDI4LjE0OV0sWzc2LjM1NywyOC4xNDRdLFs3Ni4xNiwyNy45OThdLFs3Ni4yMjUsMjcuODMzXSxbNzUuOTcxLDI3Ljg1Ml0sWzc1Ljk0NiwyOC4xMDhdLFs3Ni4wOTUsMjguMTUxXSxbNzUuOTMsMjguMzU5XSxbNzUuNTYxLDI4LjYxM10sWzc1LjQ3MywyOC45MjNdLFs3NS41MjEsMjkuMDA0XSxbNzUuMzkxLDI5LjA2M10sWzc1LjM4OSwyOS4yNjFdLFs3NS4zNCwyOS4yODNdLFs3NS4xMiwyOS4yMjNdLFs3NC45NjIsMjkuMjhdLFs3NC44NTEsMjkuNDA0XSxbNzQuNjA0LDI5LjMyN10sWzc0LjU0MywyOS40NjhdLFs3NC42MTYsMjkuNzUyXSxbNzQuNDc3LDI5Ljc0NV0sWzc0LjU2MSwyOS44N10sWzc0LjUyNywyOS45NDNdLFs3My44OTYsMjkuOTc0XSxbNzMuOTczLDMwLjE5OF0sWzczLjgwNiwzMC4wNjhdLFs3My4zOTcsMjkuOTQ2XSxbNzMuMjgyLDI5LjU3Ml0sWzcyLjk0NSwyOS4wMjhdLFs3Mi43MzIsMjguOTQ4XSxbNzIuNDA0LDI4Ljc4M10sWzcyLjI5OSwyOC42N10sWzcyLjIwNiwyOC4zOTRdLFs3MS45MjgsMjguMTIyXSxbNzEuODk4LDI3Ljk2Ml0sWzcxLjY2NiwyNy44NzhdLFs3MS4zODMsMjcuODcyXSxbNzEuMjA1LDI3LjgzNV0sWzcwLjkwNiwyNy43MV0sWzcwLjc1OSwyNy43MjFdLFs3MC42NzcsMjcuOTIyXSxbNzAuNTA1LDI4LjAzN10sWzcwLjM3MiwyOC4wMTJdLFs3MC4xMzIsMjcuODA2XSxbNzAuMDI2LDI3LjU2M10sWzY5Ljg2MywyNy40MDJdLFs2OS41ODcsMjcuMTg0XSxbNjkuNTEzLDI3LjAxXSxbNjkuNTEsMjYuNzQ0XSxbNjkuODg2LDI2LjU3OV0sWzcwLjA1NiwyNi42MDFdLFs3MC4xNzQsMjYuNTUxXSxbNzAuMTc1LDI2LjI1Ml0sWzcwLjA4MywyNi4wODNdLFs3MC4xLDI1LjkzOF0sWzcwLjI2OCwyNS43MTRdLFs3MC4zODcsMjUuNjc0XSxbNzAuNjA5LDI1LjcxNV0sWzcwLjY3NCwyNS42NzZdLFs3MC42NjUsMjUuMzk3XSxbNzAuODg4LDI1LjE0OF0sWzcwLjkzNywyNC45MzldLFs3MS4xMTIsMjQuNjc2XSxbNzEuMjg4LDI0LjYxNl0sWzcxLjQ3OCwyNC42OF0sWzcxLjY1NSwyNC42MzldLFs3MS44MDIsMjQuNjcyXSxbNzEuOTI2LDI0LjYzNl0sWzcyLjA4NSwyNC43MDddLFs3Mi4xNjUsMjQuNjIxXSxbNzIuMzM5LDI0LjZdLFs3Mi40NDQsMjQuNTA4XSxbNzIuNDU3LDI0LjQxNV0sWzcyLjUzNywyNC41Ml0sWzcyLjY4MSwyNC40NjVdLFs3Mi43MzMsMjQuMzY0XSxbNzIuOTc4LDI0LjM3M10sWzcyLjk2OSwyNC40NTNdLFs3My4wODYsMjQuNDk4XSxbNzMuMDc3LDI0LjM5N10sWzczLjE1MiwyNC4zNTRdLFs3My4wNjcsMjQuMTk1XSxbNzMuMjM5LDI0LjAwNF0sWzczLjMyNSwyNC4wNzddLFs3My40MDUsMjQuMDQxXSxbNzMuNDIsMjMuOTI1XSxbNzMuMzU0LDIzLjg1Ml0sWzczLjU2OSwyMy42NTNdLFs3My42NTYsMjMuNjIxXSxbNzMuNjMzLDIzLjQ2OV0sWzczLjcxMywyMy40MTRdLFs3My44MzMsMjMuNDM2XSxbNzMuODksMjMuMzM2XSxbNzMuOTYyLDIzLjM4MV0sWzc0LjEzOSwyMy4yNjZdLFs3NC4xMjgsMjMuMTc2XSxbNzQuMjc0LDIzLjE1OF0sWzc0LjMyNCwyMy4wNjFdLFs3NC4zODUsMjMuMTExXSxbNzQuNTM5LDIzLjEwM10sWzc0Ljc0NCwyMy4yMTFdLFs3NC41MjMsMjMuMzIxXSxbNzQuNTc1LDIzLjQyM10sWzc0LjkwNCwyMy42MjVdLFs3NC45NCwyMy43NjVdLFs3NC45MDIsMjMuODczXSxbNzQuOTc4LDI0LjAzN10sWzc0Ljg2OCwyNC4yNDNdLFs3NC43NDcsMjQuMjUzXSxbNzQuODU1LDI0LjQyNF0sWzc0LjcxOCwyNC41MDhdLFs3NC43ODcsMjQuNTg2XSxbNzQuODA5LDI0Ljc4MV0sWzc0Ljg5LDI0LjYzNF0sWzc0Ljk5OSwyNC42ODRdLFs3NC45ODIsMjQuNzY0XSxbNzQuODYxLDI0Ljc5OV0sWzc0Ljg0MywyNC45NjldLFs3NC45MjQsMjQuODc4XSxbNzUuMTE5LDI0Ljg4Ml0sWzc1LjE5MywyNS4wMzNdLFs3NS4zNSwyNS4wMzRdLFs3NS4yOTUsMjQuODU4XSxbNzUuMzk4LDI0Ljg0Ml0sWzc1LjE5MywyNC43NzRdLFs3NS4yMjgsMjQuNzE4XSxbNzUuNDU1LDI0LjY4MV0sWzc1LjY0NiwyNC42ODVdLFs3NS43NTcsMjQuNzYyXSxbNzUuODM4LDI0LjcyNV0sWzc1LjgyNSwyNC42MTNdLFs3NS45MDcsMjQuNTc2XSxbNzUuOTA5LDI0LjQ1NV0sWzc1Ljc4OSwyNC40NzJdLFs3NS43MzgsMjQuMzM1XSxbNzUuODE4LDI0LjIzOV0sWzc1Ljc1MiwyNC4xNDhdLFs3NS44MzcsMjQuMDU3XSxbNzUuNzAyLDIzLjk2N10sWzc1LjY3MSwyNC4wMThdLFs3NS41MjEsMjQuMDI1XSxbNzUuNDU5LDIzLjkyMV0sWzc1LjU4NCwyMy43OTVdLFs3NS42OTMsMjMuNzc2XSxbNzUuNzMxLDIzLjg1M10sWzc1Ljk4NywyMy45NF0sWzc1Ljk2MiwyNC4wMTVdLFs3Ni4xMjcsMjQuMDg4XSxbNzYuMTE4LDI0LjE5NV0sWzc2LjE4NiwyNC4zMjldLFs3Ni4yMDUsMjQuMjE3XSxbNzYuMzQsMjQuMjQ0XSxbNzYuNTA1LDI0LjIwM10sWzc2LjY5NSwyNC4yODRdLFs3Ni42NzgsMjQuMjA0XSxbNzYuODAyLDI0LjExN10sWzc2Ljk0NiwyNC4yMDZdLFs3Ni44NjMsMjQuMjczXSxbNzYuODQ2LDI0LjQ4Nl0sWzc2LjkxOCwyNC41NDNdLFs3Ni45NzgsMjQuNDYxXSxbNzcuMDU1LDI0LjUyNl0sWzc3LjA2NSwyNC42NDRdLFs3Ni45NjQsMjQuNzU3XSxbNzYuODU2LDI0Ljc0Ml0sWzc2LjgwMywyNC44MDldLFs3Ni45NDIsMjQuODU5XSxbNzYuODYyLDI0Ljk2MV0sWzc2Ljg3NywyNS4wNDFdLFs3Ny4wODIsMjUuMDU4XSxbNzcuMTc1LDI1LjExMl0sWzc3LjM3NiwyNS4xMDVdLFs3Ny40MTQsMjUuMjJdLFs3Ny4zNTUsMjUuMjYzXSxbNzcuMzcxLDI1LjQwOF0sWzc3LjMxMiwyNS40MzFdLFs3Ny4yMDksMjUuMzA2XSxbNzcuMDg0LDI1LjMzN10sWzc2LjkzLDI1LjI4M10sWzc2LjU5OCwyNS4zOTRdLFs3Ni41MTYsMjUuNTI4XSxbNzYuNTMxLDI1LjgxMl0sWzc2LjYzMiwyNS45XSxbNzYuNzc5LDI1LjkzOV0sWzc2LjkwMiwyNi4wOTRdLFs3Ny4yMDQsMjYuMjNdLFs3Ny40MzksMjYuNDA0XSxbNzcuNTI0LDI2LjQwN10sWzc3LjgzMywyNi41NjFdLFs3Ny44OTgsMjYuNjU1XSxbNzguMDk1LDI2LjY3OV0sWzc4LjExNiwyNi43OTddLFs3OC4zOTUsMjYuODE3XSxbNzguNTc4LDI2Ljc0OF0sWzc4LjgxNiwyNi43NjJdLFs3OC45OTMsMjYuNjc3XSxbNzguOTg4LDI2LjU5M10sWzc5LjEyOSwyNi40NF0sWzc5LjExNiwyNi4zMjFdLFs3OS4wMTgsMjYuMjQ4XSxbNzkuMDAzLDI2LjA2N10sWzc4Ljk0OCwyNi4wMjZdLFs3OC43NjMsMjUuNzJdLFs3OC44MSwyNS42MTldLFs3OC42NTgsMjUuNTZdLFs3OC40OTQsMjUuNTc5XSxbNzguNDE5LDI1LjUzNF0sWzc4LjMwMSwyNS4zNjJdLFs3OC40NDMsMjUuMTY1XSxbNzguMzQsMjUuMDg3XSxbNzguMzM0LDI0Ljk5NV0sWzc4LjE3MiwyNC44NzhdLFs3OC4yNzcsMjQuNjYyXSxbNzguMjI3LDI0LjUzNF0sWzc4LjM2NiwyNC4zODZdLFs3OC4zOTUsMjQuMjY5XSxbNzguNTAyLDI0LjM5XSxbNzguNzg5LDI0LjE3N10sWzc4Ljg4OCwyNC4yMjddLFs3OC45OTQsMjQuNDIzXSxbNzguOTE1LDI0LjQ1OF0sWzc4Ljk0NiwyNC41NTddLFs3OC44ODMsMjQuNjQxXSxbNzguNzg0LDI0LjU4OV0sWzc4Ljc3MSwyNC44NTddLFs3OC42MzIsMjQuOTYyXSxbNzguNTc4LDI1LjI1M10sWzc4LjUwMywyNS4yOV0sWzc4LjY0MywyNS40MzVdLFs3OC43NzUsMjUuMzUzXSxbNzguNzMzLDI1LjQ4NF0sWzc4Ljg0OCwyNS40M10sWzc4Ljg0MiwyNS41MTNdLFs3OC45MzksMjUuNTU3XSxbNzguODg0LDI1LjM0NF0sWzc4Ljg4MiwyNS4xNTddLFs3OC45OTQsMjUuMjczXSxbNzkuMTQ0LDI1LjExNV0sWzc5LjMxNCwyNS4xMzZdLFs3OS4yNjMsMjUuMjczXSxbNzkuMywyNS4zMzhdLFs3OS40NDcsMjUuMjQ1XSxbNzkuMzg0LDI1LjE0M10sWzc5LjQ4MywyNS4wOF0sWzc5LjU2OSwyNS4xNzJdLFs3OS44NDQsMjUuMDk0XSxbNzkuODUxLDI1LjIyN10sWzgwLjAwMywyNS4yNjddLFs4MC4wMzQsMjUuMzQyXSxbODAuMTMxLDI1LjMzNF0sWzgwLjI2NCwyNS40MjRdLFs4MC4zMTEsMjUuMjg2XSxbODAuNDMyLDI1LjE3OF0sWzgwLjI3NCwyNS4wMjZdLFs4MC40NTcsMjQuOTgxXSxbODAuNTA3LDI1LjA4NF0sWzgwLjc4MywyNS4wNzZdLFs4MC43MzUsMjUuMTM3XSxbODAuOTA0LDI1LjE1OV0sWzgwLjgxMiwyNC45MjNdLFs4MC45NSwyNC45NjRdLFs4MS4yMTUsMjQuOTMzXSxbODEuMjY2LDI1LjE0XSxbODEuMzM1LDI1LjE2OV0sWzgxLjQ5OSwyNS4wNzddLFs4MS41MTksMjUuMTg2XSxbODEuNzkzLDI1LjAwNF0sWzgxLjkwOCwyNC45OF0sWzgxLjkwOCwyNC44ODFdLFs4Mi4yNTYsMjQuNzQ5XSxbODIuMjM1LDI0LjY3MV0sWzgyLjQwMiwyNC41OTFdLFs4Mi40MjgsMjQuNzAyXSxbODIuNTM5LDI0LjY0OF0sWzgyLjY3MSwyNC42OTddLFs4Mi43NzQsMjQuNjQyXSxbODIuNzEzLDI0LjM4MV0sWzgyLjc3MywyNC4zMDhdLFs4Mi43MjgsMjQuMTM2XSxbODIuODEsMjMuOTYzXSxbODIuOTU0LDIzLjg3MV0sWzgzLjE0MSwyMy44ODVdLFs4My4zMywyNC4xMDJdLFs4My40NDgsMjQuMzcxXSxbODMuNDAyLDI0LjUwM10sWzgzLjUwMywyNC41MjVdLFs4My41NDQsMjQuNjI4XSxbODMuMzkxLDI0Ljc4OV0sWzgzLjM1MSwyNS4wMDldLFs4My4zNTQsMjUuMTg5XSxbODMuNDA5LDI1LjI0Nl0sWzgzLjgwOCwyNS40MDldLFs4My44NzYsMjUuNTE4XSxbODQuMDgxLDI1LjYzNl0sWzg0LjE1NCwyNS43MjddLFs4NC4yMDYsMjUuNjddLFs4NC41NjEsMjUuNjg0XSxbODQuNjM1LDI1LjcyOF0sWzg0LjUzNCwyNS44NzZdLFs4NC4yMDcsMjUuOTk5XSxbODQuMDEsMjYuMTc0XSxbODQuMTc3LDI2LjI2NV0sWzg0LjE3NiwyNi4zNzNdLFs4My45MTEsMjYuNDVdLFs4My45NCwyNi41MjVdLFs4NC4wNDgsMjYuNTM2XSxbODQuMDg4LDI2LjYzNl0sWzg0LjI4NSwyNi42XSxbODQuNDIsMjYuNjI2XSxbODQuMjYsMjYuODA3XSxbODQuMDQ0LDI2LjkzMV0sWzgzLjk4NywyNy4xOThdLFs4My44NjQsMjcuMzQ0XSxbODMuNjE1LDI3LjQ2OV0sWzgzLjQwOSwyNy40NzldLFs4My4zODgsMjcuMzc2XSxbODMuMjk2LDI3LjMzNF0sWzgzLjE4OCwyNy40NTRdLFs4My4wMzUsMjcuNDQ5XSxbODIuOTI5LDI3LjUwMV0sWzgyLjczNSwyNy41MDNdLFs4Mi43MDksMjcuNzE2XSxbODIuNDQ5LDI3LjY4XSxbODIuMDcsMjcuOTIzXSxbODEuOTY4LDI3LjkyOV0sWzgxLjg5OSwyNy44NTRdLFs4MS42OTksMjcuOTg4XSxbODEuNDc4LDI4LjA4M10sWzgxLjQ0NCwyOC4xNjJdLFs4MS4zMTgsMjguMTQ1XSxbODEuMjExLDI4LjM2MV0sWzgxLjA4LDI4LjM4OV0sWzgwLjcxNCwyOC41NjldLFs4MC41OSwyOC42OF0sWzgwLjUwMywyOC42NjRdLFs4MC41MjMsMjguNTU1XSxbODAuMzc3LDI4LjYyOV0sWzgwLjExOCwyOC44MjhdLFs4MC4wNTksMjguOTE2XSxbODAuMTQ1LDI5LjEwM10sWzgwLjI3MSwyOS4xNDddLFs4MC4zMTgsMjkuMzAxXSxbODAuMjQyLDI5LjQ0Ml0sWzgwLjQyLDI5LjYzXSxbODAuMzY5LDI5Ljc1XSxbODAuNDkzLDI5Ljc5NV0sWzgwLjYwNCwyOS45NThdLFs4MC42NzgsMjkuOTU5XSxbODAuODA0LDMwLjA4OV0sWzgxLjAzMiwzMC4yNDZdLFs4MC44MjcsMzAuMzE0XSxbODAuNjA2LDMwLjQ3MV0sWzgwLjU0OCwzMC40NDhdLFs4MC4yMDksMzAuNTg4XSxbODAuMjQ5LDMwLjc0M10sWzgwLjEyNSwzMC43ODFdLFs3OS43NTMsMzEuMDA2XSxbNzkuNjAxLDMwLjkzOV0sWzc5LjQxLDMxLjEwN10sWzc5LjMxOCwzMS4xMzZdLFs3OS4xMzksMzEuNDMzXSxbNzkuMDIzLDMxLjQyN10sWzc4Ljg4MiwzMS4yODddXV19LCJwcm9wZXJ0aWVzIjp7InpvbmUiOiJOMiIsInJlZ2lvbiI6Ik5vcnRoIn0sImlkIjoiTjIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbNzQuNTI3LDI5Ljk0M10sWzc0LjY0NywyOS45MDRdLFs3NC44MDYsMjkuOTkyXSxbNzQuOTksMjkuODY4XSxbNzUuMTE1LDI5Ljg3OV0sWzc1LjI0MiwyOS43NTVdLFs3NS4xNjgsMjkuNjY3XSxbNzUuMjQyLDI5LjU0Nl0sWzc1LjQ2MiwyOS44MDhdLFs3NS42MTcsMjkuNzQ0XSxbNzUuNzc5LDI5LjgyMl0sWzc1Ljk4NCwyOS43MjddLFs3Ni4yNDQsMjkuODUyXSxbNzYuMTc4LDI5Ljk0Ml0sWzc2LjI0OSwzMC4wODVdLFs3Ni4zOTksMzAuMTE2XSxbNzYuNTQ3LDMwLjA3Nl0sWzc2LjY0LDMwLjE1XSxbNzYuNjIzLDMwLjI2NV0sWzc2Ljc0OSwzMC40MjldLFs3Ni44ODYsMzAuNDNdLFs3Ni45MjYsMzAuNjFdLFs3Ni43NTIsMzAuNjg1XSxbNzYuNzEyLDMwLjc2Ml0sWzc2Ljg1NywzMC43OTVdLFs3Ni43NjYsMzAuOTIxXSxbNzYuNjI1LDMwLjk5OV0sWzc2LjYxMiwzMS4yNV0sWzc2LjQzMiwzMS4zMjddLFs3Ni4zNzIsMzEuNDA4XSxbNzYuMjE0LDMxLjI5OV0sWzc2LjA5OCwzMS41MzZdLFs3Ni4wMTgsMzEuNjMyXSxbNzUuODkyLDMxLjk2Ml0sWzc1LjYwMSwzMi4wOTNdLFs3NS42NjEsMzIuMTM3XSxbNzUuNjE4LDMyLjIzN10sWzc1Ljc3MywzMi4yOV0sWzc1LjkzMiwzMi4zOTldLFs3NS44MzQsMzIuNTEyXSxbNzUuNjg3LDMyLjM5MV0sWzc1LjUzOSwzMi4zMzZdLFs3NS4zMzIsMzIuMzI3XSxbNzUuMzcyLDMyLjI4XSxbNzUuMjYxLDMyLjEwMl0sWzc1LjAxMiwzMi4wMzZdLFs3NC44NzUsMzIuMDUxXSxbNzQuODE5LDMxLjk1OV0sWzc0LjY3NywzMS45MjZdLFs3NC40ODcsMzEuNzE1XSxbNzQuNjUzLDMxLjQ1NV0sWzc0LjU1MiwzMS4zNjRdLFs3NC41MSwzMS4xMzJdLFs3NC42ODksMzEuMTI4XSxbNzQuMzI1LDMwLjg1XSxbNzQuMjY1LDMwLjcyNV0sWzczLjk5MywzMC41MTRdLFs3My44OCwzMC4zNl0sWzczLjk3MywzMC4xOThdLFs3My44OTYsMjkuOTc0XSxbNzQuNTI3LDI5Ljk0M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6Ik4zIiwicmVnaW9uIjoiTm9ydGgifSwiaWQiOiJOMyJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiTXVsdGlQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbW1s4NC4wMDksMjIuNTI2XSxbODQuMTQyLDIyLjQ3Ml0sWzg0LjE5NywyMi4zNzhdLFs4NC40LDIyLjM0Nl0sWzg0LjUwMywyMi40Ml0sWzg0Ljc1OSwyMi40NDddLFs4NC45MDksMjIuNDIzXSxbODUuMDU3LDIyLjQ4Nl0sWzg1LjExOCwyMi4zMThdLFs4NS4wMjQsMjIuMTA5XSxbODUuMjM5LDIyLjAwOV0sWzg1LjI4MSwyMi4wOV0sWzg1LjQxMiwyMi4xNjJdLFs4NS41OTksMjIuMDc4XSxbODUuNzMsMjIuMDY1XSxbODUuODA3LDIyLjExNl0sWzg1Ljc2NiwyMS45OTVdLFs4NS45MTQsMjEuOThdLFs4Ni4wMzEsMjIuMTkzXSxbODUuOTczLDIyLjUwNl0sWzg2LjA2OSwyMi41NTZdLFs4Ni4xMjQsMjIuNDg5XSxbODYuMjgzLDIyLjQ0OF0sWzg2LjM2OCwyMi4zNDRdLFs4Ni40OTksMjIuMzQ2XSxbODYuNzI3LDIyLjIxN10sWzg2LjcyMiwyMi4xNDddLFs4Ni45NiwyMi4wODhdLFs4Ny4wMjgsMjIuMDM4XSxbODcuMDAyLDIxLjkxM10sWzg3LjA5OSwyMS44NjZdLFs4Ny4xNjMsMjEuOTY5XSxbODcuMjM2LDIxLjk1N10sWzg3LjI3NywyMS44MDVdLFs4Ny40NDQsMjEuNzY4XSxbODcuNDg2LDIxLjYxXSxbODcuODA2LDIxLjcwOV0sWzg3Ljk4NywyMS44NzFdLFs4OC4wNiwyMi4wMThdLFs4OC4xODcsMjIuMTA1XSxbODguMTQ2LDIxLjk1OV0sWzg4LjI1NywyMS41NTddLFs4OC4zMDIsMjEuNjc5XSxbODguMjU2LDIxLjgwMV0sWzg4LjQ2LDIxLjkyOV0sWzg4LjQ5OCwyMS44NzVdLFs4OC42MDcsMjEuOTE4XSxbODguNTk5LDIxLjk4Ml0sWzg5LjAwOCwyMS45MDNdLFs4OS4wNjYsMjEuOTQyXSxbODkuMDQyLDIyLjA5Ml0sWzg5LjA5NSwyMi4xNDldLFs4OC45ODQsMjIuMzMxXSxbODkuMDAxLDIyLjQyOV0sWzg4LjkxMiwyMi43NThdLFs4OC45NywyMi44NDRdLFs4OC44NiwyMi45NDRdLFs4OC44NjksMjMuMV0sWzg4Ljk3OSwyMy4xOTNdLFs4OC43MTksMjMuMjU1XSxbODguNzY1LDIzLjQ0OF0sWzg4LjU2MiwyMy42MzZdLFs4OC41OTksMjMuODY5XSxbODguNzM1LDIzLjkxNV0sWzg4Ljc0MSwyNC4yNTRdLFs4OC42ODMsMjQuMzI0XSxbODguNTU5LDI0LjMwOF0sWzg4LjM0MiwyNC40MzhdLFs4OC4xMjQsMjQuNTE3XSxbODguMDI0LDI0LjY4OF0sWzg4LjIyMiwyNC45Nl0sWzg4LjI2MywyNC44OTJdLFs4OC40NCwyNS4wMTVdLFs4OC40NDQsMjUuMTk4XSxbODguNTc4LDI1LjE3N10sWzg4LjgzMSwyNS4yMDVdLFs4OC45MjIsMjUuMTY2XSxbODkuMDA5LDI1LjI5NF0sWzg4Ljg0LDI1LjM2M10sWzg4LjgsMjUuNTI0XSxbODguNjQ2LDI1LjQ3OV0sWzg4LjQ0NiwyNS42MTVdLFs4OC40NTUsMjUuNjYzXSxbODguMjY5LDI1Ljc4MV0sWzg4LjE1MiwyNS43NzZdLFs4OC4wODcsMjUuOTE3XSxbODguMTg1LDI2LjA2NF0sWzg4LjE3NywyNi4xNDhdLFs4OC4zNTEsMjYuMjIyXSxbODguNDQ0LDI2LjM2MV0sWzg4LjUxNywyNi4zNTJdLFs4OC40NjEsMjYuNDY3XSxbODguMzMxLDI2LjQ4Nl0sWzg4LjQxLDI2LjYzMV0sWzg4LjQzLDI2LjU0Nl0sWzg4LjYyOCwyNi40MzldLFs4OC43MjMsMjYuMzEyXSxbODguODcxLDI2LjIzNF0sWzg5LjA2MywyNi4yNl0sWzg4LjkxMSwyNi4zN10sWzg4Ljk1NywyNi40NTldLFs4OS4wOSwyNi4zOTJdLFs4OS4xNTQsMjYuMTQxXSxbODkuMzU3LDI2LjAwOF0sWzg5LjUzMiwyNi4wMDRdLFs4OS42NDYsMjYuMDYzXSxbODkuNjM1LDI2LjIyM10sWzg5LjcyLDI2LjE2Nl0sWzg5Ljc4MSwyNi4zNTNdLFs4OS44NTYsMjYuMzg1XSxbODkuODUyLDI2LjY5N10sWzg5LjYwOSwyNi43MjhdLFs4OS42NCwyNi43NzddLFs4OS40NTQsMjYuNzk4XSxbODkuMzcsMjYuODU3XSxbODkuMTI5LDI2LjgwN10sWzg5LjAxOCwyNi45MzddLFs4OC44ODEsMjYuOTU3XSxbODguODY0LDI3LjExXSxbODguNzQ2LDI3LjE0Ml0sWzg4LjgwMywyNy4yNDhdLFs4OC45MTMsMjcuMjldLFs4OC43NzcsMjcuNDY5XSxbODguNzcsMjcuNTcxXSxbODguODQ4LDI3LjY2OF0sWzg4Ljg4MywyNy44OV0sWzg4Ljc1NiwyOC4wNzZdLFs4OC42MjksMjguMTI0XSxbODguMzg5LDI3Ljk3OV0sWzg4LjE0NSwyNy45NjRdLFs4OC4xOTYsMjcuODU0XSxbODguMTQzLDI3LjY2M10sWzg4LjA0NywyNy40NzVdLFs4OC4wMDksMjcuMTQxXSxbODguMTg2LDI2Ljc3NF0sWzg4LjA5OSwyNi40NTZdLFs4Ny45OTcsMjYuMzY1XSxbODcuODk5LDI2LjQ3OV0sWzg3LjY3NywyNi40MzZdLFs4Ny41ODgsMjYuMzgyXSxbODcuNDY0LDI2LjQ0XSxbODcuMzQsMjYuMzQ4XSxbODcuMDkxLDI2LjQ1MV0sWzg3LjA3MSwyNi41ODddLFs4Ni44MzQsMjYuNDM5XSxbODYuNzMsMjYuNDIzXSxbODYuMzk2LDI2LjU5NF0sWzg2LjIzMiwyNi41OTNdLFs4Ni4wMjgsMjYuNjY2XSxbODUuODU5LDI2LjU3XSxbODUuNzMyLDI2LjY1NF0sWzg1LjczNSwyNi43OTZdLFs4NS41NzUsMjYuODYxXSxbODUuMzM0LDI2Ljc0Ml0sWzg1LjIxMiwyNi43NThdLFs4NS4xOTMsMjYuODY3XSxbODUuMDI5LDI2Ljg1OV0sWzg0Ljk2MSwyNi45NjFdLFs4NC42NDUsMjcuMDQ2XSxbODQuNjksMjcuMjIyXSxbODQuNjIsMjcuMzM5XSxbODQuMjc5LDI3LjM5Nl0sWzg0LjEwNiwyNy41MjFdLFs4NC4wNDYsMjcuNDQ2XSxbODMuODMyLDI3LjQzMV0sWzgzLjg2NCwyNy4zNDRdLFs4My45ODcsMjcuMTk4XSxbODQuMDQ0LDI2LjkzMV0sWzg0LjI2LDI2LjgwN10sWzg0LjQyLDI2LjYyNl0sWzg0LjI4NSwyNi42XSxbODQuMDg4LDI2LjYzNl0sWzg0LjA0OCwyNi41MzZdLFs4My45NCwyNi41MjVdLFs4My45MTEsMjYuNDVdLFs4NC4xNzYsMjYuMzczXSxbODQuMTc3LDI2LjI2NV0sWzg0LjAxLDI2LjE3NF0sWzg0LjIwNywyNS45OTldLFs4NC41MzQsMjUuODc2XSxbODQuNjM1LDI1LjcyOF0sWzg0LjU2MSwyNS42ODRdLFs4NC4yMDYsMjUuNjddLFs4NC4xNTQsMjUuNzI3XSxbODQuMDgxLDI1LjYzNl0sWzgzLjg3NiwyNS41MThdLFs4My44MDgsMjUuNDA5XSxbODMuNDA5LDI1LjI0Nl0sWzgzLjM1NCwyNS4xODldLFs4My4zNTEsMjUuMDA5XSxbODMuMzkxLDI0Ljc4OV0sWzgzLjU0NCwyNC42MjhdLFs4My41MDMsMjQuNTI1XSxbODMuNDAyLDI0LjUwM10sWzgzLjQ0OCwyNC4zNzFdLFs4My4zMywyNC4xMDJdLFs4My41MDgsMjQuMDMxXSxbODMuNTY5LDIzLjg2N10sWzgzLjcwOCwyMy44MTddLFs4My43NzcsMjMuNjA4XSxbODMuOTQsMjMuNTcxXSxbODQuMDMsMjMuNl0sWzgzLjk2OSwyMy4zNjddLFs4NC4wNTEsMjMuMzc1XSxbODQuMDMyLDIzLjE1OF0sWzg0LjEzMywyMy4wODNdLFs4NC4xNDksMjIuOTY1XSxbODQuMzgsMjIuOTcyXSxbODQuMjM4LDIyLjY5Ml0sWzg0LjAyNCwyMi41OTJdLFs4NC4wMDksMjIuNTI2XV1dLFtbWzg5LjA5MywyMS42MzhdLFs4OS4wMTIsMjEuODA3XSxbODguOTU3LDIxLjc2Nl0sWzg5LjA0MiwyMS42MV0sWzg5LjA5MywyMS42MzhdXV0sW1tbODguOTY1LDIxLjgwN10sWzg4Ljk2OCwyMS45MDldLFs4OC44MzgsMjEuOTA5XSxbODguOTAxLDIxLjc2Ml0sWzg4Ljk2NSwyMS44MDddXV0sW1tbODguODU1LDIxLjYzN10sWzg4Ljg2LDIxLjc2M10sWzg4Ljc4OCwyMS43NDJdLFs4OC44NTUsMjEuNjM3XV1dLFtbWzg4Ljc4NCwyMS43NTddLFs4OC44MjEsMjEuODY4XSxbODguNzE0LDIxLjkwMl0sWzg4LjY5MywyMS43NDFdLFs4OC43NDYsMjEuNjYyXSxbODguNzg0LDIxLjc1N11dXSxbW1s4OC4xMzcsMjEuNjc4XSxbODguMTcxLDIxLjczOF0sWzg4LjEzMywyMS44NzNdLFs4OC4wODQsMjEuNzkzXSxbODguMTExLDIxLjc5MV0sWzg4LjEzOCwyMS43NTRdLFs4OC4xMzcsMjEuNjc4XV1dLFtbWzg4LjA2NSwyMS42MzZdLFs4OC4xNDcsMjEuNjQ1XSxbODguMTAzLDIxLjc4NV0sWzg4LjAzMywyMS42ODhdLFs4OC4wNjUsMjEuNjM2XV1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IkUxIiwicmVnaW9uIjoiRWFzdCJ9LCJpZCI6IkUxIn0seyJ0eXBlIjoiRmVhdHVyZSIsImdlb21ldHJ5Ijp7InR5cGUiOiJQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbWzg0Ljc2NSwxOS4wNzddLFs4NC44NDgsMTkuMjAxXSxbODUuMzA3LDE5LjU2Ml0sWzg1LjY3OSwxOS43NDVdLFs4Ni4zNTUsMTkuOTQ4XSxbODYuNTIsMjAuMTddLFs4Ni43NzEsMjAuMzI0XSxbODYuNzMzLDIwLjM5NV0sWzg2Ljc3NiwyMC41MjJdLFs4Ny4wNTYsMjAuNzE1XSxbODYuODQxLDIxLjE1OF0sWzg2Ljk0NSwyMS4zNTNdLFs4Ny4xNDgsMjEuNTA5XSxbODcuMzkzLDIxLjU0M10sWzg3LjQ4NiwyMS42MV0sWzg3LjQ0NCwyMS43NjhdLFs4Ny4yNzcsMjEuODA1XSxbODcuMjM2LDIxLjk1N10sWzg3LjE2MywyMS45NjldLFs4Ny4wOTksMjEuODY2XSxbODcuMDAyLDIxLjkxM10sWzg3LjAyOCwyMi4wMzhdLFs4Ni45NiwyMi4wODhdLFs4Ni43MjIsMjIuMTQ3XSxbODYuNzI3LDIyLjIxN10sWzg2LjQ5OSwyMi4zNDZdLFs4Ni4zNjgsMjIuMzQ0XSxbODYuMjgzLDIyLjQ0OF0sWzg2LjEyNCwyMi40ODldLFs4Ni4wNjksMjIuNTU2XSxbODUuOTczLDIyLjUwNl0sWzg2LjAzMSwyMi4xOTNdLFs4NS45MTQsMjEuOThdLFs4NS43NjYsMjEuOTk1XSxbODUuODA3LDIyLjExNl0sWzg1LjczLDIyLjA2NV0sWzg1LjU5OSwyMi4wNzhdLFs4NS40MTIsMjIuMTYyXSxbODUuMjgxLDIyLjA5XSxbODUuMjM5LDIyLjAwOV0sWzg1LjAyNCwyMi4xMDldLFs4NS4xMTgsMjIuMzE4XSxbODUuMDU3LDIyLjQ4Nl0sWzg0LjkwOSwyMi40MjNdLFs4NC43NTksMjIuNDQ3XSxbODQuNTAzLDIyLjQyXSxbODQuNCwyMi4zNDZdLFs4NC4xOTcsMjIuMzc4XSxbODQuMTQyLDIyLjQ3Ml0sWzg0LjAwOSwyMi41MjZdLFs4NC4wMDUsMjIuMzc0XSxbODMuODY2LDIyLjM0M10sWzgzLjc1OCwyMi4yNF0sWzgzLjYyOCwyMi4yMDRdLFs4My41MzcsMjIuMDQ0XSxbODMuNTc2LDIxLjgzMV0sWzgzLjQ5MywyMS44MThdLFs4My4zMzgsMjEuNTAyXSxbODMuMzksMjEuMzQzXSxbODMuMjc0LDIxLjM3N10sWzgzLjE5OCwyMS4xNDVdLFs4My4xMzksMjEuMTA5XSxbODIuOTQyLDIxLjE2MV0sWzgyLjYzNywyMS4xNDhdLFs4Mi42MywyMS4wNF0sWzgyLjQ4OCwyMC45MDldLFs4Mi40NTUsMjAuODI3XSxbODIuMzQsMjAuODQ3XSxbODIuMzc3LDIwLjYzMl0sWzgyLjMzNCwyMC41NjldLFs4Mi40MzgsMjAuNDM0XSxbODIuNDAxLDIwLjA1NV0sWzgyLjcxOCwxOS45ODldLFs4Mi43MDQsMTkuODMyXSxbODIuNTgzLDE5Ljc3OV0sWzgyLjYwNCwxOS44NjZdLFs4Mi40MTgsMTkuOTA0XSxbODIuMzQ1LDE5LjgzNl0sWzgyLjI2OSwxOS45NzVdLFs4MS45NDYsMjAuMTA1XSxbODEuODY1LDIwLjAyN10sWzgxLjg1MiwxOS45MjNdLFs4Mi4wNiwxOS43OTZdLFs4Mi4wMjksMTkuNTA4XSxbODIuMTc4LDE5LjQzN10sWzgyLjE2OCwxOS4xMzZdLFs4Mi4yMTksMTkuMDk1XSxbODIuMjQ2LDE4LjkxOV0sWzgyLjE3NSwxOC45MDFdLFs4Mi4xNTYsMTguNzg1XSxbODEuOTY1LDE4LjY5M10sWzgxLjk2MywxOC41OTVdLFs4MS43NjksMTguNDE4XSxbODEuNTMxLDE4LjI2NV0sWzgxLjQ0OCwxNy44ODldLFs4MS4zOTYsMTcuODJdLFs4MS42MTksMTcuODI0XSxbODEuODA4LDE3Ljk1Nl0sWzgyLjA3NSwxOC4wNzZdLFs4Mi4yNjUsMTcuOTk2XSxbODIuMzQyLDE4LjA1OV0sWzgyLjMxNCwxOC4xODVdLFs4Mi4zOTEsMTguMzI3XSxbODIuMzYzLDE4LjQyMl0sWzgyLjQ3MiwxOC41NDNdLFs4Mi41NDEsMTguNF0sWzgyLjYwNSwxOC4zODJdLFs4Mi41OTcsMTguMjY1XSxbODIuNzY5LDE4LjMzOF0sWzgyLjgxNCwxOC40NTJdLFs4Mi45NzUsMTguMzY0XSxbODMuMDc1LDE4LjQwNF0sWzgzLjAxOSwxOC40NTddLFs4Mi45OTksMTguNjIxXSxbODMuMTM3LDE4Ljc4Nl0sWzgzLjIxNywxOC43NDhdLFs4My40MDQsMTguODQ1XSxbODMuMzA5LDE5XSxbODMuNDYsMTguOTU2XSxbODMuNjMyLDE5LjE0MV0sWzgzLjc0NiwxOC45OTddLFs4My43OTMsMTkuMDE5XSxbODMuODk1LDE4LjgxN10sWzg0LjAzNiwxOC44MTddLFs4NC4wOTIsMTguNzZdLFs4NC4zMTksMTguNzg4XSxbODQuNDQ4LDE5LjAwNF0sWzg0LjYwMSwxOS4xMjhdLFs4NC43MDksMTkuMTZdLFs4NC43NjUsMTkuMDc3XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiRTIiLCJyZWdpb24iOiJFYXN0In0sImlkIjoiRTIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODIuODEsMjMuOTYzXSxbODIuNzI4LDI0LjEzNl0sWzgyLjc3MywyNC4zMDhdLFs4Mi43MTMsMjQuMzgxXSxbODIuNzc0LDI0LjY0Ml0sWzgyLjY3MSwyNC42OTddLFs4Mi41MzksMjQuNjQ4XSxbODIuNDI4LDI0LjcwMl0sWzgyLjQwMiwyNC41OTFdLFs4Mi4yMzUsMjQuNjcxXSxbODIuMjU2LDI0Ljc0OV0sWzgxLjkwOCwyNC44ODFdLFs4MS45MDgsMjQuOThdLFs4MS43OTMsMjUuMDA0XSxbODEuNTE5LDI1LjE4Nl0sWzgxLjQ5OSwyNS4wNzddLFs4MS4zMzUsMjUuMTY5XSxbODEuMjY2LDI1LjE0XSxbODEuMjE1LDI0LjkzM10sWzgwLjk1LDI0Ljk2NF0sWzgwLjgxMiwyNC45MjNdLFs4MC45MDQsMjUuMTU5XSxbODAuNzM1LDI1LjEzN10sWzgwLjc4MywyNS4wNzZdLFs4MC41MDcsMjUuMDg0XSxbODAuNDU3LDI0Ljk4MV0sWzgwLjI3NCwyNS4wMjZdLFs4MC40MzIsMjUuMTc4XSxbODAuMzExLDI1LjI4Nl0sWzgwLjI2NCwyNS40MjRdLFs4MC4xMzEsMjUuMzM0XSxbODAuMDM0LDI1LjM0Ml0sWzgwLjAwMywyNS4yNjddLFs3OS44NTEsMjUuMjI3XSxbNzkuODQ0LDI1LjA5NF0sWzc5LjU2OSwyNS4xNzJdLFs3OS40ODMsMjUuMDhdLFs3OS4zODQsMjUuMTQzXSxbNzkuNDQ3LDI1LjI0NV0sWzc5LjMsMjUuMzM4XSxbNzkuMjYzLDI1LjI3M10sWzc5LjMxNCwyNS4xMzZdLFs3OS4xNDQsMjUuMTE1XSxbNzguOTk0LDI1LjI3M10sWzc4Ljg4MiwyNS4xNTddLFs3OC44ODQsMjUuMzQ0XSxbNzguOTM5LDI1LjU1N10sWzc4Ljg0MiwyNS41MTNdLFs3OC44NDgsMjUuNDNdLFs3OC43MzMsMjUuNDg0XSxbNzguNzc1LDI1LjM1M10sWzc4LjY0MywyNS40MzVdLFs3OC41MDMsMjUuMjldLFs3OC41NzgsMjUuMjUzXSxbNzguNjMyLDI0Ljk2Ml0sWzc4Ljc3MSwyNC44NTddLFs3OC43ODQsMjQuNTg5XSxbNzguODgzLDI0LjY0MV0sWzc4Ljk0NiwyNC41NTddLFs3OC45MTUsMjQuNDU4XSxbNzguOTk0LDI0LjQyM10sWzc4Ljg4OCwyNC4yMjddLFs3OC43ODksMjQuMTc3XSxbNzguNTAyLDI0LjM5XSxbNzguMzk1LDI0LjI2OV0sWzc4LjM2NiwyNC4zODZdLFs3OC4yMjcsMjQuNTM0XSxbNzguMjc3LDI0LjY2Ml0sWzc4LjE3MiwyNC44NzhdLFs3OC4zMzQsMjQuOTk1XSxbNzguMzQsMjUuMDg3XSxbNzguNDQzLDI1LjE2NV0sWzc4LjMwMSwyNS4zNjJdLFs3OC40MTksMjUuNTM0XSxbNzguNDk0LDI1LjU3OV0sWzc4LjY1OCwyNS41Nl0sWzc4LjgxLDI1LjYxOV0sWzc4Ljc2MywyNS43Ml0sWzc4Ljk0OCwyNi4wMjZdLFs3OS4wMDMsMjYuMDY3XSxbNzkuMDE4LDI2LjI0OF0sWzc5LjExNiwyNi4zMjFdLFs3OS4xMjksMjYuNDRdLFs3OC45ODgsMjYuNTkzXSxbNzguOTkzLDI2LjY3N10sWzc4LjgxNiwyNi43NjJdLFs3OC41NzgsMjYuNzQ4XSxbNzguMzk1LDI2LjgxN10sWzc4LjExNiwyNi43OTddLFs3OC4wOTUsMjYuNjc5XSxbNzcuODk4LDI2LjY1NV0sWzc3LjgzMywyNi41NjFdLFs3Ny41MjQsMjYuNDA3XSxbNzcuNDM5LDI2LjQwNF0sWzc3LjIwNCwyNi4yM10sWzc2LjkwMiwyNi4wOTRdLFs3Ni43NzksMjUuOTM5XSxbNzYuNjMyLDI1LjldLFs3Ni41MzEsMjUuODEyXSxbNzYuNTE2LDI1LjUyOF0sWzc2LjU5OCwyNS4zOTRdLFs3Ni45MywyNS4yODNdLFs3Ny4wODQsMjUuMzM3XSxbNzcuMjA5LDI1LjMwNl0sWzc3LjMxMiwyNS40MzFdLFs3Ny4zNzEsMjUuNDA4XSxbNzcuMzU1LDI1LjI2M10sWzc3LjQxNCwyNS4yMl0sWzc3LjM3NiwyNS4xMDVdLFs3Ny4xNzUsMjUuMTEyXSxbNzcuMDgyLDI1LjA1OF0sWzc2Ljg3NywyNS4wNDFdLFs3Ni44NjIsMjQuOTYxXSxbNzYuOTQyLDI0Ljg1OV0sWzc2LjgwMywyNC44MDldLFs3Ni44NTYsMjQuNzQyXSxbNzYuOTY0LDI0Ljc1N10sWzc3LjA2NSwyNC42NDRdLFs3Ny4wNTUsMjQuNTI2XSxbNzYuOTc4LDI0LjQ2MV0sWzc2LjkxOCwyNC41NDNdLFs3Ni44NDYsMjQuNDg2XSxbNzYuODYzLDI0LjI3M10sWzc2Ljk0NiwyNC4yMDZdLFs3Ni44MDIsMjQuMTE3XSxbNzYuNjc4LDI0LjIwNF0sWzc2LjY5NSwyNC4yODRdLFs3Ni41MDUsMjQuMjAzXSxbNzYuMzQsMjQuMjQ0XSxbNzYuMjA1LDI0LjIxN10sWzc2LjE4NiwyNC4zMjldLFs3Ni4xMTgsMjQuMTk1XSxbNzYuMTI3LDI0LjA4OF0sWzc1Ljk2MiwyNC4wMTVdLFs3NS45ODcsMjMuOTRdLFs3NS43MzEsMjMuODUzXSxbNzUuNjkzLDIzLjc3Nl0sWzc1LjU4NCwyMy43OTVdLFs3NS40NTksMjMuOTIxXSxbNzUuNTIxLDI0LjAyNV0sWzc1LjY3MSwyNC4wMThdLFs3NS43MDIsMjMuOTY3XSxbNzUuODM3LDI0LjA1N10sWzc1Ljc1MiwyNC4xNDhdLFs3NS44MTgsMjQuMjM5XSxbNzUuNzM4LDI0LjMzNV0sWzc1Ljc4OSwyNC40NzJdLFs3NS45MDksMjQuNDU1XSxbNzUuOTA3LDI0LjU3Nl0sWzc1LjgyNSwyNC42MTNdLFs3NS44MzgsMjQuNzI1XSxbNzUuNzU3LDI0Ljc2Ml0sWzc1LjY0NiwyNC42ODVdLFs3NS40NTUsMjQuNjgxXSxbNzUuMjI4LDI0LjcxOF0sWzc1LjE5MywyNC43NzRdLFs3NS4zOTgsMjQuODQyXSxbNzUuMjk1LDI0Ljg1OF0sWzc1LjM1LDI1LjAzNF0sWzc1LjE5MywyNS4wMzNdLFs3NS4xMTksMjQuODgyXSxbNzQuOTI0LDI0Ljg3OF0sWzc0Ljg0MywyNC45NjldLFs3NC44NjEsMjQuNzk5XSxbNzQuOTgyLDI0Ljc2NF0sWzc0Ljk5OSwyNC42ODRdLFs3NC44OSwyNC42MzRdLFs3NC44MDksMjQuNzgxXSxbNzQuNzg3LDI0LjU4Nl0sWzc0LjcxOCwyNC41MDhdLFs3NC44NTUsMjQuNDI0XSxbNzQuNzQ3LDI0LjI1M10sWzc0Ljg2OCwyNC4yNDNdLFs3NC45NzgsMjQuMDM3XSxbNzQuOTAyLDIzLjg3M10sWzc0Ljk0LDIzLjc2NV0sWzc0LjkwNCwyMy42MjVdLFs3NC41NzUsMjMuNDIzXSxbNzQuNTIzLDIzLjMyMV0sWzc0Ljc0NCwyMy4yMTFdLFs3NC41MzksMjMuMTAzXSxbNzQuMzg1LDIzLjExMV0sWzc0LjMyNCwyMy4wNjFdLFs3NC4zNzgsMjIuOTA3XSxbNzQuNDYxLDIyLjkwOF0sWzc0LjQ2NSwyMi44MTZdLFs3NC4zODQsMjIuNjQ3XSxbNzQuMjc3LDIyLjY0Nl0sWzc0LjEzNSwyMi41Ml0sWzc0LjExOSwyMi40MTldLFs3NC4yNywyMi40MTNdLFs3NC4xOSwyMi4zMl0sWzc0LjA3MiwyMi4zNjFdLFs3NC4xMTYsMjIuMjE2XSxbNzQuMTA0LDIxLjk5OF0sWzc0LjI4MSwyMS45MzNdLFs3NC40MzIsMjIuMDNdLFs3NC41MjQsMjEuOTEyXSxbNzQuNTEzLDIxLjcxOV0sWzc0LjU4MiwyMS42NjVdLFs3NS4wNTIsMjEuNTY2XSxbNzUuMTA4LDIxLjQ2Ml0sWzc1LjIwNywyMS40MTNdLFs3NS40OTYsMjEuMzg3XSxbNzYuMDk2LDIxLjM3MV0sWzc2LjE5MiwyMS4wODddLFs3Ni4zOCwyMS4wNzVdLFs3Ni40OTMsMjEuMTk0XSxbNzYuNjIzLDIxLjE4NV0sWzc2LjYyMSwyMS4zMzJdLFs3Ni43OTYsMjEuNDg5XSxbNzYuNzk5LDIxLjU5NV0sWzc2Ljg5NywyMS41OTZdLFs3Ny4wMDgsMjEuNjhdLFs3Ny4yODEsMjEuNzU5XSxbNzcuNDc5LDIxLjc3XSxbNzcuNTYyLDIxLjY2Nl0sWzc3LjU3NSwyMS41MjZdLFs3Ny40MjYsMjEuNTM4XSxbNzcuNDkyLDIxLjM3NF0sWzc3LjUzMSwyMS40MTldLFs3Ny43MSwyMS4zNTddLFs3Ny44MDEsMjEuNDA5XSxbNzcuOTAyLDIxLjM3N10sWzc4LjE3NiwyMS40OTldLFs3OC4xODIsMjEuNTU3XSxbNzguNDE3LDIxLjYwMV0sWzc4LjQzMiwyMS41MTVdLFs3OC41ODUsMjEuNDg3XSxbNzguOTM3LDIxLjQ4Nl0sWzc4LjkxNywyMS41OTFdLFs3OS4xMDMsMjEuNjAxXSxbNzkuMjIxLDIxLjY5NF0sWzc5LjQ5NiwyMS42NzRdLFs3OS41NCwyMS41NDNdLFs3OS43MzMsMjEuNjAzXSxbNzkuODYzLDIxLjUzMV0sWzgwLjAwMSwyMS41MzRdLFs4MC4xOTMsMjEuNjM1XSxbODAuMzc2LDIxLjUyM10sWzgwLjM5NiwyMS40MDVdLFs4MC42NiwyMS4zMzRdLFs4MC43MzUsMjEuNDYxXSxbODAuNzQ3LDIxLjc1Nl0sWzgwLjgzOSwyMS44XSxbODAuODMyLDIxLjkwOV0sWzgwLjkwOCwyMi4xMV0sWzgxLjAxMSwyMi4wOTVdLFs4MS4wMjMsMjIuMjI5XSxbODEuMTE4LDIyLjI5MV0sWzgxLjExLDIyLjQzNl0sWzgxLjE5NCwyMi40OTFdLFs4MS40MjgsMjIuNDhdLFs4MS42NiwyMi41N10sWzgxLjY0NywyMi42MTNdLFs4MS43OTQsMjIuNzY2XSxbODEuNzc2LDIyLjg3NF0sWzgxLjk1LDIyLjk4M10sWzgxLjkyMSwyMy4wNDFdLFs4Mi4xNjEsMjMuMTQzXSxbODIuMTk5LDIzLjMxMl0sWzgyLjEwMiwyMy4zOThdLFs4MS45ODUsMjMuNDE1XSxbODEuOTIzLDIzLjUzM10sWzgxLjczNiwyMy41NjZdLFs4MS42MzksMjMuNDc4XSxbODEuNjIsMjMuNjUxXSxbODEuNjk2LDIzLjcyMV0sWzgxLjYxLDIzLjkwNF0sWzgxLjc3MywyMy44MTZdLFs4Mi4wMDksMjMuODYxXSxbODIuNTI1LDIzLjc4NF0sWzgyLjgxLDIzLjk2M11dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlcxIiwicmVnaW9uIjoiV2VzdCJ9LCJpZCI6IlcxIn0seyJ0eXBlIjoiRmVhdHVyZSIsImdlb21ldHJ5Ijp7InR5cGUiOiJNdWx0aVBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbWzc0LjIzNywxNS40ODNdLFs3NC4yODIsMTUuNTEzXSxbNzQuMjU0LDE1LjU2Nl0sWzc0LjI2NywxNS42MTddLFs3NC4yNTUsMTUuNjU0XSxbNzQuMjMyLDE1LjY2N10sWzc0LjIyNCwxNS42NTldLFs3NC4yMjksMTUuNjUzXSxbNzQuMjEzLDE1LjY0OV0sWzc0LjIxMiwxNS42NjFdLFs3NC4xOTYsMTUuNjY1XSxbNzQuMTksMTUuNjgxXSxbNzQuMTc1LDE1LjY3XSxbNzQuMTczLDE1LjY1Ml0sWzc0LjExOCwxNS42NTJdLFs3NC4xMjYsMTUuNzI0XSxbNzQuMzcxLDE1Ljc5NV0sWzc0LjM0NiwxNS44NTFdLFs3NC40NjMsMTYuMDRdLFs3NC41MDMsMTYuMjI1XSxbNzQuMzM0LDE2LjI2OV0sWzc0LjMxOCwxNi41NTRdLFs3NC4zNzksMTYuNTI4XSxbNzQuNDU1LDE2LjY0N10sWzc0LjU0NSwxNi42MzVdLFs3NC41NjksMTYuNTU0XSxbNzQuNjg5LDE2LjYxN10sWzc0LjY5MSwxNi43MTZdLFs3NC45MiwxNi43NzNdLFs3NC45MjIsMTYuOTNdLFs3NS4wODksMTYuOTUyXSxbNzUuMTgzLDE2Ljg0M10sWzc1LjI2NSwxNi44NjNdLFs3NS4yOCwxNi45NTddLFs3NS40NjYsMTYuOTg4XSxbNzUuNDg5LDE2Ljk0NF0sWzc1LjY2NiwxNi45OF0sWzc1LjY1NCwxNy4yNzRdLFs3NS41NzQsMTcuMzgzXSxbNzUuNjMzLDE3LjQ3N10sWzc1LjkyNiwxNy4zMjVdLFs3Ni4xMiwxNy4zN10sWzc2LjM0NSwxNy4zNTRdLFs3Ni4zMzIsMTcuNTk2XSxbNzYuNDIsMTcuNjA0XSxbNzYuNDg3LDE3LjcxNV0sWzc2LjYxMiwxNy43N10sWzc2LjY3MSwxNy42OTFdLFs3Ni43ODcsMTcuODMzXSxbNzYuNzM4LDE3Ljg1OV0sWzc2LjkxOSwxNy45MTZdLFs3Ni45NTIsMTguMTg4XSxbNzcuMTEzLDE4LjE1N10sWzc3LjI0MiwxOC40MTNdLFs3Ny40MTQsMTguMzkzXSxbNzcuMzY2LDE4LjMwN10sWzc3LjQ5MywxOC4yNjddLFs3Ny41OTYsMTguNTQ5XSxbNzcuNzM5LDE4LjU1N10sWzc3LjczLDE4LjY2N10sWzc3Ljg0LDE4LjgwNV0sWzc3Ljk0OSwxOC44NDNdLFs3Ny43NzIsMTguOTc5XSxbNzcuODYzLDE5LjMwNF0sWzc3Ljk0NCwxOS4zNDNdLFs3OC4wNTYsMTkuMjM3XSxbNzguMTc1LDE5LjIzOF0sWzc4LjE3MiwxOS4zNl0sWzc4LjMwNCwxOS40NTZdLFs3OC4yNjMsMTkuNjY1XSxbNzguMzY1LDE5Ljc4MV0sWzc4LjMwNywxOS45MTRdLFs3OC40MjMsMTkuODE4XSxbNzguNjA0LDE5LjgxOF0sWzc4Ljg0MSwxOS43NjJdLFs3OC44NTIsMTkuNjU5XSxbNzguOTU1LDE5LjY1Nl0sWzc4Ljk0NywxOS41NjJdLFs3OS4xOSwxOS40NTldLFs3OS4yNTEsMTkuNjE2XSxbNzkuNTAxLDE5LjUwN10sWzc5Ljc3OSwxOS42XSxbNzkuOTQ0LDE5LjQ3MV0sWzc5Ljk3NywxOS4zOTRdLFs3OS44NywxOS4wNDJdLFs3OS45MzgsMTkuMDQxXSxbNzkuOTYyLDE4Ljg2N10sWzc5LjkxNCwxOC44MjZdLFs4MC4xMTIsMTguNjgzXSxbODAuMjczLDE4LjcyM10sWzgwLjM1NCwxOC44MjddLFs4MC4yNzQsMTguOTMyXSxbODAuMzI4LDE5LjEzNV0sWzgwLjQ4NiwxOS4zNDFdLFs4MC41NzksMTkuNDAxXSxbODAuNjIzLDE5LjMwNl0sWzgwLjc2LDE5LjI5MV0sWzgwLjg1MywxOS4zNjRdLFs4MC44MTMsMTkuNDM0XSxbODAuODk2LDE5LjUxOV0sWzgwLjY3LDE5LjYwOV0sWzgwLjY3NiwxOS42OTldLFs4MC41ODcsMTkuNzQxXSxbODAuNTA2LDE5Ljg3MV0sWzgwLjU1MiwyMC4xMTFdLFs4MC40MywyMC4xMzZdLFs4MC4zOTgsMjAuMjQ0XSxbODAuNjI2LDIwLjMzM10sWzgwLjU5MSwyMC4zOTNdLFs4MC42MjYsMjAuNTY3XSxbODAuNDgxLDIwLjYxOF0sWzgwLjU4OCwyMC42ODNdLFs4MC41MzUsMjAuOTM0XSxbODAuNDQzLDIwLjk5NV0sWzgwLjQ2NCwyMS4xNzVdLFs4MC42NDMsMjEuMjVdLFs4MC42NiwyMS4zMzRdLFs4MC4zOTYsMjEuNDA1XSxbODAuMzc2LDIxLjUyM10sWzgwLjE5MywyMS42MzVdLFs4MC4wMDEsMjEuNTM0XSxbNzkuODYzLDIxLjUzMV0sWzc5LjczMywyMS42MDNdLFs3OS41NCwyMS41NDNdLFs3OS40OTYsMjEuNjc0XSxbNzkuMjIxLDIxLjY5NF0sWzc5LjEwMywyMS42MDFdLFs3OC45MTcsMjEuNTkxXSxbNzguOTM3LDIxLjQ4Nl0sWzc4LjU4NSwyMS40ODddLFs3OC40MzIsMjEuNTE1XSxbNzguNDE3LDIxLjYwMV0sWzc4LjE4MiwyMS41NTddLFs3OC4xNzYsMjEuNDk5XSxbNzcuOTAyLDIxLjM3N10sWzc3LjgwMSwyMS40MDldLFs3Ny43MSwyMS4zNTddLFs3Ny41MzEsMjEuNDE5XSxbNzcuNDkyLDIxLjM3NF0sWzc3LjQyNiwyMS41MzhdLFs3Ny41NzUsMjEuNTI2XSxbNzcuNTYyLDIxLjY2Nl0sWzc3LjQ3OSwyMS43N10sWzc3LjI4MSwyMS43NTldLFs3Ny4wMDgsMjEuNjhdLFs3Ni44OTcsMjEuNTk2XSxbNzYuNzk5LDIxLjU5NV0sWzc2Ljc5NiwyMS40ODldLFs3Ni42MjEsMjEuMzMyXSxbNzYuNjIzLDIxLjE4NV0sWzc2LjQ5MywyMS4xOTRdLFs3Ni4zOCwyMS4wNzVdLFs3Ni4xOTIsMjEuMDg3XSxbNzYuMDk2LDIxLjM3MV0sWzc1LjQ5NiwyMS4zODddLFs3NS4yMDcsMjEuNDEzXSxbNzUuMTA4LDIxLjQ2Ml0sWzc1LjA1MiwyMS41NjZdLFs3NC41ODIsMjEuNjY1XSxbNzQuNTEzLDIxLjcxOV0sWzc0LjUyNCwyMS45MTJdLFs3NC40MzIsMjIuMDNdLFs3NC4yODEsMjEuOTMzXSxbNzQuMTA0LDIxLjk5OF0sWzc0LjExNiwyMi4yMTZdLFs3NC4wNzIsMjIuMzYxXSxbNzQuMTksMjIuMzJdLFs3NC4yNywyMi40MTNdLFs3NC4xMTksMjIuNDE5XSxbNzQuMTM1LDIyLjUyXSxbNzQuMjc3LDIyLjY0Nl0sWzc0LjM4NCwyMi42NDddLFs3NC40NjUsMjIuODE2XSxbNzQuNDYxLDIyLjkwOF0sWzc0LjM3OCwyMi45MDddLFs3NC4zMjQsMjMuMDYxXSxbNzQuMjc0LDIzLjE1OF0sWzc0LjEyOCwyMy4xNzZdLFs3NC4xMzksMjMuMjY2XSxbNzMuOTYyLDIzLjM4MV0sWzczLjg5LDIzLjMzNl0sWzczLjgzMywyMy40MzZdLFs3My43MTMsMjMuNDE0XSxbNzMuNjMzLDIzLjQ2OV0sWzczLjY1NiwyMy42MjFdLFs3My41NjksMjMuNjUzXSxbNzMuMzU0LDIzLjg1Ml0sWzczLjQyLDIzLjkyNV0sWzczLjQwNSwyNC4wNDFdLFs3My4zMjUsMjQuMDc3XSxbNzMuMjM5LDI0LjAwNF0sWzczLjA2NywyNC4xOTVdLFs3My4xNTIsMjQuMzU0XSxbNzMuMDc3LDI0LjM5N10sWzczLjA4NiwyNC40OThdLFs3Mi45NjksMjQuNDUzXSxbNzIuOTc4LDI0LjM3M10sWzcyLjczMywyNC4zNjRdLFs3Mi42ODEsMjQuNDY1XSxbNzIuNTM3LDI0LjUyXSxbNzIuNDU3LDI0LjQxNV0sWzcyLjQ0NCwyNC41MDhdLFs3Mi4zMzksMjQuNl0sWzcyLjE2NSwyNC42MjFdLFs3Mi4wODUsMjQuNzA3XSxbNzEuOTI2LDI0LjYzNl0sWzcxLjgwMiwyNC42NzJdLFs3MS42NTUsMjQuNjM5XSxbNzEuNDc4LDI0LjY4XSxbNzEuMjg4LDI0LjYxNl0sWzcxLjExMiwyNC42NzZdLFs3MC45ODYsMjQuNTk1XSxbNzAuOTk4LDI0LjQ0NF0sWzcxLjEwMywyNC40MzZdLFs3MS4wNDksMjQuMzU2XSxbNzAuODc4LDI0LjMwMl0sWzcwLjkwNywyNC4yNTldLFs3MC43MTQsMjQuMjE1XSxbNzAuNTcxLDI0LjI1MV0sWzcwLjU3MywyNC40MjJdLFs3MC4xMSwyNC4yOTVdLFs3MC4wMjUsMjQuMTcxXSxbNjkuNzMyLDI0LjE3MV0sWzY5LjU5NCwyNC4yOTNdLFs2OS4zMTMsMjQuMjgxXSxbNjkuMTk0LDI0LjIzNl0sWzY5LjA5NSwyNC4yNzRdLFs2OS4wMDMsMjQuMjIzXSxbNjguOTQ2LDI0LjMwM10sWzY4Ljg1NywyNC4yMTRdLFs2OC43NjUsMjQuMjk2XSxbNjguNzUsMjMuOTcxXSxbNjguMzQ1LDIzLjk3Ml0sWzY4LjIwOCwyMy44NzVdLFs2OC4xMTksMjMuNjE2XSxbNjguMzEsMjMuNTc5XSxbNjguNDEzLDIzLjQ4Nl0sWzY4LjQ1OSwyMy4zNjddLFs2OC41ODgsMjMuMzM3XSxbNjguNTMyLDIzLjI4MV0sWzY4LjY1NywyMy4xNTFdLFs2OS4xOTUsMjIuODM5XSxbNjkuNDQ4LDIyLjc3OV0sWzY5LjcxMywyMi44MDZdLFs2OS45MzksMjIuODk4XSxbNzAuMDgsMjIuOTJdLFs3MC4yNDUsMjMuMTYzXSxbNzAuNDA4LDIzLjIxOF0sWzcwLjUwNSwyMy4xNzddLFs3MC43MTIsMjMuMjE0XSxbNzAuNzEzLDIzLjE1NV0sWzcwLjU3MiwyMy4wMzhdLFs3MC40MjgsMjIuODNdLFs3MC40MTQsMjIuOTI3XSxbNzAuMTIxLDIyLjU1NF0sWzcwLjAzOCwyMi41NjJdLFs2OS44NjIsMjIuNDYyXSxbNjkuNzAxLDIyLjQ2MV0sWzY5LjY1NiwyMi4zNl0sWzY5LjU0NCwyMi4zNzddLFs2OS4yNTUsMjIuMjY3XSxbNjkuMTM3LDIyLjE5NV0sWzY5LjE4OCwyMi40MTVdLFs2OS4wMDYsMjIuNDM5XSxbNjguOTM2LDIyLjMxMV0sWzY4Ljk1NiwyMi4yNDJdLFs2OS4yODIsMjEuODk2XSxbNjkuNjAzLDIxLjYzN10sWzcwLjA5OSwyMS4xMDhdLFs3MC40MjYsMjAuODYzXSxbNzAuNzQzLDIwLjcyXSxbNzAuODc0LDIwLjcwNF0sWzcxLjE0OSwyMC43NThdLFs3MS41MTEsMjAuOTQ1XSxbNzEuNzc5LDIxLjAzXSxbNzEuODMxLDIxLjA5OF0sWzcyLjExMiwyMS4yXSxbNzIuMDg0LDIxLjI0Nl0sWzcyLjIxMSwyMS40MjFdLFs3Mi4zMDksMjEuNjM5XSxbNzIuMTc3LDIxLjgwNF0sWzcyLjIyNSwyMi4wNTVdLFs3Mi4zMjQsMjIuMTQ0XSxbNzIuMzczLDIyLjMxNl0sWzcyLjQyNywyMi4yMV0sWzcyLjUxNywyMi4zMDZdLFs3Mi45MTEsMjIuMjY3XSxbNzIuNzU4LDIyLjE3NF0sWzcyLjU2NywyMi4xODJdLFs3Mi41MDksMjEuOTQ0XSxbNzIuNjE5LDIxLjgxXSxbNzIuNTUzLDIxLjY2Ml0sWzcyLjcyOCwyMS42ODZdLFs3Mi42MTIsMjEuNTg1XSxbNzIuNzA2LDIxLjUyN10sWzcyLjY1NCwyMS4zNDZdLFs3Mi42MDEsMjEuMzIzXSxbNzIuNjMyLDIxLjA4Ml0sWzcyLjcwMiwyMS4wOTZdLFs3Mi44NDMsMjAuNzc3XSxbNzIuODk4LDIwLjU4M10sWzcyLjg1NiwyMC40NjddLFs3Mi44OTEsMjAuMzczXSxbNzIuNzksMjAuMzUyXSxbNzIuNzQxLDIwLjI0N10sWzcyLjcyOSwxOS45OF0sWzcyLjY2NCwxOS45MzFdLFs3Mi43MTYsMTkuNTkzXSxbNzIuOCwxOS4zM10sWzcyLjc4MiwxOS4xNTldLFs3Mi44MjcsMTkuMDk2XSxbNzIuODA1LDE4Ljg5OV0sWzcyLjg2NCwxOC44MDVdLFs3Mi44NjYsMTguNjUyXSxbNzIuOTMxLDE4LjUzN10sWzcyLjkxMSwxOC4zNjZdLFs3My4wNTMsMTguMjcyXSxbNzMuMDY5LDE4LjIwOV0sWzcyLjkzNywxOC4yNzVdLFs3Mi45OSwxOC4wNTZdLFs3My4xMzYsMTcuNzA4XSxbNzMuMTQsMTcuNTY3XSxbNzMuMjQ5LDE3LjI5Nl0sWzczLjE5OSwxNy4zMDVdLFs3My4yODksMTcuMDc0XSxbNzMuMjgsMTYuOTA1XSxbNzMuMzUyLDE2LjYyM10sWzczLjMxOSwxNi41MTldLFs3My41MSwxNS45NDJdLFs3My41ODcsMTUuOTExXSxbNzMuNzAyLDE1LjY5MV0sWzczLjc2OCwxNS40OTFdLFs3My44OSwxNS40MjZdLFs3My45MDQsMTUuNDE2XSxbNzMuOTE5LDE1LjQyMV0sWzczLjkyNywxNS40MjNdLFs3My45MjksMTUuNDI0XSxbNzMuOTMxLDE1LjQyOF0sWzczLjkzNiwxNS40MzJdLFs3My45NDIsMTUuNDM0XSxbNzMuOTQ1LDE1LjQzMl0sWzczLjkzNiwxNS40MjFdLFs3My45MzYsMTUuNDJdLFs3My45MzUsMTUuNDEzXSxbNzMuOTM2LDE1LjQxMV0sWzczLjk0NywxNS40MDddLFs3My45NDksMTUuNDA1XSxbNzMuOTM5LDE1LjQwM10sWzczLjkzMiwxNS40MDJdLFs3My45NTgsMTUuMzk3XSxbNzMuOTYzLDE1LjM4N10sWzczLjk2OCwxNS4zNjldLFs3NC4xMSwxNS4yNjldLFs3NC4wOCwxNS40MDldLFs3NC4yMzcsMTUuNDgzXV0sW1s3Mi45NzcsMjAuMTgxXSxbNzIuOTEyLDIwLjI2OV0sWzczLjE2NiwyMC4yODNdLFs3My4wNiwyMC4yMjNdLFs3My4xMDcsMjAuMTU4XSxbNzMuMTk5LDIwLjE5NF0sWzczLjE3MSwyMC4wNTJdLFs3Mi45NiwyMC4xMzRdLFs3Mi45NzcsMjAuMTgxXV1dLFtbWzcyLjQ0MywyMS45NzZdLFs3Mi4zODksMjIuMDI3XSxbNzIuMjkzLDIxLjk3XSxbNzIuMzIxLDIxLjgyXSxbNzIuMzg4LDIxLjgxN10sWzcyLjQ0MywyMS45NzZdXV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiVzIiLCJyZWdpb24iOiJXZXN0In0sImlkIjoiVzIifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODMuMzMsMjQuMTAyXSxbODMuMTQxLDIzLjg4NV0sWzgyLjk1NCwyMy44NzFdLFs4Mi44MSwyMy45NjNdLFs4Mi41MjUsMjMuNzg0XSxbODIuMDA5LDIzLjg2MV0sWzgxLjc3MywyMy44MTZdLFs4MS42MSwyMy45MDRdLFs4MS42OTYsMjMuNzIxXSxbODEuNjIsMjMuNjUxXSxbODEuNjM5LDIzLjQ3OF0sWzgxLjczNiwyMy41NjZdLFs4MS45MjMsMjMuNTMzXSxbODEuOTg1LDIzLjQxNV0sWzgyLjEwMiwyMy4zOThdLFs4Mi4xOTksMjMuMzEyXSxbODIuMTYxLDIzLjE0M10sWzgxLjkyMSwyMy4wNDFdLFs4MS45NSwyMi45ODNdLFs4MS43NzYsMjIuODc0XSxbODEuNzk0LDIyLjc2Nl0sWzgxLjY0NywyMi42MTNdLFs4MS42NiwyMi41N10sWzgxLjQyOCwyMi40OF0sWzgxLjE5NCwyMi40OTFdLFs4MS4xMSwyMi40MzZdLFs4MS4xMTgsMjIuMjkxXSxbODEuMDIzLDIyLjIyOV0sWzgxLjAxMSwyMi4wOTVdLFs4MC45MDgsMjIuMTFdLFs4MC44MzIsMjEuOTA5XSxbODAuODM5LDIxLjhdLFs4MC43NDcsMjEuNzU2XSxbODAuNzM1LDIxLjQ2MV0sWzgwLjY2LDIxLjMzNF0sWzgwLjY0MywyMS4yNV0sWzgwLjQ2NCwyMS4xNzVdLFs4MC40NDMsMjAuOTk1XSxbODAuNTM1LDIwLjkzNF0sWzgwLjU4OCwyMC42ODNdLFs4MC40ODEsMjAuNjE4XSxbODAuNjI2LDIwLjU2N10sWzgwLjU5MSwyMC4zOTNdLFs4MC42MjYsMjAuMzMzXSxbODAuMzk4LDIwLjI0NF0sWzgwLjQzLDIwLjEzNl0sWzgwLjU1MiwyMC4xMTFdLFs4MC41MDYsMTkuODcxXSxbODAuNTg3LDE5Ljc0MV0sWzgwLjY3NiwxOS42OTldLFs4MC42NywxOS42MDldLFs4MC44OTYsMTkuNTE5XSxbODAuODEzLDE5LjQzNF0sWzgwLjg1MywxOS4zNjRdLFs4MC43NiwxOS4yOTFdLFs4MC42MjMsMTkuMzA2XSxbODAuNTc5LDE5LjQwMV0sWzgwLjQ4NiwxOS4zNDFdLFs4MC4zMjgsMTkuMTM1XSxbODAuMjc0LDE4LjkzMl0sWzgwLjM1NCwxOC44MjddLFs4MC4yNzMsMTguNzIzXSxbODAuMzQzLDE4LjU5OF0sWzgwLjQ1NywxOC42M10sWzgwLjYzOCwxOC41MjNdLFs4MC44NjcsMTguMTRdLFs4MC45NTgsMTguMTc3XSxbODEuMDA4LDE3Ljc5OF0sWzgxLjE2OCwxNy44NTZdLFs4MS4zOTYsMTcuODJdLFs4MS40NDgsMTcuODg5XSxbODEuNTMxLDE4LjI2NV0sWzgxLjc2OSwxOC40MThdLFs4MS45NjMsMTguNTk1XSxbODEuOTY1LDE4LjY5M10sWzgyLjE1NiwxOC43ODVdLFs4Mi4xNzUsMTguOTAxXSxbODIuMjQ2LDE4LjkxOV0sWzgyLjIxOSwxOS4wOTVdLFs4Mi4xNjgsMTkuMTM2XSxbODIuMTc4LDE5LjQzN10sWzgyLjAyOSwxOS41MDhdLFs4Mi4wNiwxOS43OTZdLFs4MS44NTIsMTkuOTIzXSxbODEuODY1LDIwLjAyN10sWzgxLjk0NiwyMC4xMDVdLFs4Mi4yNjksMTkuOTc1XSxbODIuMzQ1LDE5LjgzNl0sWzgyLjQxOCwxOS45MDRdLFs4Mi42MDQsMTkuODY2XSxbODIuNTgzLDE5Ljc3OV0sWzgyLjcwNCwxOS44MzJdLFs4Mi43MTgsMTkuOTg5XSxbODIuNDAxLDIwLjA1NV0sWzgyLjQzOCwyMC40MzRdLFs4Mi4zMzQsMjAuNTY5XSxbODIuMzc3LDIwLjYzMl0sWzgyLjM0LDIwLjg0N10sWzgyLjQ1NSwyMC44MjddLFs4Mi40ODgsMjAuOTA5XSxbODIuNjMsMjEuMDRdLFs4Mi42MzcsMjEuMTQ4XSxbODIuOTQyLDIxLjE2MV0sWzgzLjEzOSwyMS4xMDldLFs4My4xOTgsMjEuMTQ1XSxbODMuMjc0LDIxLjM3N10sWzgzLjM5LDIxLjM0M10sWzgzLjMzOCwyMS41MDJdLFs4My40OTMsMjEuODE4XSxbODMuNTc2LDIxLjgzMV0sWzgzLjUzNywyMi4wNDRdLFs4My42MjgsMjIuMjA0XSxbODMuNzU4LDIyLjI0XSxbODMuODY2LDIyLjM0M10sWzg0LjAwNSwyMi4zNzRdLFs4NC4wMDksMjIuNTI2XSxbODQuMDI0LDIyLjU5Ml0sWzg0LjIzOCwyMi42OTJdLFs4NC4zOCwyMi45NzJdLFs4NC4xNDksMjIuOTY1XSxbODQuMTMzLDIzLjA4M10sWzg0LjAzMiwyMy4xNThdLFs4NC4wNTEsMjMuMzc1XSxbODMuOTY5LDIzLjM2N10sWzg0LjAzLDIzLjZdLFs4My45NCwyMy41NzFdLFs4My43NzcsMjMuNjA4XSxbODMuNzA4LDIzLjgxN10sWzgzLjU2OSwyMy44NjddLFs4My41MDgsMjQuMDMxXSxbODMuMzMsMjQuMTAyXV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiVzMiLCJyZWdpb24iOiJXZXN0In0sImlkIjoiVzMifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbNzMuODksMTUuNDI2XSxbNzMuNzg0LDE1LjQxNF0sWzczLjksMTUuMzE5XSxbNzMuOTgsMTUuMDUyXSxbNzQuMTI1LDE0LjgzN10sWzc0LjA5NSwxNC44XSxbNzQuMjUsMTQuNzM5XSxbNzQuMzE2LDE0LjUxOV0sWzc0LjM1NSwxNC41MDldLFs3NC40NywxNC4xODhdLFs3NC41MTUsMTMuOTg3XSxbNzQuNjA5LDEzLjg2MV0sWzc0LjY2NCwxMy42NTJdLFs3NC43MSwxMy4zMzJdLFs3NC44MjQsMTIuODUxXSxbNzQuODcsMTIuNzYxXSxbNzUuMTYxLDEyLjY3M10sWzc1LjIyLDEyLjU2OF0sWzc1LjQyMiwxMi4zNzNdLFs3NS41NzcsMTIuMTU3XSxbNzUuODAzLDEyLjA4XSxbNzUuODMsMTEuOTg0XSxbNzYuMDAzLDExLjkzMV0sWzc2LjExMiwxMS45NzldLFs3Ni4xMiwxMS44NV0sWzc2LjIwNywxMS44NjJdLFs3Ni4zNCwxMS43MzldLFs3Ni40MTEsMTEuNzU4XSxbNzYuNDMxLDExLjY2Nl0sWzc2LjUxMiwxMS43MDVdLFs3Ni41NywxMS42MThdLFs3Ni44MzUsMTEuNjRdLFs3Ni45MDksMTEuNzk1XSxbNzcuMTExLDExLjc3NF0sWzc3LjI5NCwxMS44MDldLFs3Ny40NSwxMS43OTZdLFs3Ny40OTMsMTEuOTQxXSxbNzcuNjY5LDExLjk0OV0sWzc3Ljc3NiwxMi4xMTldLFs3Ny43MzEsMTIuMThdLFs3Ny40NzIsMTIuMjFdLFs3Ny42MiwxMi4zODNdLFs3Ny41OTksMTIuNjY3XSxbNzcuNzQsMTIuNjc0XSxbNzcuNzk5LDEyLjg1Ml0sWzc3LjkyOSwxMi44OTFdLFs3OC4yMzEsMTIuNzYxXSxbNzguMzc5LDEyLjYyNV0sWzc4LjU1NSwxMi42OTldLFs3OC42MzQsMTIuOTMxXSxbNzguNjIxLDEyLjk5MV0sWzc4LjgxMywxMy4wODldLFs3OS4wMDQsMTMuMDg1XSxbNzkuMTg1LDEzLjAzXSxbNzkuMjI3LDEzLjE1OV0sWzc5LjMxLDEzLjExMl0sWzc5LjQ1MywxMy4yMzhdLFs3OS4zOTgsMTMuMzNdLFs3OS41MzcsMTMuMzM5XSxbNzkuNTQsMTMuMjcyXSxbNzkuNzk1LDEzLjI0Ml0sWzc5Ljc2OCwxMy4zMTRdLFs3OS45MzEsMTMuMzUyXSxbODAsMTMuNTQyXSxbODAuMjQyLDEzLjQ3Ml0sWzgwLjI2OCwxMy41NjRdLFs4MC4yNTUsMTMuNzc5XSxbODAuMTQ3LDE0LjA0MV0sWzgwLjEzLDE0LjIyXSxbODAuMTk2LDE0LjU4N10sWzgwLjExMiwxNC43NF0sWzgwLjA0NywxNS4wODNdLFs4MC4xMTEsMTUuMzQ2XSxbODAuMjA5LDE1LjQ3OV0sWzgwLjI0MywxNS42MTVdLFs4MC4zNjIsMTUuNzY0XSxbODAuNjQ5LDE1Ljg3OV0sWzgwLjc4MiwxNS44NjNdLFs4MC44MTYsMTUuNzEzXSxbODEuMDA4LDE1Ljc1NF0sWzgxLjAwNSwxNS44MzhdLFs4MS4xNDgsMTUuOTc5XSxbODEuMjE0LDE2LjIwOF0sWzgxLjI2OCwxNi4yNzldLFs4MS41MDMsMTYuMzU1XSxbODEuNzIsMTYuMzA3XSxbODIuMzEzLDE2LjU2Ml0sWzgyLjM2MSwxNi43MDVdLFs4Mi4zNTYsMTYuODU4XSxbODIuMjQ4LDE2LjkwNV0sWzgyLjI4OCwxNy4wMTNdLFs4Mi40NDMsMTcuMTc1XSxbODIuNzAzLDE3LjM0NF0sWzgyLjk5NSwxNy40NzVdLFs4My4yMzUsMTcuNjEyXSxbODMuNTY5LDE4LjAxXSxbODMuNzUxLDE4LjEyOV0sWzg0LjEyNiwxOC4zMTFdLFs4NC4xNDgsMTguMzc0XSxbODQuMzU1LDE4LjU1NV0sWzg0Ljc2NSwxOS4wNzddLFs4NC43MDksMTkuMTZdLFs4NC42MDEsMTkuMTI4XSxbODQuNDQ4LDE5LjAwNF0sWzg0LjMxOSwxOC43ODhdLFs4NC4wOTIsMTguNzZdLFs4NC4wMzYsMTguODE3XSxbODMuODk1LDE4LjgxN10sWzgzLjc5MywxOS4wMTldLFs4My43NDYsMTguOTk3XSxbODMuNjMyLDE5LjE0MV0sWzgzLjQ2LDE4Ljk1Nl0sWzgzLjMwOSwxOV0sWzgzLjQwNCwxOC44NDVdLFs4My4yMTcsMTguNzQ4XSxbODMuMTM3LDE4Ljc4Nl0sWzgyLjk5OSwxOC42MjFdLFs4My4wMTksMTguNDU3XSxbODMuMDc1LDE4LjQwNF0sWzgyLjk3NSwxOC4zNjRdLFs4Mi44MTQsMTguNDUyXSxbODIuNzY5LDE4LjMzOF0sWzgyLjU5NywxOC4yNjVdLFs4Mi42MDUsMTguMzgyXSxbODIuNTQxLDE4LjRdLFs4Mi40NzIsMTguNTQzXSxbODIuMzYzLDE4LjQyMl0sWzgyLjM5MSwxOC4zMjddLFs4Mi4zMTQsMTguMTg1XSxbODIuMzQyLDE4LjA1OV0sWzgyLjI2NSwxNy45OTZdLFs4Mi4wNzUsMTguMDc2XSxbODEuODA4LDE3Ljk1Nl0sWzgxLjYxOSwxNy44MjRdLFs4MS4zOTYsMTcuODJdLFs4MS4xNjgsMTcuODU2XSxbODEuMDA4LDE3Ljc5OF0sWzgwLjk1OCwxOC4xNzddLFs4MC44NjcsMTguMTRdLFs4MC42MzgsMTguNTIzXSxbODAuNDU3LDE4LjYzXSxbODAuMzQzLDE4LjU5OF0sWzgwLjI3MywxOC43MjNdLFs4MC4xMTIsMTguNjgzXSxbNzkuOTE0LDE4LjgyNl0sWzc5Ljk2MiwxOC44NjddLFs3OS45MzgsMTkuMDQxXSxbNzkuODcsMTkuMDQyXSxbNzkuOTc3LDE5LjM5NF0sWzc5Ljk0NCwxOS40NzFdLFs3OS43NzksMTkuNl0sWzc5LjUwMSwxOS41MDddLFs3OS4yNTEsMTkuNjE2XSxbNzkuMTksMTkuNDU5XSxbNzguOTQ3LDE5LjU2Ml0sWzc4Ljk1NSwxOS42NTZdLFs3OC44NTIsMTkuNjU5XSxbNzguODQxLDE5Ljc2Ml0sWzc4LjYwNCwxOS44MThdLFs3OC40MjMsMTkuODE4XSxbNzguMzA3LDE5LjkxNF0sWzc4LjM2NSwxOS43ODFdLFs3OC4yNjMsMTkuNjY1XSxbNzguMzA0LDE5LjQ1Nl0sWzc4LjE3MiwxOS4zNl0sWzc4LjE3NSwxOS4yMzhdLFs3OC4wNTYsMTkuMjM3XSxbNzcuOTQ0LDE5LjM0M10sWzc3Ljg2MywxOS4zMDRdLFs3Ny43NzIsMTguOTc5XSxbNzcuOTQ5LDE4Ljg0M10sWzc3Ljg0LDE4LjgwNV0sWzc3LjczLDE4LjY2N10sWzc3LjczOSwxOC41NTddLFs3Ny41OTYsMTguNTQ5XSxbNzcuNDkzLDE4LjI2N10sWzc3LjM2NiwxOC4zMDddLFs3Ny40MTQsMTguMzkzXSxbNzcuMjQyLDE4LjQxM10sWzc3LjExMywxOC4xNTddLFs3Ni45NTIsMTguMTg4XSxbNzYuOTE5LDE3LjkxNl0sWzc2LjczOCwxNy44NTldLFs3Ni43ODcsMTcuODMzXSxbNzYuNjcxLDE3LjY5MV0sWzc2LjYxMiwxNy43N10sWzc2LjQ4NywxNy43MTVdLFs3Ni40MiwxNy42MDRdLFs3Ni4zMzIsMTcuNTk2XSxbNzYuMzQ1LDE3LjM1NF0sWzc2LjEyLDE3LjM3XSxbNzUuOTI2LDE3LjMyNV0sWzc1LjYzMywxNy40NzddLFs3NS41NzQsMTcuMzgzXSxbNzUuNjU0LDE3LjI3NF0sWzc1LjY2NiwxNi45OF0sWzc1LjQ4OSwxNi45NDRdLFs3NS40NjYsMTYuOTg4XSxbNzUuMjgsMTYuOTU3XSxbNzUuMjY1LDE2Ljg2M10sWzc1LjE4MywxNi44NDNdLFs3NS4wODksMTYuOTUyXSxbNzQuOTIyLDE2LjkzXSxbNzQuOTIsMTYuNzczXSxbNzQuNjkxLDE2LjcxNl0sWzc0LjY4OSwxNi42MTddLFs3NC41NjksMTYuNTU0XSxbNzQuNTQ1LDE2LjYzNV0sWzc0LjQ1NSwxNi42NDddLFs3NC4zNzksMTYuNTI4XSxbNzQuMzE4LDE2LjU1NF0sWzc0LjMzNCwxNi4yNjldLFs3NC41MDMsMTYuMjI1XSxbNzQuNDYzLDE2LjA0XSxbNzQuMzQ2LDE1Ljg1MV0sWzc0LjM3MSwxNS43OTVdLFs3NC4xMjYsMTUuNzI0XSxbNzQuMTE4LDE1LjY1Ml0sWzc0LjE2NywxNS42NzJdLFs3NC4yMDMsMTUuNjYzXSxbNzQuMjI0LDE1LjY2OV0sWzc0LjI1MiwxNS42NTRdLFs3NC4yNDQsMTUuNjI2XSxbNzQuMjY0LDE1LjYxNl0sWzc0LjI0OSwxNS41NjhdLFs3NC4yNzksMTUuNTE4XSxbNzQuMjM3LDE1LjQ4M10sWzc0LjA4LDE1LjQwOV0sWzc0LjExLDE1LjI2OV0sWzczLjk2OCwxNS4zNjldLFs3My45NjMsMTUuMzg3XSxbNzMuOTU4LDE1LjM5N10sWzczLjkzMiwxNS40MDJdLFs3My45MzksMTUuNDAzXSxbNzMuOTQ5LDE1LjQwNV0sWzczLjk0NywxNS40MDddLFs3My45MzYsMTUuNDExXSxbNzMuOTM1LDE1LjQxM10sWzczLjkzNiwxNS40Ml0sWzczLjkzNiwxNS40MjFdLFs3My45NDUsMTUuNDMyXSxbNzMuOTQyLDE1LjQzNF0sWzczLjkzNiwxNS40MzJdLFs3My45MzEsMTUuNDI4XSxbNzMuOTI5LDE1LjQyNF0sWzczLjkyNywxNS40MjNdLFs3My45MTksMTUuNDIxXSxbNzMuOTA0LDE1LjQxNl0sWzczLjg5LDE1LjQyNl1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlMxIiwicmVnaW9uIjoiU291dGgifSwiaWQiOiJTMSJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiTXVsdGlQb2x5Z29uIiwiY29vcmRpbmF0ZXMiOltbW1s3Ny4wOTgsOC4yOTJdLFs3Ny4zMzEsOC4xMjddLFs3Ny41NTYsOC4wNzddLFs3Ny41ODQsOC4xMzhdLFs3Ny43OTQsOC4xNjJdLFs3Ny44NDEsOC4yNTJdLFs3Ny45OTEsOC4zNV0sWzc4LjE0Myw4LjUwMl0sWzc4LjE2MSw4LjgwNV0sWzc4LjIyOCw4Ljk3NF0sWzc4LjQxNSw5LjExNF0sWzc4LjY1LDkuMTYxXSxbNzguNjY1LDkuMTk0XSxbNzguOTgxLDkuMjc0XSxbNzkuMTksOS4yODJdLFs3OS4zOTIsOS4xOV0sWzc5LjMxNCw5LjI3OV0sWzc5LjA2Nyw5LjI5OF0sWzc4LjkwMyw5LjQ2M10sWzc4Ljk4LDkuNjldLFs3OS4yNjYsMTAuMDM5XSxbNzkuMjI2LDEwLjEwMV0sWzc5LjMsMTAuMjY1XSxbNzkuMzgxLDEwLjMxNl0sWzc5Ljc2OCwxMC4yNzJdLFs3OS44NjIsMTAuMjgzXSxbNzkuODQzLDExLjM1MV0sWzc5Ljc2NiwxMS41MjJdLFs3OS43NjEsMTEuNjI0XSxbNzkuODc0LDEyLjA0M10sWzgwLjA1NywxMi4zMjZdLFs4MC4xMzgsMTIuNDExXSxbODAuMjU1LDEyLjc4M10sWzgwLjI2OCwxMi45NzldLFs4MC4zNDUsMTMuMjc2XSxbODAuMzI0LDEzLjQ1XSxbODAuMjY4LDEzLjU2NF0sWzgwLjI0MiwxMy40NzJdLFs4MCwxMy41NDJdLFs3OS45MzEsMTMuMzUyXSxbNzkuNzY4LDEzLjMxNF0sWzc5Ljc5NSwxMy4yNDJdLFs3OS41NCwxMy4yNzJdLFs3OS41MzcsMTMuMzM5XSxbNzkuMzk4LDEzLjMzXSxbNzkuNDUzLDEzLjIzOF0sWzc5LjMxLDEzLjExMl0sWzc5LjIyNywxMy4xNTldLFs3OS4xODUsMTMuMDNdLFs3OS4wMDQsMTMuMDg1XSxbNzguODEzLDEzLjA4OV0sWzc4LjYyMSwxMi45OTFdLFs3OC42MzQsMTIuOTMxXSxbNzguNTU1LDEyLjY5OV0sWzc4LjM3OSwxMi42MjVdLFs3OC4yMzEsMTIuNzYxXSxbNzcuOTI5LDEyLjg5MV0sWzc3Ljc5OSwxMi44NTJdLFs3Ny43NCwxMi42NzRdLFs3Ny41OTksMTIuNjY3XSxbNzcuNjIsMTIuMzgzXSxbNzcuNDcyLDEyLjIxXSxbNzcuNzMxLDEyLjE4XSxbNzcuNzc2LDEyLjExOV0sWzc3LjY2OSwxMS45NDldLFs3Ny40OTMsMTEuOTQxXSxbNzcuNDUsMTEuNzk2XSxbNzcuMjk0LDExLjgwOV0sWzc3LjExMSwxMS43NzRdLFs3Ni45MDksMTEuNzk1XSxbNzYuODM1LDExLjY0XSxbNzYuNTcsMTEuNjE4XSxbNzYuNTEyLDExLjcwNV0sWzc2LjQzMSwxMS42NjZdLFs3Ni4yMzMsMTEuNTY4XSxbNzYuMjQ3LDExLjQ2OF0sWzc2LjM0MiwxMS40NjhdLFs3Ni41NDgsMTEuMzU5XSxbNzYuNDU4LDExLjE4OF0sWzc2LjYyOSwxMS4xOTRdLFs3Ni43MDcsMTEuMjM4XSxbNzYuNzQ4LDExLjEzNV0sWzc2LjY1OSwxMC45MzFdLFs3Ni45MDEsMTAuODA4XSxbNzYuODM5LDEwLjU5Nl0sWzc2LjgzLDEwLjMwM10sWzc2Ljk4NCwxMC4yMjJdLFs3Ny4xNzYsMTAuMzU5XSxbNzcuMjg4LDEwLjIzMl0sWzc3LjI3NSwxMC4xMzFdLFs3Ny4yMDEsMTAuMTA3XSxbNzcuMjczLDkuOTY0XSxbNzcuMjE4LDkuOTA1XSxbNzcuMjIzLDkuNzNdLFs3Ny4xNjgsOS42MTVdLFs3Ny4zMjIsOS41OThdLFs3Ny40MTIsOS41MDldLFs3Ny4yODMsOS4yOTNdLFs3Ny4yNjgsOS4xNTNdLFs3Ny4xNDksOS4wMV0sWzc3LjI2NCw4Ljg0Ml0sWzc3LjE3OSw4LjczMV0sWzc3LjI4NCw4LjU0N10sWzc3LjIxNCw4LjUxMl0sWzc3LjE1OCw4LjMyOF0sWzc3LjA5OCw4LjI5Ml1dXSxbW1s3NS4yMjcsMTIuMDQ0XSxbNzUuMjYzLDEyLjAwM10sWzc1LjM5OCwxMi4xM10sWzc1LjIyMSwxMi4xMDFdLFs3NS4yMjcsMTIuMDQ0XV1dXX0sInByb3BlcnRpZXMiOnsiem9uZSI6IlMyIiwicmVnaW9uIjoiU291dGgifSwiaWQiOiJTMiJ9LHsidHlwZSI6IkZlYXR1cmUiLCJnZW9tZXRyeSI6eyJ0eXBlIjoiUG9seWdvbiIsImNvb3JkaW5hdGVzIjpbW1s3Ni40MzEsMTEuNjY2XSxbNzYuNDExLDExLjc1OF0sWzc2LjM0LDExLjczOV0sWzc2LjIwNywxMS44NjJdLFs3Ni4xMiwxMS44NV0sWzc2LjExMiwxMS45NzldLFs3Ni4wMDMsMTEuOTMxXSxbNzUuODMsMTEuOTg0XSxbNzUuODAzLDEyLjA4XSxbNzUuNTc3LDEyLjE1N10sWzc1LjQyMiwxMi4zNzNdLFs3NS4yMiwxMi41NjhdLFs3NS4xNjEsMTIuNjczXSxbNzQuODcsMTIuNzYxXSxbNzUuMjA0LDEyLjAwNl0sWzc1LjI1MiwxMi4wMDldLFs3NS4zNjYsMTEuODUzXSxbNzUuNTA4LDExLjczM10sWzc1LjYxOSwxMS40ODddLFs3NS42ODEsMTEuNDUxXSxbNzUuODMsMTEuMTE3XSxbNzUuOTIyLDEwLjc2MV0sWzc2LjExNywxMC4zMzRdLFs3Ni4yNiw5Ljg4M10sWzc2LjMxNiw5LjUwM10sWzc2LjM1Myw5LjM3N10sWzc2LjUxNyw5LjAxOF0sWzc2LjYxLDguODZdLFs3Ni45OTgsOC4zNzVdLFs3Ny4wOTgsOC4yOTJdLFs3Ny4xNTgsOC4zMjhdLFs3Ny4yMTQsOC41MTJdLFs3Ny4yODQsOC41NDddLFs3Ny4xNzksOC43MzFdLFs3Ny4yNjQsOC44NDJdLFs3Ny4xNDksOS4wMV0sWzc3LjI2OCw5LjE1M10sWzc3LjI4Myw5LjI5M10sWzc3LjQxMiw5LjUwOV0sWzc3LjMyMiw5LjU5OF0sWzc3LjE2OCw5LjYxNV0sWzc3LjIyMyw5LjczXSxbNzcuMjE4LDkuOTA1XSxbNzcuMjczLDkuOTY0XSxbNzcuMjAxLDEwLjEwN10sWzc3LjI3NSwxMC4xMzFdLFs3Ny4yODgsMTAuMjMyXSxbNzcuMTc2LDEwLjM1OV0sWzc2Ljk4NCwxMC4yMjJdLFs3Ni44MywxMC4zMDNdLFs3Ni44MzksMTAuNTk2XSxbNzYuOTAxLDEwLjgwOF0sWzc2LjY1OSwxMC45MzFdLFs3Ni43NDgsMTEuMTM1XSxbNzYuNzA3LDExLjIzOF0sWzc2LjYyOSwxMS4xOTRdLFs3Ni40NTgsMTEuMTg4XSxbNzYuNTQ4LDExLjM1OV0sWzc2LjM0MiwxMS40NjhdLFs3Ni4yNDcsMTEuNDY4XSxbNzYuMjMzLDExLjU2OF0sWzc2LjQzMSwxMS42NjZdXV19LCJwcm9wZXJ0aWVzIjp7InpvbmUiOiJTMyIsInJlZ2lvbiI6IlNvdXRoIn0sImlkIjoiUzMifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbOTIuMjEyLDI0LjUwNF0sWzkyLjA4MywyNC4zNzVdLFs5MS45MjIsMjQuMzM3XSxbOTEuOTExLDI0LjE0MV0sWzkxLjc0NywyNC4yNDVdLFs5MS43NTcsMjQuMTQ0XSxbOTEuNjYzLDI0LjIxM10sWzkxLjU4MSwyNC4wNzRdLFs5MS4zNzYsMjQuMTA2XSxbOTEuMzc5LDIzLjk3NF0sWzkxLjI4LDIzLjk4Ml0sWzkxLjIxOSwyMy44NzldLFs5MS4yMjEsMjMuNzQyXSxbOTEuMTY2LDIzLjc1XSxbOTEuMTYxLDIzLjU5NV0sWzkxLjI1NCwyMy40ODhdLFs5MS4zNDcsMjMuMTAyXSxbOTEuNDE2LDIzLjA4MV0sWzkxLjM4NiwyMy4yMjhdLFs5MS40NDksMjMuMjZdLFs5MS41NSwyMy4wMzldLFs5MS42MjcsMjIuOTU2XSxbOTEuODIyLDIzLjA4Nl0sWzkxLjc2NCwyMy4zMV0sWzkxLjk3NCwyMy40ODFdLFs5MS45MzcsMjMuNjkxXSxbOTIuMDc1LDIzLjY0N10sWzkyLjExOCwyMy43MzFdLFs5Mi4yNTUsMjMuNzI3XSxbOTIuNCwyMy4yMzZdLFs5Mi4zNDcsMjMuMjM3XSxbOTIuMzkyLDIzLjA1N10sWzkyLjM3MiwyMi45MzddLFs5Mi41MDcsMjIuNzM4XSxbOTIuNTg0LDIyLjI5OV0sWzkyLjU5OSwyMi4wMDZdLFs5Mi42OCwyMi4wMTJdLFs5Mi43MjUsMjIuMTQ4XSxbOTIuODU3LDIyLjA2N10sWzkyLjkwMywyMS45NDFdLFs5My4wNDIsMjIuMTk5XSxbOTMuMTk5LDIyLjI1Nl0sWzkzLjE4NSwyMi40MjhdLFs5My4wOTEsMjIuNzA0XSxbOTMuMTM2LDIyLjkxM10sWzkzLjEyNywyMy4wNDRdLFs5My4yOTQsMjMuMDA3XSxbOTMuMzg3LDIzLjE0NF0sWzkzLjM1NSwyMy4zNTJdLFs5My40MzYsMjMuNjc4XSxbOTMuMzkyLDIzLjc1N10sWzkzLjM5MywyMy45MjFdLFs5My4zMzMsMjMuOTc5XSxbOTMuMzQzLDI0LjA5Ml0sWzkzLjQxNywyNC4wNzJdLFs5My41LDIzLjk0NV0sWzkzLjYyNCwyNC4wMTFdLFs5My43NTgsMjQuMDAzXSxbOTMuODIsMjMuOTI0XSxbOTQuMDE5LDIzLjkyNl0sWzk0LjExNiwyMy44MzldLFs5NC4yMzcsMjQuMDM1XSxbOTQuMjYsMjQuMTY1XSxbOTQuNTQ1LDI0LjcxXSxbOTQuNjI4LDI0Ljc1Nl0sWzk0LjcxNCwyNC45MzZdLFs5NC43NDEsMjUuMTI3XSxbOTQuNTc2LDI1LjIxNF0sWzk0LjY4MywyNS40NjZdLFs5NC44MDYsMjUuNDkyXSxbOTUuMDUsMjUuNzkzXSxbOTUuMDA5LDI1Ljg2N10sWzk1LjE4NiwyNi4wNzNdLFs5NS4xMTgsMjYuMTAxXSxbOTUuMTMyLDI2LjM3OF0sWzk1LjA2MiwyNi40NV0sWzk1LjIzNCwyNi42ODJdLFs5NS4xODIsMjYuODYxXSxbOTUuMjMsMjYuODg0XSxbOTUuMTk1LDI3LjAzMV0sWzk0Ljk4MiwyNi45MTNdLFs5NC44OTEsMjYuOTNdLFs5NC44LDI2LjhdLFs5NC42OTQsMjYuNzMzXSxbOTQuNTM5LDI2LjcwNl0sWzk0LjQwNCwyNi42MTJdLFs5NC4zNzQsMjYuNTA3XSxbOTQuMjgxLDI2LjU0OV0sWzk0LjE4NSwyNi40NTldLFs5NC4wMDgsMjYuMTgzXSxbOTMuOTU0LDI1Ljk2OV0sWzkzLjk3OSwyNS45MTddLFs5My43OSwyNS44MTFdLFs5My43ODcsMjUuOTQ3XSxbOTMuNDgxLDI1LjY0NV0sWzkzLjMyNywyNS41NDVdLFs5My40NTUsMjUuNDM0XSxbOTMuNDcsMjUuMzA1XSxbOTMuMzU0LDI1LjE4N10sWzkzLjI0MiwyNS4wMDRdLFs5My4xOTEsMjQuODA0XSxbOTMuMTA1LDI0Ljc5Ml0sWzkzLjA0MiwyNC40MTNdLFs5Mi44MjYsMjQuMzc2XSxbOTIuNzY0LDI0LjUyMV0sWzkyLjY5LDI0LjM1NF0sWzkyLjYyMywyNC4zMzJdLFs5Mi40NjUsMjQuMTM2XSxbOTIuNDIyLDI0LjI1NV0sWzkyLjIwNiwyNC4yMzhdLFs5Mi4yNiwyNC4zNTldLFs5Mi4yMTIsMjQuNTA0XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiQTEiLCJyZWdpb24iOiJOb3J0aCBFYXN0In0sImlkIjoiQTEifSx7InR5cGUiOiJGZWF0dXJlIiwiZ2VvbWV0cnkiOnsidHlwZSI6IlBvbHlnb24iLCJjb29yZGluYXRlcyI6W1tbODkuNzIsMjYuMTY2XSxbODkuODg3LDI1Ljk0NV0sWzg5LjgzMywyNS44N10sWzg5Ljg4MSwyNS42MjldLFs4OS44MTQsMjUuMzddLFs5MC4xMTIsMjUuMjI0XSxbOTAuNTEsMjUuMTY4XSxbOTAuODY5LDI1LjE2XSxbOTEuMjY1LDI1LjIwN10sWzkxLjQ3MSwyNS4xMzZdLFs5MS42MDMsMjUuMTc0XSxbOTIuMDc1LDI1LjE4Nl0sWzkyLjQyNSwyNS4wM10sWzkyLjQ3NiwyNC44NjhdLFs5Mi4yMzcsMjQuOTAzXSxbOTIuMjk2LDI0LjczN10sWzkyLjIxMiwyNC41MDRdLFs5Mi4yNiwyNC4zNTldLFs5Mi4yMDYsMjQuMjM4XSxbOTIuNDIyLDI0LjI1NV0sWzkyLjQ2NSwyNC4xMzZdLFs5Mi42MjMsMjQuMzMyXSxbOTIuNjksMjQuMzU0XSxbOTIuNzY0LDI0LjUyMV0sWzkyLjgyNiwyNC4zNzZdLFs5My4wNDIsMjQuNDEzXSxbOTMuMTA1LDI0Ljc5Ml0sWzkzLjE5MSwyNC44MDRdLFs5My4yNDIsMjUuMDA0XSxbOTMuMzU0LDI1LjE4N10sWzkzLjQ3LDI1LjMwNV0sWzkzLjQ1NSwyNS40MzRdLFs5My4zMjcsMjUuNTQ1XSxbOTMuNDgxLDI1LjY0NV0sWzkzLjc4NywyNS45NDddLFs5My43OSwyNS44MTFdLFs5My45NzksMjUuOTE3XSxbOTMuOTU0LDI1Ljk2OV0sWzk0LjAwOCwyNi4xODNdLFs5NC4xODUsMjYuNDU5XSxbOTQuMjgxLDI2LjU0OV0sWzk0LjM3NCwyNi41MDddLFs5NC40MDQsMjYuNjEyXSxbOTQuNTM5LDI2LjcwNl0sWzk0LjY5NCwyNi43MzNdLFs5NC44LDI2LjhdLFs5NC44OTEsMjYuOTNdLFs5NC45ODIsMjYuOTEzXSxbOTUuMTk1LDI3LjAzMV0sWzk1LjIzLDI2Ljg4NF0sWzk1LjE4MiwyNi44NjFdLFs5NS4yMzQsMjYuNjgyXSxbOTUuNDMxLDI2LjddLFs5NS41NDMsMjYuODM1XSxbOTUuNzQ1LDI2Ljg5OF0sWzk1LjgwMiwyNy4wMTVdLFs5NS45NDYsMjcuMDUxXSxbOTYuMDIyLDI3LjE4XSxbOTYuMzA3LDI3LjI5NF0sWzk2LjUxOCwyNy4yODZdLFs5Ni42MDYsMjcuMzY2XSxbOTYuNzk3LDI3LjM0Nl0sWzk2Ljg4NCwyNy4yNl0sWzk2Ljg1NywyNy4xOTJdLFs5Ny4wNjIsMjcuMDk5XSxbOTcuMTY0LDI3LjE0Ml0sWzk2LjkwMywyNy40NTRdLFs5Ni44OTMsMjcuNTg4XSxbOTcuMDIyLDI3Ljc0Ml0sWzk3LjI1MywyNy45MDFdLFs5Ny4zODUsMjcuODg3XSxbOTcuNDA4LDI4LjAwNl0sWzk3LjMwOCwyOC4wNjJdLFs5Ny4zNzIsMjguMjE4XSxbOTcuMTIzLDI4LjM0OV0sWzk2Ljk5NCwyOC4zMV0sWzk2Ljg5NiwyOC4zOF0sWzk2Ljc3MiwyOC4zNjhdLFs5Ni42NjMsMjguNDZdLFs5Ni40NTcsMjguNDE0XSxbOTYuNDIxLDI4LjM0Nl0sWzk2LjI2NCwyOC40MTJdLFs5Ni4zNjYsMjguNDc1XSxbOTYuMzIzLDI4LjUyNl0sWzk2LjU4NSwyOC43MTddLFs5Ni42MDcsMjguNzk0XSxbOTYuNDc3LDI4Ljk5XSxbOTYuNTI1LDI5LjA3Nl0sWzk2LjM0NywyOS4wMjldLFs5Ni4xNjYsMjguOTAzXSxbOTYuMTI1LDI5LjA3OF0sWzk2LjM0NywyOS4xNjhdLFs5Ni4zNzYsMjkuMjgxXSxbOTYuMjM1LDI5LjI0MV0sWzk2LjA4MiwyOS40NjJdLFs5NS45NTgsMjkuMzgxXSxbOTUuNzc5LDI5LjM1NV0sWzk1LjU0NiwyOS4yMTRdLFs5NS40NTUsMjkuMDM1XSxbOTUuMjUxLDI5LjA2N10sWzk1LjAwNywyOS4xN10sWzk0LjgsMjkuMTY0XSxbOTQuNzY5LDI5LjI1Ml0sWzk0LjYzMSwyOS4zNDhdLFs5NC41NiwyOS4yMjldLFs5NC40MzQsMjkuMjI3XSxbOTQuMjE3LDI5LjA4NF0sWzk0LjE1NywyOC45NTRdLFs5My45OTcsMjguODQxXSxbOTMuOTIxLDI4LjY3XSxbOTMuODQ2LDI4LjcwN10sWzkzLjYwOSwyOC42NTVdLFs5My40OTgsMjguNjg0XSxbOTMuMzM1LDI4LjYzM10sWzkzLjI3OCwyOC41MDRdLFs5My4xODUsMjguNDRdLFs5My4xOTUsMjguMzE3XSxbOTMuMDI0LDI4LjNdLFs5Mi44NDEsMjguMTc5XSxbOTIuODAyLDI4LjIwMl0sWzkyLjY2NSwyOC4wNjJdLFs5Mi43NDEsMjcuOTg5XSxbOTIuNTYyLDI3LjgyXSxbOTIuMzA5LDI3Ljc3OV0sWzkyLjI1NywyNy44NjJdLFs5MS45MjEsMjcuNzE1XSxbOTEuODMsMjcuODA3XSxbOTEuNTcyLDI3Ljg2MV0sWzkxLjYzMSwyNy44MDFdLFs5MS41NjQsMjcuNTg0XSxbOTEuNjU1LDI3LjQ4M10sWzkyLjAyLDI3LjQ3OV0sWzkyLjA2LDI3LjMyN10sWzkyLjExOCwyNy4yOTJdLFs5Mi4wMjYsMjcuMTcxXSxbOTIuMTA0LDI3LjAwN10sWzkyLjEwMiwyNi44NjddLFs5MS45ODQsMjYuODU4XSxbOTEuODkzLDI2LjkxOV0sWzkxLjcyMSwyNi44MTJdLFs5MS40OTUsMjYuNzkxXSxbOTEuNDA4LDI2Ljg0XSxbOTEuMzM3LDI2Ljc4MV0sWzkxLjA5OCwyNi44MjJdLFs5MC42OTMsMjYuNzcxXSxbOTAuNDE4LDI2LjkwNF0sWzkwLjIzMSwyNi44NTldLFs5MC4xOTUsMjYuNzc0XSxbODkuODUyLDI2LjY5N10sWzg5Ljg1NiwyNi4zODVdLFs4OS43ODEsMjYuMzUzXSxbODkuNzIsMjYuMTY2XV1dfSwicHJvcGVydGllcyI6eyJ6b25lIjoiQTIiLCJyZWdpb24iOiJOb3J0aCBFYXN0In0sImlkIjoiQTIifV19",
+              "style": {
+                "color": {
+                  "fixed": "#808080"
+                },
+                "lineWidth": 1,
+                "opacity": 0.45
+              }
+            },
+            "name": "RTM clearing zones",
+            "tooltip": true,
+            "type": "dynamic-geojson"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 22.5,
+          "lon": 81.5,
+          "noRepeat": false,
+          "zoom": 3.6
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bfq7nkxjvbj0gd"
+          },
+          "format": 1,
+          "rawSQL": "-- One value per clearing zone for the RTM metric volume_bid_purchase (template: build_dashboard.py fills\n-- volume_bid_purchase, 0 and 6000 per map; Grafana fills ${...} at run time).\n--\n-- Window: the dashboard time range. \"Show\" (latest | avg | max | min) reduces it per zone.\n--   latest = each zone's own newest data point in the window (the zones may differ by a slot).\n--   \"Data as of\" = the OLDEST of those per-zone newest timestamps, i.e. how fresh the whole map is.\n-- \"Slot\" (newest | current): by default a range that ends \"now\" also includes the next one or two\n-- slots CDH already holds as cleared results; \"current\" caps the window at the present time.\n-- ts is the extractor's UTC helper (TSDB application date, YYYY-MM-DD HH:MM:SS).\nWITH win AS (\n  SELECT\n    CAST(from_unixtime(${__from} / 1000) AT TIME ZONE 'UTC' AS timestamp) AS from_ts,\n    CAST(from_unixtime(${__to} / 1000) AT TIME ZONE 'UTC' AS timestamp) AS to_raw,\n    CAST(current_timestamp AT TIME ZONE 'UTC' AS timestamp) AS now_ts\n), bounds AS (\n  SELECT\n    from_ts,\n    now_ts,\n    LEAST(to_raw, now_ts) AS age_ref,\n    CASE\n      WHEN ${slot:sqlstring} = 'current' THEN LEAST(to_raw, now_ts)\n      WHEN to_raw >= date_add('minute', -5, now_ts) THEN TIMESTAMP '2100-01-01 00:00:00'\n      ELSE to_raw\n    END AS to_ts\n  FROM win\n), zones(region) AS (\n  VALUES ('A1'), ('A2'), ('E1'), ('E2'), ('N1'), ('N2'), ('N3'),\n         ('S1'), ('S2'), ('S3'), ('W1'), ('W2'), ('W3')\n), ranked AS (\n  SELECT\n    region,\n    TRY_CAST(ts AS timestamp) AS delivery_time,\n    value,\n    unit,\n    ROW_NUMBER() OVER (\n      PARTITION BY region, ts\n      ORDER BY\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(publication_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(publication_date AS timestamp)\n        ) DESC NULLS LAST,\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(insertion_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(insertion_date AS timestamp)\n        ) DESC NULLS LAST,\n        COALESCE(\n          CAST(TRY(from_iso8601_timestamp(silver_insertion_date)) AT TIME ZONE 'UTC' AS timestamp),\n          TRY_CAST(silver_insertion_date AS timestamp)\n        ) DESC NULLS LAST,\n        as_of_date DESC NULLS LAST,\n        \"$path\" DESC\n    ) AS revision_rank\n  FROM india_iex_tsdb_expanded_latest\n  WHERE level = 'regional'\n    AND market = 'RTM'\n    AND metric = 'volume_bid_purchase'\n    AND region IN (SELECT region FROM zones)\n    AND TRY_CAST(ts AS timestamp) IS NOT NULL\n), observations AS (\n  SELECT * FROM ranked WHERE revision_rank = 1\n), in_window AS (\n  SELECT o.* FROM observations o CROSS JOIN bounds b\n  WHERE o.value IS NOT NULL\n    AND o.delivery_time >= b.from_ts\n    AND o.delivery_time <= b.to_ts\n), per_zone AS (\n  SELECT region, MAX(delivery_time) AS latest_ts,\n         AVG(value) AS avg_v, MAX(value) AS max_v, MIN(value) AS min_v,\n         COUNT(*) AS slots, MAX(unit) AS unit\n  FROM in_window GROUP BY region\n), snapshot AS (\n  SELECT\n    z.region,\n    p.latest_ts AS delivery_time,\n    MIN(p.latest_ts) OVER () AS data_as_of,\n    CASE ${agg:sqlstring}\n      WHEN 'avg' THEN p.avg_v\n      WHEN 'max' THEN p.max_v\n      WHEN 'min' THEN p.min_v\n      ELSE l.value\n    END AS price,\n    COALESCE(l.unit, p.unit) AS unit,\n    CASE WHEN ${agg:sqlstring} IN ('avg', 'max', 'min') THEN p.slots\n         WHEN l.value IS NOT NULL THEN 1 END AS slots,\n    CASE\n      WHEN p.latest_ts IS NULL THEN 'Missing'\n      WHEN date_diff('minute', p.latest_ts, (SELECT age_ref FROM bounds)) > 90 THEN 'Stale'\n      ELSE 'Available'\n    END AS status\n  FROM zones z\n  LEFT JOIN per_zone p ON p.region = z.region\n  LEFT JOIN in_window l ON l.region = z.region AND l.delivery_time = p.latest_ts\n), scored AS (\n  SELECT\n    snapshot.*,\n    AVG(CASE WHEN status = 'Available' THEN price END) OVER () AS avg_price,\n    MIN(CASE WHEN status = 'Available' THEN price END) OVER () AS min_price,\n    MAX(CASE WHEN status = 'Available' THEN price END) OVER () AS max_price\n  FROM snapshot\n), deviation AS (\n  SELECT\n    scored.*,\n    CASE WHEN status = 'Available' AND avg_price > 0\n         THEN (price - avg_price) / avg_price * 100 END AS dev_pct\n  FROM scored\n)\n-- \"Map band\" is a colour code the dashboard maps to colours (it is not a value):\n--   0-8   level: nine equal steps between 0 and 6000 (YlOrRd, 8 = at or above 6000)\n--   10-16 deviation from the zone average (13 = within +-0.1%)\n--   20-25 position between the lowest and highest zone (20 lowest, 25 highest)\nSELECT\n  region,\n  delivery_time AS \"Delivery time\",\n  price AS \"Value\",\n  unit AS \"Unit\",\n  slots AS \"Slots\",\n  dev_pct AS \"Vs average (%)\",\n  status AS \"Status\",\n  data_as_of AS \"Data as of\",\n  CASE WHEN status = 'Available' THEN\n    CASE ${colour:sqlstring}\n      WHEN 'relative' THEN\n        CASE WHEN dev_pct IS NULL THEN NULL\n             WHEN dev_pct <= -3 THEN 10 WHEN dev_pct <= -1 THEN 11 WHEN dev_pct < -0.1 THEN 12\n             WHEN dev_pct <= 0.1 THEN 13 WHEN dev_pct < 1 THEN 14 WHEN dev_pct < 3 THEN 15\n             ELSE 16 END\n      WHEN 'range' THEN\n        CASE WHEN max_price = min_price THEN 23\n             ELSE 20 + LEAST(5, CAST(FLOOR((price - min_price) / (max_price - min_price) * 6) AS integer)) END\n      ELSE\n        CASE WHEN price <= 0 THEN 0\n             ELSE LEAST(8, CAST(FLOOR((price - 0) / (6000 - 0) * 9) AS integer)) END\n    END\n  END AS \"Map band\"\nFROM deviation\nORDER BY region\n",
+          "refId": "A",
+          "table": "india_iex_tsdb_expanded_latest"
+        }
+      ],
+      "title": "RTM purchase volume by clearing zone · ${agg:text}",
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "bfq7nkxjvbj0gd"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM Volume Cleared"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM Volume Cleared"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM Volume Cleared"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 3,
+      "maxDataPoints": 1573,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "timezone": [
+          "Asia/Kolkata"
+        ],
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bficmsrgc0zk0c"
+          },
+          "format": 1,
+          "rawSQL": "SELECT\r\n  CAST(application_date AS timestamp) AS ts,\r\n  MAX(CASE WHEN market = 'DAM'  THEN value END) AS \"DAM Volume Cleared\",\r\n  MAX(CASE WHEN market = 'GDAM' THEN value END) AS \"GDAM Volume Cleared\",\r\n  MAX(CASE WHEN market = 'RTM'  THEN value END) AS \"RTM Volume Cleared\"\r\nFROM india_iex_tsdb_expanded_latest\r\nWHERE level = 'national'\r\n  AND technology = 'total'\r\n  AND metric = 'volume_cleared'\r\n  AND market IN ('DAM', 'GDAM', 'RTM')\r\n  AND value IS NOT NULL\r\nGROUP BY application_date\r\nORDER BY ts",
+          "refId": "A",
+          "table": "india_iex_tsdb_expanded_latest"
+        }
+      ],
+      "timeFrom": "1d/d",
+      "timeShift": "0d/d",
+      "title": "MCV Last 2 days",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "bfq7nkxjvbj0gd"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM MCP Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM MCP"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM MCP"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM MCP"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM + REC"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM + REC"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM + REC"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DAM"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GDAM"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RTM"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "timezone": [
+          "Asia/Kolkata"
+        ],
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bficmsrgc0zk0c"
+          },
+          "format": 1,
+          "rawSQL": "WITH prices AS (\r\n    SELECT\r\n        CAST(application_date AS timestamp) AS time,\r\n\r\n        MAX(CASE WHEN market = 'DAM' THEN value END) AS dam,\r\n        MAX(CASE WHEN market = 'GDAM' THEN value END) AS gdam,\r\n        MAX(CASE WHEN market = 'RTM' THEN value END) AS rtm\r\n\r\n    FROM india_iex_tsdb_expanded_latest\r\n\r\n    WHERE level = 'national'\r\n      AND technology = 'total'\r\n      AND metric = 'price'\r\n      AND market IN ('DAM', 'GDAM', 'RTM')\r\n      AND value IS NOT NULL\r\n\r\n      AND CAST(application_date AS timestamp)\r\n          >= CAST(CURRENT_DATE - INTERVAL '1' DAY AS timestamp)\r\n             - INTERVAL '5' HOUR\r\n             - INTERVAL '30' MINUTE\r\n\r\n      AND CAST(application_date AS timestamp)\r\n          < CAST(CURRENT_DATE + INTERVAL '1' DAY AS timestamp)\r\n            - INTERVAL '5' HOUR\r\n            - INTERVAL '30' MINUTE\r\n\r\n    GROUP BY application_date\r\n),\r\n\r\nrec AS (\r\n    SELECT value AS rec_price\r\n    FROM india_iex_rec_tsdb_latest\r\n    WHERE field = 'Clearing_Price'\r\n      AND value IS NOT NULL\r\n    ORDER BY ts DESC\r\n    LIMIT 1\r\n)\r\n\r\nSELECT\r\n    p.time,\r\n\r\n    p.dam AS \"DAM\",\r\n    p.gdam AS \"GDAM\",\r\n    p.rtm AS \"RTM\",\r\n\r\n    p.dam + r.rec_price AS \"DAM + REC\",\r\n    p.rtm + r.rec_price AS \"RTM + REC\"\r\n\r\nFROM prices p\r\nCROSS JOIN rec r\r\n\r\nORDER BY p.time",
+          "refId": "A",
+          "table": "india_iex_tsdb_expanded_latest"
+        },
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "bfq7nkxjvbj0gd"
+          },
+          "format": 1,
+          "hide": false,
+          "rawSQL": "SELECT\r\n  MAX_BY(value, ts) AS rec_price\r\nFROM india_iex_rec_tsdb_latest\r\nWHERE field = 'Clearing_Price'",
+          "refId": "B"
+        }
+      ],
+      "timeFrom": "1d/d",
+      "timeShift": "0d/d",
+      "title": "MCP Last 2 days + with last REC prices",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "IEX",
+    "DAM",
+    "GDAM",
+    "RTM",
+    "MCP",
+    "MVC",
+    "REC"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5d",
+    "to": "now+1d"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Kolkata",
+  "title": "IEX Prices & Volumes",
+  "uid": "corsica",
+  "version": 2
+}
+</pasted_content id="006c">
+
+-- he said that this is actually a copy paste of the geomap poc dashboard we did recently, and it's not rendering correctly, the maps! I see... <screenshot>
+
+## 14:54 assistant (smp-dashboard-scr1269/dashboards/spikes)
+
+The maps fail because Mateo copied the panels but not the dashboard variables. His export has `"templating": { "list": [] }`. The map queries use `${slot:sqlstring}`, `${agg:sqlstring}` and `${colour:sqlstring}`. With no variables defined, Grafana leaves that text in the query as written, and Athena stops at the first `$`. The error position matches: line 21, column 12 is `WHEN ${slot:sqlstring} = 'current'`, which is the first of those references in the query.
+
+**Fix:** paste the three variables from the POC ([scr_1269_rtm_price_map.json](smp-dashboard-scr1269/dashboards/spikes/scr_1269_rtm_price_map.json)) into his dashboard JSON (Dashboard settings → JSON Model), replacing the empty `templating`:
+
+```json
+"templating": {
+  "list": [
+    {
+      "type": "custom", "name": "agg", "label": "Show",
+      "query": "Latest slot : latest, Average : avg, Maximum : max, Minimum : min",
+      "current": { "text": "Latest slot", "value": "latest" },
+      "multi": false, "includeAll": false, "hide": 0
+    },
+    {
+      "type": "custom", "name": "colour", "label": "Colour by",
+      "query": "Level : level, Vs zone average : relative, Spread (lowest to highest) : range",
+      "current": { "text": "Level", "value": "level" },
+      "multi": false, "includeAll": false, "hide": 0
+    },
+    {
+      "type": "custom", "name": "slot", "label": "Slot",
+      "query": "Newest published : newest, Current slot : current",
+      "current": { "text": "Newest published", "value": "newest" },
+      "multi": false, "includeAll": false, "hide": 0
+    }
+  ]
+}
+```
+
+This also fixes the panel titles, which show `${agg:text}` as plain text right now.
+
+Message for Mateo:
+
+```
+The maps break because the copy brought the panels but not the dashboard variables. Your JSON has "templating": {"list": []}, so ${slot}/${agg}/${colour} reach Athena as literal text, hence "mismatched input '$'". Add the 3 custom variables (agg, colour, slot) from the POC dashboard via Settings → JSON Model, or recreate them under Settings → Variables, then save. The maps should render after that.
+```
+
+I haven't tested this against his Grafana instance. Also, his three line-chart panels use a different Athena datasource UID than the map panels (`bficmsrgc0zk0c` vs `bfq7nkxjvbj0gd`). That doesn't cause this error, but it's worth checking if those charts show odd data.
+
+## 14:56 user (smp-dashboard-scr1269/dashboards/spikes)
+
+I see. This was my hunch as well, "Grafana must've messed up in copying or not copied everything"
+
+Long term though, we seem to observe the demand for the map panel, how can we make it easy for them to "copy paste" this functionality?
+
+## 14:56 assistant (smp-dashboard-scr1269/dashboards/spikes)
+
+The root problem is that the panel only works if three dashboard-level variables exist, and Grafana keeps variables on the dashboard, not the panel. "Copy panel", library panels and panel JSON all leave them behind. So the fix is to make the panel work without them.
+
+**Recommendation: make the panel self-contained, with the variables as optional extras.**
+
+In the SQL, replace `${slot:sqlstring}` with `'${slot}'`, and do the same for `agg` and `colour`. If the variable exists, it works as it does today. If it's missing, Grafana passes the literal text `'${slot}'`, which is a valid string, so the query falls through to its `ELSE` branch. The `ELSE` branches already hold the defaults (newest / latest / level), so a pasted panel renders with sensible defaults. Adding the variables then turns on the dropdowns. One other edit: the title's `${agg:text}` would show up as plain text, so we'd drop it or move it into the description.
+
+- **Cost:** about six small edits in the query template, plus re-publishing the POC.
+- **Risk:** the sqlstring format escapes quotes, but a plain quoted variable doesn't. Someone could craft a `?var-slot=...` URL that changes the SQL. The query runs read-only in Athena, so they could only read other tables that datasource can reach. That's probably fine internally, but we should decide it on purpose.
+
+**What I'd skip:**
+- **Library panels:** they still don't bring the variables along, and you can't parameterise them per metric. The 0–6000 scale and the metric name are baked in.
+- **A generator script or a custom plugin:** too much for a handful of users.
+
+**Optional extra:** a short "Adding a zone map" note in smp-dashboard. It would cover copying the panel, changing the `metric = '...'` line and the scale, and pasting this variables snippet if they want the dropdowns.
+
+Should I make the self-contained change in the POC template and add the note? Or would you rather keep `:sqlstring` and just document "copy the variables too"? That keeps the escaping, but people will keep hitting the same error Mateo did.
+
+I haven't checked whether Athena or this Grafana version handles a missing variable inside quotes exactly as described. I'd test it on a copy of the POC before rolling it out.
+
+## 15:01 user (smp-dashboard-scr1269/dashboards/spikes)
+
+hmmm so if he did copy the dashboard as a whole, it shouldn't have any issues,  you saying?
+
+## 15:01 assistant (smp-dashboard-scr1269/dashboards/spikes)
+
+Yes. Copying the whole dashboard ("Save as", or exporting and importing the full JSON) keeps the `templating` block, so the maps would have worked as they do in the POC.
+
+He did something different: he added the map panels to his own dashboard, *IEX Prices & Volumes*, next to his existing charts. Copying panels only brings the panels, not the dashboard-level variables. That mix-and-match case is what most people asking for the map will want, so it will keep coming up. That's the reason to make the panel work on its own.
+
+## 15:02 user (smp-dashboard-scr1269/dashboards/spikes)
+
+Riggggghhhht. If we do the self-contained panels, this should have no difference if he had copied the whole dashboard but at least this opens up the option if he wants to "grocery" for only the map panels
+
+## 15:02 assistant (smp-dashboard-scr1269/dashboards/spikes)
+
+Exactly. Copying the whole dashboard behaves the same as today, because the variables are there and the dropdowns work. Copying only the map panels gives a working map with fixed defaults (latest slot, level colouring, newest published) and no dropdowns until they paste the variables in.
+
+Two small differences to know about:
+- **Title:** `${agg:text}` would only show correctly in the full-dashboard case, so I'd take it out of the title for both.
+- **Escaping:** the quoted `'${slot}'` form loses the quote escaping that `:sqlstring` does, which is the URL-injection point from before.
+
+Want me to make the change in the POC template, test it on a copy (whole dashboard vs panel-only paste), then re-publish?
+
+## 15:02 user (smp-dashboard-scr1269/dashboards/spikes)
+
+yes go ahead. no scope commit!
+
+## 15:03 assistant (smp-dashboard-scr1269)
+
+The SQL edits are in. Now fixing the panel titles, which are stored with an escaped character.
+
+## 15:03 assistant (smp-dashboard-scr1269)
+
+Edits are done and the tests pass. Committing now.
+
+## 15:03 assistant (smp-dashboard-scr1269)
+
+I made the change in [scr_1269_rtm_price_map.json](dashboards/spikes/scr_1269_rtm_price_map.json) and committed it as `933208e fix: let zone map panels run without dashboard variables` on `poc/scr-1269`, with no scope. It's not pushed. I haven't tested it in Grafana, so it isn't re-published yet.
+
+- **Queries:** in all three map queries, `${slot|agg|colour:sqlstring}` became `'${slot|agg|colour}'` (12 spots). When the variables are missing, each query falls back to newest / latest / level.
+- **Titles:** I removed `· ${agg:text}` from the three map titles.
+- **Checks:** the JSON is valid and the repo tests pass (64). I also ran the substitution both ways to check the SQL: with the variables set it reads `CASE 'avg'`, and without them it reads `CASE '${agg}'`. Both are valid string literals.
+
+Grafana is behind the VPN, so you'll need to run the two checks there:
+1. Import the updated JSON over the POC (or as a copy). The maps should render and the dropdowns should still work.
+2. Copy one map panel into an empty dashboard. It should render with the defaults and no `$` error.
+
+If both pass, Mateo can re-paste the panels from the updated POC. That replaces the variables snippet I gave earlier.
+
+Two risks remain. The URL-variable injection point is still there. And the comments inside the queries still say "Grafana fills ${...}", which doesn't affect anything.
+
+## 15:05 user (smp-dashboard-scr1269)
+
+fyi, not sure if you can address or it's something we simply must live with lol, since we're working on a parent folder (smp) and then you updating something in one of the repos, the path you use when linking the files are broken! <screenshot>
+
+## 15:06 assistant (smp-dashboard-scr1269)
+
+Yes, I can fix that, and the mistake was mine. The file pane opens links starting from the `smp` folder, but I wrote the path starting from `smp-dashboard-scr1269`, the repo I had moved into. Here's the corrected link: [scr_1269_rtm_price_map.json](smp-dashboard-scr1269/dashboards/spikes/scr_1269_rtm_price_map.json).
+
+I've saved this to memory, so future links will start from the `smp` folder and include the repo folder name.
+
+## 15:28 user (smp-dashboard-scr1269)
+
+no data sources of type Amazon Athena found???? is that a typo though? <screennshot>
+
+## 15:28 assistant (smp-dashboard-scr1269)
+
+Yes, it's a typo, and it's in the file you imported: `"pluginId": "grafana-at hena-datasource"`, with a space in "athena". Grafana looks for data sources whose plugin ID matches that exactly, finds none, and says no Athena sources exist.
+
+It isn't from my commit. Git showed it as an uncommitted edit to the file, saved at 15:06 after `933208e`, and that one line was the only change. My guess is a stray keystroke while the file was open in the side pane. I've reverted it, so the file is back to the committed version with `grafana-athena-datasource`.
+
+Re-import [scr_1269_rtm_price_map.json](smp-dashboard-scr1269/dashboards/spikes/scr_1269_rtm_price_map.json) and the Athena dropdown should list your data source.
+
+If that edit was deliberate, it's gone now, but it was only that one line.
+
+## 15:35 user (smp-dashboard-scr1269)
+
+imported, maps render now. And I tested it by fixing mateo's dashboard by hand!
+
+Can we keep this in mind for grafana in general pls, as much as possible... as much as it makes sense... to write the panels as self-contained as users seem to prefer copy-pasting panels from diff dashboards vs copying dashboards as a whole
+
+## 15:35 assistant (smp-dashboard-scr1269)
+
+Good to hear it's working on both dashboards. I've saved this to memory as a standing Grafana rule. Where it makes sense, panels should still render when pasted into another dashboard on their own:
+
+- **Variables:** quote them as `'${var}'` and write the query so the `ELSE` branch gives the default, instead of `${var:sqlstring}`.
+- **Titles:** don't put variables in panel titles.
+- **Settings:** keep metric names and scales inside the panel.
+- **Exceptions:** real cross-panel filters like dates or markets can stay dashboard variables, but they still get a working default.
+
+One gap is still in the POC. The tables and "data as of" tiles use `-- Dashboard --` as their data source, which reuses a map panel's query. If someone pastes one of those on its own, it will show nothing. Only the maps work on their own for now. I'll leave that unless someone asks for those panels.
+
+## 17:22 user
+
+Lol
+
+## 17:22 assistant
+
+Failed to authenticate. API Error: 403 ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+
+## 17:23 user
+
+Try again
+
+## 17:24 assistant (smp-dashboard-scr1269)
+
+This is the gap I mentioned last time. The "data as of" tile doesn't run a query of its own. Its data source is `-- Dashboard --`, which reuses the results of the map panel with ID 1. When Mateo pasted it into his dashboard, it either pointed at a panel that doesn't exist there or at the wrong panel.
+
+**Fixed in the POC:** I committed `5ae0277 fix: give zone map tiles and tables their own Athena query` on `poc/scr-1269`, not pushed. All 9 panels that relied on another panel now run their map's Athena query directly: the 3 "data as of" tiles, the 3 zone tables and the 3 price stats. Their display settings didn't change. Tests pass (64). I haven't checked it in Grafana. Re-import [scr_1269_rtm_price_map.json](smp-dashboard-scr1269/dashboards/spikes/scr_1269_rtm_price_map.json) and the tiles should look the same as before.
+
+Reply for Mateo:
+
+```
+Same family of issue: that "data as of" tile has no query of its own, it reads the results of the map panel through the "-- Dashboard --" datasource, so it breaks once pasted elsewhere. Quick fix on your side: edit the tile → switch the datasource to Athena → paste the same SQL as the matching map panel (Query inspector → copy). Or wait until I re-publish the POC and copy it again; the tiles there now have their own query.
+```
+
+**Trade-off:** the POC now runs about 4× as many Athena queries per refresh, since each map's query also runs for its tile, its table and, for price, 3 stats. The queries are small, so I'd accept that for now. If cost matters, turning on Athena's `resultReuseEnabled` would let the repeated queries reuse cached results.
+
+## 17:25 user (smp-dashboard-scr1269)
+
+Yea. I told him I'd revamp the whole poc dashboard to make everything applicable self-contained. Let's pls
+
+## 17:26 assistant
+
+Every panel in the POC can now be copied on its own. There are three commits on `poc/scr-1269`, all without a scope and none pushed:
+
+| Commit | What it fixes |
+|---|---|
+| `933208e` | Missing variables fall back to defaults (newest / latest / level), and no titles use variables |
+| `5ae0277` | The 3 tiles, 3 tables and 3 price stats each run their own Athena query instead of reusing a map panel's results |
+| `2370d87` | Times come out in IST from the query itself, not from the dashboard's timezone |
+
+The third one was a problem we hadn't hit yet. The tiles and tables were only in IST because the POC dashboard is set to Asia/Kolkata. Pasted into a dashboard set to UTC or browser time, they would show a different time under an "(IST)" title. Stat and table panels have no timezone setting of their own, so the SQL now returns IST text. The time-series panel sets Asia/Kolkata itself.
+
+I checked every panel: no `-- Dashboard --` references remain, the only variables left are the quoted ones that have defaults, and the text panels are static. Tests pass (64), and I updated the memory note with the data-source and timezone rules.
+
+To check in Grafana, re-import [scr_1269_rtm_price_map.json](smp-dashboard-scr1269/dashboards/spikes/scr_1269_rtm_price_map.json), then:
+1. Confirm the tiles show IST times like before, and the tables show `yyyy-MM-dd HH:mm`.
+2. Paste one tile and one table into a dashboard set to UTC; both should still show IST.
+
+The main risk is that I couldn't run anything against Athena. The new time conversion uses `with_timezone(...)`, which needs Athena engine v3. If the panels error on that, tell me and I'll switch to a version that works on older engines. Also, Athena now runs about 4× the queries per refresh.
+
+## 18:15 user
+
+that worked. can we write a short reply to Mateo pls... Here's our last exchange
+
+## 18:16 assistant
+
+Short enough for chat, with the three rules he can reuse:
+
+```
+Done! The POC dashboard is updated, re-import it and you can copy any panel on its own now.
+
+What I changed, so you can do the same:
+1. Variables: write '${slot}' (with quotes) instead of ${slot:sqlstring}, and make the ELSE branch of the CASE the default. If the variable doesn't exist in your dashboard, the query just uses the default instead of crashing.
+2. No "-- Dashboard --" datasource: each tile/table has its own Athena query instead of reusing another panel's results.
+3. Timezone: times are converted to IST inside the SQL, so the panel doesn't depend on the dashboard's timezone setting.
+
+Happy to walk you through it on a call if it helps!
+```
+
+## 18:17 user
+
+ah.. tell him we updated his dashboard by copying the sell and purchase timing panels.
+
+Drop the call suggestion, I hate calls lol.
+
+## 18:17 assistant
+
+```
+Done! The POC dashboard is updated, and I also updated yours by copying in the sell and purchase "data as of" panels. You can copy any panel from the POC on its own now.
+
+What I changed, so you can do the same:
+1. Variables: write '${slot}' (with quotes) instead of ${slot:sqlstring}, and make the ELSE branch of the CASE the default. If the variable doesn't exist in your dashboard, the query just uses the default instead of crashing.
+2. No "-- Dashboard --" datasource: each tile/table has its own Athena query instead of reusing another panel's results.
+3. Timezone: times are converted to IST inside the SQL, so the panel doesn't depend on the dashboard's timezone setting.
+```
+
+## 18:20 user
+
+maybe for closing, moving fwd, as much as possible, we'd define the dashboard panels as self-contained, but if there's anything you wanted specifically or is meant to be copied to diff dashboards, let us know!
+
+What happened with this geomaps thing, it didn't come to me that it'll be used in actuality, but more of a proof of concept that yes we can do this. If I had known earlier, I would've configured them better and avoided this finnicky experience lol. Concisely of course
+
+## 18:20 assistant
+
+```
+Done! The POC dashboard is updated, and I also updated yours by copying in the sell and purchase "data as of" panels. You can copy any panel from the POC on its own now.
+
+What I changed, so you can do the same:
+1. Variables: write '${slot}' (with quotes) instead of ${slot:sqlstring}, and make the ELSE branch of the CASE the default. If the variable doesn't exist in your dashboard, the query just uses the default instead of crashing.
+2. No "-- Dashboard --" datasource: each tile/table has its own Athena query instead of reusing another panel's results.
+3. Timezone: times are converted to IST inside the SQL, so the panel doesn't depend on the dashboard's timezone setting.
+
+Sorry for the back and forth: I built the maps as a proof of concept that it could be done, not as something to reuse, so I didn't build them to be copied. Going forward we'll make dashboard panels self-contained by default. If there's anything you specifically want to reuse across dashboards, let us know early and we'll set it up for that from the start.
+```
