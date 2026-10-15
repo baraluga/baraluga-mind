@@ -1,0 +1,135 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `cbea7fa4-db06-4475-ab55-60c0d5d4d1e7`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/cbea7fa4-db06-4475-ab55-60c0d5d4d1e7.jsonl`
+Resume: `claude --resume cbea7fa4-db06-4475-ab55-60c0d5d4d1e7`
+
+## 11:54 user
+
+the khaba dags are proving to be quite intermittent as the csv source is unreliable as we speak. Upstream uploading of the csv seems to be broken for 2 days now and it only bombards the airflow with tons of failed runs. 
+
+Wdyt we should do on this? I'm thinking of an aggressive exponential backoff. or a sensor or something?? How can we improve the Khaba dags to only run the whole thing if the csv in s3 is present?
+
+## 11:54 assistant (smp-india/dags/src)
+
+There's already a `check_khaba_source_exists` gate. Let me see what it does when the file is missing.
+
+## 11:56 user
+
+Yes: set the window Variable to 1440 now as a stopgap, then make skip-on-missing explicit in realtime/minute DAGs with a test.
+
+## 11:56 assistant (smp-india)
+
+Now remove the window resolver and constants, which are dead code now. Then update the callers.
+
+## 11:56 assistant (smp-india/dags/src)
+
+Now the tests and the doc.
+
+## 11:57 assistant (smp-india)
+
+Tests are updated. The doc edit failed because of line wrapping, so I'll do it by hand and also check the second doc.
+
+## 11:57 assistant (smp-india)
+
+The code change is ready and tests pass. You need to set the stopgap Variable yourself, because Airflow is only reachable on the VPN.
+
+**Stopgap (do now):** in each Airflow environment where these DAGs are scheduled (prod, plus qa if it runs there), go to Admin → Variables and set:
+
+```
+KHABA_GENERATION_SOURCE_TRANSITION_WINDOW_MINUTES = 1440
+```
+
+Once that's set, the 5- and 10-minute runs skip all day when today's CSV is missing instead of failing. No deploy is needed. After the code below is deployed, the Variable does nothing, so delete it then.
+
+**Code change (not committed):**
+- `check_khaba_source_exists` now takes a `skip_if_missing` flag instead of the time-window logic ([khaba_generation.py:455](smp-india/dags/src/scripts/khaba_generation_tsdb/khaba_generation.py:455)).
+- The realtime and minute DAGs pass `skip_if_missing=True`. The two daily reconciliation DAGs still fail on a missing file, so you get about one alert a day instead of hundreds.
+- I deleted the old window setting, its function and its tests, and added one test for the new skip case. I also updated `docs/bulk-backfill.md` and `docs/khaba-minute-feed.md`. In total: 28 lines added, 113 removed.
+- The 194 Khaba tests pass, and ruff check and format are clean. I had to run the tests on the existing virtualenv without coverage, because `uv sync` couldn't reach Artifactory without credentials.
+
+**Risk to know about:** an outage that starts today won't alert until the reconciliation run at 12:00 IST tomorrow. That's a detection delay of up to about 27 hours.
+
+I haven't checked the case where the CSV exists but upstream has stopped updating it. The existence check passes then, and the failure shows up later in the freshness check.
+
+## 12:01 user (smp-india)
+
+so when's the first successful run, assuming the csv arrives?
+
+## 12:01 assistant (smp-india)
+
+It depends on when the CSV lands in S3. The minute DAG will publish within 5 minutes of that, and the realtime DAG within 10.
+
+- **`india_khaba_generation_minute`** runs every 5 minutes (IST cron `*/5`), so its first run after the file appears publishes.
+- **`india_khaba_generation_realtime`** runs every 10 minutes (`*/10`), same idea.
+- **Both reprocess the whole day** on every run. Today's earlier hours get published in that first run, so the missed runs leave no gap.
+- **Possible delay:** each DAG allows only one run at a time. If a run is still busy (for example, the realtime validation step retrying for up to about 30 minutes), the next run waits for it.
+
+Two things to know:
+
+- **Skipped runs show as success.** In the Airflow UI, a run where the CSV check skipped looks green even though nothing was published. To find the first real publish, look for the check task with an actual success state, or a log line containing `KHABA_SOURCE_PREFLIGHT=`.
+- **The two broken days won't fill themselves.** The realtime DAGs only process today's file. The reconciliation DAGs run at 12:00 IST and only process yesterday's. Even if upstream re-uploads the missing dates, anything older than yesterday needs a manual trigger of the reconciliation DAGs (both the 15-minute and the minute one) with `target_date` set to each missing day.
+
+## 12:02 user (smp-india)
+
+right. As long as the "not yet there" runs show as SKIPPED with clear logs, I'm okay with it. I just hate seeing hundreds of failed runs only to find out that it's because of khaba. Legit failed runs get buried!
+
+## 12:03 assistant (smp-india)
+
+Yes, that's how it'll look.
+
+- **Task:** `check_current_khaba_source_exists` / `check_source` ends as **skipped** (pink in the grid). The log says `Khaba source object is not yet available: s3://<bucket>/KHABA/FTP_DATA15-10-2026.csv`, so you can tell at a glance that it's Khaba and which file is missing.
+- **Downstream tasks:** also skipped, so nothing runs against a missing file.
+- **The run itself:** marked **success** (green), not failed. Airflow treats a run where every task skipped as successful. So the failed filter only shows real failures, and no Teams alert fires for these runs.
+
+Errors other than a missing file still fail loudly: access denied, 5xx responses, credential problems, and publish or validation errors. Those are the failures you want to see.
+
+The code is still uncommitted. Say the word when you want it committed.
+
+## 12:03 user (smp-india)
+
+commit and push pls. no scope
+
+## 12:04 assistant (smp-india)
+
+I've committed `eb90588` (`fix: skip realtime Khaba runs when the source CSV is missing`) and pushed it to `dev` in smp-india. Ruff and the other pre-commit checks passed. GitHub printed its usual note about the "changes must be made through a pull request" rule; your work account bypasses that rule on `dev`.
+
+The push doesn't deploy anything. Until this reaches each environment, set the `KHABA_GENERATION_SOURCE_TRANSITION_WINDOW_MINUTES = 1440` Variable there to stop the failed runs. Once the new code is running, the Variable does nothing, so delete it then.
+
+I haven't checked that this works in a real Airflow environment yet.
+
+## 12:04 user (smp-india)
+
+ah promote to qa and prod pls
+
+## 12:04 assistant (smp-india)
+
+Promoting `dev` would bring three other commits along with ours. Let me see what they touch, and start the pre-promotion Codex review in parallel.
+
+## 12:05 assistant (smp-india)
+
+I'll ship all four. While the Codex review finishes, I'll make sure the local `qa`/`prod` branches have nothing unpushed, and check that `qa` and `prod` have no changes that `dev` lacks.
+
+## 12:05 assistant (smp-india)
+
+I'm waiting on the Codex review. Promoting to qa and prod will continue when it reports back.
+
+## 12:08 assistant (smp-india)
+
+Codex found nothing. I checked its main claim myself: all the Khaba tasks use the default `@task`, which runs only when every upstream task succeeded, so a skipped source check skips the upload and cleanup as well. Promoting now.
+
+## 12:10 assistant (smp-india)
+
+qa and prod are both updated and pushed, with all 4 commits:
+
+- **qa:** `3b0e97e Merge dev into qa`
+- **prod:** `a1f0aab Merge qa into prod`. Its contents now match `dev` exactly.
+
+Codex reviewed the fix before I merged and found nothing. I checked its main claim myself: when the source check skips, upload and cleanup skip too.
+
+**CI** started on both pushes; qa was in progress and prod queued when I last looked. This workflow only runs docs, lint, tests and the Darwin image build. It doesn't deploy DAGs. Airflow should pick up the new code through git-sync from these branches, but I haven't confirmed git-sync is set up that way for smp-india. The README says that cutover is handled separately.
+
+Two things still need you:
+- **The 1440 Variable:** if you set it, delete it once Airflow is running the new code. If you didn't set it, there's nothing to do.
+- **The SCR-1273 Darwin mappings** (`mappings.json`) take effect only after a Darwin collector deploy from smp-tool. The CI job prints the `deploy_darwin.sh --env qa|prod --tag …` command to use. Merging to qa and prod didn't deploy the collector.

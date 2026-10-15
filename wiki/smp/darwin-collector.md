@@ -8,13 +8,13 @@ As of 2026-10-15.
 - There is no automatic collector deployment. Code changes need a new amd64 image; config-only changes need rendering the complete enabled-site config, server-side dry-run, apply, and rollout status. Omitting a site from render silently stops collecting it.
 - For `SCR-1273`, Mateo clarified ModuleTemperature is not needed. The rollout removed ModuleTemperature from collection instead of collecting and dropping it later.
 - TSDB probing found 12 Gujarat IDs in UAT and all 16 in prod. The four Tithwa series existed in prod but initially 404ed in UAT; Mateo said he would create them in UAT too. Generation destinations are MW, so Darwin kW values still need the existing 0.001 conversion.
-- Local live-Darwin validation after the mapping changes collected all six entities and 18 streams, with no ModuleTemperature and no quarantine, then published live batches through the real publisher into a fake TSDB. Real TSDB writes and cluster rollout remained unproven in the source.
+- The collector is running in India dev and has gathered a publish backlog, but the first real UAT TSDB write was rejected with HTTP 403 on the `tsdb-uat-live-darwin` topic. The UAT service account can read catalogue/data but lacks Darwin-source write permission; the publisher should remain paused until that grant is made. The backlog remains on EFS because deletion follows verified writes.
+- Khaba is confirmed as Darwin entity `SOF_INNS7`. Its Darwin series are intended to run in parallel with, not replace, the CSV/SFTP feed, which remains the backup. The capture verified the three source tags were fresh; four associated TSDB IDs existed in both UAT and prod, but end-to-end publishing is blocked by the UAT permission failure.
 - **Tickets:**
   - `SCR-1261`: Tuticorin wind speed, wind direction, and generation.
   - `SCR-1273`: four more assets. All 15 requested measurements parse from saved responses.
   - `SCR-1268`: collector health and freshness monitoring, starting with Prometheus discovery.
-- As of 2026-10-14, the cluster can reach the Darwin API and CI/CD exists, but building and pushing the collector image is blocked on an unassigned SMP India AWS ECR/data-source-role ticket. [[michael]] is helping with deployment.
-- Mateo asked to add four Khaba series using Darwin request type `ENS7`; the entity code and whether this is a parallel or replacement source for the existing Khaba CSV feed need confirmation. See [[smp-india]].
+- Freshness monitoring (`SCR-1268`) is merged through dev, QA, and prod but remains paused. It has configurable Airflow thresholds; the initial TSDB-read design is being reconsidered in favour of EFS collector-state freshness plus a pending-batch watchdog, so it does not duplicate publisher verification.
 
 ## Background
 
@@ -31,6 +31,7 @@ As of 2026-10-15.
 - 2026-09-30: M2M credentials obtained.
 - 2026-10-01: deployed to India dev; blocked by proxy 403s.
 - 2026-10-13: Gujarat mappings and ModuleTemperature removal completed and pushed to `dev`; rollout still needed registry/image or config apply work and first UAT writes.
+- 2026-10-15: first UAT Darwin publication attempt reached TSDB but failed with a 403 write-permission error; no data was lost.
 
 ## Open Questions
 
@@ -40,8 +41,9 @@ As of 2026-10-15.
 - UNCERTAIN: Whether Khavda's sparse irradiance (6–7 values per 15 minutes) is expected Darwin behaviour. Asset spellings are settled in [[aliases]].
 - UNCERTAIN: Whether Gregory is still relevant now that Brian treated Darwin as unblocked.
 - UNCERTAIN: Whether the four Tithwa UAT series were created after Mateo's October 13 reply.
-- UNCERTAIN: Whether first real UAT writes and the cluster rollout succeeded after the local live-Darwin/fake-TSDB check.
-- UNCERTAIN: Which Darwin entity represents Khaba, and whether its Darwin series should run alongside or replace the CSV feed.
+- UNCERTAIN: Whether TSDB will grant the UAT Darwin-source write permission, and whether the prod service account needs the same grant.
+- UNCERTAIN: Whether the first production write probe was run; it would make an irreversible but genuine point.
+- UNCERTAIN: Whether the monitoring DAG was refactored from TSDB reads to EFS collector-state freshness before it is unpaused.
 
 ## Sources
 
@@ -63,5 +65,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/meetings/2026-10-14-1415-granola-daily-standup.md`
 - `sources/meetings/2026-10-14-1441-granola-mateo-call.md`
 - `sources/claude-conversations/2026-10-14-claude-smp-68dedda3.txt`
+- `sources/claude-conversations/2026-10-15-claude-smp-36b94912.txt`
+- `sources/claude-conversations/2026-10-15-claude-smp-68dedda3.txt`
 
 Last Updated: 2026-10-15

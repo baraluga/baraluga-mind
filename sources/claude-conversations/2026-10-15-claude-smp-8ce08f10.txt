@@ -1,0 +1,324 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/8ce08f10-6bc0-4bbc-9efe-04ea0036aaac.jsonl`
+Resume: `claude --resume 8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+
+## 21:06 user
+
+From Lou:
+
+"
+
+<pasted_content id="9e59">
+Hello everyone, here are the timeseries for the HPX provider (source HPX website): 
+ 
+GDAM
+For GDAM, after talking with Mateo, we have decided to take only the cleared-volume :
+HPX_GDAM_MCP	d2d69d71-69a3-545b-9723-9b5af10da522
+HPX_GDAM_bid_purchase	29423196-e1fc-5eed-853e-e8e0114ea8c6
+HPX_GDAM_bid_sell_solar	6807a80d-bc76-581f-90ba-9bdf61bce1c5
+HPX_GDAM_bid_sell_nonsolar	f2ce2405-ef63-5e27-8004-5f199b9af704
+HPX_GDAM_bid_sell_hydro	10818974-4f31-558f-8242-a71a2a40fd05
+HPX_GDAM_bid_sell_total	464d3bdc-425b-55c7-b6e5-e002329793e3
+HPX_GDAM_cleared_volume_solar		8cbaa1f0-d2e3-52b5-971f-29294bfbebf6
+HPX_GDAM_cleared_volume_nonsolar	080a4a5a-3ad0-5cda-85c6-5ee324432c01
+HPX_GDAM_cleared_volume_hydro	ca251ada-2c1b-56b7-bb86-29a9e834119d
+HPX_GDAM_cleared_volume_total	cc91fbbc-201c-5935-9155-d36363f034ce
+HPX_GDAM_scheduled_volume_solar	f308b0d4-3002-53c8-a5d3-853ae5ec5983
+HPX_GDAM_scheduled_volume_nonsolar	1f592fbb-d3df-58fe-b301-5f8454d17ed0
+HPX_GDAM_scheduled_volume_hydro	c8f8761c-b181-54f0-aef3-ebc24f6bf44c
+HPX_GDAM_scheduled_volume_total		c0e37669-1164-580f-864f-3a97a20665bb
+ 
+ 
+DAM
+HPX_DAM_MCP	de133f45-1ace-5654-9329-4c14d94e3ee6
+HPX_DAM_bid_purchase		
+e5919de0-220a-58d3-9bdc-5bd8ae2a1a6d
+HPX_DAM_bid_sell	8660b928-33e7-5c7f-bef0-b734ae59cf6f
+HPX_DAM_cleared_volume	aae2069c-2748-5a72-ac4f-fb620de88619
+HPX_DAM_scheduled_volume	08c5499a-1334-54b6-ae5a-40ee71316d4b
+ 
+HPDAM
+HPX_HPDAM_MCP	47cc0c57-55e8-5947-8ab6-ef15c6dffda9
+HPX_HPDAM_bid_purchase	994c5feb-503a-5a7f-a3b1-dd2426041f3d
+HPX_HPDAM_bid_sell	ca17c5a3-93af-5e4d-9c2b-ab295dd85139
+HPX_HPDAM_cleared_volume	ad81255d-c93a-526d-8fdb-319aebd10733
+HPX_HPDAM_scheduled_volume	c5c23056-51c9-5713-ae16-36e3c00733bb
+ 
+RTM
+HPX_RTM_MCP	d85b53f6-d1a2-5b58-bc58-7c79a3f14503
+HPX_RTM_bid_purchase	25bf437f-b846-560a-998b-ed9d104a0fb9
+HPX_RTM_bid_sell	bbc440ea-9caf-51a3-a2c2-0db24e496c56
+HPX_RTM_cleared_volume	bffca506-79a5-51e0-b33f-a83c66d1655d
+HPX_RTM_scheduled_volume	ec99d36d-6a4f-51ca-8846-bb97a230e8cd
+ 
+Let me know if you need more information
+</pasted_content id="9e59">
+
+  "
+
+## 21:06 assistant
+
+Lou's list changes the scope again. GDAM has no MCV series: he says "only the cleared-volume", and the list has 14 GDAM series, not 18. That makes the total 29, not 33. I'll find every place that assumes 18 or 33.
+
+## 21:06 assistant (smp-india)
+
+Lou's IDs are in. Before filling the mapping, I'll drop MCV from GDAM tests-first: GDAM becomes 14 metrics and the total 29.
+
+## 21:06 assistant (smp-india)
+
+The tests fail as expected: the code still has MCV, and the mapping file is still empty. Now the code change and the mapping.
+
+## 21:07 assistant (smp-india)
+
+Now I'll write the mapping JSON directly, the same IDs for `uat` and `prod`, following the convention in memory.
+
+## 21:08 assistant (smp-india)
+
+All 58 mapping entries match Lou's list: 29 unique IDs, none missing, and UAT identical to prod. Two older tests assert that the mapping is empty, which is no longer true, so I'll replace them.
+
+## 21:08 assistant (smp-india)
+
+Tests are green at 1195. Now the docs. Several statements are stale: the mapping is no longer empty, GDAM has no MCV, and the total is 29.
+
+## 21:09 assistant (smp-india)
+
+The docs are updated. The catalogue script failed only because the default `python3` is too old, so I'll run it with the project's venv.
+
+## 21:10 assistant (smp-india)
+
+The 29 timeseries IDs are in and verified against Lou's list. Everything is uncommitted.
+
+**What changed from Lou's list**
+- **GDAM has 14 series, not 18.** He says they decided to take only the cleared volume, and there is no MCV series in the list. I dropped GDAM MCV from the code, so GDAM is now price, total purchase bid, and sell bid, cleared and scheduled volume for total, solar, non-solar and hydro.
+- **The total is 29, not 33.** That's 3 markets × 5 plus GDAM's 14.
+
+**What I did**
+- **Mapping:** I filled `catalog_mapping.json` for all four markets, with the same IDs under `uat` and `prod`, following the convention in memory that they're identical. Units are MW for volumes and INR/MWh for price, with publication frequency PT24H for DAM, GDAM and HPDAM and PT15M for RTM.
+- **ID check:** an independent script re-parsed Lou's paste and compared it to the file. All 58 entries match (29 per environment), none are missing, and UAT equals prod. His paste had stray tabs and one ID on its own line, which is why I didn't trust hand-typing alone.
+- **Tests:** a new test checks that every market in `uat` and `prod` loads a complete mapping. I replaced two older tests that asserted the mapping was empty. The full suite is **1195 passed**, and lint is clean.
+- **Docs:** the runbook, DATA_CATALOGUE and POC notes now say 29 series and 14 for GDAM.
+
+**Still to do**
+- **Jira:** the description and my last comment still say 33. I haven't touched them. Want me to update both?
+- **Unverified in the TSDB:** I haven't confirmed the IDs exist in UAT with the expected names and units. That needs VPN and credentials. I can write one script for you to run once inside the VPN that reads all 29 and compares them.
+- **Units:** Lou didn't give units. I assumed MW for volumes, matching what Mateo said earlier. If a catalog series is actually MWh, publishing would reject it, because the mapping validator checks units.
+
+Commit and push when you say so. I'd make it two commits again, with the code, mapping and tests first and the docs second.
+
+## 21:25 user (smp-india)
+
+let's check first in tsdb. Write the script pls, back to back UAT and Prod
+
+## 21:25 assistant (smp-india)
+
+I'll look at how this repo already talks to the TSDB, so the script reuses it.
+
+## 21:25 assistant
+
+Memory notes that someone previously discovered Tithwa IDs "404 in UAT", so a catalog lookup exists somewhere. I'll find the SDK call for series metadata.
+
+## 21:26 assistant (smp-india)
+
+The SDK supports `Timeseries.get(id)`. Now I'll check where the user normally gets the Okta service credentials, so the script can handle the credentials refresh.
+
+## 21:26 assistant
+
+I'll tidy one awkward line, re-run the dry run, and print the final script for copy-pasting.
+
+## 21:27 assistant
+
+The script is written and its offline half is tested: it loads the mapping and counts 29 series per environment, and the SDK import works. It has not talked to the TSDB. It needs the VPN, so run this once inside it:
+
+```bash
+cat > /tmp/hpx_ts_check.py <<'PYEOF'
+"""Read-only: check the 29 HPX series from catalog_mapping.json exist in the TSDB catalog (UAT, then prod)."""
+import json, os, subprocess, sys
+from pathlib import Path
+
+MAPPING = Path("/Users/qn5792/repos/smp/smp-india/dags/src/scripts/india_hpx_national/catalog_mapping.json")
+ENDPOINTS = ("uat", "prod")
+
+
+def tech(o):
+    return None if o is None else str(getattr(o, "technical_name", o))
+
+
+def auth_for(endpoint):
+    prefixes = (["SMP_SERVICE_APP_OKTA_UAT_"] if endpoint == "uat" else []) + ["SMP_SERVICE_APP_OKTA_"]
+    for p in prefixes:
+        cid, sec = os.getenv(p + "CLIENT_ID"), os.getenv(p + "CLIENT_SECRET")
+        if cid and sec and cid.startswith("2-" if endpoint == "uat" else "3-"):
+            return dict(intact_client=cid, intact_secret=[REDACTED], f"service credentials ({p}*)"
+    return {}, "interactive Okta login"
+
+
+def expected_rows(endpoint):
+    data = json.loads(MAPPING.read_text())["environments"][endpoint]
+    return {r["series_id"]: (mk, metric, r) for mk, rows in data.items() for metric, r in rows.items()}
+
+
+def check(endpoint, dry_run):
+    expected = expected_rows(endpoint)
+    print(f"\n=== {endpoint.upper()}: {len(expected)} series in mapping ===", flush=True)
+    if dry_run:
+        return 0
+    from engie_tsdb.catalog import Config, Timeseries
+
+    auth, how = auth_for(endpoint)
+    print(f"auth: {how}", flush=True)
+    Config.set(catalog_endpoint=endpoint, client_name="scr_1274_readonly_check", log_level="WARNING", **auth)
+    found = {str(s.id): s for s in Timeseries.search_with_text(ids=list(expected))}
+    rows, problems = [], []
+    for sid, (mk, metric, r) in expected.items():
+        s = found.get(sid)
+        if s is None:
+            rows.append(dict(market=mk, metric=metric, id=sid, found=False))
+            problems.append(f"{mk}/{metric}: NOT FOUND in {endpoint} ({sid})")
+            continue
+        row = dict(market=mk, metric=metric, id=sid, found=True, name=s.name, unit=tech(s.unit),
+                   frequency_value=tech(s.frequency_value), frequency_publication=tech(s.frequency_publication),
+                   active=getattr(s, "active", None), latest=str(getattr(s, "time_data_latest", None)))
+        rows.append(row)
+        if s.name != r["name"]:
+            problems.append(f"{mk}/{metric}: name '{s.name}' != mapping '{r['name']}'")
+        if (row["frequency_value"] or "").casefold() != "pt15m":
+            problems.append(f"{mk}/{metric}: frequency_value {row['frequency_value']} != PT15M")
+        if (row["frequency_publication"] or "").casefold() != r["publication_frequency"].casefold():
+            problems.append(f"{mk}/{metric}: frequency_publication {row['frequency_publication']} != {r['publication_frequency']}")
+        if row["active"] is False:
+            problems.append(f"{mk}/{metric}: series is not active")
+    for row in rows:
+        print({k: row.get(k) for k in ("market", "metric", "found", "name", "unit", "frequency_value", "frequency_publication", "active", "latest")}, flush=True)
+    units = sorted({str(r.get("unit")) for r in rows if r["found"]})
+    print(f"\n{endpoint.upper()}: found {sum(r['found'] for r in rows)}/{len(expected)}; distinct units seen: {units}")
+    print(f"{endpoint.upper()}: {len(problems)} problem(s)" + ("" if not problems else ":\n  " + "\n  ".join(problems)))
+    Path(f"/tmp/hpx_ts_check_{endpoint}.json").write_text(json.dumps({"rows": rows, "problems": problems}, indent=2, default=str))
+    return 1 if problems else 0
+
+
+if __name__ == "__main__":
+    dry = "--dry-run" in sys.argv
+    if "--endpoint" in sys.argv:
+        sys.exit(check(sys.argv[sys.argv.index("--endpoint") + 1], dry))
+    # One fresh process per endpoint: the SDK config is process-global.
+    worst = 0
+    for e in ENDPOINTS:
+        r = subprocess.run([sys.executable, __file__, "--endpoint", e] + (["--dry-run"] if dry else []), timeout=180)
+        worst = max(worst, r.returncode)
+    print("\nOUTPUT FILES: /tmp/hpx_ts_check_uat.json /tmp/hpx_ts_check_prod.json")
+    sys.exit(worst)
+PYEOF
+/Users/qn5792/repos/smp/smp-india/.venv/bin/python /tmp/hpx_ts_check.py
+```
+
+- **Read-only:** it only reads catalog metadata, with no TSDB reads or writes.
+- **Runtime:** about a minute per environment, with a hard 180-second timeout each. It runs UAT, then prod, as separate processes.
+- **Auth:** it uses `SMP_SERVICE_APP_OKTA_*` env vars if they're set in your shell, with a `2-` client for UAT and a `3-` client for prod. Otherwise it falls back to an interactive Okta login, so expect up to two browser prompts.
+- **What it checks per series:**
+  - the ID exists
+  - the catalog name matches our mapping
+  - the data frequency is PT15M
+  - the publication frequency matches what we set (PT24H or PT15M)
+  - the series is active
+
+  It also prints each series' unit, which is the thing I had to assume was MW.
+- **Results:** it writes `/tmp/hpx_ts_check_uat.json` and `/tmp/hpx_ts_check_prod.json`, which I can read once you tell me it's done.
+
+## 22:26 user
+
+<command-name>/model</command-name>
+            <command-message>model</command-message>
+            <command-args>claude-opus-5-5</command-args>
+
+## 22:26 user
+
+<local-command-stdout>Set model to `claude-opus-5-5`</local-command-stdout>
+
+## 22:29 user
+
+done
+
+## 22:29 assistant
+
+All 29 series exist in both UAT and prod, and our mapping matches the catalog. There's one mismatch, and it's on the catalog side in UAT, not in our code.
+
+| Check | UAT | Prod |
+|---|---|---|
+| Found | 29/29 | 29/29 |
+| Names match the mapping | yes | yes |
+| Units | 25 `MW`, 4 `INR/MWh` | same |
+| Data frequency | all PT15M | all PT15M |
+| Active | all | all |
+| Data already present | none | none |
+
+The MW assumption was right, so no MWh conversion applies.
+
+**The mismatch:** in UAT, the **DAM, GDAM and HPDAM price series** have publication frequency **PT15M**. In prod they're PT24H, like every other day-ahead series. Our mapping says PT24H, which matches prod and the agreed design.
+
+This doesn't block publishing. Our validator checks the mapping against our own rule, not the catalog field, so writes would go through. But UAT and prod disagree, and UAT is where we'll test first. I'd ask Lou to fix the three UAT series instead of bending our code around it:
+
+```
+Hi Lou, thanks! All 29 found in UAT and prod, names/units/frequency all match. One small thing: in UAT, HPX_DAM_MCP, HPX_GDAM_MCP and HPX_HPDAM_MCP have publication frequency PT15M, while prod (and all the other DAM/GDAM/HPDAM series) are PT24H. Could you align those three in UAT to PT24H?
+```
+
+The mapping, tests and docs are still uncommitted, and nothing depends on Lou's fix. Want me to commit and push now? It would be two commits again: code, mapping and tests first, then docs.
+
+## 22:30 user
+
+commit and push, then merge to qa and prod
+
+For the frequency thing, tbf, that's only metadata no? Not really a blocker?
+
+## 22:31 assistant (smp-india)
+
+Committed. Before pushing and promoting, I'll check what else is on dev, because `b739da7` (SCR-1268) isn't ours.
+
+## 22:31 assistant (smp-india)
+
+Only our 2 commits are missing from qa. But prod has 7 commits that qa doesn't, so I'll look at those before merging into prod.
+
+## 22:31 assistant (smp-india)
+
+Those 7 are only "Merge qa into prod" merge commits with no content of their own, so prod's content matches qa. Safe to proceed: push dev, then merge dev into qa and qa into prod.
+
+## 22:33 assistant (smp-india)
+
+Everything is pushed and promoted.
+- **dev:** `ee96eff` (code, mapping and tests) and `26945da` (docs).
+- **qa:** `fd18372`, merged from dev.
+- **prod:** `d78475b`, merged from qa.
+
+I confirmed qa and prod had identical content before merging. The extra prod commits were only merge commits. Prod now matches dev.
+
+Publishing is still off everywhere, so nothing writes until you set `INDIA_HPX_NATIONAL_TSDB_PUBLISH_ENABLED` to true. With the IDs mapped, flipping that flag in QA will write real data to UAT.
+
+**On the frequency mismatch:** you're right, it's metadata and not a blocker.
+- Our code never reads the catalog's publication frequency. It only checks our own mapping value, so writes don't depend on it.
+- It could matter wherever something judges freshness from that field. In UAT, the three day-ahead price series would look about 23 hours late between daily writes.
+- I haven't confirmed that the TSDB ignores the field when writing. The first QA publish will show it either way.
+
+I'd still send Lou the one-liner so UAT matches prod, but don't wait on it.
+
+**Next steps**
+1. Set `INDIA_HPX_NATIONAL_TSDB_PUBLISH_ENABLED=true` in QA's Airflow Variables.
+2. Trigger both DAGs and check that the publish and verify tasks report `verified`, not just `submitted`.
+3. Re-trigger and confirm unchanged points get skipped.
+
+Want me to unflag this session and move SCR-1274 out of Blocked?
+
+## 22:50 user (smp-india)
+
+yes, unflag and set to in progress
+
+## 22:51 assistant (smp-india)
+
+The session flag is cleared, the sidebar title is back to "(SCR-1274) hpx", and SCR-1274 is In Progress. It went through To Do on the way, as before.
+
+Two Jira leftovers I didn't change:
+- **The Jira flag** I set yesterday ("waiting for HPX Timeseries") is still on the ticket.
+- **The description and my last comment** still say 33 series.
+
+Want me to clear that flag and update both to 29 with GDAM at 14?

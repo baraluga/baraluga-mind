@@ -1,0 +1,918 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `36b94912-7f68-4c00-a812-37f2a6c0149d`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d.jsonl`
+Resume: `claude --resume 36b94912-7f68-4c00-a812-37f2a6c0149d`
+
+## 12:41 user
+
+wdyt of scr-1268? Can we start on it?
+
+## 12:42 assistant
+
+Read the ticket; now checking how the Darwin collector runs and whether Prometheus is already wired anywhere.
+
+## 12:43 assistant
+
+Yes, I think we can start. It's in the current sprint (31, ends Oct 21), 3 SP and unassigned. The scope is reasonable, but the first acceptance criterion blocks everything after it.
+
+**What already exists**
+- The collector ([collector.py](smp-india/services/darwin-collector/src/darwin_collector/collector.py)) already logs JSON events: `poll_complete`, `poll_failed`, `poll_entity_failed`, `missing_tags`, `missed_poll_cycles` and `collector_stopped`. Pending batches are saved under `spool/pending`. So the signals the ticket asks for are already there; they just aren't exposed anywhere.
+- It runs as a single-replica Deployment (see [render_darwin.py](smp-tool/scripts/render_darwin.py)).
+
+**The blocker**
+- Our Grafana dashboards only use the **Athena** datasource. I found no Prometheus datasource, ServiceMonitor or scrape config in any repo. The only Prometheus-related piece is Airflow's statsd-exporter image.
+- I can't check the clusters from here because I have no EKS context without the VPN. If there's no Prometheus server, the ticket's own wording says to "document blockers or alternative".
+
+**How I'd build it**
+1. **If Prometheus exists:** add a `/metrics` endpoint to the collector, using the stdlib HTTP server and `prometheus_client`. It would expose four values:
+   - when the last poll succeeded
+   - how fresh the data is for each entity and tag
+   - how old the oldest pending batch is
+   - how many polls failed
+
+   Then add a PodMonitor and Grafana alert rules. That's roughly a day of work, plus the QA failure drills.
+2. **If it doesn't:** look at the CloudWatch logs from those JSON events, read through a Grafana CloudWatch datasource. We'd use log-based alerts, with no code change to the collector.
+3. **Either way:** failure alerts go to the Scraper Notification channel, kept separate from the market alerts set up in SCR-1267. The thresholds and recipients need Francois or SMP ops to agree. Neither path has a code fix for that.
+
+**Check script.** Run it once on the VPN; it takes about 1 minute (15 seconds per call):
+```bash
+for p in $(aws configure list-profiles | grep -iE 'smp|india|624915953606|154989746575'); do aws sso login --profile "$p" >/dev/null 2>&1; for c in $(aws eks list-clusters --profile "$p" --region eu-west-1 --query 'clusters[]' --output text 2>/dev/null); do echo "== $p / $c"; aws eks update-kubeconfig --profile "$p" --region eu-west-1 --name "$c" --kubeconfig /tmp/k.$c >/dev/null; timeout 15 kubectl --kubeconfig /tmp/k.$c get pods -A 2>&1 | grep -iE 'prometheus|alertmanager|grafana|adot|cloudwatch|fluent' ; timeout 15 kubectl --kubeconfig /tmp/k.$c get crd 2>&1 | grep -iE 'monitoring.coreos|servicemonitor|podmonitor'; done; done
+```
+
+I didn't read the one Jira comment because the API kept returning the comment as rich HTML and I didn't follow up. I also haven't checked that the prod Grafana can reach a Prometheus or CloudWatch datasource.
+
+## 12:45 user
+
+Ran the Prometheus check script, output below:
+
+## 12:46 assistant
+
+The output didn't come through with your message, so I read your terminal instead. The script never got going: it fails with `aws: command not found`. I'll check how you usually get AWS credentials.
+
+## 12:46 assistant
+
+The profiles are named `solaris-*`, so my grep would have skipped them even with `aws` installed. Since `uvx` is available, I'll test read-only access from here first.
+
+## 12:46 assistant
+
+macOS doesn't ship `timeout` either, so my script had a second bug. Running it again without that:
+
+## 12:46 assistant
+
+That `ExpiredToken` error is the real blocker: all three profiles in `~/.aws/credentials` hold short-lived session tokens that have expired. I can't renew them. I also got two things wrong in the earlier script: it filtered profiles by `smp|india` (yours are named `solaris-*`), and it called `timeout`, which macOS doesn't have.
+
+Corrected script. Refresh your AWS credentials the usual way first (I don't know your method, so the script can't do that step), then run this on the VPN. It takes about 2 minutes; every kubectl call stops after 15 seconds:
+
+```bash
+aws() { uvx --quiet --from awscli aws "$@"; }; for p in default solaris-boy solaris-prod; do acct=$(aws sts get-caller-identity --profile $p --query Account --output text 2>&1 | tail -1); echo "##### $p -> $acct"; for c in $(aws eks list-clusters --profile $p --region eu-west-1 --query 'clusters[]' --output text 2>/dev/null); do echo "== $c"; aws eks update-kubeconfig --profile $p --region eu-west-1 --name "$c" --kubeconfig /tmp/k.$c >/dev/null 2>&1 || { echo "kubeconfig failed"; continue; }; kubectl --kubeconfig /tmp/k.$c --request-timeout=15s get pods -A 2>&1 | grep -iE 'prometheus|alertmanager|grafana|adot|cloudwatch|fluent|unauthorized|forbidden|timeout' | head -15; kubectl --kubeconfig /tmp/k.$c --request-timeout=15s get crd 2>&1 | grep -iE 'monitoring.coreos|podmonitor|servicemonitor'; done; done
+```
+
+Paste the whole output here and I'll take it from there. A cluster with no matching lines means none of these monitoring tools are installed in it. I'll check that the cluster responded at all, so a broken connection isn't mistaken for "nothing installed".
+
+The script only tries these three profiles. If the India dev/QA account (624915953606) or prod account (154989746575) uses a different profile, add its name to the list.
+
+## 12:50 user
+
+there
+
+## 12:50 assistant
+
+No existing bundle, so I'll build one from the macOS keychains, which already hold the corporate CA. Your machine and mine are the same, so I'll test it directly:
+
+## 12:50 assistant
+
+The certificate fix works: the call now reaches AWS. It then fails with `ExpiredToken`, because the credentials stored in `~/.aws/credentials` are still the expired ones. Either you haven't refreshed them yet, or you refreshed them only inside your terminal session, where my commands can't see them.
+
+I saved the bundle to `~/.aws/macos-ca-bundle.pem` (186 certificates exported from your keychains). Updated script; run it in the same terminal right after you refresh credentials. It takes about 2 minutes:
+
+```bash
+export AWS_CA_BUNDLE=~/.aws/macos-ca-bundle.pem; aws() { uvx --quiet --from awscli aws "$@"; }; for p in default solaris-boy solaris-prod; do acct=$(aws sts get-caller-identity --profile $p --query Account --output text 2>&1 | tail -1); echo "##### $p -> $acct"; for c in $(aws eks list-clusters --profile $p --region eu-west-1 --query 'clusters[]' --output text 2>/dev/null); do echo "== $c"; aws eks update-kubeconfig --profile $p --region eu-west-1 --name "$c" --kubeconfig /tmp/k.$c >/dev/null 2>&1 || { echo "kubeconfig failed"; continue; }; kubectl --kubeconfig /tmp/k.$c --request-timeout=15s get pods -A 2>&1 | grep -iE 'prometheus|alertmanager|grafana|adot|cloudwatch|fluent|unauthorized|forbidden|timeout|certificate' | head -15; kubectl --kubeconfig /tmp/k.$c --request-timeout=15s get crd 2>&1 | grep -iE 'monitoring.coreos|podmonitor|servicemonitor'; done; done
+```
+
+There's one more step that could fail. `kubectl` calls `aws` through the kubeconfig to get a login token, and inside the kubeconfig `aws` is not your shell function. If the output says `executable aws not found`, install the AWS CLI once with `brew install awscli`, then run the script again.
+
+## 12:51 user
+
+there
+
+## 12:51 assistant
+
+Your run got past the certificate error, but every profile still returns `ExpiredToken`, so the credentials haven't been refreshed. I'll check your shell history for how you normally refresh them:
+
+## 12:52 assistant
+
+India QA Grafana is at `dms-smp-india-qa.gems.myengie.com/dashboard`. I'll list its datasources (read-only) in the built-in browser:
+
+## 12:52 assistant
+
+The built-in browser couldn't reach Grafana, either because the site isn't approved or because the pane isn't on the VPN. I'll stop guessing and hand you the quickest check.
+
+Open this in your own browser while on the VPN and logged in to Grafana, then paste the JSON back:
+
+```
+https://dms-smp-india-qa.gems.myengie.com/dashboard/api/datasources
+```
+
+I only need each datasource's `type` field. If no entry has `prometheus` (or `cloudwatch`), we have our answer without going near the cluster.
+
+**What we've learned so far**
+- The local script can't reach the clusters as things stand. Your AWS profiles are DAC/Solaris CDH accounts. The Darwin collector runs on `eks-qrm-dms-noprod-6196` (dev/QA) and `eks-qrm-dms-strategy-prod-bba1` (prod), and only CI gets into those, through GitHub OIDC roles ([docker-build.yml:248-271](smp-tool/.github/workflows/docker-build.yml:248)). Your machine has no kube context for them.
+- One thing works now: `~/.aws/macos-ca-bundle.pem` gets the AWS CLI past the VPN's certificate interception. It's useful if you ever do get EKS access.
+
+**Fallback if Grafana is ambiguous:** ask whoever runs `eks-qrm-dms-noprod-6196` whether a Prometheus or Alertmanager stack is installed. The answer to that one question is what the ticket's first acceptance criterion needs written down anyway.
+
+## 12:57 user
+
+<pasted_content id="f04e">
+[{"id":2,"uid":"bfq9unsramvpce","orgId":1,"name":"grafana-athena-datasource","type":"grafana-athena-datasource","typeName":"Amazon Athena","typeLogoUrl":"public/plugins/grafana-athena-datasource/img/logo.svg","access":"proxy","url":"","user":"","database":"","basicAuth":false,"isDefault":false,"jsonData":{},"readOnly":false},{"id":1,"uid":"bfq356c7rufb4a","orgId":1,"name":"SMP_INDIA_CDH_QA","type":"grafana-athena-datasource","typeName":"Amazon Athena","typeLogoUrl":"public/plugins/grafana-athena-datasource/img/logo.svg","access":"proxy","url":"","user":"","database":"","basicAuth":false,"isDefault":true,"jsonData":{"assumeRoleArn":"arn:aws:iam::493399554860:role/cdh_smpcdhindiaqa_78133","authType":"default","catalog":"AwsDataCatalog","database":"smpindiadatasourceqa","defaultRegion":"eu-west-1","pdcInjected":false,"workgroup":"cdh_smpcdhindiaqa_78133"},"readOnly":false}]
+</pasted_content id="f04e">
+
+## 12:57 assistant
+
+The QA Grafana has only Athena datasources: no Prometheus and no CloudWatch. I'll check what Darwin data already reaches Athena, since that's the only place Grafana can alert from right now.
+
+## 12:57 assistant
+
+I've confirmed the first acceptance criterion's blocker, at least on the Grafana side: India QA Grafana has only two Athena datasources, and nothing it can query comes from the collector.
+
+**Why this matters**
+- The collector writes batches to `spool/pending`, and a separate publisher pushes them to TSDB. The README says pending-backlog monitoring "belongs to the publisher" ([README.md:32](smp-india/services/darwin-collector/README.md:32)).
+- So collector health and TSDB lag are both invisible to Grafana today. The Darwin data in Athena (`read_darwin_cdh_dataset`) is the Darwin team's 10-minute CDS dataset, not our collector's output.
+
+**Options**
+1. **Prometheus, as the ticket prefers.** This only works if the `eks-qrm-dms-*` clusters already run Prometheus. The platform owner would need to add it as a datasource, and we would then add a `/metrics` endpoint to the collector. We can't check the clusters from here, so this needs one question to the platform team:
+   ```
+   Hi, does eks-qrm-dms-noprod-6196 (and the prod cluster) run Prometheus/Alertmanager we can scrape from smp-india-* namespaces via PodMonitor? And could it be added as a datasource to dms-smp-india-qa Grafana? It's for Darwin collector health alerts (SCR-1268).
+   ```
+2. **No new infrastructure.** Run a small scheduled check of TSDB freshness for each expected Darwin series. Data going stale is the one symptom shared by all four failures the ticket lists: stopped collector, failed polling, stale source data, stalled publication. Alerts would go through the existing Airflow failure notifications to Scraper Notification. The cost is that it tells you something broke but not which part, so the JSON logs remain the troubleshooting tool. I'd document that limit as the alternative the ticket asks for.
+
+I'd send the message now and start option 2 while waiting, because option 2 is useful whatever the answer. Thresholds still need SMP ops to agree on them.
+
+I haven't checked prod Grafana (I'm assuming it's the same as QA) or read the one Jira comment on the ticket.
+
+## 12:57 assistant
+
+Read the ticket; now checking how the Darwin collector runs and whether Prometheus is already wired anywhere.
+
+## 12:57 user
+
+Yes, I'll send the platform message; start option 2, the TSDB freshness check, now.
+
+## 12:58 assistant (smp-india)
+
+The TSDB catalog has a `time_data_latest` field for each series, which may be enough for a cheap freshness check. Next I'll look for the publisher, any existing freshness checks, and the DAG layout.
+
+## 12:58 assistant (smp-india)
+
+The publisher DAG already calculates `oldest_pending_file_age_seconds` and already alerts Teams when it fails. That's probably the cheapest place to hook in. I'll read the publisher before deciding.
+
+## 12:59 assistant (smp-india)
+
+The local `.envrc` has TSDB credentials. I'll read the last 24 hours of solar minute data from UAT to see whether night-time gaps really happen:
+
+## 13:09 assistant (smp-india)
+
+It's taking more than 10 minutes, which is a finding in itself: TSDB reads are too slow to run 28 of them every 15 minutes. I'll check the partial output:
+
+## 13:09 assistant (smp-india)
+
+The output is empty because the pipe buffers everything until the end. I'll stop it and time a single read unbuffered:
+
+## 13:14 assistant (smp-india)
+
+So the reads weren't slow: the SDK couldn't fetch its login configuration from `tsdb-uat.gems.myengie.com` and was stuck retrying. This is likely the same VPN certificate problem as before. Checking:
+
+## 13:14 assistant (smp-india)
+
+The hostname won't resolve at all. That may be my sandbox blocking DNS rather than the VPN, so I'll retry once outside the sandbox:
+
+## 13:15 assistant (smp-india)
+
+I've pulled the credential guard into its own function; now writing the freshness module and the DAG.
+
+## 13:16 assistant (smp-india)
+
+Now the DAG and its config constants:
+
+## 13:16 assistant (smp-india)
+
+Now the tests:
+
+## 13:16 assistant (smp-india)
+
+Field order matches. Running the tests:
+
+## 13:16 assistant (smp-india)
+
+My refactor changed the order of checks: mappings used to be validated before credentials. I'll put that order back:
+
+## 13:17 assistant (smp-india)
+
+The freshness DAG produces no data, so it belongs under "Not catalogued":
+
+## 13:18 assistant (smp-india)
+
+The catalogue check needs a newer Python than the system `python3`. Rerunning it with the project's interpreter:
+
+## 13:18 assistant (smp-india)
+
+Everything passes: 1185 tests at 91% coverage, plus ruff, the docs check and the catalogue check. Saving what we learned about monitoring infrastructure so it doesn't need rediscovering:
+
+## 13:18 assistant (smp-india)
+
+I've built the freshness check in smp-india and all tests pass, but there's one thing to check on the VPN before committing.
+
+**What's new**
+- **New DAG:** [india_darwin_freshness_dag.py](smp-india/dags/src/india/india_darwin_freshness_dag.py) runs every 15 minutes and is paused when first deployed.
+- **The check itself** is in [freshness.py](smp-india/dags/src/scripts/darwin_publish/freshness.py). It reads the latest TSDB point for each of the 28 series in `mappings.json` and flags as stale:
+  - a minute series with no point in the last 20 minutes;
+  - a 15-minute series with no point in the last 45 minutes;
+  - a pending batch older than 15 minutes, which means publication has stalled.
+
+  A failed TSDB read also fails the run, so an unknown state alerts instead of passing.
+- **Alerts:** the first failed run sends one Teams alert, and the next successful run sends one recovery message, with nothing repeated in between. This uses the existing Teams helper and Scraper Notification route, which is separate from the market alerts.
+- **Small refactor:** the TSDB credential and stage checks moved into `tsdb_config_from_environment()` in [publisher.py](smp-india/dags/src/scripts/darwin_publish/publisher.py), so the publisher and the freshness check share them.
+- **Also updated:** [DATA_CATALOGUE.md](smp-india/DATA_CATALOGUE.md) and `utils/config.py`.
+- **Checks:** 11 new tests; the full suite (1185 tests, 91% coverage), ruff, the docs check and the catalogue check all pass. I haven't run `airflow dags test` against a live TSDB.
+
+**Open question before unpausing.** If solar sites stop sending data at night, this check would alert every night. I couldn't test it because TSDB doesn't resolve without the VPN. Run this on the VPN; it takes at most 10 minutes:
+
+```bash
+cd ~/repos/smp/smp-india && source .envrc && perl -e 'alarm 600; exec @ARGV' uv run --no-sync python -u /private/tmp/claude-501/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d/scratchpad/night_probe.py uat 2>&1 | grep -vE "INFO|WARNING"
+```
+
+It lists any gaps longer than the thresholds over the last 26 hours. If the probe also fails with an SSL error, put `REQUESTS_CA_BUNDLE=~/.aws/macos-ca-bundle.pem` in front of `uv run`.
+
+**Not done yet**
+- The acceptance criteria still need thresholds agreed with SMP ops.
+- QA failure drills (stop the collector, confirm the alert and the recovery message).
+- The troubleshooting doc.
+- Checking the aggregation `outbox/pending` backlog. Stalled 15-minute publication still shows up as stale 15-minute series.
+
+## 15:14 user (smp-india)
+
+i had to cut it short. All I see are failures. Can u check? 
+
+IWhat are you trying to do even? Checking the actual data in the timeseries? If so, you have to remember that we've yet to deploy the darwin, so we haven't pushed any data yet
+
+## 15:15 assistant (smp-india)
+
+Ruff doesn't enable the broad-except rule here, so the `noqa` isn't needed; I'll replace it with a plain comment:
+
+## 15:15 assistant (smp-india)
+
+Yes, the probe was reading the actual TSDB data, and it couldn't work: Darwin isn't deployed, so none of the 28 series has any data yet. All the failures you saw come from that. Sorry for sending you to run it; I should have checked whether data was being published first.
+
+The failures did show one real problem. On a series or time window with no data, the TSDB SDK doesn't return an empty result; it raises `DataNotAvailableException`. My check would have stopped at the first such series with a generic read error. Now it tries every series and lists each one with no recent data or a failed read. Either way the run fails and you get one alert. The Darwin tests and ruff pass.
+
+**Night-time gaps.** Whether solar series stop at night can only be answered once Darwin is running. That's fine: the DAG is paused when first deployed, so the plan is to deploy, watch one night of data, then unpause.
+
+**Not yet tested:** the check itself against real TSDB data, since there isn't any yet.
+
+## 16:09 user (smp-india)
+
+so run me down the changes again. So for monitoring we expect two parts: the actual monitoring side of Darwin (I presume, via Prometheus?) AND a dag that checks freshness in tsdb. Is that right?
+
+## 16:09 assistant (smp-india)
+
+Mostly yes, with one difference: the two parts don't carry equal weight.
+
+**Part 1, the TSDB freshness DAG (built, not committed).** This part detects problems. All four failures in the ticket end the same way: data stops reaching TSDB. So this one check catches each of them:
+
+| Ticket failure | How the DAG catches it |
+|---|---|
+| Collector stopped | minute series go stale |
+| Polling failing | minute series go stale |
+| Stale source data | the affected entity/tag goes stale |
+| Publication stalled | an old file in `spool/pending`, then stale series |
+
+**What changed:**
+- **New DAG** [india_darwin_freshness_dag.py](smp-india/dags/src/india/india_darwin_freshness_dag.py): runs every 15 minutes and is paused when first deployed. It sends one Teams alert when an outage starts and one when it recovers.
+- **The check** [freshness.py](smp-india/dags/src/scripts/darwin_publish/freshness.py) has three rules:
+  - a minute series is stale with no point in the last 20 minutes;
+  - a 15-minute series is stale with no point in the last 45 minutes;
+  - publication has stalled if a pending batch is older than 15 minutes.
+
+  It names each series that is stale or can't be read.
+- **Shared credential guard** in [publisher.py](smp-india/dags/src/scripts/darwin_publish/publisher.py): `tsdb_config_from_environment()`, now used by both the publisher and the freshness check. The publisher's behaviour is unchanged.
+- **Also:** the new DAG ID and schedule in `utils/config.py`, a [DATA_CATALOGUE.md](smp-india/DATA_CATALOGUE.md) entry, and 11 tests.
+
+**Part 2, collector-side monitoring through Prometheus (not started, depends on the platform answer).** This part helps you diagnose. It tells you *which* piece broke and catches problems faster: "collector pod down" or "last successful poll 3 minutes ago" shows up before TSDB goes stale. It would be a `/metrics` endpoint on the collector plus Grafana alert rules. Right now it isn't possible: India Grafana has no Prometheus datasource, and we don't know whether the cluster runs Prometheus.
+
+So:
+- **If the platform team says yes:** we build Part 2 as well, and the ticket's "prefer Prometheus/Grafana" is met.
+- **If they say no:** Part 1 is the whole monitoring setup. We document the missing Prometheus as the blocker, as the first acceptance criterion asks, and use the collector's JSON logs for troubleshooting.
+
+One question: do you want Part 2 only if the platform team confirms Prometheus, or should we push for it anyway, for example by asking them to install it? I'd keep it conditional, because the ticket says a generic monitoring framework is out of scope and installing Prometheus would come close to that.
+
+## 16:11 user (smp-india)
+
+I honestly didn't think of the 1st part and after hearing it, I think it's more valuable no? At least we don't have to add any other pieces on the board.
+
+## 16:11 assistant (smp-india)
+
+I agree. For this ticket it's the more valuable part. It checks the outcome that matters (does data reach TSDB?), it runs on Airflow and Teams alerting that already exist, and it adds nothing new to deploy or maintain.
+
+It does have three limits, and they should go in the ticket notes:
+
+- **Slower detection.** A failure can take up to about 35 minutes to alert: a 20-minute threshold plus a run every 15 minutes. If ops need faster, we can tighten both once we see the real data cadence.
+- **It doesn't say which part broke.** The alert says data is stale, not whether the collector, the Darwin source or the publisher failed. The troubleshooting doc will cover reading the collector's JSON logs and the publisher's `DARWIN_BACKLOG` log line.
+- **It depends on Airflow.** If the scheduler is down, nothing alerts. Every other DAG has the same weakness, so it's not new.
+
+**What that leaves on the ticket**
+1. **Prometheus.** Record it as a blocker: India Grafana has only Athena datasources. Keep the platform team's answer as a possible later improvement, not a requirement.
+2. **Thresholds and recipients.** Get SMP ops to agree on the 20/45/15-minute values and the Scraper Notification channel.
+3. **QA drills, after Darwin is deployed:** stop the collector, block polling, let the publisher stall, and confirm both the alert and the recovery message. Watch one night of data before unpausing, to settle the solar question.
+4. **Troubleshooting doc.**
+
+Shall I commit what's built to dev? I'd make two micro commits: the publisher refactor, then the freshness DAG with its tests and catalogue entry. I could also post a short Jira comment on SCR-1268 recording the Prometheus blocker and this approach.
+
+## 16:13 user (smp-india)
+
+yea, commit and push and merge to qa  and prod pls. Scope: scr-1268
+
+For jira, I'd even rescope the ticket to just this as it answerss the core question: "how can we tell if darwin has failed to do its part?"
+
+## 16:13 assistant (smp-india)
+
+Promoting to qa and prod is a milestone, so I'll get a Codex review first, as your rules ask. While it runs I'll check how this repo usually promotes.
+
+## 16:13 assistant (smp-india)
+
+Two local commits are on dev (pre-commit hooks passed), not pushed yet:
+- `79ed5b7 refactor(scr-1268): extract Darwin TSDB credential guard for reuse`
+- `e513aff feat(scr-1268): alert when Darwin data stops reaching TSDB`
+
+Codex is reviewing the change. When it finishes, I'll check each finding, fix what's real, then push dev, merge to qa and prod, and rescope the ticket.
+
+## 16:20 user (smp-india)
+
+<task-notification>
+<task-id>aad302b4d2d3a4c95</task-id>
+<tool-use-id>toolu_01NWNjLGF9BxoxqnLTjUwvR5</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d/tasks/aad302b4d2d3a4c95.output</output-file>
+<status>completed</status>
+<summary>Agent "Codex adversarial review of SCR-1268" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>What this change does: Adds a 15-minute Darwin freshness monitor with outage/recovery notifications. The working tree is clean; I reviewed the described changes in `79ed5b7` and `e513aff`.
+
+1. **P1 — Failed Teams delivery suppresses subsequent outage alerts.**  
+   [india_darwin_freshness_dag.py:17](/Users/qn5792/repos/smp/smp-india/dags/src/india/india_darwin_freshness_dag.py:17) sets the flag after the sender returns, but the pinned helper [catches delivery errors without propagating them](/Users/qn5792/repos/smp/smp-common/smp_common/tasks/common_tasks.py:650). A temporary Graph failure therefore records an undelivered alert as reported; subsequent failed runs never retry Teams. Recovery delivery can similarly fail before the flag is deleted. Reproduced with an offline check using the actual helper functions.  
+   **Fix:** Require confirmed delivery before setting or deleting the flag, and test unsuccessful delivery.
+
+2. **P2 — Delayed callbacks can announce recovery while data is stale.**  
+   [india_darwin_freshness_dag.py:22](/Users/qn5792/repos/smp/smp-india/dags/src/india/india_darwin_freshness_dag.py:22) treats the flag as a boolean and ignores run ordering. Airflow fetches callbacks [by priority without chronological ordering](https://github.com/apache/airflow/blob/3.1.5/airflow-core/src/airflow/dag_processing/manager.py#L414-L439). With an existing outage flag, a newer failure callback can be suppressed before an older success callback sends recovery and clears it. `max_active_runs=1` does not serialize completed-run callbacks.  
+   **Fix:** Retain the latest processed outcome's timestamp, including suppressed failures and successful recoveries, and reject older callbacks. This is a conditional backlog/reordering race; production occurrence was not observed.
+
+3. **P2 — Empty-window retries can exhaust the monitoring budget.**  
+   [freshness.py:49](/Users/qn5792/repos/smp/smp-india/dags/src/scripts/darwin_publish/freshness.py:49) uses the publication adapter serially. In pinned `smp-common 0.9.1`, each unavailable series triggers four increasing row-budget attempts plus four versioned fallback attempts: **224 SDK reads for 28 unavailable series**, before checking pending files. At three seconds per read, that exceeds the [10-minute timeout](/Users/qn5792/repos/smp/smp-india/dags/src/india/india_darwin_freshness_dag.py:41); the retry can postpone terminal alerting to roughly 21 minutes and lose the complete diagnostic report. Request amplification is verified; endpoint latency is unmeasured.  
+   **Fix:** Bound monitoring read/retry costs explicitly and avoid increasing row budgets for known empty windows.
+
+Normal callback context, Variable access, and retry/recovery semantics checked out. No serious issue found in quarter-hour labeling, UTC handling, publisher deletion races, import rules, or mappings-before-credentials ordering. Lint, formatting, and documentation checks passed.
+
+**Verdict: Fix these before promotion.**
+
+Not checked: live scheduler, Teams delivery, TSDB latency, or pytest execution. No files changed.</result>
+<usage><subagent_tokens>22739</subagent_tokens><tool_uses>1</tool_uses><duration_ms>399748</duration_ms></usage>
+</task-notification>
+
+## 16:20 assistant (smp-india)
+
+Codex found three issues. I'll check each one against the code before acting on it.
+
+## 16:21 assistant (smp-india)
+
+All 1185 tests pass. I'll fold the fix into the unpushed feature commit, push dev, then merge dev into qa and qa into prod using the repo's `--no-ff` pattern:
+
+## 16:21 assistant (smp-india)
+
+Dev is pushed. Before promoting, I'll check whether CI passed on that commit:
+
+## 16:25 assistant (smp-india)
+
+Dev CI is green: lint, tests, darwin-collector and docs all passed. Promoting to qa and prod:
+
+## 16:26 assistant (smp-india)
+
+qa and prod both contain the change. Last step: rescoping the ticket.
+
+## 16:26 assistant (smp-india)
+
+The freshness check is now on dev, qa and prod, and SCR-1268 is rescoped to just this. It reaches each environment paused, so nothing runs until you unpause it.
+
+**Commits**
+- `79ed5b7 refactor(scr-1268): extract Darwin TSDB credential guard for reuse`
+- `f47bd43 feat(scr-1268): alert when Darwin data stops reaching TSDB`
+- Merged with "Merge dev into qa" (`2cbeee1`) and "Merge qa into prod" (`27c7062`). CI on dev passed before I promoted: lint, tests, darwin-collector and docs.
+
+**Codex review: what changed and what I rejected**
+- **Fixed:** the Teams helper hides delivery failures. With "alert once per outage", one failed send would have silenced every later alert. Now every failed run alerts (every 15 minutes during an outage), and the first success afterwards sends one recovery notice.
+- **Fixed by the same change:** if Airflow processes callbacks out of order, the worst case is now an early "recovered" message followed by another failure alert, never silence while data is stale.
+- **Rejected:** the claim that reading empty series could blow the 10-minute timeout. Your probe run took about 6 seconds per empty series, so about 3 minutes for all 28. That timing came from your laptop, not the cluster.
+
+**Jira:** SCR-1268 is now titled "Alert when Darwin data stops reaching TSDB". The description covers the approach, and the acceptance criteria that remain are:
+- agree the 20/45/15-minute thresholds with SMP ops;
+- after Darwin is deployed, run the QA drills and watch one night of data, then unpause;
+- write short troubleshooting notes.
+
+Prometheus is recorded as out of scope, with the reason it's blocked. I didn't change the ticket's status or assignee.
+
+The check hasn't run against real TSDB data yet; that's expected until Darwin publishes. Also, `DARWIN_FRESHNESS_ALERTING` is new: Airflow creates it on the first failure, and nobody needs to set it up.
+
+## 16:41 user (smp-india)
+
+that codex review took a while. From your view, do you think it's worth it? Or are we spending too much time on that?
+
+## 16:41 assistant (smp-india)
+
+Here I think it was worth it, but it shouldn't be the default for every change.
+
+**What it cost:** about 7 minutes. It ran in the background while I made the commits, so it held up the push by maybe 3 to 4 minutes.
+
+**What it found:**
+- **One real bug I missed** (P1): an undelivered Teams alert would have silenced every later alert. For a monitor, that's the worst kind of failure: everything looks fine while nobody is being told. And it was about to reach prod.
+- **One conditional race** (P2). It's unlikely to happen, but the P1 fix removed it at no extra cost.
+- **One overstated finding** (P3), which I rejected using your own terminal's timings.
+
+So one of three findings mattered, and it was a real one. For a prod promotion of alerting code, I'd make that trade every time.
+
+**Where it would be a waste:** docs, config values, one-line fixes, or changes the tests already pin down. Your rule already skips those, and I'd stick to it.
+
+**How to make it cheaper next time:**
+1. **Start it earlier.** Launch it as soon as the code and tests pass, not after committing, so it runs while I do the catalogue, lint and commit messages. That would have hidden most of the 7 minutes.
+2. **Narrow the prompt.** I asked it to attack eight areas. "Can this alert stay silent while data is stale?" would have found P1 alone, faster.
+3. **Scale it to the risk.** Run the full review for prod promotions and anything touching alerts, data writes or permissions. Run a quick narrow pass, or none, for dev-only changes.
+
+Want me to save "start the review in parallel, scoped to the riskiest question" as a working preference?
+
+## 16:43 user (smp-india)
+
+Not yet sure. How do you delegate to codex? I assume via the plugin?
+
+## 16:43 assistant (smp-india)
+
+Yes, through the plugin. I'll check exactly what it does under the hood rather than guess:
+
+## 16:43 assistant
+
+Yes, through the OpenAI Codex plugin (v1.0.6). Here's the actual chain:
+
+1. **I call a subagent:** the `Agent` tool with type `codex:codex-rescue`. That subagent runs on Sonnet and can only use Bash.
+2. **It hands the work straight to Codex.** It's told to make exactly one call, `node scripts/codex-companion.mjs task "<my prompt>"`, and do nothing else: no reading files, no reasoning of its own.
+3. **Codex CLI does the work.** It reads the repo itself, then the result comes back to me as a notification.
+
+Almost all of the 7 minutes was Codex: the wrapper made a single tool call.
+
+**Something I noticed while checking this.** `codex-rescue` is meant for handing Codex a fix or an investigation, and its default is to let Codex edit files. I only kept it to reviewing by writing "do NOT edit any files" in the prompt. It worked (the review reported "No files changed"), but it relied on Codex following that instruction rather than on a read-only setting.
+
+The plugin has two commands built for exactly this:
+- `/codex:review`: a standard code review of your working tree or branch.
+- `/codex:adversarial-review [focus …]`: questions the design and its assumptions, which is closer to what you want before promoting.
+
+Both are review-only by design, and both have `--background`, `--base <ref>` and `--scope` options. But both are marked `disable-model-invocation: true`, so only you can run them; I can't. That's why I used the rescue route.
+
+**Two ways to do this next time:**
+- **You run it:** for example, `/codex:adversarial-review --background can this alert stay silent while data is stale?` It's read-only and scoped, and I'd check each finding the way I did this time.
+- **I keep using rescue,** with a narrower prompt that says explicitly it's read-only. Nothing waits on you, but the read-only part is just an instruction to Codex.
+
+I'd lean towards the first for prod promotions, since read-only is guaranteed there.
+
+## 16:58 user
+
+what stopping you from calling it yourself then?
+
+## 16:58 assistant
+
+Technically, nothing stops me.
+
+`disable-model-invocation: true` only hides those two commands from my Skill tool, so I can't call `/codex:adversarial-review` by name. But the commands are thin wrappers. They run the same script the rescue agent uses, just with a different subcommand:
+
+```bash
+node ~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs adversarial-review "<focus>"
+```
+
+The script handles `review`, `adversarial-review` and `task`, so I could call it directly through Bash and skip the Sonnet wrapper.
+
+**Why I didn't:** the plugin's author used that flag to say that a person should start a review. Reviews spend Codex usage and take minutes, so it's a consent setting, not a security control. Calling the script around it without asking would be ignoring that choice, even though nothing enforces it.
+
+**If you're fine with it,** I'll call the script directly for reviews from now on. That gets read-only by design, the `--base` and `--scope` options, and no wrapper in between. I'd still keep to your existing rule about when to review (milestones, prod promotions, alerting, data writes). Want me to save that as a standing preference?
+
+## 17:02 user
+
+yes. But allow me to restate what I want..
+
+Almost on all cases? I'd rather just skip the review, as I prioritize speed over anything. 
+
+BUT in cases that YOU think it's prudent for it to be reviewed, I'll fully trust your judgment and expect you to make the call on that. We have another plugin called, ponytail, and it also has a review tool, so I'd expect that would be utilized hand in hand with codex. In terms of when to review, I'd rather do it in the design phase rather than some sort of a pre-commit/push, y know? Better to do it right ONCE vs iterate multiple times, wasting tokens. 
+
+Wdyt?
+
+## 17:02 assistant
+
+Let me check I've understood:
+
+1. **Default: no review.** Speed comes first.
+2. **I decide when a review is worth it,** and you trust that call. I don't ask first.
+3. **When I do review, use both tools:** Codex (calling the script directly, which you've approved) and ponytail's review.
+4. **Review at design time, not before commit or push.** Get the approach right once instead of finding problems after the code is written and going round again.
+
+**What I think:** I agree, and today's review supports it. The one real bug, an alert silenced by a Teams helper that hides delivery failures, was a design choice ("send once, remember that we sent it"). A design review that knew how the helper behaves would have caught it before I wrote any code. The other two findings were noise.
+
+**One caveat:** some risks only show up in code, such as races, timeouts and error handling. For those I'd keep the option of a narrow code-level check, but only when the stakes are high (prod alerting, data writes, permissions) and only scoped to that one question. Rarely, and never by default.
+
+**Roughly when I'd call a review:** something that's hard to undo (data writes, schema or output contract changes, deletions); prod alerting or monitoring; anything touching permissions or credentials; or a design built on behaviour I haven't checked. Not for DAG tweaks, docs, config or ordinary fixes.
+
+**Questions before I save anything:**
+
+1. **What should the design review look at?** My suggestion: before coding, I write a short plan (approach, assumptions, failure modes) and have Codex and ponytail-review attack that, not the code. Does that match what you mean?
+2. **Your global CLAUDE.md** currently says to review at milestones (before handoffs, before qa/prod promotion, and so on). That conflicts with this. Should I replace that line with the new rule, or keep CLAUDE.md as it is and save this only as a memory?
+3. **Do you want to hear about it when I skip a review?** For example, one line saying "skipped review: low risk because …". Or skip silently?
+
+## 17:05 user
+
+1. Can't we ask codex to do the review USING ponytail? I feel like with what you're suggesting, we're essentially doing 2 reviews at the same time....??? I'd rather have 1 only
+2. Ah. What's the difference between the two, in practice?
+3. no preference really
+
+## 17:05 assistant
+
+**1. Yes, one review.** Codex does the reviewing and ponytail's review checklist is what it reviews against. Your current CLAUDE.md line already says roughly that ("Delegate the review to Codex with the ponytail-review checklist"); I was wrong to suggest running two. In practice:
+
+```bash
+node …/codex-companion.mjs task "<ponytail-review checklist> + <design plan> + <the riskiest question>"
+```
+
+Running it without `--write` puts Codex in its `read-only` sandbox (line 491 of the script), so it can't edit files whatever the prompt says. I'd point Codex at the checklist file, `~/.claude/plugins/cache/ponytail/ponytail/5.2.0/skills/ponytail-review/SKILL.md`, rather than pasting it in, so it always uses the installed version. I'd use `task` rather than `adversarial-review` because `task` takes our own checklist as the brief.
+
+**2. CLAUDE.md vs memory in practice:**
+- **CLAUDE.md** is loaded in full at the start of every session, and I treat it as standing orders. You wrote it, and it wins over anything else.
+- **Memory** is my own notes. Only the one-line index is always loaded; the details get pulled in when they look relevant. It ranks below CLAUDE.md and can go out of date.
+
+So if I only saved this as a memory, the old CLAUDE.md line ("review at milestones… before promoting to qa/prod") would keep overriding it and I'd keep reviewing before promotions. **The new rule needs to replace that line in CLAUDE.md.**
+
+**3.** No preference, so I'll add a one-line note only when I skip a review on something that looks risky.
+
+Here's the replacement I'd put in your global CLAUDE.md:
+
+```
+- reviews: skip by default — speed first. Review only when Claude judges it prudent (hard-to-undo data/contract changes, prod alerting, permissions/creds, or a design resting on unverified behaviour), and do it at DESIGN time, before code. One review: Claude writes a short plan (approach, assumptions, failure modes) and runs Codex read-only via `codex-companion.mjs task` (no --write) using the ponytail-review checklist; Claude verifies each finding before acting.
+```
+
+Shall I make that edit?
+
+## 17:06 user
+
+#2, no I mean, what's the difference between the 2 scenarios: the one we discussed just now vs already in global claude md
+
+## 17:06 assistant
+
+Sorry, I misread the question. Here's the rule you have now compared with what we just discussed:
+
+| | **Current CLAUDE.md** | **New rule** |
+|---|---|---|
+| **Default** | Review whenever a trigger fires | Skip unless I judge it worth it |
+| **What triggers it** | Fixed events: before handing work to someone, every qa/prod promotion, several edits to one file, touching CI/deploy/data writes/permissions | Risk: hard-to-undo changes, prod alerting, credentials, or a design built on unchecked behaviour |
+| **When** | After the code is written | Before the code, at design time |
+| **What's reviewed** | The diff | The plan: approach, assumptions, failure modes |
+| **Who and how** | Codex with the ponytail checklist, findings checked | Same |
+
+**What that means day to day:**
+- **Fewer reviews.** Almost every ticket ends with a qa/prod promotion, so the current rule fires on nearly everything. The new one fires only on risky work.
+- **Cheaper when a review does happen.** A design problem found before coding costs a rewrite of the plan, not of the code. Today, the current rule sent the review after commit, so the fix meant amending the commit, rerunning the suite, then pushing. Under the new rule, I'd have reviewed "alert once, remember via a variable" before writing it, and the swallowed-delivery problem would probably have come up then.
+- **What you give up:** the automatic safety net before prod. That was deliberate in the old rule. With the new one, a bug that only shows in code (a race, a timeout) can reach prod on a change I judged low-risk. You've said speed matters more, so I think that's an acceptable trade.
+
+Only the "who and how" stays the same: Codex and the ponytail checklist, with me checking the findings. Do you want me to replace the current line with the new rule?
+
+## 17:06 user
+
+ah yes, makes sense. Yes pls.
+
+## 17:06 assistant
+
+I've replaced line 6 of your global [CLAUDE.md](/Users/qn5792/.claude/CLAUDE.md) with the new rule, and it applies from the next session. In short: skip reviews by default; when I judge one prudent, do a single read-only Codex review of the design plan before writing code, using the ponytail-review checklist, and check each finding myself.
+
+Two things to know:
+- The script path includes the plugin version (`1.0.6`), so it will break when the Codex plugin updates. If that happens I'll find the new path, but the line will need a one-word edit.
+- The ponytail checklist is referenced by its location in the ponytail plugin, so it always uses whatever version is installed.
+
+## 17:07 user
+
+can't we make the script version agnostic? Just use the version installed (hopefully latest)?
+
+## 17:07 assistant
+
+Both paths resolve from `installed_plugins.json`, and the script runs. Updating the line:
+
+## 17:07 assistant
+
+The rule in [CLAUDE.md](/Users/qn5792/.claude/CLAUDE.md) no longer has a version in it. Both the Codex script and the ponytail checklist are now looked up in `~/.claude/plugins/installed_plugins.json` each time the command runs. That's the file where Claude Code records the plugin version it actually uses. I tested both lookups just now: Codex resolves to `1.0.6`, ponytail to `5.2.0`, and the script runs.
+
+That file gives the active version rather than the highest folder on disk. Old versions stick around (`1.0.4` is still there), and after an update the file points to the new one automatically.
+
+If the plugin system ever changes how it stores this, the lookup returns `null` and the command fails visibly instead of quietly running an old version.
+
+## 17:08 user
+
+thanks. Can we test that now? the whole flow. I dunno how we can test though lol
+
+## 17:08 assistant
+
+Yes. The best test is one where we already know the answer. I'll replay today's original design for the alert behaviour ("alert once per outage, remember it in a Variable") as a short plan, before any code, and run it through the exact command from CLAUDE.md. If the flow works:
+
+1. Codex runs read-only: no file in the repo changes.
+2. It uses the ponytail checklist.
+3. It finds the flaw on its own: the Teams helper swallows delivery errors, so "alert once" can go silent.
+
+## 17:08 assistant (smp-india)
+
+The repo is clean, with HEAD at `f47bd43`. Running the review with the exact command from CLAUDE.md:
+
+## 17:09 assistant (smp-india)
+
+The review is running. When it finishes, I'll check three things: that the repo is unchanged, that the output names the checklist, and that the swallowed-delivery flaw was found.
+
+## 17:13 user (smp-india)
+
+<task-notification>
+<task-id>b0uboeyc0</task-id>
+<tool-use-id>toolu_01TnN1b3PoLVgVMaoBgGXisN</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d/tasks/b0uboeyc0.output</output-file>
+<status>completed</status>
+<summary>Background command "Run the CLAUDE.md Codex design review on the test plan" completed (exit code 0)</summary>
+</task-notification>
+
+## 17:13 assistant (smp-india)
+
+The test passed: the whole review flow from CLAUDE.md works.
+
+| What I checked | Result |
+|---|---|
+| The command finds both plugins without a version number | ✅ It found the Codex script and the ponytail checklist on its own |
+| Codex can't change files | ✅ Before and after: 0 changed files and the same commit (`f47bd43`) |
+| It used the ponytail checklist | ✅ It read the checklist file first, named it at the top of its answer, and used the checklist's headings ("Must fix", "If we skip it") |
+| It caught the flaw I'd planted | ✅ Its first finding was the one I hid: the Teams helper swallows delivery errors, so "alert once" can go silent for a whole outage. It found that by reading the code, not because I hinted at it |
+| Time | 4 min 15 s |
+
+**It also found two flaws beyond the planted one.** Both were in the test design, not the shipped code:
+- Callback ordering can leave the "already alerted" flag set, which would silence the next outage.
+- `Variable.delete` logs errors instead of raising them. I checked this in the installed Airflow SDK, and it's true.
+
+The shipped DAG isn't affected by any of the three, because it alerts on every failed run. At worst a leftover flag sends an extra "recovered" message, never silence.
+
+**One flaw in the test itself:** Codex also found the shipped version in the repo and noticed it already alerts on every failure. That could have given it a hint. But it pointed to the actual lines in the installed smp-common and Airflow code for each finding, so the findings are its own.
+
+## 17:22 user (smp-india)
+
+okay. Now back to the ticket, where were we? Lol
+
+## 17:22 assistant (smp-india)
+
+Here's where SCR-1268 stands, against the rescoped acceptance criteria:
+
+| Criterion | Status |
+|---|---|
+| Freshness DAG merged to dev, qa and prod | ✅ Done (`79ed5b7`, `f47bd43`). It stays paused in every environment |
+| Thresholds (20/45/15 min) and alert channel agreed with SMP ops | ⏳ Waiting on ops. Nothing to build |
+| QA checks: stop the collector, stall the publisher, confirm alert and recovery; watch one night of data; then unpause | 🚫 Can't start until Darwin is deployed |
+| Short troubleshooting notes | 🟢 Not started, and nothing blocks it |
+| Platform team: is Prometheus available? | Your message. Now only a possible later improvement, not a blocker |
+
+The ticket itself still shows **To Do** and has no assignee.
+
+**What can happen now:**
+1. **I write the troubleshooting notes.** It's a short section: what the alert means, how to tell from the collector's JSON logs and the publisher's `DARWIN_BACKLOG` / `DARWIN_PUBLICATION` log lines which part broke, and what to do in each case. I'd add it to [the collector README](smp-india/services/darwin-collector/README.md) or as a `docs/runbooks/` page, following the existing SCR-1256 runbook.
+2. **You ask ops** to sign off on the thresholds and the channel. I can draft that message if you like.
+3. **Move the ticket** to In Progress and assign it to you.
+
+After that, the ticket waits on the Darwin deployment.
+
+Shall I start with the troubleshooting notes as a `docs/runbooks/` page, and move the ticket to In Progress?
+
+## 17:25 user (smp-india)
+
+what are the thresholds for? Do we set this in the dag? Or...
+
+## 17:25 assistant (smp-india)
+
+Yes, they're set in the DAG's code. They're constants at the top of [freshness.py](smp-india/dags/src/scripts/darwin_publish/freshness.py):
+
+```python
+MINUTE_MAX_AGE = pd.Timedelta(minutes=20)       # 1-min series
+QUARTER_HOUR_MAX_AGE = pd.Timedelta(minutes=45) # 15-min series
+PENDING_MAX_AGE_SECONDS = 15 * 60               # oldest batch waiting in the spool
+```
+
+**What each one decides:** "how long can this go without new data before we call it broken?" Each run of the DAG (every 15 minutes) checks:
+- **20 min:** has each 1-minute series (active power per site) received a point in the last 20 minutes? Normally a point lands every few minutes, because the publisher runs every 5. Twenty minutes allows for a couple of slow publisher runs before alerting.
+- **45 min:** has each 15-minute series (wind, irradiance, plus 15-minute power) received a point in the last 45 minutes? A 15-minute value only exists once its window closes and the publisher picks it up, so its normal age is already 15 to 30 minutes.
+- **15 min:** has any batch been waiting in `spool/pending` for over 15 minutes? That means the collector is producing data but the publisher isn't sending it to TSDB.
+
+**Why ops need to agree:** it's a trade-off between alert speed and false alarms:
+- **Lower thresholds** alert faster, but normal hiccups (a slow publisher run, TSDB lagging briefly) start paging people.
+- **Higher thresholds** mean fewer false alarms, but slower alerts. At today's values, a real failure can take up to about 35 minutes to alert (the 20-minute threshold plus up to 15 minutes until the next run).
+
+I picked these from how the pipeline is built, not from real data, since Darwin isn't publishing yet. So "agree with ops" really means: is about 35 minutes acceptable to them, or do they need faster? If they want different numbers, it's a one-line change plus a deploy.
+
+We could also make them Airflow Variables, so ops can tune them without a deploy. I'd skip that unless they expect to change them often.
+
+## 17:26 user (smp-india)
+
+Ah. It's an optional ask then? In other words, we can purely decide on this one? 
+
+I'd prefer it to be configurable though...with defaults.
+
+## 17:26 assistant (smp-india)
+
+Yes, it's optional. The Jira acceptance criterion says "agree with SMP ops" only because I wrote it that way. Ops are the ones who get the alerts, so it's polite to ask, but nothing technical depends on it. We can decide ourselves and drop that criterion.
+
+For configurability I'll copy the pattern already in this module. `settings.py` reads `DARWIN_PUBLISH_MAX_FILES` from an Airflow Variable with a default and rejects invalid values. Each threshold becomes a Variable with today's value as the default:
+
+## 17:27 assistant (smp-india)
+
+Next, the catalogue entry should name the Variables, so whoever tunes them can find them:
+
+## 17:28 assistant (smp-india)
+
+I've made the three freshness thresholds configurable, with today's values as defaults. Nothing is committed yet. Setting a Variable in Airflow overrides its default; leaving it unset keeps the default:
+
+| Airflow Variable | Default |
+|---|---|
+| `DARWIN_FRESHNESS_MINUTE_MAX_AGE_MINUTES` | 20 |
+| `DARWIN_FRESHNESS_QUARTER_HOUR_MAX_AGE_MINUTES` | 45 |
+| `DARWIN_FRESHNESS_PENDING_MAX_AGE_MINUTES` | 15 |
+
+- **Validation:** an invalid value (0, a negative number, text) fails the run with a message naming the Variable, so a typo shows up as an alert rather than silently disabling the check.
+- **Shared rules:** this uses the same validation as the existing `DARWIN_PUBLISH_MAX_FILES` setting. I moved those rules into one helper in [settings.py](smp-india/dags/src/scripts/darwin_publish/settings.py) that both settings now use.
+- **Defaults in one place:** they're only in `settings.py`. The check itself requires the values to be passed in, so the defaults can't drift apart.
+- **Catalogue:** the [DATA_CATALOGUE.md](smp-india/DATA_CATALOGUE.md) entry lists the three Variables and their defaults.
+- **Checks:** 3 new tests; the full suite (1188 tests), ruff, the catalogue check and the docs check all pass.
+
+If you ship it, I'll also remove the "agree thresholds with SMP ops" criterion from SCR-1268, since we're deciding the thresholds ourselves.
+
+## 17:28 user (smp-india)
+
+Commit, push to dev, and merge to qa and prod. Also drop the ops sign-off criterion from SCR-1268.
+
+## 17:29 assistant (smp-india)
+
+Pushed `ff0214d` to dev. While CI runs I'll update the ticket, then promote once CI is green.
+
+## 17:32 assistant (smp-india)
+
+CI is green on `ff0214d`. Promoting:
+
+## 17:33 assistant (smp-india)
+
+The configurable thresholds are now on dev, qa and prod, and SCR-1268 no longer requires ops sign-off.
+
+- **Commit:** `ff0214d feat(scr-1268): make Darwin freshness thresholds configurable via Airflow Variables`. I kept it as one commit because the settings helper and the threshold wiring are the same change.
+- **CI on dev:** lint, tests, darwin-collector and docs all passed before promoting.
+- **Promotion:** merged dev into qa (`0981500`) and qa into prod (`1bd4e0f`). Both contain `ff0214d`.
+- **Jira:** I dropped the ops sign-off criterion and recorded the three Variables and their defaults. I also added a note to tune them after the first night of real data.
+
+**What's left on SCR-1268:**
+- **Troubleshooting notes:** nothing blocks these; I can write them whenever you like.
+- **QA checks, one night of data, then unpause:** these wait for the Darwin deployment.
+
+The ticket is still To Do and unassigned in Jira; I haven't changed that.
+
+## 18:01 user (smp-india)
+
+@"/Users/qn5792/Downloads/IMG_4557.HEIC" @"/Users/qn5792/Downloads/IMG_4556.HEIC" @"/Users/qn5792/Downloads/IMG_4555.HEIC"
+
+## 18:01 user (smp-india)
+
+[Request interrupted by user]
+
+## 18:02 user (smp-india)
+
+sorry wrong send lol
+
+## 18:02 assistant (smp-india)
+
+No problem, I haven't opened those photos.
+
+On SCR-1268, the troubleshooting notes are the only thing that isn't blocked. I can write them whenever you like.
+
+## 22:09 user
+
+wait, I realized something.
+
+I think we wrote the dag to monitor something redundant. The darwin publisher dag 's responsible for the publishing to TSDB, if that fails, we won't get values in TSDB, we get the alert, regardless.
+
+With this new freshness check dag, we're essentially checking the same thing... so if freshness check fails, most likely darwin publisher fails, no? Even if for some reason it doesn't... IT SHOULD lol. I mean, we should've written the publisher to self check this to fully own the publishing to tsdb.
+
+So this monitoring dag should keep tabs on the darwin -> airflow efs portion instead.....??
+
+## 22:09 assistant
+
+You're right that part of it is redundant. But the DAG already covers the leg you're worried about, just indirectly. I'll check two facts before answering properly:
+
+## 22:10 assistant
+
+Here's how I read your point:
+- **The publisher owns writing to TSDB**, so a TSDB check that duplicates it is redundant. If the publisher fails, it should alert by itself.
+- **The monitoring DAG should watch what the publisher can't see:** the Darwin → collector → EFS leg.
+
+**I agree, with one correction.** On the redundancy, you're right. The publisher already checks every write by reading it back (`verify=True`) and fails if publication isn't confirmed. So a publish failure already alerts, and the TSDB read in my DAG adds nothing there.
+
+The correction: the DAG isn't only redundant. Its useful part is already the upstream leg, just measured at the far end of the pipeline. If the collector stops, or Darwin's API fails or returns stale data, no new files arrive in `spool/pending`. The publisher then processes zero files and stays green. Today, stale TSDB data is the only thing that would reveal that. So the gap you describe is real, but the DAG does cover it, just indirectly and expensively: 28 TSDB reads, about 3 minutes when the data is empty.
+
+**Your direction is better, and EFS already has the right signal.** The collector keeps `spool/collector-state/sampling.json`, which stores a "high-water mark" for each entity/tag: the latest source minute it has accepted. The collector maintains that file whether or not the publisher has cleaned up. All three environments run `first_per_minute` mode, which is the mode that writes it. So the DAG could become:
+
+- **Per-stream source freshness:** each entity/tag's high-water mark is no older than N minutes. This catches a stopped collector, failed polling and stale source data, per tag, with no TSDB reads at all.
+- **Drop the TSDB reads.** Publishing becomes entirely the publisher's job, as you said.
+
+**Questions before I change anything:**
+
+1. **What about the publisher not running at all?** If the publisher DAG is paused, or the scheduler stops triggering it (the way the REC scraper silently stopped in SCR-1289), nothing alerts. Today the "oldest pending batch older than 15 minutes" check is what catches that, and it's also an EFS signal. Should I keep it as the publisher's watchdog, or treat "is the publisher running?" as out of scope?
+2. **Should the publisher check itself more?** You said it should fully own publishing. It already verifies every write and fails on errors. Is there something else you have in mind for it, or is that enough and we just remove the TSDB part here?
+3. **Thresholds:** with source freshness, the 1-minute and 15-minute TSDB thresholds go away. They'd be replaced by one "source minute older than N" threshold (I'd default to 10 minutes, as a Variable) plus the pending-age threshold. Does that work?
+
+## 22:12 user
+
+1. it shouldn't be paused anyway. It just so happen that we're still in the midst of deploying it live, but it should always be active
+2. If tsdb freshness is concerned, it should be here as a separate task... wdyt?
+
+## 22:12 user
+
+[Request interrupted by user]
+
+## 22:12 user
+
+3. whichever makes sense
+
+## 22:12 assistant
+
+**1.** Understood. The publisher is always on, so a "publisher isn't running" watchdog is out of scope, and I'll drop the pending-age check as well.
+
+**2.** I'd advise against a TSDB freshness task in the publisher. The publisher already reads back every write and fails if TSDB doesn't hold what it sent; that read-back is its TSDB check. A separate freshness task there would only add one case: the publisher succeeding after publishing zero files. That happens when nothing arrives from upstream, which the EFS check catches more directly. It would also cost a lot: 28 TSDB reads on a DAG that runs every 5 minutes with `max_active_runs=1`. With empty windows that's about 3 minutes, which would delay real publishing. So I'd leave the publisher as it is.
+
+**3.** One threshold: a stream is stale if its latest source minute is more than **10 minutes** old. That's an Airflow Variable `DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES`, default 10. The collector polls every 15 seconds, so 10 minutes leaves room for a few failed polls and retries without false alarms.
+
+**The redesigned DAG would:**
+- **Read** `spool/collector-state/sampling.json` from EFS. That's the collector's per-entity/tag high-water mark, kept independently of publisher cleanup.
+- **Check each expected stream.** For every entity/tag in `mappings.json`, it fails if the stream is missing or older than the threshold, naming each stale stream. A missing or unreadable state file also fails.
+- **Drop everything TSDB:** no reads, no TSDB credentials, and the 3 current Variables are replaced by 1. I'd also undo the `tsdb_config_from_environment()` extraction in the publisher, since it would have only one caller again.
+- **Keep the rest:** the DAG ID, the 15-minute schedule, the Teams alert on every failure, the single recovery notice, and starting paused.
+
+**What it would now catch:** a stopped collector, failed polling, and stale source data for each tag. It no longer watches publication, since the publisher owns that.
+
+**The open question stays:** if solar sites' source timestamps stop advancing at night, this alerts nightly. Measuring at the source doesn't change that. We'll see it in the first night after deploy, and can raise the threshold if needed.
+
+Shall I go ahead and ship it the same way as before (dev, then qa and prod) and update the ticket?
+
+## 22:15 user
+
+yes pls.
+
+## 22:16 assistant
+
+The new EFS-based check is written. Next I'm reducing the settings to one Variable and undoing the publisher refactor.
+
+## 22:16 assistant (smp-india)
+
+Now rewriting the freshness tests around the collector state file. The DAG and alert-callback tests stay as they are:
+
+## 22:19 assistant (smp-india)
+
+Both commits pass the full suite on their own, and the other session's 8 files are back in the working tree, untouched. Pushing dev and waiting for CI:
+
+## 22:23 assistant (smp-india)
+
+CI is green. The working tree has the other session's uncommitted files, so I'll do the qa/prod merges in a separate temporary worktree rather than switching branches here:
+
+## 22:23 assistant (smp-india)
+
+Both pushes failed, and my filter hid the reason. Checking what's on the remote now:
+
+## 22:23 assistant (smp-india)
+
+The remote is unchanged and nothing moved, so it wasn't a race. I'll retry with the full push error visible:
+
+## 22:24 assistant (smp-india)
+
+Both pushes went through, with the pre-push pytest hook passing each time. Cleaning up the temporary worktree, then updating the ticket and my notes:
+
+## 22:25 assistant
+
+The freshness DAG now watches the Darwin → EFS leg instead of TSDB, and it's on dev, qa and prod.
+
+**What it does now**
+- **Reads the collector's state file** `collector-state/sampling.json` on EFS, which holds the newest source minute each entity/tag has received.
+- **Fails when a stream is too old:** any mapped stream older than `DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES` (Airflow Variable, default 10). It names each stale entity/tag. A missing or unreadable state file also fails.
+- **No TSDB reads and no TSDB credentials.** The 3 old Variables are replaced by this one.
+- **Only checks streams the collector has produced data for at least once.** I found that the sites differ by environment (Tithwa is prod-only), and that list lives in smp-tool's config, which Airflow can't see. The cost: a stream that never produces anything isn't caught. That's marked in the code and noted on the ticket.
+- **Unchanged:** the alert on every failed run, the single recovery notice, and the DAG starting paused.
+
+**Commits:** `8ebf7e8 feat(scr-1268): watch Darwin collector state on EFS instead of TSDB` and `b739da7 revert(scr-1268): inline Darwin TSDB credential guard back into the publisher`. The second one puts the publisher back exactly as it was before this ticket. I ordered them so each commit passes the tests on its own.
+- **CI on dev:** green before promoting.
+- **Promotion:** qa `547808b`, prod `f752534`. The pre-push pytest hook passed both times.
+
+**Two things to know:**
+- **Your working tree:** smp-india has another session's uncommitted HPX national and SCR-1274 changes, including part of `DATA_CATALOGUE.md`. I committed only my own section of that file and left everything else uncommitted. To avoid switching branches over it, I did the qa/prod merges in a temporary worktree, which I've removed.
+- **Jira:** SCR-1268 is renamed "Alert when Darwin collection stalls". It now says the collector leg is watched by this DAG and TSDB publishing is owned by the publisher DAG. Out of scope: watching whether the publisher itself runs, and Prometheus.
+
+**What's left** is the same: troubleshooting notes (nothing blocks them), then, after Darwin is deployed, the QA checks and one night of data, then unpause.

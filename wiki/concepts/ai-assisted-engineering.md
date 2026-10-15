@@ -6,6 +6,8 @@ As of 2026-10-14, AI-assisted engineering in these notes is a practical workflow
 
 Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 work also showed a practical personal-tooling pattern: Claude mods can expose usage and work-time signals in the prompt/footer UI, while Codex can be used as an adversarial reviewer when Brian or Claude remains the main driver.
 
+As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configured for marketplace auto-update; this remains a personal-tooling convenience rather than a controlled team dependency.
+
 ## Background
 
 - [[copilot-dag-agent]] uses current repository conventions to scaffold Airflow DAGs.
@@ -49,6 +51,7 @@ Human review and workflow controls remain part of the operating model. The curre
 - October 13 Claude/Codex setup work found an old Homebrew formula `codex` 0.46.0 shadowing the newer cask 0.162.1. Removing the formula and reinstalling the cask fixed the `model_reasoning_effort = "ultra"` config failure; ripgrep was reinstalled after Homebrew removed it as a dependency. Brian then enabled Homebrew autoupdate for all packages, including Codex.
 - October 13 Claude mod work created two persistent local mods: `usage-band`, which shows session limit usage near the prompt footer, and `work-clock`, which counts engaged Claude work time from a 6am day boundary, asks whether today is a workday, shows `/time` for the current week, and nags after 3h of working time.
 - October 13 SMP collaboration clarified "pair program with Codex": Claude/Brian remains the main driver, while Codex is used for adversarial review. Codex caught a real bug in the Khaba duplicate-resolution logic before the change was committed.
+- October 15: Ponytail was updated from 5.0.0 to 5.2.0 and its marketplace auto-update was enabled locally.
 
 ## Open Questions
 
@@ -83,6 +86,7 @@ Human review and workflow controls remain part of the operating model. The curre
 - `sources/meetings/2026-07-02-1700-granola-application-team-meeting.md`
 - `sources/meetings/2026-07-07-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-07-07-1530-granola-francois-help.md`
+- `sources/claude-conversations/2026-10-15-claude-smp-e1bec58c.txt`
 - `sources/copilot-conversations/2026-07-09-copilot-conversations.md`
 - `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - `sources/meetings/2026-07-15-1500-granola-sprint-retro.md`
@@ -111,4 +115,4 @@ Human review and workflow controls remain part of the operating model. The curre
 - `sources/claude-conversations/2026-10-13-claude-scratch-75ac0d14.txt`
 - `sources/codex-conversations/2026-10-13-codex-conversations.txt`
 
-Last Updated: 2026-10-14
+Last Updated: 2026-10-16

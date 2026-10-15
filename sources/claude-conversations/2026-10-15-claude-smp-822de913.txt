@@ -1,0 +1,138 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `822de913-6a35-4648-9e65-956b7e2d3853`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853.jsonl`
+Resume: `claude --resume 822de913-6a35-4648-9e65-956b7e2d3853`
+
+## 22:51 user
+
+wait, I'm lost. How do we test this again?
+
+## 22:51 assistant
+
+Here's the whole test in four steps. Each one checks one link of the chain: scraper → TSDB → DAG → CDH → Grafana.
+
+**1. Is the scraper running on its own again?**
+REC runs daily at 07:00 UTC, so today's task should have completed by itself, without our manual runs. If it has, the fix holds.
+
+**2. Does the DAG publish fresh data?**
+Trigger `india_iex_rec_tsdb_dag` in prod Airflow, and in QA too, because the QA dashboard was stale as well. Both runs should go green. They now include the new freshness check, which should pass, since the newest REC session (30 Sep) is about 15 days old.
+
+**3. Did CDH get the new data?**
+After the DAG runs, the CDH parquet's newest date should be 30 Sep in both prod and QA, not 8 Jul.
+
+**4. Does Grafana show it?**
+Open the REC dashboard in prod and QA. It should show points on 29 Jul, 12 Aug, 27 Aug, 9 Sep and 30 Sep.
+
+Steps 2 and 4 are clicks in Airflow and Grafana. Steps 1 and 3 are one VPN command; run it after the DAGs finish:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python scripts/prod_scraper_ops.py refresh-creds && daccli cdh get_credential --use-profile smp_india_prod --save --aws-profile khaba_probe_prod && daccli cdh get_credential --use-profile smp_india_qa --save --aws-profile khaba_probe_qa && { python scripts/prod_scraper_ops.py --skip-refresh check-active; python scripts/prod_scraper_ops.py --skip-refresh status iex_api_rec; python -c "import runpy; g = runpy.run_path('/private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_diagnose.py'); g['check_cdh']('prod'); g['check_cdh']('qa')"; } 2>&1 | grep -v -i warning | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_final_check.txt
+```
+
+It only reads, and takes about a minute after the logins. A good result looks like:
+- `check-active` says the live list matches the config.
+- `status` shows a REC task for 15 Oct in state `Completed`.
+- Both CDH sections show 30 Sep as the newest date for all 4 fields.
+
+Say "done" and I'll read the output. Once it's all good, the ticket can go to Francois for validation.
+
+The failure case of the new check (stale data makes the DAG fail and alert Teams) is only covered by unit tests. Testing it live would mean making prod data stale on purpose, which isn't worth it.
+
+## 22:53 user
+
+what about backfilling pala?
+
+## 22:53 assistant
+
+The backfill is already done. It ran yesterday as part of the prod fix, and the only step left is the DAG publishing it, which the test covers.
+
+- **TSDB:** the `replay-rec --end-date 2026-08-14` run plus yesterday's scheduled REC task filled the gap. You checked TSDB afterwards: all 4 series now have 23 rows, including the 5 missing sessions (29 Jul, 12 Aug, 27 Aug, 9 Sep and 30 Sep).
+- **CDH and Grafana:** no separate backfill is needed. Each DAG run reads the last 365 days from TSDB and rewrites the whole `latest` parquet. So the next run, the one you trigger in step 2 of the test, publishes all 5 sessions at once. Step 3 checks it by confirming 30 Sep is the newest date in CDH.
+
+If the dashboard shows 30 Sep but some of those 5 points are missing, tell me. That would point at the DAG's read rather than the backfill.
+
+## 22:53 user
+
+huh. So every data from july, we've already backfilled??
+
+## 22:53 assistant
+
+Yes, in TSDB. Everything since July is in, but that's only 5 data points. REC isn't daily data; it only trades in sessions about every two weeks. The IEX API confirmed there were exactly 5 sessions after 8 July, and you saw all 5 in TSDB yesterday:
+
+| Session | In TSDB |
+|---|---|
+| 29 Jul | ✅ |
+| 12 Aug | ✅ |
+| 27 Aug | ✅ |
+| 9 Sep | ✅ |
+| 30 Sep | ✅ |
+
+There's been no new session since 30 Sep, as of the API check on 14 Oct. The next session will come in through the normal daily scraper run.
+
+The only thing still pending is CDH, which still holds data up to 8 Jul until the DAG runs. That's step 2 of the test.
+
+## 23:01 user
+
+ran in the terminal. How's it?
+
+For airflow, all green!
+
+## 23:01 assistant
+
+CDH is good in both prod and QA: 23 points per field, newest 30 Sep, written by today's scheduled run. But the task list shows a REC task that **failed**. Reading the top of the output:
+
+## 23:02 assistant (apac-tsdb-scraper)
+
+Everything checks out. The failed tasks are harmless, and the only thing left to see is the scraper running on its own tomorrow.
+
+| Check | Result |
+|---|---|
+| Airflow, prod and QA | All green (your check) |
+| CDH, prod and QA | 23 points per field, newest 30 Sep. Rewritten today at 00:30 UTC. |
+| Live scraper list | Matches the config |
+| The 4 failed REC tasks | Expired windows, not errors |
+
+- **The failed tasks:** the logs show each one ran and stopped immediately with "Too late". The scheduler drops any task whose run window has already closed:
+  - The 24 and 25 Jul tasks had sat waiting since July.
+  - The 14 Oct task was created at 08:19 UTC yesterday, after its 07:00–07:33 window.
+  
+  None of them fetched anything, and none needed to. The replay and the 15 Oct task already covered those periods.
+- **Still to prove:** the 15 Oct task was our manual run, so the scraper hasn't run on its own yet. The 16 Oct task (07:00 UTC tomorrow) will show it. If `status iex_api_rec` shows it `Completed` tomorrow without anyone touching it, the fix holds and the ticket can go to Francois. That fits the 🚩 already on this chat.
+- **Grafana:** I haven't seen the dashboard itself, but the data it reads from CDH is correct. A quick look at the prod dashboard for the 5 new points would complete the test.
+
+## 23:05 user (apac-tsdb-scraper)
+
+add a jira comment summarizing the fix. keep it extremely brief pls.
+
+## 23:06 assistant (apac-tsdb-scraper)
+
+I added a short comment to SCR-1289:
+
+> **Fixed.** `iex_api_rec` was missing from the prod scraper Lambda's `SCRAPER_NAMES` (since ~23 Jul). Re-activated and backfilled. TSDB and CDH (prod + QA) now go up to 30 Sep, with all 5 missed sessions.
+>
+> **Detection:** the REC DAG now fails and alerts when TSDB is empty or over 25 days stale, and only publishes to CDH after a successful extraction. `prod_scraper_ops.py check-active` flags scraper-list drift.
+>
+> Commits: apac-tsdb-scraper `fbd4faf`, `8129f42`; smp-india `371bb91`, `5919db9` (promoted to QA and prod).
+>
+> Pending: confirm tomorrow's scheduled REC run (16 Oct) completes on its own.
+
+It's a public comment, so Francois will see it.
+
+## 23:14 user (apac-tsdb-scraper)
+
+I see. So for tomorrow, rerun the same script from earlier? What time specifically?
+
+## 23:14 assistant (apac-tsdb-scraper)
+
+Yes, but you only need the scraper part now, since CDH is already confirmed. Run it any time after **3:35 PM tomorrow (16 Oct) your time**. The task's window is 07:00–07:33 UTC, which is 3:00–3:33 PM at UTC+8.
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python scripts/prod_scraper_ops.py refresh-creds && { python scripts/prod_scraper_ops.py --skip-refresh check-active; python scripts/prod_scraper_ops.py --skip-refresh status iex_api_rec; } 2>&1 | grep -v -i warning | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_day2_check.txt
+```
+
+**Pass:** the task for 16 Oct shows `Completed`, and `check-active` says the list matches.
+**Fail:** the task shows `Failed`, or is still `Waiting` after 3:33 PM. Say "done" either way and I'll read it.
+
+If it's `Completed`, the ticket is ready to send to Francois for validation.

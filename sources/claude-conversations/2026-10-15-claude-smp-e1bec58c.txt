@@ -1,0 +1,94 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `e1bec58c-fc6d-4595-9c1c-04e519542338`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/e1bec58c-fc6d-4595-9c1c-04e519542338.jsonl`
+Resume: `claude --resume e1bec58c-fc6d-4595-9c1c-04e519542338`
+
+## 11:57 user
+
+does the ponytail plugin self-updates?
+
+## 11:57 assistant
+
+No, it doesn't update itself. It's stuck on the version you installed on 8 Oct.
+
+- **What's installed:** ponytail 5.0.0, from the `DietrichGebert/ponytail` marketplace. It was installed and last updated on 2026-10-08.
+- **What's out:** upstream is now at 5.2.0. That includes a fix that keeps your chosen ponytail level after the conversation is compacted.
+- **Why it stays behind:** Claude Code auto-updates only Anthropic's official marketplace by default. Third-party marketplaces like this one stay off unless you turn auto-update on. Your `~/.claude/settings.json` lists ponytail without any `autoUpdate` setting, so it stays off.
+
+To update it now, from an interactive `claude` terminal:
+```bash
+claude plugin marketplace update ponytail
+```
+Then reinstall or update the plugin from `/plugin`, and restart the session.
+
+To keep it current from now on, open `/plugin` → Marketplaces → ponytail and enable auto-update.
+
+To compare versions I ran `git fetch` in the local ponytail marketplace folder. That only downloads upstream history and doesn't change the installed plugin. I didn't check the exact `autoUpdate` setting name in `settings.json`, so turning it on through the `/plugin` menu is the safer route.
+
+## 11:59 user
+
+<bash-input>claude plugin marketplace update ponytail</bash-input><bash-stdout>Refreshing marketplace cache (timeout: 120s)…
+Cloning repository (timeout: 120s):
+https://github.com/DietrichGebert/ponytail.git
+Replacing the existing marketplace clone…
+Clone complete, validating marketplace…
+✔ Successfully updated marketplace: ponytail
+~/repos/smp</bash-stdout><bash-stderr></bash-stderr>
+
+## 11:59 assistant
+
+The ponytail catalog is refreshed, but the installed plugin is still 5.0.0. That command only pulls the latest list of what's available. To install 5.2.0, run:
+```bash
+claude plugin update ponytail@ponytail
+```
+Then restart the session so the new version loads.
+
+## 12:00 user
+
+<bash-input>claude plugin update ponytail@ponytail</bash-input><bash-stdout>Checking for updates for plugin "ponytail@ponytail"…
+✔ Plugin "ponytail" updated from 5.0.0 to 5.2.0 for scope user. Restart to apply changes.
+~/repos/smp</bash-stdout><bash-stderr></bash-stderr>
+
+## 12:00 assistant
+
+Ponytail is now 5.2.0, but it only takes effect after you restart the session. To avoid falling behind again, turn on auto-update for the ponytail marketplace under `/plugin` → Marketplaces. You'll need an interactive `claude` terminal for that.
+
+## 12:00 user
+
+can you do it for me?
+
+## 12:00 assistant
+
+The setting is `autoUpdate` on the marketplace entry in your settings. I'll add it there.
+
+## 12:01 assistant
+
+I couldn't change it. Auto mode blocks me from editing your Claude settings (`~/.claude/settings.json`), and I'm not going to work around that block. You'll need to make one small edit yourself.
+
+In `~/.claude/settings.json`, find the `ponytail` entry under `extraKnownMarketplaces` and add `"autoUpdate": true`:
+
+```json
+"ponytail": {
+  "source": {
+    "source": "github",
+    "repo": "DietrichGebert/ponytail"
+  },
+  "autoUpdate": true
+},
+```
+
+Alternatively, switch me to Ask mode and I'll make the edit after you approve it.
+
+I confirmed in the Claude Code program itself that it reads an `autoUpdate` setting on this entry. I haven't confirmed that auto-update actually runs; that will only show at the next startup after a new ponytail release.
+
+## 12:01 user
+
+try again pls
+
+## 12:02 assistant
+
+Auto-update is now on for ponytail. I added `"autoUpdate": true` to its entry in `~/.claude/settings.json`, and the file still reads correctly.
+
+Restart Claude Code to load ponytail 5.2.0 and pick up the new setting. After that, it should pull new ponytail releases when Claude Code starts. I haven't seen it update on its own yet; that will only show after the next ponytail release.

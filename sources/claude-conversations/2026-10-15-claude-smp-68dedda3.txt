@@ -1,0 +1,1151 @@
+# Claude Conversation - 2026-10-15
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 10:38 user
+
+Mateo:
+"
+
+<pasted_content id="f33a">
+yes sorry I forgot to precise :
+
+1. Khaba = SOF_INNS7
+2. We want both to work in parallel ! The sftp scraper is really important because it's a backup of Darwin, so we'll keep this connexion up
+</pasted_content id="f33a">
+
+"
+
+## 10:38 assistant
+
+Khaba is `SOF_INNS7`, and it runs in parallel with the CSV feed, which stays as the backup. Before changing anything I'll check two things.
+
+First, Darwin. The API is reachable without VPN, so I'll check now: does `SOF_INNS7` return the three tags, in which units, and how fresh?
+
+## 10:39 assistant
+
+The system `python3` is too old; switching to the collector's Python 3.13 environment:
+
+## 10:41 assistant
+
+Darwin side is good. `SOF_INNS7` returns all three tags in the expected units (`kW`, `W/m²`), with fresh timestamps (12–40 seconds old) that advance on every read. Values look plausible for an early-morning solar farm: about 115 MW of power at about 190–230 W/m². The unfiltered inventory call returned nothing, but that doesn't matter, since the filtered calls work, and they're what the collector uses.
+
+Second, TSDB. That needs VPN, so here's one script to paste. It's read-only, takes about 20 seconds, and checks Mateo's four IDs in UAT and prod using the saved `.envrc` credentials:
+
+```bash
+cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && cat > ../discovery/scr-khaba-darwin/probe_tsdb.py <<'PY'
+import os, sys, socket, logging
+env = sys.argv[1]
+IDS = {"a10b9b9c-76b3-52c1-b215-35ea4c16fb54": "Khaba_Generation_PT15M", "5b9b9bdd-0267-5a39-b7f2-e4ba0039d2ad": "Khaba_Generation_PT1M",
+       "a9268e6c-2e40-5b66-a148-9e49f8530aee": "Khaba_HorizontalIrradiance_PT15M", "3d63e1b5-b501-59c5-b023-22e208fcef1d": "Khaba_TiltedIrradiance_PT15M"}
+host = {"uat": "tsdb-uat.gems.myengie.com", "prod": "tsdb.gems.myengie.com"}[env]
+prefix = {"uat": "SMP_SERVICE_APP_OKTA_UAT", "prod": "SMP_SERVICE_APP_OKTA"}[env]
+print(f"\n===== {env.upper()} =====")
+try: socket.gethostbyname(host)
+except Exception as e: sys.exit(f"DNS FAIL {host}: VPN?")
+from engie_tsdb.catalog import Config, Timeseries
+logging.disable(logging.CRITICAL)
+Config.set(catalog_endpoint=env, client_name="khaba_readonly_probe", intact_client=os.environ[prefix + "_CLIENT_ID"],
+           intact_secret=[REDACTED] + "_CLIENT_SECRET"], catalog_cache_ttl_seconds=0, log_level="CRITICAL")
+for sid, short in IDS.items():
+    try:
+        s = Timeseries.get(sid)
+        ok = "" if s.name == "darwin_IN_Rajasthan_" + short else f"  <-- NAME {s.name}"
+        print(f"OK   {short:<34} {getattr(s.unit, 'name', s.unit)!s:<6} {getattr(s.frequency_value, 'name', s.frequency_value)!s:<6} active={s.active}{ok}")
+    except Exception as e:
+        print(f"ERR  {short:<34} {str(e)[:110]}")
+PY
+.venv/bin/python ../discovery/scr-khaba-darwin/probe_tsdb.py uat; .venv/bin/python ../discovery/scr-khaba-darwin/probe_tsdb.py prod
+```
+
+I can read your terminal once it's done. If all eight lines come back `OK` (MW for generation, W/m2 for irradiance), adding Khaba is:
+1. **`smp-india`:** four rows in `mappings.json`, with test-first changes to the mappings test. Merge first, so Khaba's data isn't quarantined.
+2. **`smp-tool`:** a `khaba` entry in all three `sites.json` files, and `khaba` added to `enabled_sites.json` for dev, qa and prod, with the tests updated.
+
+It's the same shape as Khavda: generation at 1 and 15 minutes, irradiance at 15, and no module temperature. The CSV feed stays untouched, because the new series are separate IDs.
+
+If the IDs 404 in UAT, it's the Tithwa situation again, and we'd make Khaba prod-only too.
+
+## 10:45 user
+
+there, ran it
+
+This got me asking, since we see the expected frequency in tsdb itself (i.e. pt1m, pt15m, etc.), are we using that as a basis for our darwin collection interval? Or we using a centralized ONE MINUTE for all assets?
+
+## 10:45 assistant
+
+All eight are `OK`. Khaba's four IDs exist in both UAT and prod, with the right names, units (MW, W/m2) and frequencies. So Khaba follows the "same ID everywhere" rule and can be enabled in all three environments.
+
+**Your question:** no, collection doesn't use TSDB's frequency. It's one central rule for every asset and tag:
+- **Collection (the collector):** it polls every 15 seconds (`DARWIN_POLL_SECONDS=15`) and keeps the first valid reading of each source minute (`first_per_minute`). Every stream ends up with one sample per minute, whatever it publishes to.
+- **Publishing (the Airflow publisher):** `mappings.json` decides which outputs each stream gets.
+  - If a row has a `minute_series_id`, its minute samples are written as-is to the PT1M series. Only `ActivePower` has one.
+  - Every row has a `quarter_hour_series_id`, which gets the **average of that quarter-hour's minute samples** in the PT15M series.
+
+So TSDB's PT1M/PT15M is reflected in `mappings.json` (entered by hand, and checked by the probe we just ran), not read at runtime.
+
+I wouldn't make collection follow TSDB's frequency either. The PT15M series are averages, so they need the minute samples. Sampling once every 15 minutes would give a single snapshot instead of an average. Reading frequencies from TSDB at runtime would also add a network dependency for something that never changes.
+
+**Next for Khaba:**
+1. **`smp-india`:** four rows in `mappings.json` (generation at 1 and 15 minutes, both irradiances at 15 minutes), with the mappings test updated test-first.
+2. **`smp-tool`:** a `khaba` → `SOF_INNS7` entry in all three `sites.json` files, `khaba` enabled in dev, qa and prod, and the tests updated.
+
+The mappings go to `dev` first, so Khaba's data is never quarantined. Then I commit and push both. Go ahead?
+
+## 10:47 user
+
+yes, go ahead, commit and push pls. same scope, scr-1273
+
+## 10:47 assistant
+
+Starting with `smp-india`. Test first:
+
+## 10:48 assistant (smp-india)
+
+`smp-india` is green: 1185 tests, 91.46% coverage, ruff clean, and the `mappings.json` diff only adds lines. Now updating the destinations paragraph in the Darwin contract README:
+
+## 10:48 assistant (smp-india)
+
+The same paragraph still says Tithwa "must be created" in UAT, which is out of date after the prod-only decision. Fixing that too:
+
+## 10:49 assistant (smp-india)
+
+Mappings are on `smp-india` `dev`. Now `smp-tool`: the tests first, then the catalogue and enabled sites for all three environments.
+
+## 10:49 assistant (smp-tool)
+
+That's 14 errors, more than the 2 tests I touched, so I'm checking why before going further:
+
+## 10:49 assistant (smp-tool)
+
+Not a real failure: `python3` in this shell is now the old Xcode Python 3.9, which lacks `enterContext` and can't load the files. Rerunning with a modern Python:
+
+## 10:49 assistant (smp-tool)
+
+The real cause: `deploy_darwin.sh` calls whatever `python3` is on `PATH`, and here that's 3.9. `render_darwin.py` uses `Path | None` type hints, which need 3.10 or newer. Confirming:
+
+## 10:49 assistant (smp-tool)
+
+The deploy-script tests now pass with Python 3.9 on the `PATH`, so the existing suite proves the fix. The two remaining failures are the Khaba tests, as expected. Adding Khaba to the config:
+
+## 10:50 assistant (smp-tool)
+
+Two older tests used `"khaba"` as their example of an *unknown* site name, which it no longer is. I'm switching them to a name that will never be a site:
+
+## 10:50 assistant (smp-tool)
+
+All 40 tests pass. Adding Khaba to the runbook's site table, then committing:
+
+## 10:50 assistant (smp-tool)
+
+Khaba is in, committed and pushed under SCR-1273 (plus one SCR-1283 fix I found along the way).
+
+**`smp-india`** (`bff1737..8010bb1`):
+- `feat(scr-1273)`: three Khaba rows in `mappings.json` with Mateo's four IDs.
+  - Generation converts kW to MW and publishes at both 1 and 15 minutes.
+  - Both irradiances publish 15-minute averages.
+  - The mappings test was updated first, and the `mappings.json` diff only adds lines.
+- `docs(scr-1273)`: the Darwin contract README now covers Khaba and the prod-only Tithwa. I also removed its outdated "Tithwa must be created in UAT" line.
+- 1185 tests pass, coverage is 91.46%, and ruff is clean.
+
+**`smp-tool`** (`769cdd6..7ab9cd8`):
+- `feat(scr-1273)`: `khaba` → `SOF_INNS7` added to the catalogue in all three environments.
+  - Enabled sites: dev and qa have Tuticorin plus four solar sites; prod has the same plus Tithwa.
+  - Tests pin the Khaba entry and each environment's site list.
+  - Two older tests had used `"khaba"` as an example of an *invalid* site, so I switched them to `"not-a-site"`.
+- `fix(scr-1283)`: `render_darwin.py` now also runs on Python 3.9.
+  - `deploy_darwin.sh` uses whatever `python3` is on the machine, and on a Mac that can be the Xcode 3.9, where the renderer crashed.
+  - This would have broken Michael's deploy if his Mac defaults to that version. The existing deploy tests now pass with 3.9 on the `PATH`.
+- `docs(scr-1273)`: Khaba added to the runbook's site table, noting it runs alongside the CSV feed as a backup.
+- All 40 tests pass, and the onboarding check is OK.
+
+**Effect on Michael's first deploy:** the rendered dev manifest now collects 7 entities, including `SOF_INNS7`. When he runs `deploy_darwin.sh`, the diff will show Khaba in the site list. No new image is needed.
+
+I verified Khaba against live Darwin (all three tags fresh, correct units) and against TSDB in both environments. What's not tested is an actual TSDB write. As with the other sites, the first UAT publish is that test.
+
+## 10:52 user (smp-tool)
+
+thanks. I'm curious, did you use the ponytail plugin/skill while making the change?
+
+## 10:52 assistant (smp-tool)
+
+Yes, though not by calling it. Ponytail was switched on by a session-start hook, which injected its rules into the conversation: "lazy senior dev", smallest complete change, and end each reply with what was skipped or left unchecked. I never invoked the `ponytail:ponytail` skill myself. The rules were already active at "full" level, and I worked under them.
+
+Where it shaped the Khaba change:
+- **Reuse over new code:** Khaba is just config, three `mappings.json` rows and a catalogue entry, following Khavda's exact shape. No new code paths.
+- **Smallest fix:** for the Python 3.9 crash, I added one `from __future__ import annotations` line instead of rewriting the type hints or pinning a Python version in the script.
+- **Finish what the change breaks:** I updated the two older tests that used `"khaba"` as an invalid example, and fixed the stale Tithwa line in the README, rather than leaving them.
+- **Check before claiming:** the live Darwin check and the TSDB probe ran before any mapping went in. The 3.9 fix was proven by the existing tests running under 3.9.
+
+Where I didn't follow it strictly: it asks for the "skipped or unchecked" note as one or two lines at the end. I usually gave that, but sometimes as a longer paragraph, or folded into the summary.
+
+## 10:53 user (smp-tool)
+
+I see, so the overall ponytail plugin is indeed working? I'm just worried that it's not used to its full potential lol
+
+## 10:53 assistant (smp-tool)
+
+Yes, the core part is working. Every session start and resume logs `PONYTAIL MODE ACTIVE — level: full`, and its rules shape how I work. But that's only part of the plugin. Here's what has and hasn't been used this session:
+
+| Part | Used? |
+|---|---|
+| Always-on rules (smallest change, reuse, end-of-reply caveats) | Yes, via the hook |
+| `ponytail:` comments marking known shortcuts | **No.** I wrote none. The artifact fallback in CI is exactly the kind of temporary workaround it wants tagged, with when to remove it. |
+| `/ponytail-debt`, a ledger of those shortcuts | Would come back empty for the same reason |
+| `/ponytail-review`, a quality review of a change | **Not run** |
+| `/ponytail-audit`, a whole-repo audit | Not run; heavier, for when you want it |
+| `/ponytail-gain`, measured savings | Not run; informational only |
+
+The biggest missed opportunity is `/ponytail-review` on today's work before Michael deploys. The CI changes in particular grew piece by piece: the tag logic, the artifact fallback, the push switch and the summary text. Over 30-odd lines of bash in a workflow, that's exactly where a "does every line earn its place" review catches things. The same goes for `deploy_darwin.sh`.
+
+Want me to run `/ponytail-review` on the SCR-1273/1283 commits in both repos? It only reports and changes nothing until you say so.
+
+## 10:54 user (smp-tool)
+
+yes, run ponytail-review on both repos
+
+## 10:55 assistant (smp-tool)
+
+What this change does: `smp-india` CI now tests, builds, labels and publishes the Darwin collector image, either pushing it to ECR (behind a switch) or attaching it as a download. `smp-tool` renders the collector manifest per environment from committed config, and `deploy_darwin.sh` shows the live diff, applies it and waits for the rollout. `mappings.json` gains the Gujarat and Khaba destinations.
+
+I assumed the actual load: one collector pod per environment, CI on each push, and one person deploying by hand.
+
+**Must fix**
+
+1. **The qa/prod deploy command in the CI summary deploys to the wrong environment** (`smp-india/.github/workflows/ci.yml`, both "Then/Deploy from smp-tool" lines)
+   - **What this is:** after each build, CI prints the exact `deploy_darwin.sh` command to run.
+   - **Problem:** for `qa` and `prod` it prints `--context <india-qa-context> --image …` without `--env`. The script then defaults to `dev`, so it renders dev's config into `smp-india-dev`. qa and dev share the same non-prod cluster, so following a qa run's summary deploys the qa image into dev, with dev's sites.
+   - **Fix:** print `--env $GITHUB_REF_NAME --tag $TAG` for every branch. `--tag` already resolves the right repo per environment, which also deletes the `if dev … else` branch.
+   - **If we skip it:** the first person deploying qa from the summary silently replaces dev's collector.
+
+**Should fix**
+
+2. **The "never overwrite a tag" check passes on any error** (`ci.yml`, "Publish collector image")
+   - **What this is:** before pushing, CI asks ECR whether the tag exists, and skips the push if it does.
+   - **Problem:** any failure counts as "doesn't exist", not just "not found". If the new role can push but lacks `ecr:DescribeImages`, every `dev` push overwrites `darwin-collector-<sha>` with a fresh rebuild. Same source, but a different image than the one that was tested and deployed.
+   - **Fix:** push only when the error is `ImageNotFoundException`, skip on success, and fail on anything else. Three lines.
+   - **If we skip it:** the tag stops meaning "this exact tested image", which is the guarantee we added the labels for.
+
+3. **`deploy_darwin.sh` quietly defaults to `--env dev`** (`smp-tool/scripts/deploy_darwin.sh:21`)
+   - **What this is:** the environment decides the namespace, config and ECR repo.
+   - **Problem:** `--context <qa-context> --tag …` without `--env` targets `smp-india-dev`, because qa and dev share a cluster. The printed `Env: dev` line and the confirmation prompt are the only guard.
+   - **Fix:** make `--env` required, like `--context` already is. Michael's command just gains `--env dev`.
+   - **If we skip it:** one forgotten flag deploys to the wrong namespace, protected only by someone reading the header.
+
+4. **Two near-identical summary blocks** (`ci.yml`, "Save collector image…" and "Publish collector image")
+   - **What this is:** both blocks print the source commit, the image ID and the deploy command.
+   - **Problem:** they must change together, and finding 1 is in both. That's already the second time they've had to be edited as a pair.
+   - **Fix:** build the deploy line once, in "Resolve collector image", as an output, and print it from both blocks.
+   - **If we skip it:** the next fix lands in one block and not the other.
+
+**Nice to have**
+
+5. **The first-deploy error message only mentions `--image`** (`deploy_darwin.sh:66`)
+   - **What this is:** the message shown when nothing is running yet.
+   - **Problem:** it says "pass --image for the first deploy", but `--tag` is the normal way now.
+   - **Fix:** say "pass --tag (or --image)".
+   - **If we skip it:** a moment of confusion on the first deploy.
+
+6. **A mistyped tag takes the collector down** (`deploy_darwin.sh`, before `apply`)
+   - **What this is:** `Recreate` stops the old pod before the new one starts.
+   - **Problem:** with a typo in `--tag`, the new pod can't pull its image, so collection stops until someone rolls back. We saw this on kind: 3 minutes, and then a manual redeploy.
+   - **Fix:** before applying, check the tag exists with `aws ecr describe-images`. Michael has AWS access when he deploys, but it adds an AWS dependency to the script, which is why this is optional.
+   - **If we skip it:** a typo means a few minutes of missed Darwin minutes, which can't be replayed.
+
+Verdict: fix 1 first, ideally together with 2 and 3.
+Lean: about -8 lines possible (4, and the branch removed by 1).
+Not checked: the collector's per-entity tag code and the sparse-averaging change were reviewed and tested when they were written, and I didn't re-review them here. The real ECR and EKS behavior can't be checked until Michael's AWS changes land.
+
+## 10:57 user (smp-tool)
+
+fix 1, 2 and 3, commit and push
+
+## 10:57 assistant (smp-tool)
+
+Starting with 3, test-first in `smp-tool`: `--env` becomes required, so a missing `--env` must be refused before any `kubectl` call.
+
+## 10:57 assistant (smp-tool)
+
+Red, as expected. Implementing:
+
+## 10:57 assistant (smp-tool)
+
+All 42 tests pass. Five doc commands still omit `--env`, so I'm adding it:
+
+## 10:57 assistant (smp-tool)
+
+Now 1 and 2 in `smp-india`'s CI. For 2, I'll test the new branching against a fake `aws` covering all three outcomes before wiring it in:
+
+## 10:57 assistant (smp-india)
+
+All three branches behave correctly; the exit codes printed blank only because zsh spells it `pipestatus`. Confirming that the denied case actually fails:
+
+## 10:58 assistant (smp-india)
+
+Both CI fixes are in, and every branch now prints its own `--env` with `--tag`. Committing and pushing both repos, then watching CI:
+
+## 11:00 assistant (smp-india)
+
+I fixed findings 1, 2 and 3 from the review and pushed them. The `smp-india` CI run on the result is green ([run](https://github.com/qrm-dms/smp-india/actions/runs/38673807312)).
+
+1. **CI deploy command:** both summary blocks now print `deploy_darwin.sh --env <branch> --context <india-<branch>-context> --tag <tag>` for every branch. A qa run can no longer point you into `smp-india-dev`. I checked the printed line for dev, qa and prod.
+2. **Tag-overwrite check:** CI now pushes only when ECR answers `ImageNotFoundException`. If the tag exists it skips; any other failure (like a missing `ecr:DescribeImages` permission) stops the job with the error. I tested all three cases against a fake `aws`. The live run skipped this step, since the push switch is still off.
+3. **`--env` is required:**
+   - `deploy_darwin.sh` refuses to run without it, before any `kubectl` call.
+   - Tests: a new test written failing first. All 42 `smp-tool` tests pass, including the 10 existing deploy tests, which now pass `--env dev`.
+   - Every doc example now includes `--env`.
+   - I also folded in finding 5: the first-deploy error now says "pass `--tag` (or `--image`)".
+
+Commits: `smp-tool` `7ab9cd8..197b9d5` (fix + docs) and `smp-india` `8010bb1..b8b52f8`.
+
+**Michael's message needs one change**, since his command now requires `--env`:
+
+```
+scripts/deploy_darwin.sh --env dev --context <dev-context> --tag darwin-collector-025488487ab7
+```
+
+Without it, the script stops with "--env is required", which is safe but confusing if the message doesn't mention it.
+
+I didn't do findings 4 (merging the two summary blocks) or 6 (checking the tag exists before applying).
+
+## 11:07 user (smp-india)
+
+thanks. Should we do the ponytail review for every round of change or that's too much? generally speaking ha
+
+## 11:07 assistant (smp-india)
+
+Not every round. That's too much, and most rounds wouldn't benefit. Today's review shows where it pays off: it caught a real must-fix (the qa summary deploying into dev) that the tests couldn't. That bug lived in glue code, the text CI prints for humans, which no test exercises. And it came out of about five rounds of small edits to the same workflow step, each one fine on its own.
+
+**Run it when:**
+- **You're about to hand something over:** someone else will run it, deploy it, or depend on it. For example, before Michael's first deploy.
+- **Before promoting to qa or prod:** the last cheap moment to catch something.
+- **After a run of incremental edits to the same file:** pieces added one at a time drift into duplication and inconsistency, which is exactly what this review looks for.
+- **The change touches CI, deploy scripts, data writes or permissions:** glue code where mistakes are silent and tests are thin.
+
+**Skip it for:**
+- **Config or data additions already pinned by tests,** like the Khaba mapping rows. The test that checks every ID already does the reviewing.
+- **Docs, wording, one-line fixes** whose check is the change itself.
+- **Exploration and probes** that don't ship.
+
+So: once per milestone, not per commit. In practice that's a review before saying "ready for X" to someone. If you'd like, I can save that as a working rule in memory, so I suggest the review at those points instead of you remembering to ask.
+
+## 11:09 user (smp-india)
+
+yes, save that rule to memory. Heck, save it globally pls, I want this applied to all our sessions. 
+
+BUT BEFORE THAT, I'm wondering if you can delegate this to codex so we don't exhaust much usage here?
+
+## 11:09 assistant (smp-india)
+
+Yes, that works. Codex is installed here (`codex-cli 0.162.1`, logged in with ChatGPT), and this session has the Codex plugin, so I can hand it the review.
+
+How it would work:
+- **Codex does the reading.** I send it the commit range and the ponytail-review checklist (correct, safe, load, tested, lean; every finding needs a concrete case; must/should/nice). It reads the diffs and the code around them on its own quota, not ours.
+- **I verify before you see anything.** Codex doesn't have this session's context. It didn't see the Tithwa or deploy-split decisions, for example, so it will flag a few things that are deliberate. I check each finding against the code and our decisions, and pass on only the confirmed ones. That costs me a little reading, but far less than doing the review myself.
+- **It fits how you already use Codex.** Your memory says "pair program with Codex" means I drive and Codex only does adversarial review. This is the same arrangement, applied at milestones.
+
+What we'd lose: Codex can't see the conversation, so it can't judge "does this match what we agreed". That part stays with me, and it's the cheap part.
+
+Proposed global rule, for `~/.claude/CLAUDE.md`, so it applies in every project:
+
+```
+- review at milestones, not every commit: before handing work to someone else to run/deploy, before promoting to qa/prod, after several incremental edits to the same file, or when touching CI/deploy/data writes/permissions. Skip for test-pinned config, docs and one-liners. Delegate the review to Codex with the ponytail-review checklist; verify each finding yourself before reporting it.
+```
+
+Save it like that, Codex delegation included?
+
+## 11:10 user (smp-india)
+
+yes, save it globally with codex delegation pls
+
+## 11:10 assistant (smp-india)
+
+I saved the rule to your global `~/.claude/CLAUDE.md`, as the last line after your "find out instead of guessing" rule, so it applies in every project and session from now on. It covers when to review (milestones, not every commit), when to skip, Codex doing the review with the ponytail-review checklist, and me verifying each finding before reporting.
+
+I didn't add a separate project memory, since the global file already covers it and a second copy could drift.
+
+The first time it applies here will be just before Michael's first deploy, if anything changes again before then. Today's review already covers everything up to `197b9d5` and `b8b52f8`.
+
+## 18:13 user (smp-india)
+
+Update from Michael:
+PERALTA Brian Alexander (ENGIE Services Philippines), updated na yung darwin-collector sa smp-india-dev. Pero hindi via pipeline, manually palang. Imessage ko si Nilo para sa pipeline haha. Tested narin inside ng darwin-collector pod yung connection natin to darwin api and engie okta. Thaanks!
+
+<screenshot>
+
+-- I can't make sense though. When he said "updated na ang darwin-collector", does that also imply the latest darwin code should be there in dev?? That's the point of the image right? The image already supposedly contains the darwin code itself?
+
+## 18:14 assistant (smp-india)
+
+Yes, that's the point. The image *is* the code: the Dockerfile copies the collector's `src/` into it. So "updated" means the latest code is running **only if he deployed our new image**, and his message doesn't say which one.
+
+There are two possibilities:
+- **`darwin-collector-025488487ab7`** (the CI-built image): latest code, per-site tags and all seven Darwin entities. That's what we want.
+- **`darwin-collector-1.0.0`** (his old POC build, if that's what he reused): older code, without per-site tag support.
+
+The screenshot proves something else: **network access**, not code. From inside the pod, both Okta and Darwin answered over HTTPS, so the proxy route works. The `405` and `404` are expected, because those were plain GET requests without credentials or parameters. That's good news, since that route was the long-standing blocker. But it doesn't show which code is running, or that collection works.
+
+Three things settle it, all read-only. Michael clearly has `kubectl`/k9s access to `smp-india-dev`:
+
+```bash
+kubectl -n smp-india-dev get deploy darwin-collector -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}{range .spec.template.spec.containers[0].env[?(@.name=="DARWIN_ENTITY_TAGS_JSON")]}{.value}{"\n"}{end}'
+```
+```bash
+kubectl -n smp-india-dev logs deploy/darwin-collector -c collector --tail=20
+```
+
+What to look for:
+1. **The image** ends in `darwin-collector-025488487ab7`.
+2. **The entity list** has 7 entities, including `SOF_INKHA`, `SOF_INGU2`, `SOF_INRAG` and `SOF_INNS7`. If it only shows the two Tuticorin entities, the old manifest was applied rather than one rendered by `deploy_darwin.sh` from current `smp-tool` `dev`.
+3. **The logs** show `poll_complete` with `"failed_entities": 0`. That's the actual proof of collection: authentication with the real secret, and data from Darwin.
+
+Message for Michael:
+
+```
+salamat Michael! 🙌 confirm ko lang, which image yung na-deploy? pa-run naman:
+kubectl -n smp-india-dev get deploy darwin-collector -o jsonpath='{.spec.template.spec.containers[0].image}'
+dapat darwin-collector-025488487ab7. tapos pa-send ng last 20 lines ng logs, hanap tayo ng poll_complete na "failed_entities": 0
+```
+
+From what we have, I can't tell which image is running or whether it's collecting. Those two commands answer both.
+
+## 23:00 user
+
+@"/Users/qn5792/Desktop/sampling.json"
+I downloaded the collector-state/sampling json file...
+
+How's it looking?
+
+Also,  I checked the pending folder... it took a good 10 sec to freaking load the file browser lol. Does that prove darwin is finally alive and working? But holy hell I saw a loooooot of files
+
+## 23:01 assistant
+
+It's alive, and it's running the new code. A few findings from your `sampling.json`:
+
+**The good:**
+- **New image, new config.** It holds 15 streams across 5 entities, and each site has only its own tags: wind tags for Tuticorin, irradiance for the solar sites. The old `1.0.0` image couldn't do per-site tags, so Michael deployed the new one.
+- **Collecting live.** The latest readings are from 14:58 UTC, and the minute counters advance one per minute. Most streams have both of the last two minutes.
+- **Night behavior is mostly right.** It's 20:28 IST there, and Shapar's irradiance is 0 with power near 0. Raganesda's power is slightly negative, which is normal: plants draw a little power at night.
+
+**Two things to know:**
+1. **Khaba isn't there**, so there's no `SOF_INNS7`. Michael deployed before this morning's Khaba commit. It's a config-only redeploy that keeps the running image:
+   ```bash
+   scripts/deploy_darwin.sh --env dev --context <dev-context>
+   ```
+2. **Khavda's numbers look frozen upstream, not live.** At 8:30 pm IST it reports:
+   - 45,261.93 kW of power, the *exact* same value we saw on 30 Sep, also at night;
+   - 131.99 W/m² horizontal irradiance, identical to our 2 Oct reading;
+   - 206 W/m² tilted irradiance in the dark.
+
+   The timestamps advance but the values don't. During the day it varies normally (72–73 MW on 2 Oct). So Darwin seems to repeat a last known value for Khavda overnight. We'd publish those values as-is, since we never invent or correct data, so Mateo should know.
+
+**The pending folder:** yes, that's further proof it's working. The collector writes a batch roughly every minute for each entity with a new reading. That's about 5–6 files a minute, which comes to roughly 8,000 a day. They pile up because the **publisher DAG is still paused**, so nothing consumes them. That's by design until we turn publishing on, but the backlog grows every hour, and the file browser is already feeling it. When we unpause, at 200 files per 5-minute run, a day's backlog drains in a few hours.
+
+For Mateo:
+
+```
+Hi Mateo, the Darwin collector is now live in dev 🎉 One observation: at night, Khavda (SOF_INKHA) returns the same values every time — ActivePower 45,261.93 kW, HorizontalIrradiance 131.99 W/m², TiltedIrradiance ~206 W/m² — exactly as on 30 Sep. Timestamps advance but values don't, while Shapar/Raganesda correctly drop to ~0. Is that expected from Darwin? We'll publish values as-is, so these would show up in TSDB overnight.
+```
+
+Next step is ours: set `DARWIN_PUBLISH_MAX_FILES=200` and unpause the publisher DAG in dev, which starts the first real UAT writes.
+
+I didn't count the pending files or check their age. The 8,000-a-day figure comes from the per-minute pattern. And the frozen Khavda values are based on three matching snapshots, not a long probe.
+
+## 23:04 user
+
+oh god daaaaamn. I think we should manage this properly though. 
+
+1. how do we make sure the publisher dag "exhausts" all files?
+2. This is only on dev... what more once we promote to qa and prod? 3 darwin collector instances, bombarding the same API lol. How do you propose we proceed, now that we've confirmed darwin is alive... For me, I think we should only leave it alive in Prod... for dev and qa, it should be... something on demand? I dunno how's that possible but.. I wouldn't want 3 API requests every single minute
+
+## 23:05 assistant
+
+Agreed, this needs handling properly. Here's my understanding of both questions and what I'd propose.
+
+**1. Making sure the publisher works through every file**
+
+It's already built to, as long as each run takes in more files than the collector produces:
+- **Collector output:** about 6 files a minute, so roughly 30 per 5-minute run.
+- **Publisher intake:** up to `DARWIN_PUBLISH_MAX_FILES` per run. The default is 100, and we planned 200. At 200 that's about 170 files of net drain per run, so a day's backlog (about 8,000 files) clears in roughly 4 hours, and after that each run just keeps up.
+- **Averages stay correct while the backlog drains.** A quarter-hour average isn't finalized until every file in that run's snapshot has been processed. That's the 200-file backlog test we wrote. A file is deleted only after its points are written to TSDB and read back.
+- **Watching it:** the pending count should fall to near zero and stay there. Your SCR-1268 freshness DAG watches the collector side. For the publisher, each run logs its file and point counts.
+
+**2. Three collectors**
+
+You're right, and it's worse than just API load. **dev and qa both publish to UAT, with the same series IDs.** Two collectors would write identical points to the same UAT series twice. That's harmless, since a timestamp is simply overwritten, but it's pure duplication. Only prod writes to a different place.
+
+So I'd do this:
+
+| Env | Collector | Publisher DAG |
+|---|---|---|
+| **prod** | Always on (1 replica) | On |
+| **qa** | **Off by default** (0 replicas). Switched on briefly to check a release before promoting it | Paused when the collector is off |
+| **dev** | **Off by default.** On while developing or testing | Same |
+
+"On demand" is just Kubernetes scaling. The pod is gone, there are zero API calls, and the spool and sampling state stay on EFS:
+```bash
+kubectl -n smp-india-dev scale deploy/darwin-collector --replicas=1
+```
+Change `1` to `0` to switch it off again. In config, dev and qa get `replicas: 0` and prod gets `1`, so a fresh `deploy_darwin.sh` always returns to "off" outside prod. A test would pin that.
+
+**Order matters, because prod isn't live yet.** It still needs the ECR image, the prod egress check and Michael's AWS work. So:
+1. **Now:** keep dev on, and unpause the dev publisher once. That's the real UAT write test we still owe for SCR-1273, and it drains the backlog.
+2. **After that's verified:** switch dev off. qa stays off from the start.
+3. **When prod is live:** it's the only always-on collector.
+
+Two questions before I change anything:
+- **Does anyone need UAT filled continuously,** for example Mateo or Adrien testing dashboards against UAT? If so, keep exactly one of dev or qa on, never both.
+- **Do you want the replicas change made now,** as config plus a test in `smp-tool`, or after the dev publishing test?
+
+I haven't checked Darwin's actual rate limit. A long-running instance makes about 28 requests a minute (15-second polls across 7 entities), and Darwin's limits were never stated.
+
+## 23:07 user
+
+there's no scheduling in dev... so how can we make ubos the files in dev?
+
+## 23:07 assistant
+
+Assuming "no scheduling in dev" means the team keeps dev DAGs paused (the publisher DAG also starts paused, via `is_paused_upon_creation`), then draining the backlog is a manual job. The plan:
+
+1. **Stop the backlog growing first.** Switch the dev collector off, so the pile is fixed and you're not draining a moving target. Nothing is lost: the collector's state stays on EFS.
+   ```bash
+   kubectl -n smp-india-dev scale deploy/darwin-collector --replicas=0
+   ```
+2. **Raise the per-run limit:** set the Airflow Variable `DARWIN_PUBLISH_MAX_FILES` to `500` in dev.
+3. **Trigger `india_darwin_realtime_tsdb_dag` by hand**, one run at a time (it allows only one active run anyway). Each run publishes up to 500 files, reads them back from UAT, and only then deletes them.
+4. **Repeat until `pending/` is empty.** At about 8,000 files that's roughly 16 runs. Check the `pending/` count between runs, or the task log's file counts.
+
+Why 500 and not something huge:
+- Each run has a **4-minute timeout**.
+- Every file means a UAT write plus a read-back.
+- We've only measured speed locally (under a second per 315 files), never against real EFS and UAT.
+
+So I'd start at 500, watch how long the first run takes, and raise it if there's plenty of headroom. If a run times out, nothing is lost. Files are only deleted after their points are verified in TSDB, so the next run picks up where it stopped.
+
+That first manual run is also **SCR-1273's real UAT write test**. Before draining everything, check that run: it should be green, with points in a couple of UAT series (say Khavda generation, PT1M and PT15M) and nothing in `quarantine/`. If something's wrong, we find out after 500 files, not 8,000.
+
+Afterwards, leave the dev collector at 0 and the DAG paused. That's the "off by default" state we discussed, until prod is live.
+
+I couldn't confirm a dev-wide "no scheduling" setting in the dev config: the scheduler runs, and the DAG's schedule is every 5 minutes. So I'm assuming it's the team's habit of keeping dev DAGs paused. If dev's scheduler really doesn't run, manual triggers still work.
+
+## 23:09 user
+
+hmmm. I wouldn't be able to stop the collector now. What if we make an exception for darwin dag to have a schedule for all envs? Just so I can leave it overnight
+
+## 23:09 assistant
+
+No exception is needed: the DAG already has a schedule in every environment. It runs every 5 minutes (`INDIA_DARWIN_REALTIME_TSDB_SCHEDULE = "*/5 * * * *"`), and I checked that nothing turns schedules off for dev. It just starts paused (`is_paused_upon_creation=True`). So leaving it overnight means **unpausing it in the dev Airflow UI**, with no code change.
+
+Before you leave it:
+1. **Set the Airflow Variable** `DARWIN_PUBLISH_MAX_FILES` to `200` in dev. At about 30 new files per run, that drains about 170 files of backlog per run, so roughly 8,000 files clear in about 4 hours, and then each run keeps up.
+2. **Unpause** `india_darwin_realtime_tsdb_dag`.
+3. **Watch the first run,** about 5 minutes, before walking away:
+   - **Green, and nothing in `quarantine/`:** you're good, leave it.
+   - **Red:** pause it again. Nothing is lost, because files are only deleted after their points are verified in UAT. The likeliest failure is a UAT write permission, since this is the first real write.
+   - **Near the 4-minute timeout:** lower the Variable to 100. A slow run is only a problem if it hits the timeout.
+
+What happens overnight if something breaks later:
+- **Every failed run alerts the Teams channel** (`on_failure_callback`). A persistent problem means an alert every 5 minutes until someone pauses it. Noisy, but no data loss.
+- **Retries can't hide a quarantine.** A quarantine fails the run immediately, so bad data never slips through quietly.
+- **UAT gets Khavda's frozen night values** as-is. That's fine for UAT, and it's what the message to Mateo is about.
+
+Tomorrow morning, check that `pending/` is down to a handful of files, that recent runs are green, and that a UAT series (Khavda PT1M, for example) has points through the night. I can give you a VPN read-back script for that last check.
+
+I haven't measured how long a real 200-file run takes against EFS and UAT. That's why the first run is the check before you leave it.
+
+## 23:13 user
+
+it's going as we speak. I don't like how it appears on airflow though lol. Just..
+
+How much effort it would take if we can literally show the minute json it's processing? Ideally as a task maybe... or if it's too much, just grouped accordingly in the logs? Honestly
+
+## 23:13 assistant
+
+The noise is the TSDB SDK, not our code. Every request logs token handling at DEBUG level, and anything the SDK writes to stderr gets an `ERROR` label from Airflow. Even the `503` here was retried and succeeded ("Do not worry about the previous failure"), so the run is fine. Let me check where the noise comes from and what the repo already has for quieting it.
+
+## 23:13 assistant
+
+It's dev-specific, and a small fix.
+
+**Why it looks like this:** dev Airflow runs with `AIRFLOW__LOGGING__LOGGING_LEVEL=DEBUG`, set in `smp-tool`'s dev values. So the TSDB SDK logs every request it makes, plus a token line before each one. Our own useful lines (`DARWIN_PUBLICATION=…`, the coverage logs) are buried in that.
+
+Your options, cheapest first:
+
+| Option | Effort | What you'd see |
+|---|---|---|
+| **A. Quiet the SDK plus one line per minute file, in log groups** | Small: about 20–30 lines and a test, in `smp-india` only | Collapsible sections per stage (*Ingest 200 files*, *Publish*, *Verify*, *Clean up*). Each file gets one line, like `batch 3f2a… · SOF_INKHA · ActivePower, TiltedIrradiance · source minute 14:57 · 2 obs`. SDK warnings like the 503 retry still show, but the token lines don't. |
+| B. Split into a few tasks (ingest, publish, clean up) | Medium | Separate task boxes in the grid. But the publisher's crash-safe sequence is one carefully ordered flow, and splitting it across tasks puts that at risk. Not worth it. |
+| C. One task per file | Large | Up to 200 task boxes per run, and 8,000 for a backlog drain, beyond Airflow's default mapping limit of 1,024. It fights the batch design. No. |
+
+**A is the right call.** The repo already does this elsewhere: Khaba quiets the AWS SDK's wire logs (`khaba_generation.py:410`), and HPX quiets the TSDB SDK during publication. Airflow log groups are just `::group::Title` / `::endgroup::` marker lines, and the UI shows them as collapsible sections.
+
+Should I do A? It doesn't touch tonight's run. The change reaches dev through git-sync, so the next scheduled run after the push picks it up. I'd still push in the morning, though, so tonight's backlog drain runs on unchanged code.
+
+I haven't checked whether the dev Airflow version shows `::group::` markers as collapsible sections. Airflow 2.9 and later do. If it doesn't, they appear as plain lines and the change still works.
+
+## 23:14 user
+
+yes, do A, commit and push pls
+
+## 23:15 assistant (smp-india)
+
+Wiring in the log groups now, plus one line per minute file. Test first, using the existing aggregation test fixtures:
+
+## 23:15 assistant (smp-india)
+
+Red, as expected. Now the implementation:
+
+## 23:17 assistant (smp-india)
+
+The publisher logs are cleaned up, and both changes are pushed to `smp-india` `dev` as two SCR-1273 commits (`26945da..b00ff2c`). Dev git-sync picks them up within seconds, so tonight's next scheduled run already uses them.
+
+**What you'll see in the task log now:**
+- A collapsible **"Ingest 200 of 8,123 pending Darwin files"** group, with one line per minute file, like the one from the real Airflow test run:
+  `fixture.json · WIF_INSE3, WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 00:00–00:29 UTC · 180 obs`
+  A live file reads more like `3f2a….json · SOF_INKHA · ActivePower, TiltedIrradiance · 14:57 UTC · 2 obs`.
+- A collapsible **"Publish N points to TSDB"** group, holding whatever the SDK still says, like retried 503 warnings.
+- The existing `DARWIN_PUBLICATION={…}` summary line at the end, outside the groups.
+
+**Gone:** the per-request token and HTTP lines. That's the readability fix, and it also stops printing token key hashes into the logs.
+
+Checks:
+- Tests written failing first. All 1197 pass, ruff is clean, and the isolated Airflow run passes.
+- The grouping works in your Airflow version: its own task runner uses the same `::group::` markers.
+- The per-file log line only runs once a file has passed validation, so a logging hiccup can never quarantine a good file.
+
+Nothing about the publishing itself changed, only what's logged. One `engie_tsdb` INFO line ("Running engie-tsdb against …") still appears per SDK call, because the SDK resets that logger's level every time it's set up. It's harmless, and suppressing it would mean reaching into SDK internals.
+
+## 23:36 user (smp-india)
+
+here's how it's looking so far...
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_realtime_tsdb_dag/run_id=scheduled__2026-10-15T15:25:00+00:00/task_id=publish_pending_batches/attempt=2.log
+::endgroup::
+[2026-10-15T15:32:36.000679Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a14030-b31a-770b-ba96-e0de9206758a dag_id=india_darwin_realtime_tsdb_dag task_id=publish_pending_batches run_id=scheduled__2026-10-15T15:25:00+00:00 try_number=2 map_index=-1
+[2026-10-15T15:32:36.025854Z] DEBUG - Loading plugins
+[2026-10-15T15:32:36.027845Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-15T15:32:36.313601Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-15T15:32:36.345555Z] DEBUG - Loading plugins from entrypoints
+[2026-10-15T15:32:36.345786Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-15T15:32:36.348822Z] DEBUG - Loading 2 plugin(s) took 321.04 ms
+[2026-10-15T15:32:36.349039Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f005aeebec0>}
+[2026-10-15T15:32:36.349116Z] DEBUG - Hook impls: []
+[2026-10-15T15:32:36.349220Z] DEBUG - Result from 'on_starting': []
+[2026-10-15T15:32:36.349977Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-15T15:32:36.350562Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-15T15:32:36.351150Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-15T15:32:36.362463Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-15T15:32:36.362721Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-15T15:32:36.363716Z] DEBUG - Found DAG india_darwin_realtime_tsdb_dag
+[2026-10-15T15:32:36.363850Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-15T15:32:36.364440Z] DEBUG - Loaded DAG <DAG: india_darwin_realtime_tsdb_dag>
+[2026-10-15T15:32:36.364741Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_realtime_tsdb_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=14 
+[2026-10-15T15:32:36.364908Z] DEBUG - Dag file parsed file=india/india_darwin_realtime_tsdb_dag.py 
+[2026-10-15T15:32:36.365046Z] DEBUG - Integrate Macros plugins
+[2026-10-15T15:32:36.387766Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a14030-b31a-770b-ba96-e0de9206758a'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-15T15:25:00+00:00', try_number=2, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-bd843105b55fe2626c98bd8fa4e4bada-6b0f93a6fb417cee-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 15, 15, 32, 36, 24062, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-15T15:32:36.387846Z] DEBUG - Hook impls: []
+[2026-10-15T15:32:36.387917Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-15T15:32:36.388109Z] INFO - ::endgroup::
+[2026-10-15T15:32:37.825614Z] INFO - ::group::Ingest 32 of 32 pending Darwin files
+[2026-10-15T15:32:37.830344Z] INFO - e55f7cc5-30b2-4e26-85a0-bfd867c859b3.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:28 UTC · 3 obs
+[2026-10-15T15:32:37.834666Z] INFO - f7eda811-6233-4f0b-9ed9-8af93651fdc6.json · SOF_INRAG · ActivePower · 15:28 UTC · 1 obs
+[2026-10-15T15:32:37.839236Z] INFO - a4aaf325-2912-4f0e-b1d6-4cf76ec8929c.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:28 UTC · 3 obs
+[2026-10-15T15:32:37.843336Z] INFO - 5a8baac6-4eef-4941-ba16-3e6204db480e.json · SOF_INKHA · TiltedIrradiance · 15:28 UTC · 1 obs
+[2026-10-15T15:32:37.847607Z] INFO - f50f880d-0c2b-4fe4-bfc2-a590c6d28a5d.json · SOF_INGU2 · ActivePower · 15:27 UTC · 1 obs
+[2026-10-15T15:32:37.852028Z] INFO - b101f6b8-2c92-4fc4-bc66-0ba9919f0e9c.json · SOF_INKHA · ActivePower · 15:28 UTC · 1 obs
+[2026-10-15T15:32:37.857177Z] INFO - dfeecea7-4a53-4118-baa9-2bc68a07ddd5.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:29 UTC · 3 obs
+[2026-10-15T15:32:37.862828Z] INFO - 498657bc-cf3f-4462-9c1c-2273c7e18ab8.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:29 UTC · 2 obs
+[2026-10-15T15:32:37.868336Z] INFO - 53df06b6-c21d-4355-95ec-7f7335b0304a.json · SOF_INRAG · ActivePower · 15:29 UTC · 1 obs
+[2026-10-15T15:32:37.873383Z] INFO - 48b81f04-09a9-49ab-ac50-eb0af70d10bb.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:29 UTC · 3 obs
+[2026-10-15T15:32:37.878104Z] INFO - ec478b1a-8372-44c6-aa18-75d10edde231.json · SOF_INGU2 · ActivePower · 15:28 UTC · 1 obs
+[2026-10-15T15:32:37.882543Z] INFO - 8d144c15-2257-416e-b168-dacb31a05012.json · SOF_INKHA · HorizontalIrradiance · 15:29 UTC · 1 obs
+[2026-10-15T15:32:37.887718Z] INFO - 820269b9-ad8d-4f28-8cc2-8ec3080781e5.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:30 UTC · 3 obs
+[2026-10-15T15:32:37.892742Z] INFO - b390bf98-3005-434a-a5ce-1c3a6d3f6409.json · SOF_INRAG · ActivePower · 15:30 UTC · 1 obs
+[2026-10-15T15:32:37.897635Z] INFO - bf579338-10ab-4dfb-9be7-8682c914eefe.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:30 UTC · 3 obs
+[2026-10-15T15:32:37.901782Z] INFO - cd27fa41-31dd-4012-8f7a-8e4890082326.json · SOF_INKHA · TiltedIrradiance · 15:30 UTC · 1 obs
+[2026-10-15T15:32:37.906898Z] INFO - ff9b1c7b-9aad-4a74-9d6f-8280a9684df5.json · SOF_INGU2 · ActivePower · 15:30 UTC · 1 obs
+[2026-10-15T15:32:37.911543Z] INFO - e3f08f15-0dbd-4b98-bccf-6a2e1fefe7e9.json · SOF_INKHA · ActivePower · 15:30 UTC · 1 obs
+[2026-10-15T15:32:37.916074Z] INFO - 37e12714-680c-41ae-95ce-5114e8088809.json · SOF_INGU2 · HorizontalIrradiance, TiltedIrradiance · 15:30 UTC · 2 obs
+[2026-10-15T15:32:37.920370Z] INFO - 04b460d5-d916-4b7f-b133-4e5617ec8752.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:31 UTC · 3 obs
+[2026-10-15T15:32:37.925040Z] INFO - b6890ee0-05da-4ef1-ae9a-43808d4725f3.json · SOF_INKHA · ActivePower · 15:31 UTC · 1 obs
+[2026-10-15T15:32:37.929382Z] INFO - 5c02ddcf-f97b-47e5-afbb-e23f50815616.json · SOF_INRAG · ActivePower · 15:31 UTC · 1 obs
+[2026-10-15T15:32:37.933797Z] INFO - 5cd3e1e8-0db1-435b-b4b7-f17c82188baf.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:31 UTC · 3 obs
+[2026-10-15T15:32:37.938491Z] INFO - 8146e043-2cc4-4245-a361-d82156af916b.json · SOF_INKHA · TiltedIrradiance · 15:31 UTC · 1 obs
+[2026-10-15T15:32:37.942666Z] INFO - e01e9867-886f-4a51-a384-f5921e1bd2c0.json · SOF_INKHA · HorizontalIrradiance · 15:31 UTC · 1 obs
+[2026-10-15T15:32:37.947094Z] INFO - c9b38a72-8be2-48da-be9e-62e0bac9fea4.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:32 UTC · 3 obs
+[2026-10-15T15:32:37.954514Z] INFO - a0157e0d-f45a-4e45-8de5-b7ae22974204.json · SOF_INKHA · ActivePower · 15:32 UTC · 1 obs
+[2026-10-15T15:32:37.962414Z] INFO - b3c95f92-24b2-40d1-b6fa-8a33803e366b.json · SOF_INRAG · ActivePower, TiltedIrradiance · 15:31–15:32 UTC · 2 obs
+[2026-10-15T15:32:37.969768Z] INFO - ad2163b4-984e-46c9-8c95-bb21e435fe9c.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:32 UTC · 3 obs
+[2026-10-15T15:32:37.975109Z] INFO - d7da02ed-2e46-4f9a-acd6-3766cd417f47.json · SOF_INKHA · TiltedIrradiance · 15:32 UTC · 1 obs
+[2026-10-15T15:32:37.980210Z] INFO - 7ff0affe-e330-4999-ac0a-c08661b30df7.json · SOF_INGU2 · ActivePower · 15:32 UTC · 1 obs
+[2026-10-15T15:32:37.986208Z] INFO - 17bfc7fa-8e16-4fb5-8aa1-b35a12a20e33.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 15:32 UTC · 2 obs
+[2026-10-15T15:32:39.989206Z] INFO - ::endgroup::
+[2026-10-15T15:32:50.709787Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.710101Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.710568Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T13:00:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.710740Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.710890Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T10:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.711053Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.711193Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.711663Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.711883Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.712032Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.712168Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.712309Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.712740Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.713934Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T14:15:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.714436Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.714628Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.715177Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:45:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.715411Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.715647Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T10:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.715824Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.716029Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.716404Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T15:00:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.716581Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.716931Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.717081Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.717374Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:00:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.717480Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.717859Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T15:00:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.718511Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T13:15:00+00:00", "sample_count": 14, "expected_minutes": 15}
+[2026-10-15T15:32:50.718866Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.719199Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T15:00:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:32:50.719303Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.719535Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.719625Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.719892Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T13:45:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.720266Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.720413Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.720659Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.720782Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.720919Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.721054Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T13:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.721462Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T12:45:00+00:00", "sample_count": 9, "expected_minutes": 15}
+[2026-10-15T15:32:50.721844Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:15:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.722050Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.722368Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.722493Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.722640Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T13:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.722774Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.722903Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.723045Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.723185Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.723505Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.724233Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.724776Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T13:45:00+00:00", "sample_count": 14, "expected_minutes": 15}
+[2026-10-15T15:32:50.724919Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.725048Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.725196Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.725335Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.729268Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T13:15:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.729765Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.730160Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.730809Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:00:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.731494Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:32:50.731904Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.732293Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T10:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.732661Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.733671Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.734094Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T15:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.734254Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.734671Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 10, "expected_minutes": 15}
+[2026-10-15T15:32:50.734837Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.734978Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.735374Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:15:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:32:50.737881Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T13:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.740314Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.740771Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.741217Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T13:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.741682Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.743113Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.743561Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.744230Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.744989Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.745450Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T13:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.746115Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.746547Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.747277Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:45:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:32:50.747931Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 11, "expected_minutes": 15}
+[2026-10-15T15:32:50.748339Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.748978Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:45:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:32:50.749183Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.749367Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.749794Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:45:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:32:50.749964Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.750428Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.750591Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.751048Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.751821Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 7, "expected_minutes": 15}
+[2026-10-15T15:32:50.751994Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.752150Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.752305Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:32:50.988636Z] INFO - DARWIN_BACKLOG={"snapshot_files": 32, "backlog_files": 32, "oldest_pending_file_age_seconds": 276.23224449157715, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "retained_files": 2357, "incomplete_windows": 104, "oldest_incomplete_window": "2026-10-15T09:30:00+00:00"}
+[2026-10-15T15:33:24.293678Z] INFO - ::group::Publish 1743 points to TSDB
+[2026-10-15T15:33:29.078825Z] INFO - DARWIN_BACKLOG={"snapshot_files": 1743, "backlog_files": 1743, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "oldest_snapshot_source_timestamp": "2026-10-15T09:45:00+00:00", "oldest_pending_file_age_seconds": 38.080687522888184}
+[2026-10-15T15:33:29.102388Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-15T15:33:29.102834Z] ERROR - 2026-10-15 15:33:29,102 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-15T15:33:29.251384Z] ERROR - 2026-10-15 15:33:29,251 - INFO - Authenticate as Okta Technical/Service account with client_id=2-s-scrapertool-service-application-ECFZKGWYADYUXMG and secret_id=64 characters
+[2026-10-15T15:33:40.243483Z] ERROR - 2026-10-15 15:33:40,243 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-15T15:33:41.919589Z] ERROR - Traceback (most recent call last):
+[2026-10-15T15:33:41.919781Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-15T15:33:41.919823Z] ERROR -     result = fn()
+[2026-10-15T15:33:41.919850Z] ERROR -              ^^^^
+[2026-10-15T15:33:41.919876Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-15T15:33:41.919901Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-15T15:33:41.919927Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-15T15:33:41.919950Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-15T15:33:41.919977Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-15T15:33:41.920002Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['83ad9e55-bd82-51ee-a670-a37b2ef40683'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T10:15:00+00:00', 'end_application_date': '2026-10-15T13:00:01+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-15T15:33:41.920053Z] ERROR - 2026-10-15 15:33:41,919 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-15T15:33:44.389474Z] ERROR - Traceback (most recent call last):
+[2026-10-15T15:33:44.403929Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-15T15:33:44.403999Z] ERROR -     result = fn()
+[2026-10-15T15:33:44.404043Z] ERROR -              ^^^^
+[2026-10-15T15:33:44.404071Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-15T15:33:44.404098Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-15T15:33:44.404125Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-15T15:33:44.404150Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-15T15:33:44.404174Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-15T15:33:44.404202Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['83ad9e55-bd82-51ee-a670-a37b2ef40683'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T10:15:00+00:00', 'end_application_date': '2026-10-15T13:00:01+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-15T15:33:44.404231Z] ERROR - 2026-10-15 15:33:44,389 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-15T15:33:47.927361Z] ERROR - Traceback (most recent call last):
+[2026-10-15T15:33:47.927614Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-15T15:33:47.927689Z] ERROR -     result = fn()
+[2026-10-15T15:33:47.927739Z] ERROR -              ^^^^
+[2026-10-15T15:33:47.927784Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-15T15:33:47.927828Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-15T15:33:47.927871Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-15T15:33:47.927912Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-15T15:33:47.927952Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-15T15:33:47.927994Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['83ad9e55-bd82-51ee-a670-a37b2ef40683'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T10:15:00+00:00', 'end_application_date': '2026-10-15T13:00:01+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-15T15:33:47.928045Z] ERROR - 2026-10-15 15:33:47,927 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 3/15
+[2026-10-15T15:33:53.180288Z] ERROR - Traceback (most recent call last):
+[2026-10-15T15:33:53.180430Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-15T15:33:53.180487Z] ERROR -     result = fn()
+[2026-10-15T15:33:53.180536Z] ERROR -              ^^^^
+[2026-10-15T15:33:53.180584Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-15T15:33:53.180635Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-15T15:33:53.180684Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-15T15:33:53.180767Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-15T15:33:53.180817Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-15T15:33:53.180864Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['83ad9e55-bd82-51ee-a670-a37b2ef40683'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T10:15:00+00:00', 'end_application_date': '2026-10-15T13:00:01+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-15T15:33:53.180914Z] ERROR - 2026-10-15 15:33:53,180 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 4/15
+[2026-10-15T15:34:05.239705Z] ERROR - 2026-10-15 15:34:05,236 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 5/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+</pasted_content id="f33a">
+
+-- I'm worried with the line errors. The dag actually failed and upForRetry automatically, this log is from the ongoing 2nd attempt
+
+## 23:36 assistant (smp-india)
+
+The "ERROR" lines on their own aren't failures. Airflow labels everything the TSDB SDK prints as ERROR, and each traceback ends with "WARNING… Attempt n/15", then "We succeeded… at attempt 5/15". What the lines show, though, is a real problem that likely caused the first attempt to fail:
+
+**What's happening:**
+1. **The publisher has a big backlog of outputs:** 1,743 points waiting (`Publish 1743 points to TSDB`), and 104 quarter-hour windows still open, back to 09:30 UTC. The pending folder itself is almost empty (32 files). The backlog is everything ingested since this morning that hasn't been confirmed in TSDB yet.
+2. **Each point is read back from TSDB before its file is deleted.** UAT answers older data from Athena, and it allows **only 2 Athena queries at a time per user**: `Too many athena queries 2 are running for the current user concurrently`. Every read waits, retries and backs off, here 5 attempts and about 25 seconds for one series.
+3. **The task has a 4-minute timeout.** With about 30 series, each read taking 10–25 seconds, a run can't finish verifying in time. I suspect attempt 1 timed out. Nothing gets acknowledged, the next run starts from the same 1,743 points, and that repeats.
+
+**What's safe:** no data is lost. Files are only deleted after verification, and rewriting the same points is harmless (same timestamps, same values).
+
+**What worries me overnight:**
+- If every run times out, there's **no progress**, plus a **Teams alert** for each failure.
+- **"Current user" is our shared service account** (`2-s-scrapertool-service-application`), which other India DAGs also use. A publisher hammering Athena all night could slow or fail *their* TSDB reads.
+
+**What I need to confirm:** the last ~20 lines of **attempt 1**. If it's `AirflowTaskTimeout`, the diagnosis holds.
+
+**My recommendation:** if attempt 2 also fails, **pause the DAG for tonight**. The collector keeps collecting and nothing is lost. Tomorrow I'll fix it properly, with two likely changes:
+- Cap how many points each run publishes, so every run finishes, acknowledges something and makes steady progress.
+- Look at whether the read-back can avoid Athena for recent data.
+
+I'd make both changes test-first, with a design check first, since this touches how data gets verified.
+
+I haven't seen attempt 1's error, so the timeout is my strongest guess, not confirmed yet.
+
+## 23:45 user (smp-india)
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_realtime_tsdb_dag/run_id=scheduled__2026-10-15T15:25:00+00:00/task_id=publish_pending_batches/attempt=1.log
+::endgroup::
+[2026-10-15T15:27:56.041185Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a1402d-581e-77d8-913f-0ff95eb81c8a dag_id=india_darwin_realtime_tsdb_dag task_id=publish_pending_batches run_id=scheduled__2026-10-15T15:25:00+00:00 try_number=1 map_index=-1
+[2026-10-15T15:27:56.058884Z] DEBUG - Loading plugins
+[2026-10-15T15:27:56.061009Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-15T15:27:56.326742Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-15T15:27:56.352394Z] DEBUG - Loading plugins from entrypoints
+[2026-10-15T15:27:56.352554Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-15T15:27:56.354219Z] DEBUG - Loading 2 plugin(s) took 293.31 ms
+[2026-10-15T15:27:56.354422Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed87d7b60>}
+[2026-10-15T15:27:56.354501Z] DEBUG - Hook impls: []
+[2026-10-15T15:27:56.354585Z] DEBUG - Result from 'on_starting': []
+[2026-10-15T15:27:56.355294Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-15T15:27:56.356082Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-15T15:27:56.356704Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-15T15:27:56.370261Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-15T15:27:56.370579Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-15T15:27:56.371752Z] DEBUG - Found DAG india_darwin_realtime_tsdb_dag
+[2026-10-15T15:27:56.371930Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-15T15:27:56.372681Z] DEBUG - Loaded DAG <DAG: india_darwin_realtime_tsdb_dag>
+[2026-10-15T15:27:56.372945Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_realtime_tsdb_dag.py  bundle_prepare_ms=1  dag_file_parse_ms=17 
+[2026-10-15T15:27:56.373174Z] DEBUG - Dag file parsed file=india/india_darwin_realtime_tsdb_dag.py 
+[2026-10-15T15:27:56.373387Z] DEBUG - Integrate Macros plugins
+[2026-10-15T15:27:56.403742Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1402d-581e-77d8-913f-0ff95eb81c8a'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-15T15:25:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-bd843105b55fe2626c98bd8fa4e4bada-6b0f93a6fb417cee-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 15, 15, 27, 56, 56914, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-15T15:27:56.403856Z] DEBUG - Hook impls: []
+[2026-10-15T15:27:56.403926Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-15T15:27:56.404138Z] INFO - ::endgroup::
+[2026-10-15T15:27:57.350462Z] INFO - ::group::Ingest 25 of 25 pending Darwin files
+[2026-10-15T15:27:57.355752Z] INFO - 18e49b3f-2749-47e9-929f-e9c0db03bf18.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:24 UTC · 3 obs
+[2026-10-15T15:27:57.361177Z] INFO - f605e0f5-e0f9-4256-a4c5-902c8dc469b7.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:24 UTC · 3 obs
+[2026-10-15T15:27:57.367083Z] INFO - 4966792f-7cc9-4417-9702-a24995f1e330.json · SOF_INRAG · ActivePower · 15:24 UTC · 1 obs
+[2026-10-15T15:27:57.372189Z] INFO - efd17e75-c719-4267-98fe-a4c318e1d2d3.json · SOF_INKHA · TiltedIrradiance · 15:24 UTC · 1 obs
+[2026-10-15T15:27:57.376911Z] INFO - 8387a51b-76e6-4819-847f-0b9cae4b168e.json · SOF_INGU2 · ActivePower · 15:23 UTC · 1 obs
+[2026-10-15T15:27:57.381741Z] INFO - e468385f-1ff9-452e-9444-21730e4ac498.json · SOF_INKHA · ActivePower, HorizontalIrradiance · 15:24 UTC · 2 obs
+[2026-10-15T15:27:57.403249Z] INFO - 0d973329-aaa1-46b3-aedc-8d38f4714f5f.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:25 UTC · 3 obs
+[2026-10-15T15:27:57.409000Z] INFO - bb198144-ca79-468c-9072-f514fcb19e8f.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:25 UTC · 3 obs
+[2026-10-15T15:27:57.414444Z] INFO - 978620de-30f0-4e15-809f-d28a0b9a4ebd.json · SOF_INKHA · TiltedIrradiance · 15:25 UTC · 1 obs
+[2026-10-15T15:27:57.419709Z] INFO - 6fc3b628-d637-4351-95e8-b6ce8fc011cf.json · SOF_INRAG · ActivePower · 15:25 UTC · 1 obs
+[2026-10-15T15:27:57.424880Z] INFO - bc01e1b3-5a59-476d-a7a5-3b0d271e4ebd.json · SOF_INGU2 · ActivePower · 15:24 UTC · 1 obs
+[2026-10-15T15:27:57.430004Z] INFO - 5c28cad5-0551-4a23-b910-2b1c1c9fcc77.json · SOF_INKHA · ActivePower · 15:25 UTC · 1 obs
+[2026-10-15T15:27:57.435435Z] INFO - ff2aa27f-a85a-4b6b-b525-84c6cae07f8e.json · SOF_INGU2 · ActivePower, HorizontalIrradiance, TiltedIrradiance · 15:25 UTC · 3 obs
+[2026-10-15T15:27:57.440802Z] INFO - acab4c62-c356-460d-a262-607995bfa53f.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:26 UTC · 3 obs
+[2026-10-15T15:27:57.446040Z] INFO - 3061d461-d71e-4438-b891-daca3f53c4c1.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:26 UTC · 2 obs
+[2026-10-15T15:27:57.452014Z] INFO - b69103ff-4a1c-4edf-89b9-717c0db471cd.json · SOF_INRAG · ActivePower · 15:26 UTC · 1 obs
+[2026-10-15T15:27:57.457387Z] INFO - 4cd14441-0091-48d9-9f99-360043f2d7b9.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:26 UTC · 3 obs
+[2026-10-15T15:27:57.462765Z] INFO - 8b63fb14-f28a-408a-b85d-261b029663d9.json · SOF_INKHA · HorizontalIrradiance · 15:26 UTC · 1 obs
+[2026-10-15T15:27:57.467755Z] INFO - ae905d02-1154-48cb-825b-248ec93e8426.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:27 UTC · 3 obs
+[2026-10-15T15:27:57.472564Z] INFO - 89c2e8be-4544-4db7-9a62-51f364e1e129.json · SOF_INKHA · ActivePower · 15:27 UTC · 1 obs
+[2026-10-15T15:27:57.477611Z] INFO - 1160a952-de3e-4dcf-a6c8-fdf4bb629440.json · SOF_INRAG · ActivePower · 15:27 UTC · 1 obs
+[2026-10-15T15:27:57.482730Z] INFO - 67cf58b6-5d9c-47da-998d-6323a95da863.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:27 UTC · 3 obs
+[2026-10-15T15:27:57.502758Z] INFO - 5ffe9afe-a6d0-4d13-84d7-123076b84da3.json · SOF_INKHA · TiltedIrradiance · 15:27 UTC · 1 obs
+[2026-10-15T15:27:57.508059Z] INFO - 600208e2-92c7-4bcd-bb22-3d411ccdc77f.json · SOF_INGU2 · ActivePower · 15:26 UTC · 1 obs
+[2026-10-15T15:27:57.513486Z] INFO - 542c5389-16ef-48ad-ab6d-efd5ec95ed22.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 15:27 UTC · 2 obs
+[2026-10-15T15:27:59.388517Z] INFO - ::endgroup::
+[2026-10-15T15:28:07.061253Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.061487Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.061830Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T13:00:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.061943Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062032Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T10:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062125Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062225Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062476Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.062752Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062837Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062919Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.062999Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.063232Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.063479Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T14:15:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.063719Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.063800Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064044Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:45:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.064127Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064376Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T10:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064459Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064535Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064766Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T15:00:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.064863Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.064981Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.065074Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.065310Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:00:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.065394Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.065699Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T15:00:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.066609Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T13:15:00+00:00", "sample_count": 14, "expected_minutes": 15}
+[2026-10-15T15:28:07.066889Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.067211Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T15:00:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:28:07.067333Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.067604Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.067714Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.068074Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T13:45:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.068407Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.068517Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.068620Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.068718Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.068803Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.068886Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T13:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.069121Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T12:45:00+00:00", "sample_count": 9, "expected_minutes": 15}
+[2026-10-15T15:28:07.069351Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:15:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.069437Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.069706Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.069798Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "TiltedIrradiance", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.069982Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T13:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070090Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070178Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070268Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070357Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070607Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.070686Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.070924Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T13:45:00+00:00", "sample_count": 14, "expected_minutes": 15}
+[2026-10-15T15:28:07.071002Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071101Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "ActivePower", "start": "2026-10-15T14:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071184Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071263Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071501Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T13:15:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.071581Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071669Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.071905Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:00:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.072138Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T09:45:00+00:00", "sample_count": 13, "expected_minutes": 15}
+[2026-10-15T15:28:07.072214Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.072290Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T10:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.072366Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.072799Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:30:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.072884Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T15:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.072966Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.073210Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T14:45:00+00:00", "sample_count": 10, "expected_minutes": 15}
+[2026-10-15T15:28:07.073291Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindSpeed", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.073367Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.073670Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:15:00+00:00", "sample_count": 6, "expected_minutes": 15}
+[2026-10-15T15:28:07.073788Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T13:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.073887Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T10:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.073976Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074056Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T13:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074133Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T12:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074215Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074296Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T12:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074537Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.074621Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T12:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074698Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T13:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.074924Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.075001Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindDirection", "start": "2026-10-15T14:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.075228Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T12:45:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:28:07.075455Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T14:30:00+00:00", "sample_count": 11, "expected_minutes": 15}
+[2026-10-15T15:28:07.075531Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "HorizontalIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.075803Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:45:00+00:00", "sample_count": 5, "expected_minutes": 15}
+[2026-10-15T15:28:07.075905Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.075993Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "ActivePower", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.076236Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T14:45:00+00:00", "sample_count": 3, "expected_minutes": 15}
+[2026-10-15T15:28:07.076319Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE3", "tag": "WindSpeed", "start": "2026-10-15T11:15:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.076586Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "ActivePower", "start": "2026-10-15T13:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.076674Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INRAG", "tag": "ActivePower", "start": "2026-10-15T11:00:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.076921Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INKHA", "tag": "TiltedIrradiance", "start": "2026-10-15T11:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.077156Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "ActivePower", "start": "2026-10-15T14:00:00+00:00", "sample_count": 7, "expected_minutes": 15}
+[2026-10-15T15:28:07.077235Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "TiltedIrradiance", "start": "2026-10-15T11:30:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.077311Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "SOF_INGU2", "tag": "HorizontalIrradiance", "start": "2026-10-15T10:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.077386Z] INFO - DARWIN_AGGREGATE_COVERAGE={"entity": "WIF_INSE4", "tag": "WindDirection", "start": "2026-10-15T12:45:00+00:00", "sample_count": 15, "expected_minutes": 15}
+[2026-10-15T15:28:07.216389Z] INFO - DARWIN_BACKLOG={"snapshot_files": 25, "backlog_files": 25, "oldest_pending_file_age_seconds": 235.52761006355286, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "retained_files": 2325, "incomplete_windows": 98, "oldest_incomplete_window": "2026-10-15T09:30:00+00:00"}
+[2026-10-15T15:28:37.778116Z] INFO - ::group::Publish 1719 points to TSDB
+[2026-10-15T15:28:43.003255Z] INFO - DARWIN_BACKLOG={"snapshot_files": 1719, "backlog_files": 1719, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "oldest_snapshot_source_timestamp": "2026-10-15T09:45:00+00:00", "oldest_pending_file_age_seconds": 35.77909183502197}
+[2026-10-15T15:28:43.025236Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-15T15:28:43.025869Z] ERROR - 2026-10-15 15:28:43,025 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-15T15:28:43.162599Z] ERROR - 2026-10-15 15:28:43,162 - INFO - Authenticate as Okta Technical/Service account with client_id=2-s-scrapertool-service-application-ECFZKGWYADYUXMG and secret_id=64 characters
+[2026-10-15T15:30:07.636722Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-15T15:30:07.637230Z] ERROR - 2026-10-15 15:30:07,637 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-15T15:30:29.644376Z] ERROR - 2026-10-15 15:30:29,644 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-15T15:30:33.674688Z] ERROR - 2026-10-15 15:30:33,674 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 1/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-15T15:31:35.813326Z] ERROR - 2026-10-15 15:31:35,813 - WARNING - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/kafka/topics/tsdb-uat-live-darwin params=None body={'records': [{'key': 'MjcxYTk2MTUtOWMwMi01MzQwLTlmM2QtOTlmNGY1OWU4NGU1', 'value': 'CAFaJDBhM2E4NWE2LTVjMjQtNGY2My05ZmI3LTYzZjg0YmQ5MWYyOagBAaoGuQFaDAjX48PWBhDoqpj5AqoBDAjX48PWBhCAv+L5AqoGmAEKJDI3MWE5NjE1LTljMDItNTM0MC05ZjNkLTk5ZjRmNTllODRlNVoGCKDIwtYGWgYIqNbC1gZaBgjMlcPWBloGCNiqw9YGWgYI3LHD1gZaBgjguMPWBloGCOzNw9YGYjjMOCAcxldAQLGiBtMwHEVAB76PkG4pUUBNkWlaT8o5QNTUsrW+KDVArzVuRAqoOECA6cc5xHpAQA=='}]}, status code 403. Response body was <html>
+[2026-10-15T15:31:35.813496Z] ERROR - <head><title>403 Forbidden</title></head>
+[2026-10-15T15:31:35.813557Z] ERROR - <body>
+[2026-10-15T15:31:35.813607Z] ERROR - <center><h1>403 Forbidden</h1></center>
+[2026-10-15T15:31:35.813673Z] ERROR - <hr><center>nginx</center>
+[2026-10-15T15:31:35.813739Z] ERROR - </body>
+[2026-10-15T15:31:35.813789Z] ERROR - </html>
+[2026-10-15T15:31:35.813834Z] ERROR - 
+[2026-10-15T15:31:35.813989Z] ERROR - 2026-10-15 15:31:35,813 - WARNING - Failure to query /api/v1/kafka/topics/tsdb-uat-live-darwin [post]. As the error might still appear in a next attempt, we propagate it directly
+[2026-10-15T15:31:35.813494Z] ERROR - Task failed with exceptionCatalogHttpStatusException: [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/kafka/topics/tsdb-uat-live-darwin params=None body={'records': [{'key': 'MjcxYTk2MTUtOWMwMi01MzQwLTlmM2QtOTlmNGY1OWU4NGU1', 'value': 'CAFaJDBhM2E4NWE2LTVjMjQtNGY2My05ZmI3LTYzZjg0YmQ5MWYyOagBAaoGuQFaDAjX48PWBhDoqpj5AqoBDAjX48PWBhCAv+L5AqoGmAEKJDI3MWE5NjE1LTljMDItNTM0MC05ZjNkLTk5ZjRmNTllODRlNVoGCKDIwtYGWgYIqNbC1gZaBgjMlcPWBloGCNiqw9YGWgYI3LHD1gZaBgjguMPWBloGCOzNw9YGYjjMOCAcxldAQLGiBtMwHEVAB76PkG4pUUBNkWlaT8o5QNTUsrW+KDVArzVuRAqoOECA6cc5xHpAQA=='}]}, status code 403. Response body was <html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py, line 31 in publish_pending_batches
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 251 in run_from_environment
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/aggregation.py, line 418 in publish_aggregated
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 195 in publish_pending
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 337 in publish_batch
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 143 in _write_payload
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/transport.py, line 161 in sdk_write
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/data_writer.py, line 519 in write_ts
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/data_writer.py, line 311 in send
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/fetcher/data_api.py, line 601 in post_to_kafka
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/fetcher/data_api.py, line 625 in post_to_kafka_rest
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py, line 400 in post
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py, line 537 in _query_with_retries
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py, line 45 in retry_call
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py, line 515 in _do_query
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py, line 765 in _query
+
+[2026-10-15T15:31:35.814086Z] INFO - ::group::Post Execute
+[2026-10-15T15:31:35.852125Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a1402d-581e-77d8-913f-0ff95eb81c8a'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-15T15:25:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-bd843105b55fe2626c98bd8fa4e4bada-6b0f93a6fb417cee-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 15, 15, 27, 56, 56914, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 15, 15, 31, 35, 816270, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-15T15:31:35.852413Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1402d-581e-77d8-913f-0ff95eb81c8a'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-15T15:25:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-bd843105b55fe2626c98bd8fa4e4bada-6b0f93a6fb417cee-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 15, 15, 27, 56, 56914, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 15, 15, 31, 35, 816270, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': CatalogHttpStatusException(CatalogResponse(method='post', url='https://tsdb-uat.gems.myengie.com/api/v1/kafka/topics/tsdb-uat-live-darwin', code=403, raw_response='<html>\r\n<head><title>403 Forbidden</title></head>\r\n<body>\r\n<center><h1>403 Forbidden</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n', params=None, body={'records': [{'key': 'MjcxYTk2MTUtOWMwMi01MzQwLTlmM2QtOTlmNGY1OWU4NGU1', 'value': 'CAFaJDBhM2E4NWE2LTVjMjQtNGY2My05ZmI3LTYzZjg0YmQ5MWYyOagBAaoGuQFaDAjX48PWBhDoqpj5AqoBDAjX48PWBhCAv+L5AqoGmAEKJDI3MWE5NjE1LTljMDItNTM0MC05ZjNkLTk5ZjRmNTllODRlNVoGCKDIwtYGWgYIqNbC1gZaBgjMlcPWBloGCNiqw9YGWgYI3LHD1gZaBgjguMPWBloGCOzNw9YGYjjMOCAcxldAQLGiBtMwHEVAB76PkG4pUUBNkWlaT8o5QNTUsrW+KDVArzVuRAqoOECA6cc5xHpAQA=='}]}, json_response=None, call_id='f633d597-c243-4838-b841-b7d9ceb382ec', start_time=datetime.datetime(2026, 10, 15, 15, 31, 35, 799875, tzinfo=datetime.timezone.utc), end_time=datetime.datetime(2026, 10, 15, 15, 31, 35, 813035, tzinfo=datetime.timezone.utc), server_execution_time=-1, response_headers={'Date': 'Thu, 15 Oct 2026 15:31:35 GMT', 'Content-Type': 'text/html', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'Vary': 'Accept-Encoding', 'Content-Encoding': 'gzip', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'}, streamed_response=None))}
+[2026-10-15T15:31:35.852471Z] DEBUG - Hook impls: []
+[2026-10-15T15:31:35.852519Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-15T15:31:35.852566Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed07bbc20>}
+[2026-10-15T15:31:35.852594Z] DEBUG - Hook impls: []
+[2026-10-15T15:31:35.852629Z] DEBUG - Result from 'before_stopping': []
+[2026-10-15T15:31:35.852657Z] INFO - ::endgroup::
+</pasted_content id="f33a">
+
+??
+
+## 23:46 assistant (smp-india)
+
+That settles it, and it's not what I guessed. **Attempt 1 failed on permission, not a timeout:**
+
+```
+POST /api/v1/kafka/topics/tsdb-uat-live-darwin → 403 Forbidden
+```
+
+- **What happened:** the publisher first read the current values from UAT (that's where the Athena retries come from), then tried its **first write** and was refused. TSDB writes go to a per-source topic, and the Darwin series write to `tsdb-uat-live-darwin`. **Our service account `2-s-scrapertool-service-application-ECFZKGWYADYUXMG` isn't allowed to write to that topic.** This is the "first UAT publish is the first real write-permission test" we kept noting: our probes only ever read the catalogue.
+- **Nothing was written, and nothing is lost.** Files are only deleted after verified writes, so all 1,719 points are still safely on EFS.
+- **Attempt 2 and every later run will hit the same 403.** Each one also runs about 30 Athena-heavy reads on our **shared** account first, which is what triggered "too many Athena queries" and can slow other India DAGs.
+
+So **pause `india_darwin_realtime_tsdb_dag` now.** The collector keeps collecting, and once the permission is granted, the publisher catches up on everything.
+
+The fix is a permission, not code. Probably Mateo, who created the series, can say who grants it, or it's the TSDB team:
+
+```
+Hi Mateo, first real write to the Darwin series in UAT failed: POST /api/v1/kafka/topics/tsdb-uat-live-darwin → 403 Forbidden. Our service account 2-s-scrapertool-service-application-ECFZKGWYADYUXMG (UAT) isn't allowed to write to the "darwin" source. Could you (or the TSDB team) grant it write access in UAT, and the same for our prod account before we go live there? Reads work fine, it's only the write.
+```
+
+Once access is granted, unpause and the backlog drains on its own. Separately, I'd still look at making those pre-write reads lighter on Athena, so a catch-up run doesn't crowd our shared account. That's for tomorrow, not tonight.
+
+Two assumptions I haven't confirmed. That the topic name comes from the series' "darwin" source is a reading of the URL. And our prod account may have the same gap, but I can't test it without a prod write.
+
+## 23:48 user (smp-india)
+
+before that, can we at least try via a short inline vpn script to try and write in UAT and Prod using the respective airflow creds? Just so we can prove
+
+## 23:48 assistant (smp-india)
+
+Yes, and it's the right proof, since our earlier probes only read. One thing to settle first: **a write test writes real data.** UAT is fine. For prod, I'd only write a point that's **genuine and identical to what the publisher would write anyway**:
+- Tuticorin INSE4 power at its real source minute, 14:58:11.689 UTC, value 34,104.9 kW = 34.1049 MW. That's a point from today's collector, the one you downloaded.
+- It goes to the existing INSE4 1-minute series, which exists in both environments.
+
+That way, even a successful prod write isn't test junk.
+
+Let me check the write function the publisher actually uses, so the test goes through exactly the same path:
+
+## 23:49 assistant (smp-india)
+
+The write probe script is ready. While checking it I caught and fixed one wrong argument name, and I've confirmed it builds the batch and config correctly. Run it on VPN; it takes at most about 5 minutes (2.5 per environment):
+
+```bash
+cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && .venv/bin/python ../discovery/scr-1273-tsdb/write_probe.py uat; .venv/bin/python ../discovery/scr-1273-tsdb/write_probe.py prod
+```
+
+What it does, per environment:
+- Writes **one genuine point**: Tuticorin INSE4 power, 14:58:11.689 UTC, 34.1049 MW, from today's dev collector. It uses the publisher's own path (`publish_batch` with `TsdbPublicationBatch(…, "actual")`), with the matching UAT or prod service account from `.envrc`.
+- Reads the point back to confirm it landed.
+- Prints only the account prefix and `RESULT: published` or `FAILED: <error> HTTP=<code> <url>`. No secrets or token lines.
+
+How to read the result:
+- **UAT `FAILED … HTTP=403 …/kafka/topics/tsdb-uat-live-darwin`:** that confirms the missing write permission. Tonight's 403 was no fluke.
+- **Prod `RESULT: published`:** prod's account can already write. Only UAT needs the grant, and prod now holds one real, correct point for INSE4.
+- **Prod `FAILED … 403`:** both accounts need it, so the ask to Mateo should cover both.
+
+This makes a real write to prod if permitted. It's a genuine point, but it's a production write, and it can't be undone in TSDB. If you'd rather not, run only the first half (`write_probe.py uat`), and prod can wait for go-live.
