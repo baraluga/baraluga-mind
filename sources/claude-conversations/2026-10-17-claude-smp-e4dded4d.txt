@@ -1,0 +1,40 @@
+# Claude Conversation - 2026-10-17
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `e4dded4d-58e2-446a-8ac0-3d578ce9c954`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/e4dded4d-58e2-446a-8ac0-3d578ce9c954.jsonl`
+Resume: `claude --resume e4dded4d-58e2-446a-8ac0-3d578ce9c954`
+
+## 01:16 user
+
+Background (from the session that started this one):
+On 2026-10-17 we found each TSDB last-version read is an Athena query with ~8-10 s fixed overhead, and the shared India TSDB service client allows only 2 concurrent Athena queries ("Too many athena queries ... 503"). The new india_khaba_forecasts DAG went from 18 per-day reads (~10 min run) to 2 reads per run. The Khavda DAG still does 27 reads every 10 minutes, hogging the shared slots that india_iex_rtm_realtime_dag (every minute, 5-minute latency target, SCR-1284) also needs. User's standing preference: bulk TSDB reads, chunked, split locally. TSDB reads need VPN: never run live TSDB reads yourself; unit tests only.
+
+Task:
+In smp-india (/Users/qn5792/repos/smp/smp-india, branch dev), change `read_native_data` in dags/src/scripts/india_khavda_generation_forecasts/khavda_generation.py so each of the 3 series (actual, DA, ID) is read ONCE per run for the whole window of consecutive IST delivery dates (chunked to at most 9 days), then split per IST day locally, instead of one read per series per day (27 Athena-backed reads every 10 min today). Keep `boundary_padding` behaviour (±15 min around the whole chunk, then per-day frames must still include the padding the comparison step needs), the truncation check (raise if a read returns >= max rows; size the cap for 9 days of 10-min actuals = 1296 rows), the per-day KHAVDA_TSDB_SERIES diagnostics log line, and the output files unchanged.
+
+Follow the pattern already shipped for Khaba in dags/src/scripts/india_khaba_forecasts/khaba_forecasts.py (`_chunks` + `read_chunk`, commit db8ce09). Update tests in dags/test/scripts/india_khavda_generation_forecasts/ (add a read-count test: 9-day window -> 3 calls). Run `.venv/bin/ruff check/format --config pyproject.toml dags/src dags/test` and `direnv exec . .venv/bin/python -m pytest dags/test -q -p no:cacheprovider` (uv run needs VPN for Artifactory; use the existing .venv). Do not commit unless the user asks; when asked, micro commits on dev, push with the QN5792_engieco gh token, promote dev->qa->prod by `Merge dev into qa` / `Merge qa into prod` merges only if the user says so.
+
+Shared notes folder for this group of sessions (outside the repo; read siblings' notes there, leave hand-over notes or large findings there instead of pasting them into messages): /Users/qn5792/Library/Application Support/Claude/side-session-notes/local_1c1de7d8-8dfd-436a-899f-dbebcea775e7
+
+## 01:16 assistant (smp-india)
+
+The refactor is in place. Now I'm updating the tests.
+
+## 01:16 assistant (smp-india)
+
+Arithmetic slip in my test: ±15 min on 10-min data gives 1 point before and 2 after (end+0, end+10), so 147 rows per day. Fixing the expectation.
+
+## 01:18 user (smp-india)
+
+Commit the Khavda chunked-read change on dev and push.
+
+## 01:18 assistant (smp-india)
+
+One logical change, so one commit.
+
+## 01:19 assistant (smp-india)
+
+I committed the change as f9ec583 and pushed it to dev (db8ce09..f9ec583). It is one commit because it is one logical change. Each Khavda run now makes 3 TSDB reads instead of 27.
+
+Ruff and all 1222 tests pass, but it hasn't run against live TSDB yet. It is on dev only and hasn't been promoted to qa or prod.

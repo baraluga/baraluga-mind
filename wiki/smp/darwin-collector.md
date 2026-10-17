@@ -2,10 +2,11 @@
 
 ## Current State
 
-As of 2026-10-15.
+As of 2026-10-17.
 
 - The network blocker appears to have cleared enough to resume rollout work. Earlier, the collector was deployed to India dev on 2026-10-01 with [[michael]]'s help but Okta auth and the Darwin base API returned proxy 403s; by October 13 Brian treated Darwin as unblocked and moved to deployment/config questions.
-- There is no automatic collector deployment. Code changes need a new amd64 image; config-only changes need rendering the complete enabled-site config, server-side dry-run, apply, and rollout status. Omitting a site from render silently stops collecting it.
+- The collector catalogue is now the single source of truth in `smp-india`: it supplies collector entity/tag selection, publisher destinations, and freshness expectations. It has 18 expected streams in dev/QA and 21 in prod; Tithwa is prod-only. The duplicate `smp-tool` site configuration and publisher `mappings.json` were removed.
+- Collector deployments now require an explicit image tag. The new catalogue is bundled into the image, so enabling a site is an `smp-india` change and deployment of that image; the old-image/new-manifest pairing is refused before it can replace a running pod. CI currently publishes an image artifact rather than directly to ECR, so the manual image-transfer/deploy path remains until the CI ECR setting and AWS OIDC trust are resolved.
 - For `SCR-1273`, Mateo clarified ModuleTemperature is not needed. The rollout removed ModuleTemperature from collection instead of collecting and dropping it later.
 - TSDB probing found 12 Gujarat IDs in UAT and all 16 in prod. The four Tithwa series existed in prod but initially 404ed in UAT; Mateo said he would create them in UAT too. Generation destinations are MW, so Darwin kW values still need the existing 0.001 conversion.
 - The collector is running in India dev and has gathered a publish backlog, but the first real UAT TSDB write was rejected with HTTP 403 on the `tsdb-uat-live-darwin` topic. The UAT service account can read catalogue/data but lacks Darwin-source write permission; the publisher should remain paused until that grant is made. The backlog remains on EFS because deletion follows verified writes.
@@ -14,7 +15,8 @@ As of 2026-10-15.
   - `SCR-1261`: Tuticorin wind speed, wind direction, and generation.
   - `SCR-1273`: four more assets. All 15 requested measurements parse from saved responses.
   - `SCR-1268`: collector health and freshness monitoring, starting with Prometheus discovery.
-- Freshness monitoring (`SCR-1268`) is merged through dev, QA, and prod but remains paused. It has configurable Airflow thresholds; the initial TSDB-read design is being reconsidered in favour of EFS collector-state freshness plus a pending-batch watchdog, so it does not duplicate publisher verification.
+- Freshness monitoring (`SCR-1268`) now compares EFS collector state with the catalogue's expected streams, so a site that has never produced data is stale rather than invisible. Khaba's three dev streams will remain correctly stale until the new collector image is deployed and begins polling them.
+- The publisher no longer performs Athena read-before-write or read-back on live runs: TSDB storage-confirmation sockets cannot connect from EKS. It writes each series and moves fully written raw files to `published/` for seven days; a bulk validator design is pending before that retention can become verified cleanup. The manual aggregation Airflow test and its CI coverage were repaired after the catalogue migration.
 
 ## Background
 
@@ -32,6 +34,7 @@ As of 2026-10-15.
 - 2026-10-01: deployed to India dev; blocked by proxy 403s.
 - 2026-10-13: Gujarat mappings and ModuleTemperature removal completed and pushed to `dev`; rollout still needed registry/image or config apply work and first UAT writes.
 - 2026-10-15: first UAT Darwin publication attempt reached TSDB but failed with a 403 write-permission error; no data was lost.
+- 2026-10-16: catalogue ownership moved into `smp-india`; live publisher reads were removed after EKS could not use TSDB storage-confirmation sockets.
 
 ## Open Questions
 
@@ -43,7 +46,9 @@ As of 2026-10-15.
 - UNCERTAIN: Whether the four Tithwa UAT series were created after Mateo's October 13 reply.
 - UNCERTAIN: Whether TSDB will grant the UAT Darwin-source write permission, and whether the prod service account needs the same grant.
 - UNCERTAIN: Whether the first production write probe was run; it would make an irreversible but genuine point.
-- UNCERTAIN: Whether the monitoring DAG was refactored from TSDB reads to EFS collector-state freshness before it is unpaused.
+- UNCERTAIN: Whether the newly tagged collector image has been deployed in dev and Khaba has appeared in the collector state.
+- UNCERTAIN: Whether CI can be authorized to push Darwin images directly to ECR through GitHub OIDC.
+- UNCERTAIN: Whether the planned bulk validator will prove published files in TSDB before their seven-day retention ends.
 
 ## Sources
 
@@ -67,5 +72,8 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-14-claude-smp-68dedda3.txt`
 - `sources/claude-conversations/2026-10-15-claude-smp-36b94912.txt`
 - `sources/claude-conversations/2026-10-15-claude-smp-68dedda3.txt`
+- `sources/claude-conversations/2026-10-16-claude-smp-36b94912.txt`
+- `sources/claude-conversations/2026-10-16-claude-smp-68dedda3.txt`
+- `sources/claude-conversations/2026-10-16-claude-smp-c410edb9.txt`
 
-Last Updated: 2026-10-15
+Last Updated: 2026-10-18

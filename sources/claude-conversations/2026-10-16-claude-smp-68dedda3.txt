@@ -1,0 +1,1441 @@
+# Claude Conversation - 2026-10-16
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 00:09 user (smp-india)
+
+there, ran it
+
+## 00:10 assistant (smp-india)
+
+Neither environment got as far as writing. The publisher's path reads the existing value *before* writing, so it only writes points that changed, and that read is where both runs stopped:
+
+| Env | What happened | What it tells us |
+|---|---|---|
+| **UAT** | The pre-write read fell back to Athena and got `503` on every retry, until my 2.5-minute limit stopped it. | Inconclusive here. Athena was overloaded, likely by the dev publisher DAG's own runs if it's still unpaused, competing for the same 2-query limit on our shared account. But **last night's Airflow log already proved UAT**: it got past the read and was refused at the write (`403 … /kafka/topics/tsdb-uat-live-darwin`). |
+| **Prod** | `Could not load a dataframe… (generally permission issues)`, then the Athena fallback returned nothing → `DataNotAvailableException`. | **Our prod account (`3-s-SMP-Service-Application`) can't even read data from this Darwin series.** It sees the catalogue entry (our earlier probes), but not the data. A write would almost certainly be refused too. |
+
+So the picture holds, and it's broader than the write: **our service accounts lack data access on the Darwin series.**
+- **UAT:** writing is refused (proven). Reading works, slowly.
+- **Prod:** reading is refused (proven). Writing hasn't been tested, but is very likely refused too.
+
+**Is the dev DAG paused?** If not, please pause it. That's what's eating the UAT Athena slots, and it'll keep failing on the 403 anyway.
+
+Updated message for Mateo:
+
+```
+Hi Mateo, quick update on Darwin: our service accounts don't have data access on the Darwin series yet.
+- UAT (2-s-scrapertool-service-application-ECFZKGWYADYUXMG): reads work, but writes are refused: POST /api/v1/kafka/topics/tsdb-uat-live-darwin → 403.
+- Prod (3-s-SMP-Service-Application-F0MFVNSO5E1PDUC): even reading data from a Darwin series fails (permission error), so writes will fail too.
+Could you (or the TSDB team) grant both accounts read + write on the "darwin" source? Catalogue access already works, it's only the data side.
+```
+
+If you want prod's write refusal proven directly, I can change the probe to skip the pre-read and write straight away. That's only worth it if Mateo or the TSDB team asks for proof. If prod *does* allow writes, it would put one real point into prod.
+
+On the UAT side, the Airflow error was the only test that reached the write. That it's a missing grant on the "darwin" source specifically, and not something else, is my reading of the topic name in the URL.
+
+## 00:55 user (smp-india)
+
+too technical. vague-ify pls
+
+## 00:55 assistant (smp-india)
+
+```
+Hi Mateo, quick update on Darwin: the collector is running fine, but our service accounts can't write the data into TSDB yet. In UAT it's refused on write, and in prod we can't even read the data. Could you (or the TSDB team) give our accounts read + write access on the Darwin timeseries in both UAT and prod? I can share the account names and error details if needed.
+```
+
+## 08:43 user (smp-india)
+
+rephrase the reuquest to "double check" as he should be familiar with this by now.
+
+## 08:43 assistant (smp-india)
+
+```
+Hi Mateo, quick update on Darwin: the collector is running fine, but our service accounts can't write the data into TSDB yet. In UAT it's refused on write, and in prod we can't even read the data. Could you double-check our accounts' read + write access on the Darwin timeseries in both UAT and prod? Happy to share the account names and errors if useful.
+```
+
+## 08:44 user (smp-india)
+
+surface the client ids pls
+
+## 08:44 assistant (smp-india)
+
+```
+Hi Mateo, quick update on Darwin: the collector is running fine, but our service accounts can't write the data into TSDB yet. In UAT it's refused on write, and in prod we can't even read the data. Could you double-check read + write access on the Darwin timeseries for these accounts?
+- UAT: 2-s-scrapertool-service-application-ECFZKGWYADYUXMG
+- Prod: 3-s-SMP-Service-Application-F0MFVNSO5E1PDUC
+Happy to share the errors if useful.
+```
+
+## 08:50 user (smp-india)
+
+okay so apparently it's the same case for the hpx timeseries, so this is for the whole smp india team as hpx was creatd by Lou, darwin by Mateo..
+
+## 08:50 assistant (smp-india)
+
+```
+Hi team, our service accounts can't write into TSDB for the new HPX and Darwin timeseries yet. In UAT the write is refused, and in prod we can't even read the data. Could Lou (HPX) and Mateo (Darwin) double-check read + write access on those timeseries for these accounts?
+- UAT: 2-s-scrapertool-service-application-ECFZKGWYADYUXMG
+- Prod: 3-s-SMP-Service-Application-F0MFVNSO5E1PDUC
+Happy to share the errors if useful.
+```
+
+I've only seen the errors for Darwin. That HPX fails the same way, in both UAT and prod, is from what you said, so adjust the wording if HPX only fails in one of them.
+
+## 14:44 user (smp-india)
+
+tsdb access should be resolved now but when I tried running the dag... failed again!
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_realtime_tsdb_dag/run_id=scheduled__2026-10-16T06:30:00+00:00/task_id=publish_pending_batches/attempt=1.log
+::endgroup::
+[2026-10-16T06:34:18.550801Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a1436b-27c7-7ec7-8f75-4915acbdafa0 dag_id=india_darwin_realtime_tsdb_dag task_id=publish_pending_batches run_id=scheduled__2026-10-16T06:30:00+00:00 try_number=1 map_index=-1
+[2026-10-16T06:34:18.570035Z] DEBUG - Loading plugins
+[2026-10-16T06:34:18.573012Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-16T06:34:18.826697Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-16T06:34:18.853877Z] DEBUG - Loading plugins from entrypoints
+[2026-10-16T06:34:18.854011Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-16T06:34:18.855439Z] DEBUG - Loading 2 plugin(s) took 282.50 ms
+[2026-10-16T06:34:18.855603Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f005aef5af0>}
+[2026-10-16T06:34:18.855653Z] DEBUG - Hook impls: []
+[2026-10-16T06:34:18.855713Z] DEBUG - Result from 'on_starting': []
+[2026-10-16T06:34:18.856498Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-16T06:34:18.856923Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-16T06:34:18.857331Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-16T06:34:18.867525Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-16T06:34:18.867775Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-16T06:34:18.868873Z] DEBUG - Found DAG india_darwin_realtime_tsdb_dag
+[2026-10-16T06:34:18.869014Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-16T06:34:18.869747Z] DEBUG - Loaded DAG <DAG: india_darwin_realtime_tsdb_dag>
+[2026-10-16T06:34:18.869964Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_realtime_tsdb_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=13 
+[2026-10-16T06:34:18.870109Z] DEBUG - Dag file parsed file=india/india_darwin_realtime_tsdb_dag.py 
+[2026-10-16T06:34:18.870247Z] DEBUG - Integrate Macros plugins
+[2026-10-16T06:34:18.896849Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1436b-27c7-7ec7-8f75-4915acbdafa0'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T06:30:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-fc1d6b97494556583e3a18dcea9010bd-beb40d7f9c3aef55-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 6, 34, 18, 568426, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-16T06:34:18.896952Z] DEBUG - Hook impls: []
+[2026-10-16T06:34:18.897022Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-16T06:34:18.897241Z] INFO - ::endgroup::
+[2026-10-16T06:34:32.652893Z] INFO - ::group::Ingest 100 of 5774 pending Darwin files
+[2026-10-16T06:34:32.660479Z] INFO - 53a06785-b446-4c9d-96e6-2fbf4d72b744.json · SOF_INKHA · HorizontalIrradiance · 15:46 UTC · 1 obs
+[2026-10-16T06:34:32.665252Z] INFO - 72182506-77c3-49a9-a5a3-e864ecfa11cb.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:47 UTC · 3 obs
+[2026-10-16T06:34:32.669121Z] INFO - e5e8f4fb-5b34-4b9e-b088-bafa75585cc7.json · SOF_INRAG · ActivePower · 15:47 UTC · 1 obs
+[2026-10-16T06:34:32.672752Z] INFO - 172ec356-f5c5-4ec4-b5d1-7740bae791f2.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:47 UTC · 3 obs
+[2026-10-16T06:34:32.679415Z] INFO - 91ee5eb7-1504-4165-b660-632f30927634.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:47 UTC · 2 obs
+[2026-10-16T06:34:32.683426Z] INFO - ce86ec14-f95a-434e-a25f-e66db757e83e.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 15:47 UTC · 2 obs
+[2026-10-16T06:34:32.687350Z] INFO - 5c3dfe77-6ba5-4ea0-9d22-14ca9b3fb47f.json · SOF_INGU2 · TiltedIrradiance · 15:47 UTC · 1 obs
+[2026-10-16T06:34:32.691560Z] INFO - 4fd5d7de-62e8-445f-88fc-19613f2f8a74.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:48 UTC · 3 obs
+[2026-10-16T06:34:32.695361Z] INFO - 8c2f4a7d-7ceb-4ef9-b9db-a6828d14d5dc.json · SOF_INRAG · ActivePower · 15:48 UTC · 1 obs
+[2026-10-16T06:34:32.699231Z] INFO - 8c980717-4ca2-440f-9468-cc3afb319bde.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:48 UTC · 3 obs
+[2026-10-16T06:34:32.703093Z] INFO - 65c4ffc5-fb5d-4f19-bf2c-4a1ee8778bb8.json · SOF_INKHA · TiltedIrradiance · 15:48 UTC · 1 obs
+[2026-10-16T06:34:32.707277Z] INFO - 748ebace-ae1e-4b6a-9dbe-3b86a06059a8.json · SOF_INGU2 · TiltedIrradiance · 15:48 UTC · 1 obs
+[2026-10-16T06:34:32.711065Z] INFO - 29a82be6-5a7a-4160-9252-9235d2827a0c.json · SOF_INKHA · ActivePower · 15:48 UTC · 1 obs
+[2026-10-16T06:34:32.714553Z] INFO - 43c6413b-65ea-4a62-9d96-f4920edc9a91.json · SOF_INGU2 · ActivePower · 15:47 UTC · 1 obs
+[2026-10-16T06:34:32.718532Z] INFO - 8a14f543-0f88-464d-88e5-a432e815be45.json · SOF_INGU2 · ActivePower · 15:48 UTC · 1 obs
+[2026-10-16T06:34:32.721908Z] INFO - 7b1c91ce-5fee-40af-a775-8f3afd82c26f.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:49 UTC · 3 obs
+[2026-10-16T06:34:32.736375Z] INFO - 2fc5c1b1-2df2-44bf-a467-ee95717ea8e1.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:49 UTC · 2 obs
+[2026-10-16T06:34:32.745290Z] INFO - da549cc4-f094-45ed-abd2-3d2db9b8c1bd.json · SOF_INRAG · ActivePower · 15:49 UTC · 1 obs
+[2026-10-16T06:34:32.749160Z] INFO - a27bd3a9-49d5-41d9-9f4f-21231a55ccaf.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:49 UTC · 3 obs
+[2026-10-16T06:34:32.752564Z] INFO - 51773430-d3a1-4a86-b670-b9b61ca0011e.json · SOF_INGU2 · TiltedIrradiance · 15:49 UTC · 1 obs
+[2026-10-16T06:34:32.756283Z] INFO - 5c607257-fef1-4a2d-a873-2c2060ee20e2.json · SOF_INKHA · HorizontalIrradiance · 15:49 UTC · 1 obs
+[2026-10-16T06:34:32.760508Z] INFO - 97f57a7c-9a98-4d73-bfcd-e3117303abba.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:50 UTC · 3 obs
+[2026-10-16T06:34:32.764823Z] INFO - 836e2509-7b5e-4e11-aef7-f4c088b1efa2.json · SOF_INRAG · ActivePower · 15:50 UTC · 1 obs
+[2026-10-16T06:34:32.768736Z] INFO - 27a8cac2-4a8a-4394-8c9c-729c46ef87ce.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:50 UTC · 3 obs
+[2026-10-16T06:34:32.772542Z] INFO - a1728775-7c01-4273-9a88-b045ddca2342.json · SOF_INKHA · TiltedIrradiance · 15:50 UTC · 1 obs
+[2026-10-16T06:34:32.776663Z] INFO - 87da399a-3f71-4c7e-8e66-795e73b19602.json · SOF_INGU2 · ActivePower, TiltedIrradiance · 15:50 UTC · 2 obs
+[2026-10-16T06:34:32.781724Z] INFO - 06fa1994-bc36-49eb-814c-e0e1d6622166.json · SOF_INGU2 · HorizontalIrradiance · 15:50 UTC · 1 obs
+[2026-10-16T06:34:32.786221Z] INFO - 04f5b6d1-445a-4c89-b88f-b584905a2106.json · SOF_INKHA · ActivePower · 15:50 UTC · 1 obs
+[2026-10-16T06:34:32.790412Z] INFO - 1f058c44-5e27-47eb-b4ce-476243aff026.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:51 UTC · 3 obs
+[2026-10-16T06:34:32.797000Z] INFO - 1f3ebed4-0f13-4616-ae64-69175bb59368.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:51 UTC · 3 obs
+[2026-10-16T06:34:32.802055Z] INFO - 8bed451d-1dad-411b-b2a3-3f193658e7c5.json · SOF_INRAG · ActivePower · 15:51 UTC · 1 obs
+[2026-10-16T06:34:32.807025Z] INFO - d0f65e26-2f69-4c7a-a3c6-e1cfb074896c.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:51 UTC · 2 obs
+[2026-10-16T06:34:32.811780Z] INFO - b7bc5045-e68b-4234-b641-a7cd3987ae72.json · SOF_INKHA · HorizontalIrradiance · 15:51 UTC · 1 obs
+[2026-10-16T06:34:32.815405Z] INFO - 1f0ac743-c5f0-47cd-98cd-7c1d5d8e18e5.json · SOF_INGU2 · TiltedIrradiance · 15:51 UTC · 1 obs
+[2026-10-16T06:34:32.818901Z] INFO - 70f51dd4-9171-47e0-833c-5215e9f1738e.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:52 UTC · 3 obs
+[2026-10-16T06:34:32.822289Z] INFO - 05063a5b-e10d-4249-b27a-e19a471ecae1.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:52 UTC · 3 obs
+[2026-10-16T06:34:32.841346Z] INFO - 095f50e8-f8f2-402a-a197-0929e379a6f8.json · SOF_INRAG · ActivePower · 15:52 UTC · 1 obs
+[2026-10-16T06:34:32.848940Z] INFO - 753114de-856b-41fe-acc7-7dc1d7b24e67.json · SOF_INKHA · TiltedIrradiance · 15:52 UTC · 1 obs
+[2026-10-16T06:34:32.855489Z] INFO - dccc75c0-3126-4c24-865c-12766edc4861.json · SOF_INGU2 · ActivePower, TiltedIrradiance · 15:51–15:52 UTC · 2 obs
+[2026-10-16T06:34:32.870212Z] INFO - 6fcd1922-2718-47d6-86ee-d7b5fdccab69.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 15:52 UTC · 2 obs
+[2026-10-16T06:34:32.875297Z] INFO - 3081f366-0ee0-46c6-b0cb-ec55da7680d2.json · SOF_INKHA · ActivePower · 15:52 UTC · 1 obs
+[2026-10-16T06:34:32.882386Z] INFO - 3017e129-abb5-4281-aa41-8de0c6294e71.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:53 UTC · 3 obs
+[2026-10-16T06:34:32.892193Z] INFO - e6de78e1-06cd-40a0-a617-1685e7cdb8e0.json · SOF_INKHA · TiltedIrradiance · 15:53 UTC · 1 obs
+[2026-10-16T06:34:32.900988Z] INFO - 2d0d7a3b-57aa-4151-a70f-231a9ec7bee8.json · SOF_INRAG · ActivePower · 15:53 UTC · 1 obs
+[2026-10-16T06:34:32.905319Z] INFO - 89ba4458-8f23-429f-ac7c-8e3e72d4bcbf.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:53 UTC · 3 obs
+[2026-10-16T06:34:32.909423Z] INFO - a7b2e5c3-c7cf-4a7c-9407-d9d4cb5d8983.json · SOF_INGU2 · ActivePower · 15:52 UTC · 1 obs
+[2026-10-16T06:34:32.912562Z] INFO - 610b4302-e6e2-4fe0-b3ae-1df441ce44e5.json · SOF_INKHA · ActivePower · 15:53 UTC · 1 obs
+[2026-10-16T06:34:32.915928Z] INFO - a5b3f769-b794-4266-bab5-2f31bda42772.json · SOF_INGU2 · TiltedIrradiance · 15:53 UTC · 1 obs
+[2026-10-16T06:34:32.919794Z] INFO - c6ab9955-1c69-4fd0-869b-859c7a68d362.json · SOF_INGU2 · ActivePower · 15:53 UTC · 1 obs
+[2026-10-16T06:34:32.923186Z] INFO - a65193f4-53f7-4a16-b5bd-960ebef76513.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:54 UTC · 3 obs
+[2026-10-16T06:34:32.947308Z] INFO - 8db06f5c-e64d-48ca-9712-555d869a79eb.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:54 UTC · 2 obs
+[2026-10-16T06:34:32.950990Z] INFO - 8c01c5f7-c75f-4971-a749-aa279dfed2d4.json · SOF_INRAG · ActivePower · 15:54 UTC · 1 obs
+[2026-10-16T06:34:32.954485Z] INFO - 96829898-6924-46ea-9686-9d8f387fe228.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:54 UTC · 3 obs
+[2026-10-16T06:34:32.959183Z] INFO - 74e4f956-6892-463a-9c67-004ad140960a.json · SOF_INGU2 · TiltedIrradiance · 15:54 UTC · 1 obs
+[2026-10-16T06:34:32.963011Z] INFO - 2481414e-88cc-4026-978d-0bb8fdb2e4e9.json · SOF_INKHA · HorizontalIrradiance · 15:54 UTC · 1 obs
+[2026-10-16T06:34:32.967032Z] INFO - 0a58a9eb-bc8f-4b17-bd5b-f35abcde894d.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:55 UTC · 3 obs
+[2026-10-16T06:34:32.972946Z] INFO - 350503ea-ae9a-4a6b-816b-bced5e6b18f0.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:55 UTC · 3 obs
+[2026-10-16T06:34:32.979559Z] INFO - 97112f3d-61d8-4811-b05e-0fe6ee83b770.json · SOF_INRAG · ActivePower · 15:55 UTC · 1 obs
+[2026-10-16T06:34:32.983428Z] INFO - 8587b7cc-297d-4023-9dab-50d994b00775.json · SOF_INKHA · TiltedIrradiance · 15:55 UTC · 1 obs
+[2026-10-16T06:34:32.987280Z] INFO - 217d5b5a-2936-482e-805a-17eae50476d0.json · SOF_INGU2 · ActivePower · 15:54 UTC · 1 obs
+[2026-10-16T06:34:32.991195Z] INFO - a4529a11-e09e-410d-9d15-d42ed07e5e62.json · SOF_INGU2 · ActivePower, HorizontalIrradiance, TiltedIrradiance · 15:55 UTC · 3 obs
+[2026-10-16T06:34:32.994887Z] INFO - aac71926-2c2f-4b7f-ab7a-c44de095ea5c.json · SOF_INKHA · ActivePower · 15:55 UTC · 1 obs
+[2026-10-16T06:34:32.999833Z] INFO - 2cca35bc-8c56-471d-8e1c-e680a28d8597.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:56 UTC · 3 obs
+[2026-10-16T06:34:33.003875Z] INFO - 348371b0-a336-4838-b1ed-cb6410f684bf.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:56 UTC · 3 obs
+[2026-10-16T06:34:33.007678Z] INFO - b301b994-369d-4a29-a7dd-1a158acc0157.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:56 UTC · 2 obs
+[2026-10-16T06:34:33.011184Z] INFO - 9092a67c-1c52-43df-80f6-34e3b830cb5d.json · SOF_INRAG · ActivePower · 15:56 UTC · 1 obs
+[2026-10-16T06:34:33.014792Z] INFO - b7203f1b-2c04-4857-98de-416c243c4f3a.json · SOF_INKHA · HorizontalIrradiance · 15:56 UTC · 1 obs
+[2026-10-16T06:34:33.018293Z] INFO - 6ea9ede9-5122-4d49-a10c-7ef97b565032.json · SOF_INGU2 · TiltedIrradiance · 15:56 UTC · 1 obs
+[2026-10-16T06:34:33.022403Z] INFO - 6e3c67d8-f95d-4f7b-a6ac-a4574056f2da.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:57 UTC · 3 obs
+[2026-10-16T06:34:33.032921Z] INFO - 3f6542b5-d3de-4864-9404-134a65ddce9d.json · WIF_INSE4 · ActivePower · 15:57 UTC · 1 obs
+[2026-10-16T06:34:33.039838Z] INFO - 51131e7c-74da-4c8c-9ac0-4be8b0474b74.json · SOF_INRAG · ActivePower · 15:57 UTC · 1 obs
+[2026-10-16T06:34:33.043509Z] INFO - 2ceddfda-220f-433d-a64b-750ffadd8e50.json · WIF_INSE4 · WindDirection, WindSpeed · 15:57 UTC · 2 obs
+[2026-10-16T06:34:33.046737Z] INFO - 34ee4252-ca63-4f40-9237-5da5b463b16b.json · SOF_INKHA · TiltedIrradiance · 15:57 UTC · 1 obs
+[2026-10-16T06:34:33.049904Z] INFO - feca03fa-b7fd-41e0-a255-12293545196f.json · SOF_INGU2 · ActivePower, TiltedIrradiance · 15:56–15:57 UTC · 2 obs
+[2026-10-16T06:34:33.052996Z] INFO - fee44742-fe7d-4d0f-a47a-68294494d132.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 15:57 UTC · 2 obs
+[2026-10-16T06:34:33.056655Z] INFO - cc1abd02-57d3-4d5b-8e6c-be97d4ff863f.json · SOF_INKHA · ActivePower · 15:57 UTC · 1 obs
+[2026-10-16T06:34:33.060985Z] INFO - 0f2c0a54-1ff9-45f3-8eb8-ac374d17f478.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:58 UTC · 3 obs
+[2026-10-16T06:34:33.064962Z] INFO - df49daa4-dc50-4147-ad4e-abd6fb4189a6.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:58 UTC · 3 obs
+[2026-10-16T06:34:33.076413Z] INFO - b82fac96-9593-4f30-a8a3-52425d58d3f5.json · SOF_INKHA · TiltedIrradiance · 15:58 UTC · 1 obs
+[2026-10-16T06:34:33.080678Z] INFO - b7979471-2643-4987-98c3-0f4948f14003.json · SOF_INGU2 · ActivePower · 15:57 UTC · 1 obs
+[2026-10-16T06:34:33.084382Z] INFO - 79f274ca-2230-474f-a87a-7467944a4239.json · SOF_INRAG · ActivePower · 15:58 UTC · 1 obs
+[2026-10-16T06:34:33.089484Z] INFO - 6fcd056f-e094-49d2-ab0a-e333dc6081da.json · SOF_INGU2 · ActivePower · 15:58 UTC · 1 obs
+[2026-10-16T06:34:33.093343Z] INFO - ddc2c7ad-8268-429d-9cce-11859176fa85.json · SOF_INKHA · ActivePower · 15:58 UTC · 1 obs
+[2026-10-16T06:34:33.097310Z] INFO - 40e016f1-4ab6-453e-ad1c-99da0de8f555.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 15:59 UTC · 3 obs
+[2026-10-16T06:34:33.101452Z] INFO - ff905d0c-c2f5-4627-a44d-25bfa47ff7d3.json · SOF_INKHA · ActivePower, TiltedIrradiance · 15:59 UTC · 2 obs
+[2026-10-16T06:34:33.105324Z] INFO - 7dff098b-194e-48d3-95e4-37dcfca0129a.json · SOF_INGU2 · TiltedIrradiance · 15:58 UTC · 1 obs
+[2026-10-16T06:34:33.109680Z] INFO - 071da7d1-2623-4b45-b2af-f6ebadd8071c.json · SOF_INRAG · ActivePower · 15:59 UTC · 1 obs
+[2026-10-16T06:34:33.113147Z] INFO - 3e025000-8ff9-4fc7-9880-04e1eed986e1.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 15:59 UTC · 3 obs
+[2026-10-16T06:34:33.116594Z] INFO - 82eb46bd-36a6-4866-a777-7a4cb5dd5b1f.json · SOF_INGU2 · TiltedIrradiance · 15:59 UTC · 1 obs
+[2026-10-16T06:34:33.120273Z] INFO - 0e800891-3644-4e78-9b2a-74a4bd78bc52.json · SOF_INKHA · HorizontalIrradiance · 15:59 UTC · 1 obs
+[2026-10-16T06:34:33.123924Z] INFO - 5e4cc5ca-23b0-4702-a15a-64766956aa20.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:00 UTC · 3 obs
+[2026-10-16T06:34:33.129090Z] INFO - 23ac50cb-b99c-43fc-8842-272ddad41742.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:00 UTC · 3 obs
+[2026-10-16T06:34:33.134162Z] INFO - 564a57b1-055a-4b7f-b57e-83e04405cb77.json · SOF_INRAG · ActivePower · 16:00 UTC · 1 obs
+[2026-10-16T06:34:33.138616Z] INFO - 7afc8a70-c2ee-4a39-987e-faad27ed8a51.json · SOF_INKHA · TiltedIrradiance · 16:00 UTC · 1 obs
+[2026-10-16T06:34:33.144361Z] INFO - 9b0ccaf9-6e2a-4cff-815b-c993da6dfad0.json · SOF_INGU2 · ActivePower · 15:59 UTC · 1 obs
+[2026-10-16T06:34:33.148091Z] INFO - d2bcf6eb-46f4-446a-95ff-1a6ec9156f3e.json · SOF_INGU2 · ActivePower, HorizontalIrradiance, TiltedIrradiance · 16:00 UTC · 3 obs
+[2026-10-16T06:34:33.151393Z] INFO - f990c9db-a2d7-4f95-808d-14901ca3043f.json · SOF_INKHA · ActivePower · 16:00 UTC · 1 obs
+[2026-10-16T06:34:33.154668Z] INFO - a973f78f-8c2f-42cd-a1a0-38e23f900f21.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:01 UTC · 3 obs
+[2026-10-16T06:34:33.158511Z] INFO - 0b967d63-67c5-4bfb-ae57-bf0ce7d60cdd.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:01 UTC · 3 obs
+[2026-10-16T06:34:33.162904Z] INFO - a4da1a24-25f7-493d-83d9-2472e6ed6af2.json · SOF_INGU2 · ActivePower · 16:01 UTC · 1 obs
+[2026-10-16T06:34:39.934336Z] INFO - ::endgroup::
+[2026-10-16T06:34:47.511892Z] INFO - DARWIN_BACKLOG={"snapshot_files": 100, "backlog_files": 5774, "oldest_pending_file_age_seconds": 53280.675526857376, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "retained_files": 2543, "incomplete_windows": 113, "oldest_incomplete_window": "2026-10-15T09:30:00+00:00"}
+[2026-10-16T06:35:19.704256Z] INFO - ::group::Publish 1783 points to TSDB
+[2026-10-16T06:35:24.821813Z] INFO - DARWIN_BACKLOG={"snapshot_files": 1783, "backlog_files": 1783, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "oldest_snapshot_source_timestamp": "2026-10-15T09:47:48.928000+00:00", "oldest_pending_file_age_seconds": 37.30267810821533}
+[2026-10-16T06:35:24.881738Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-16T06:35:24.882225Z] ERROR - 2026-10-16 06:35:24,882 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-16T06:35:25.027070Z] ERROR - 2026-10-16 06:35:25,026 - INFO - Authenticate as Okta Technical/Service account with client_id=2-s-scrapertool-service-application-ECFZKGWYADYUXMG and secret_id=64 characters
+[2026-10-16T06:35:26.924683Z] ERROR - 2026-10-16 06:35:26,924 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:35:32.907222Z] ERROR - 2026-10-16 06:35:32,906 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 1/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:35:47.000295Z] ERROR - 2026-10-16 06:35:47,000 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:35:48.690019Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:35:48.706395Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:35:48.706460Z] ERROR -     result = fn()
+[2026-10-16T06:35:48.706490Z] ERROR -              ^^^^
+[2026-10-16T06:35:48.706518Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:35:48.706543Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:35:48.706568Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:35:48.706613Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:35:48.706641Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:35:48.706670Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['cef545f9-f893-525f-b1e6-e4a6aeb41c10'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:53.056000+00:00', 'end_application_date': '2026-10-15T16:01:02.370000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:35:48.706699Z] ERROR - 2026-10-16 06:35:48,690 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-16T06:35:51.117688Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:35:51.117854Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:35:51.118858Z] ERROR -     result = fn()
+[2026-10-16T06:35:51.118955Z] ERROR -              ^^^^
+[2026-10-16T06:35:51.119438Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:35:51.119493Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:35:51.119550Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:35:51.119592Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:35:51.119635Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:35:51.119680Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['cef545f9-f893-525f-b1e6-e4a6aeb41c10'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:53.056000+00:00', 'end_application_date': '2026-10-15T16:01:02.370000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:35:51.119724Z] ERROR - 2026-10-16 06:35:51,117 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-16T06:35:58.943577Z] ERROR - 2026-10-16 06:35:58,943 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 3/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:35:58.980974Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-16T06:35:58.981442Z] ERROR - 2026-10-16 06:35:58,981 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-16T06:37:02.722990Z] ERROR - 2026-10-16 06:37:02,722 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:37:04.454805Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:04.475406Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:04.475501Z] ERROR -     result = fn()
+[2026-10-16T06:37:04.475552Z] ERROR -              ^^^^
+[2026-10-16T06:37:04.475596Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:04.475640Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:04.475680Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:04.475721Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:04.475773Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:04.475816Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['3f418839-ff07-5553-9c2e-8d47c65911d5'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:59.024000+00:00', 'end_application_date': '2026-10-15T16:01:06.599000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:04.475859Z] ERROR - 2026-10-16 06:37:04,455 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-16T06:37:06.872968Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:06.873225Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:06.873284Z] ERROR -     result = fn()
+[2026-10-16T06:37:06.873315Z] ERROR -              ^^^^
+[2026-10-16T06:37:06.873346Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:06.873376Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:06.873405Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:06.873435Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:06.873463Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:06.873492Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['3f418839-ff07-5553-9c2e-8d47c65911d5'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:59.024000+00:00', 'end_application_date': '2026-10-15T16:01:06.599000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:06.873524Z] ERROR - 2026-10-16 06:37:06,873 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-16T06:37:16.774793Z] ERROR - 2026-10-16 06:37:16,774 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 3/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:37:17.253738Z] ERROR - 2026-10-16 06:37:17,253 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:37:18.959119Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:18.959391Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:18.959469Z] ERROR -     result = fn()
+[2026-10-16T06:37:18.959526Z] ERROR -              ^^^^
+[2026-10-16T06:37:18.959578Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:18.959626Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:18.959671Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:18.959715Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:18.959758Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:18.959804Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['79b5306e-2cc6-520c-b87e-98735322b017'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:54.390000+00:00', 'end_application_date': '2026-10-15T16:00:36.692000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:18.959852Z] ERROR - 2026-10-16 06:37:18,959 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-16T06:37:21.372544Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:21.373038Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:21.373376Z] ERROR -     result = fn()
+[2026-10-16T06:37:21.373442Z] ERROR -              ^^^^
+[2026-10-16T06:37:21.373492Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:21.375876Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:21.375979Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:21.376032Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:21.376078Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:21.376123Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['79b5306e-2cc6-520c-b87e-98735322b017'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:54.390000+00:00', 'end_application_date': '2026-10-15T16:00:36.692000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:21.376168Z] ERROR - 2026-10-16 06:37:21,372 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-16T06:37:30.431291Z] ERROR - 2026-10-16 06:37:30,430 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 3/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:37:30.676439Z] ERROR - 2026-10-16 06:37:30,676 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:37:32.376753Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:32.376897Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:32.376938Z] ERROR -     result = fn()
+[2026-10-16T06:37:32.376965Z] ERROR -              ^^^^
+[2026-10-16T06:37:32.376990Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:32.377015Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:32.377041Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:32.377066Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:32.377090Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:32.377117Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['cef545f9-f893-525f-b1e6-e4a6aeb41c10'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:53.056000+00:00', 'end_application_date': '2026-10-15T16:01:02.370000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:32.377163Z] ERROR - 2026-10-16 06:37:32,372 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-16T06:37:34.847126Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:34.847371Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:34.847436Z] ERROR -     result = fn()
+[2026-10-16T06:37:34.847474Z] ERROR -              ^^^^
+[2026-10-16T06:37:34.847502Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:34.847528Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:34.847554Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:34.847579Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:34.847603Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:34.847630Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['cef545f9-f893-525f-b1e6-e4a6aeb41c10'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:53.056000+00:00', 'end_application_date': '2026-10-15T16:01:02.370000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:34.847659Z] ERROR - 2026-10-16 06:37:34,847 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-16T06:37:43.777307Z] ERROR - 2026-10-16 06:37:43,777 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 3/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:37:44.029603Z] ERROR - 2026-10-16 06:37:44,029 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 0/15
+[2026-10-16T06:37:45.738734Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:45.754724Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:45.754809Z] ERROR -     result = fn()
+[2026-10-16T06:37:45.754843Z] ERROR -              ^^^^
+[2026-10-16T06:37:45.754871Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:45.754898Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:45.754923Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:45.754947Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:45.754981Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:45.755023Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['df993aff-fd2f-550d-b3fe-b05d9d6b990b'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:48.928000+00:00', 'end_application_date': '2026-10-15T16:01:01.451000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:45.755052Z] ERROR - 2026-10-16 06:37:45,738 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 1/15
+[2026-10-16T06:37:48.183673Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:48.183926Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:48.183970Z] ERROR -     result = fn()
+[2026-10-16T06:37:48.183999Z] ERROR -              ^^^^
+[2026-10-16T06:37:48.184025Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:48.184055Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:48.184083Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:48.184108Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:48.184141Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:48.184168Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['df993aff-fd2f-550d-b3fe-b05d9d6b990b'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:48.928000+00:00', 'end_application_date': '2026-10-15T16:01:01.451000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:48.184193Z] ERROR - 2026-10-16 06:37:48,183 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 2/15
+[2026-10-16T06:37:51.786709Z] ERROR - Traceback (most recent call last):
+[2026-10-16T06:37:51.803561Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/utils/retry.py", line 45, in retry_call
+[2026-10-16T06:37:51.803655Z] ERROR -     result = fn()
+[2026-10-16T06:37:51.803701Z] ERROR -              ^^^^
+[2026-10-16T06:37:51.803740Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 515, in _do_query
+[2026-10-16T06:37:51.803785Z] ERROR -     return self._query(method=method, endpoint=endpoint, params=params, body=body, data=data,
+[2026-10-16T06:37:51.803833Z] ERROR -            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-10-16T06:37:51.803879Z] ERROR -   File "/home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py", line 757, in _query
+[2026-10-16T06:37:51.803926Z] ERROR -     raise CatalogHttpStatusException(response)
+[2026-10-16T06:37:51.803972Z] ERROR - engie_tsdb.catalog.exceptions.CatalogHttpStatusException: Error: Too many athena queries 2 are running for the current user concurrently. Retry later - [0.53.0] Request "POST" @ https://tsdb-uat.gems.myengie.com/api/v1/timeseries/data/last-version params=None body={'series_ids': ['df993aff-fd2f-550d-b3fe-b05d9d6b990b'], 'columns': ['application_date', 'forecast_date', 'value', 'publication_date', 'series_id', 'insertion_date', 'silver_insertion_date'], 'start_application_date': '2026-10-15T09:47:48.928000+00:00', 'end_application_date': '2026-10-15T16:01:01.451000+00:00', 'format': 'json_v1', 'sources': ['dynamodb', 'athena'], 'total_timeout_ms': 600000, 'query_timeout_ms': 600000, 'fail_on_error': False, 'max_rows': 5001}, status code 503. Response body was {"error": "Too many athena queries 2 are running for the current user concurrently. Retry later"}
+[2026-10-16T06:37:51.804021Z] ERROR - 2026-10-16 06:37:51,786 - WARNING - Failure while querying /api/v1/timeseries/data/last-version [post]. Attempt 3/15
+[2026-10-16T06:38:02.493036Z] ERROR - 2026-10-16 06:38:02,491 - WARNING - ! We succeeded querying /api/v1/timeseries/data/last-version [post] at attempt 4/15. Do not worry about the previous failure, it has successfully been recovered. If it happens frequently (> 1/day), feel free to notify TSDB team.
+[2026-10-16T06:38:18.897584Z] ERROR - Process timed out pid=142378 
+[2026-10-16T06:38:18.897882Z] ERROR - Task failed with exceptionAirflowTaskTimeout: Timeout, PID: 142378
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py, line 31 in publish_pending_batches
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 251 in run_from_environment
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/aggregation.py, line 418 in publish_aggregated
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 195 in publish_pending
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 343 in publish_batch
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 201 in _verify_payload_readback
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/timeout.py, line 39 in handle_timeout
+
+[2026-10-16T06:38:18.898303Z] INFO - ::group::Post Execute
+[2026-10-16T06:38:18.934277Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a1436b-27c7-7ec7-8f75-4915acbdafa0'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T06:30:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-fc1d6b97494556583e3a18dcea9010bd-beb40d7f9c3aef55-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 6, 34, 18, 568426, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 6, 38, 18, 900612, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-16T06:38:18.934572Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1436b-27c7-7ec7-8f75-4915acbdafa0'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T06:30:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-fc1d6b97494556583e3a18dcea9010bd-beb40d7f9c3aef55-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 6, 34, 18, 568426, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 6, 38, 18, 900612, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': AirflowTaskTimeout('Timeout, PID: 142378')}
+[2026-10-16T06:38:18.934645Z] DEBUG - Hook impls: []
+[2026-10-16T06:38:18.934709Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-16T06:38:18.934768Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f005a4abb90>}
+[2026-10-16T06:38:18.934806Z] DEBUG - Hook impls: []
+[2026-10-16T06:38:18.934847Z] DEBUG - Result from 'before_stopping': []
+[2026-10-16T06:38:18.934893Z] INFO - ::endgroup::
+</pasted_content id="f33a">
+
+## 14:44 assistant (smp-india)
+
+Progress first: **the permission fix worked.** This run got past the write. The timeout hit in `_verify_payload_readback`, the step *after* writing, so points did land in UAT. No 403 this time.
+
+The new problem is the one I suspected the first night: **the run can't finish verifying within its 4-minute limit.** I'll look at exactly how verification works before proposing a fix:
+
+## 14:45 assistant (smp-india)
+
+The writes now go through. What breaks is the **amount of reading per run.**
+
+**Why it times out:** one run publishes the whole backlog at once: 1,783 points across about 15 series, spanning yesterday 09:47–16:01. For each series, the run reads TSDB **three times**:
+1. A conflict pre-check in our publisher.
+2. A "what actually changed" check in the shared `publish_batch`.
+3. A read-back to verify the write. If the data isn't visible yet, this waits 10 seconds and retries, up to 6 times.
+
+Yesterday's data comes from Athena, which allows **only 2 queries at a time on our shared account**, so most reads are refused and retried after several seconds. About 45 slow reads doesn't fit in 4 minutes. The timeout hit during verification.
+
+**Is anything wrong?** No:
+- No data is lost. Files are only deleted after verification succeeds.
+- Writes are repeat-safe, and the next run's "what changed" check skips points that already landed. So it will creep forward, but slowly, with a failure and a Teams alert on most runs, while hogging the shared Athena slots.
+
+**Proposed fix:** bound each run's work, so every run finishes and acknowledges something.
+- **Publish at most N series per run, oldest first,** with N as an Airflow Variable (`DARWIN_PUBLISH_MAX_SERIES`, default about 5). The rest wait in the outbox for the next run, as they already do today.
+  - **Backlog:** it drains over a few runs instead of failing forever.
+  - **Steady state:** each series gets its turn within a few runs, carrying several minutes of points, so throughput keeps up and the delay stays around 15 minutes. Oldest-first means no series gets starved.
+- **Raise the task timeout from 4 to 10 minutes.** `max_active_runs=1` already stops runs from overlapping, so a long run just delays the next one.
+- **Leave the triple read alone for now.** Removing the overlap means touching the shared `publish_batch` that other DAGs use, so it's a separate change.
+
+Your new review rule applies here: this changes how data gets verified, and it rests on Athena and DynamoDB timing I haven't measured. So before writing code, I'd run one read-only Codex review on this plan, then implement test-first.
+
+Meanwhile, **pause the DAG** to stop the alerts and the load on the shared Athena account. The collector keeps collecting.
+
+Should I go ahead: Codex review of the plan, then the fix test-first, then commit and push?
+
+I haven't measured how fast reads of *recent* data are. If they come from DynamoDB, steady-state runs may be much faster than this backlog run, and N could be higher.
+
+## 14:47 user (smp-india)
+
+wait but this would mean a single publish run will take more than 5 minutes? So publishing every 5 minutes is not feasible?
+
+## 14:47 assistant (smp-india)
+
+Not necessarily. The 4-minute problem comes from the **backlog**, not from the 5-minute schedule itself. These are two different situations:
+
+| | Backlog run (what failed) | Normal run (every 5 minutes) |
+|---|---|---|
+| Points | 1,783 | About 5 minutes' worth: roughly 1 to 5 per series |
+| Time range read | Yesterday 09:47–16:01 | The last few minutes |
+| Where TSDB answers from | **Athena:** slow, 2 queries at a time, retries | Probably **DynamoDB:** fast, no Athena limit (unconfirmed) |
+
+Rough math for a normal run: about 18 series (once Khaba is in) × 3 reads each.
+- If recent reads are fast, about 1 second each, a run takes **about 1 minute**, and every 5 minutes is easy.
+- If even recent reads go through Athena at about 10 seconds each, it's **about 9 minutes**, and every 5 minutes isn't feasible.
+
+So everything depends on how fast *recent* reads are, which I don't know yet. Rather than guess, here's a one-time measurement. It's read-only and takes about a minute on VPN: it times the publisher's own read function for a few series, over the last 10 minutes and over yesterday's backlog window.
+
+```bash
+cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && .venv/bin/python - <<'PY'
+import logging, os, signal, time
+import pandas as pd
+signal.alarm(120)  # hard stop at 2 minutes
+for n in ("requests_auth", "urllib3", "engie_tsdb", "smp_common"): logging.getLogger(n).setLevel(logging.CRITICAL)
+from smp_common.tsdb import TsdbClientConfig
+from smp_common.tsdb.transport import configure_sdk, sdk_read_latest
+configure_sdk(TsdbClientConfig(endpoint="uat", client_name="darwin_read_timing",
+    intact_client_id=os.environ["SMP_SERVICE_APP_OKTA_UAT_CLIENT_ID"], intact_client_secret=[REDACTED]"SMP_SERVICE_APP_OKTA_UAT_CLIENT_SECRET"]))
+now = pd.Timestamp.now(tz="UTC")
+windows = {"recent 10 min": (now - pd.Timedelta(minutes=10), now),
+           "yesterday backlog": (pd.Timestamp("2026-10-15T09:45Z"), pd.Timestamp("2026-10-15T16:05Z"))}
+series = {"INSE4 power 1M": "cef545f9-f893-525f-b1e6-e4a6aeb41c10", "INSE3 power 1M": "3f418839-ff07-5553-9c2e-8d47c65911d5",
+          "Khavda power 1M": "79b5306e-2cc6-520c-b87e-98735322b017"}
+for label, (start, end) in windows.items():
+    for name, sid in series.items():
+        t = time.monotonic()
+        try: rows = len(sdk_read_latest(sid, start, end, 5001)); note = f"{rows} rows"
+        except Exception as e: note = f"FAILED {type(e).__name__}"
+        print(f"{label:<18} {name:<16} {time.monotonic() - t:6.1f}s  {note}", flush=True)
+PY
+```
+
+How to read the result:
+- **Recent reads around 1–2 seconds:** 5-minute publishing is fine. The fix is just the backlog guard (a series cap plus a longer timeout as a safety net).
+- **Recent reads around 10 seconds or more:** 5 minutes isn't realistic with three reads per series. Then we either remove the duplicate reads (one change in the shared publishing code), or publish every 15 minutes, which still meets the 15-minute averages, with minute points arriving in 15-minute batches.
+
+I'm assuming `sdk_read_latest` takes `(series, start, end, max_rows)` the same way the publisher calls it. If it errors on the signature, paste the output and I'll fix it. Also, the "recent" window may hold no rows yet, since nothing has published today. It still measures how fast the read path answers.
+
+## 14:48 user (smp-india)
+
+I can confirm that it's still athena, all our reads are in athena so, dynamo is out of the question. 
+
+Maybe readback is the crux here? What if we just remove the readback and just write write write?
+
+## 14:48 assistant (smp-india)
+
+Yes, the read-back is most of the cost. But dropping it outright would remove the one thing that makes deleting source files safe. There's a middle ground that keeps the guarantee and needs **no Athena reads at all.**
+
+**What each read does today:**
+
+| Read | Purpose | Can it go? |
+|---|---|---|
+| 1. Conflict pre-check (our publisher) | Refuses to overwrite a *different* value someone else wrote to the same timestamp | Yes. We're the only writer for these series. |
+| 2. "What changed" pre-check (`publish_batch`) | Skips points already in TSDB | Yes. Rewriting the same value is harmless: TSDB keeps the latest version, which is identical. |
+| 3. Read-back after writing | Proves the points landed **before we delete the source files** | Not outright, but it can be replaced. |
+
+**Why not just write, write, write?** A plain write is accepted by TSDB's intake queue (that's the Kafka call in the logs). "Accepted into the queue" isn't the same as "stored". If storage fails afterwards and we've already deleted the files, those minutes are gone for good, because Darwin doesn't replay history.
+
+**The replacement:** the TSDB SDK can **wait for TSDB to confirm the data is stored.** Our shared write code already supports it: give it a timeout, and it asks for storage confirmation instead of firing and forgetting. TSDB answers about its own storage, so no Athena query is involved.
+- **Confirmed:** delete the files, which is safe.
+- **Not confirmed in time:** keep the files and retry next run. Our publisher already does this for the "submitted-unconfirmed" status.
+
+So each run becomes about 18 writes, each waiting for "stored", and **zero Athena reads**. That should fit comfortably in 5 minutes, with the backlog included.
+
+What I haven't verified yet:
+- How long storage confirmation takes in UAT.
+- Whether it works for these series.
+
+That's exactly the "rests on unverified behavior" case from your review rule. So the plan:
+1. Run one read-only Codex review of this design.
+2. Do a one-point UAT test: write with confirmation and time it. That's a VPN script, a genuine point, the same as before.
+3. Implement it test-first in our publisher only (reads 1 and 2 off, confirmation on, read-back off). The shared `publish_batch` doesn't change, since it already has these switches.
+
+Should I start with steps 1 and 2?
+
+I'm basing "confirmation doesn't touch Athena" on the SDK asking for `storage_confirmation=["s3", "dynamodb"]`. That's TSDB confirming its own writes, and I'm assuming it doesn't use our read quota. The UAT test will show whether that's true.
+
+## 14:50 user (smp-india)
+
+well if we're unsure, I'd rather us probe on it first. We can try to write in a timeseries and see what we can find
+
+## 14:50 assistant (smp-india)
+
+Agreed, probe first. This one writes **a single genuine point to UAT** through our shared write code (`_write_payload`, the exact function the publisher uses), **with storage confirmation on**, and times it. Then it does **one** timed read to check that "confirmed" really means readable. That's the only Athena query in the whole test.
+
+The point: Tuticorin INSE4 power at 14:57:11.720 UTC yesterday, 34,207.2 kW = 34.2072 MW, a real reading from the dev collector, the one in your `sampling.json`.
+
+Paste this on VPN. It's UAT only and stops after 3 minutes at most:
+
+```bash
+cd /Users/qn5792/repos/smp && source .envrc && cd smp-india && .venv/bin/python - <<'PY'
+import logging, os, signal, time
+import pandas as pd
+signal.alarm(180)  # hard stop at 3 minutes
+for n in ("requests_auth", "urllib3"): logging.getLogger(n).setLevel(logging.WARNING)
+from smp_common.tsdb import TsdbClientConfig
+from smp_common.tsdb.contracts import TsdbPublicationBatch
+from smp_common.tsdb.publication import _write_payload
+from smp_common.tsdb.transport import configure_sdk, sdk_read_latest, sdk_write
+
+sid, ts, value = "cef545f9-f893-525f-b1e6-e4a6aeb41c10", pd.Timestamp("2026-10-15T14:57:11.720Z"), 34.2072
+configure_sdk(TsdbClientConfig(endpoint="uat", client_name="darwin_confirm_probe",
+    intact_client_id=os.environ["SMP_SERVICE_APP_OKTA_UAT_CLIENT_ID"], intact_client_secret=[REDACTED]"SMP_SERVICE_APP_OKTA_UAT_CLIENT_SECRET"]))
+payload = TsdbPublicationBatch(pd.DataFrame([(sid, ts, value)], columns=["series_id", "application_date", "value"]), "actual").payload
+
+print("\n=== 1. write WITH storage confirmation (no reads) ===", flush=True)
+t = time.monotonic()
+try:
+    result = _write_payload(payload, timeout=120, writer=sdk_write)
+    print(f"took {time.monotonic() - t:.1f}s -> status={result[0]['status']} sdk_result={result[0].get('sdk_result') or result[0].get('detail')}", flush=True)
+except Exception as e:
+    print(f"took {time.monotonic() - t:.1f}s -> FAILED {type(e).__name__}: {str(e)[:300]}", flush=True)
+
+print("\n=== 2. one read-back to confirm 'confirmed' means readable (Athena) ===", flush=True)
+t = time.monotonic()
+try:
+    frame = sdk_read_latest(sid, ts - pd.Timedelta(seconds=1), ts + pd.Timedelta(seconds=1), 10)
+    print(f"took {time.monotonic() - t:.1f}s -> rows={len(frame)} values={frame['value'].tolist() if len(frame) else []}", flush=True)
+except Exception as e:
+    print(f"took {time.monotonic() - t:.1f}s -> FAILED {type(e).__name__}: {str(e)[:300]}", flush=True)
+PY
+```
+
+How to read it:
+- **Step 1, `status=confirmed` in a few seconds:** the approach works. Confirmation needs no Athena reads, and each series costs one quick write.
+- **Step 1, `status=submitted-unconfirmed`, or close to the 120-second limit:** confirmation is too slow or unavailable for these series, and we'd need a different plan.
+- **Step 2, `rows=1` with `34.2072`:** "confirmed" really means stored. If step 1 confirmed but step 2 finds nothing, confirmation isn't trustworthy as proof.
+
+If the paused DAG's last run already wrote this point, the write is just a harmless re-write of the same value. I can read the output from your terminal when it's done.
+
+## 14:53 user (smp-india)
+
+there, ran it
+
+## 14:53 assistant (smp-india)
+
+The probe settles it, and the result is good:
+
+| Step | Time | Result |
+|---|---|---|
+| 1. Write with storage confirmation, no reads | **8.6 s** (including login) | `status=confirmed` |
+| 2. One read-back (Athena) | 7.8 s | `rows=1`, value `34.2072`, an exact match |
+
+So **TSDB's "stored" confirmation is trustworthy**: what it confirmed was really there and readable. And it costs no Athena reads.
+
+**What that means for a 5-minute schedule:**
+- **Today, about 45 reads per run:** at roughly 8 seconds each, plus Athena retries, that's well over 5 minutes, which is why it fails.
+- **Write with confirmation only:** one confirmed write per series. About 18 series × about 8 seconds ≈ **2.5 minutes** per run, with the backlog included, since a series costs the same whether it carries 3 points or 300. That fits the 4-minute limit, with headroom.
+
+**The change, all in our publisher (`publisher.py`):**
+1. **Drop our conflict pre-read.** We're the only writer for these series.
+2. **Drop the "what changed" pre-read.** The shared `publish_batch` has no switch for it, but it lets us pass in the reader. A reader that returns "nothing there yet" makes it write everything, and rewriting identical values is harmless. That uses the shared code's own extension point, so `smp-common` doesn't change.
+3. **Write with storage confirmation** (a timeout of about 30 seconds per series) **instead of the read-back.**
+   - Confirmed → files get deleted, which is safe.
+   - Not confirmed in time → files are kept and retried next run, using the existing "submitted-unconfirmed" path.
+
+Under your review rule, this changes how deleting files is justified, so one read-only Codex review of the plan comes first, then the change test-first. Should I go ahead, and commit and push once it's green?
+
+I measured one series once. 8.6 seconds includes the first login, so later writes may be faster, but a slow day in UAT could push a run toward the limit. If it ever runs out of time, nothing is lost: unconfirmed means retained.
+
+## 14:54 user (smp-india)
+
+yes go ahead, commit and push pls. same scope:  scr-1273
+
+## 14:54 assistant (smp-india)
+
+Before the Codex review I'll read the publisher's publish step in full, so the plan matches the real code:
+
+## 14:57 assistant (smp-india)
+
+The Codex review finished, but its final answer didn't print, so I'm fetching it:
+
+## 14:57 assistant (smp-india)
+
+Codex is still working. While it finishes, I'll write the failing tests, which don't depend on its verdict. First, how the existing publisher tests drive `publish_pending`:
+
+## 14:58 assistant (smp-india)
+
+Red, as expected. Two more tests, checking that the live entry point actually turns the mode on. First, how `run_from_environment` is tested today:
+
+## 14:58 assistant (smp-india)
+
+Six red, all the new expectations. Checking whether Codex has finished before I implement:
+
+## 15:02 assistant (smp-india)
+
+Codex is still going, so I'll implement now and fold in its findings when it reports.
+
+## 15:03 assistant (smp-india)
+
+All 70 tests in the two files pass. Running the full suite and lint while Codex finishes:
+
+## 15:08 assistant (smp-india)
+
+The failure isn't from this change: **the same failure happens without my edits** (baseline exit 1). Something already on `dev` broke the integration script. Line 79:
+
+## 15:09 assistant (smp-india)
+
+Updating that doc paragraph, then committing and pushing:
+
+## 15:10 assistant (smp-india)
+
+The publisher no longer reads from TSDB on live runs, and the change is committed and pushed to `smp-india` `dev` (`42ee7f3..28bf1c6`). Git-sync puts it on dev Airflow within seconds, so you can unpause the DAG whenever you're ready.
+
+**What happened while you were waiting:** Codex hung partway through the design review. It stopped making progress after 06:57 and never sent a final report, so I cancelled it. Before stalling, it confirmed the main safety point: an unconfirmed write, or any write error, keeps the files, so nothing gets deleted. The one question it didn't finish, whether skipping the pre-write check affects the quarter-hour averages, I checked myself: it doesn't. The 15-minute average is fixed before it's sent, and we're the only writer to these series. Its partial output is all I relied on from it.
+
+**The change:**
+- **Live runs:** no reads before the write and no read-back after it. Each series is written once, and the run waits up to 30 seconds for TSDB to confirm the data is stored.
+  - Files are deleted only if every series confirms.
+  - Anything unconfirmed, or any error, keeps all its files for the next run.
+  - At about 8 seconds per series, a run with roughly 18 series should take about 2.5 minutes, backlog included.
+- **Tests and the fake-TSDB mock:** unchanged; they still do the exact read-back.
+- **Docs:** the Darwin contract README now explains why live runs use storage confirmation.
+
+**Tests:** written failing first. All 1,200 pass and ruff is clean. The new tests prove that a live run never reads, that it deletes files only after confirmation, that an unconfirmed write keeps every file, and that the live entry point really switches the new mode on.
+
+**One unrelated breakage turned up:** the manual Airflow check for the aggregation path (`scripts/test_darwin_poc_airflow.py --aggregation`) fails on `dev` with or without my change. It broke with this morning's SCR-1268 commit `42ee7f3`, which changed where the mappings come from. CI doesn't run that mode, so CI stays green. I've added a one-click task chip to fix it separately.
+
+**When you unpause:** the first runs work through the backlog. Each log should end with `acknowledged_files` above zero and no `AirflowTaskTimeout`. The 2.5-minute estimate is based on one series measured once, so watch the first run's duration. If UAT is slow and a run times out, nothing is lost, but every run would need to fit inside the 4-minute limit to keep making progress.
+
+## 15:13 user (smp-india)
+
+okay, why the need for arbitrarily waiting for 30 seconds?
+
+## 15:13 assistant (smp-india)
+
+It's not a fixed wait. **30 seconds is a ceiling, not a pause.** Each series write returns the moment TSDB confirms it's stored. In the probe that took 8.6 seconds, so a normal run never waits anywhere near 30.
+
+**Why have a limit at all:**
+- **Storage confirmation is asynchronous.** The write goes into TSDB's intake queue, and TSDB reports "stored" a few seconds later. The SDK needs to know how long to wait for that report.
+- **With no limit (`0`), the SDK doesn't ask for confirmation at all.** It's fire-and-forget, the unsafe mode we decided against.
+- **Without a ceiling, a single stuck series could hang the whole run** until Airflow's 4-minute kill, at which point nothing gets acknowledged.
+
+**Why 30 specifically:** it's a judgement call, not a measured number. It's about 3.5× the one write we timed, so normal variation passes, but a stuck series gives up after 30 seconds and the run moves on. The files for any unconfirmed series are kept and retried next run, so nothing is lost.
+
+It does have an edge: if *every* series hit the 30-second ceiling, 18 × 30 seconds is about 9 minutes, past the 4-minute task limit. On a really slow UAT day, the run would time out and simply retry later. If the first real runs show confirmations reliably around 8–10 seconds, I'd lower it to about 15 seconds, which keeps even a bad run inside 4 minutes. I'd measure before tuning, though, since right now we have exactly one data point.
+
+## 15:28 user (smp-india)
+
+it failed yet again...
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_realtime_tsdb_dag/run_id=scheduled__2026-10-16T07:20:00+00:00/task_id=publish_pending_batches/attempt=1.log
+::endgroup::
+[2026-10-16T07:24:55.192192Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a14399-7daf-7abc-8efa-c85107f73fed dag_id=india_darwin_realtime_tsdb_dag task_id=publish_pending_batches run_id=scheduled__2026-10-16T07:20:00+00:00 try_number=1 map_index=-1
+[2026-10-16T07:24:55.209044Z] DEBUG - Loading plugins
+[2026-10-16T07:24:55.211041Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-16T07:24:55.503199Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-16T07:24:55.527186Z] DEBUG - Loading plugins from entrypoints
+[2026-10-16T07:24:55.527356Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-16T07:24:55.529062Z] DEBUG - Loading 2 plugin(s) took 318.14 ms
+[2026-10-16T07:24:55.529259Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed85d0da0>}
+[2026-10-16T07:24:55.529336Z] DEBUG - Hook impls: []
+[2026-10-16T07:24:55.529416Z] DEBUG - Result from 'on_starting': []
+[2026-10-16T07:24:55.530292Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-16T07:24:55.530816Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-16T07:24:55.531477Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py
+[2026-10-16T07:24:55.543105Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-16T07:24:55.543398Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-16T07:24:55.544524Z] DEBUG - Found DAG india_darwin_realtime_tsdb_dag
+[2026-10-16T07:24:55.544697Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-16T07:24:55.545428Z] DEBUG - Loaded DAG <DAG: india_darwin_realtime_tsdb_dag>
+[2026-10-16T07:24:55.545730Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_realtime_tsdb_dag.py  bundle_prepare_ms=1  dag_file_parse_ms=14 
+[2026-10-16T07:24:55.545942Z] DEBUG - Dag file parsed file=india/india_darwin_realtime_tsdb_dag.py 
+[2026-10-16T07:24:55.546164Z] DEBUG - Integrate Macros plugins
+[2026-10-16T07:24:55.572884Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a14399-7daf-7abc-8efa-c85107f73fed'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T07:20:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-b64ab5526b7887aed98919be2e3cdb77-cfec012cb01391ff-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 7, 24, 55, 206124, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-16T07:24:55.572977Z] DEBUG - Hook impls: []
+[2026-10-16T07:24:55.573052Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-16T07:24:55.573263Z] INFO - ::endgroup::
+[2026-10-16T07:25:10.182788Z] INFO - ::group::Ingest 100 of 5673 pending Darwin files
+[2026-10-16T07:25:10.187231Z] INFO - 8d9c59f8-ac2b-42d5-b773-242736fabf75.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:48 UTC · 3 obs
+[2026-10-16T07:25:10.191269Z] INFO - 2b2d3ebf-246e-4ddf-8aef-d336eaa37803.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:48 UTC · 3 obs
+[2026-10-16T07:25:10.195904Z] INFO - 6e9c2374-3f9b-45ea-934e-7ea2e9faec39.json · SOF_INKHA · TiltedIrradiance · 16:48 UTC · 1 obs
+[2026-10-16T07:25:10.200765Z] INFO - 98faa444-5596-4427-b7bc-1da950e5b696.json · SOF_INRAG · ActivePower · 16:48 UTC · 1 obs
+[2026-10-16T07:25:10.205662Z] INFO - 58f57dcb-e459-4e87-9500-15d15c51f9cf.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:49 UTC · 3 obs
+[2026-10-16T07:25:10.216240Z] INFO - 1d992863-3e94-4290-bf0a-c583bd70982a.json · SOF_INKHA · ActivePower · 16:48 UTC · 1 obs
+[2026-10-16T07:25:10.221504Z] INFO - 2acfcf11-9c5e-4fd1-85c9-95db666869a9.json · SOF_INGU2 · ActivePower · 16:48 UTC · 1 obs
+[2026-10-16T07:25:10.226061Z] INFO - a0034d75-303f-45f8-930f-415bc9fe37ef.json · SOF_INRAG · ActivePower · 16:49 UTC · 1 obs
+[2026-10-16T07:25:10.230056Z] INFO - 1a9f0fb8-d3dc-4e36-a177-5dadc6b20e89.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:49 UTC · 3 obs
+[2026-10-16T07:25:10.234685Z] INFO - 0e3c95e8-2fdd-4c7b-a373-1f29760c12ab.json · SOF_INKHA · ActivePower, TiltedIrradiance · 16:49 UTC · 2 obs
+[2026-10-16T07:25:10.241907Z] INFO - 86758e9e-c0ee-46db-b889-47e89e2e618b.json · SOF_INGU2 · ActivePower · 16:49 UTC · 1 obs
+[2026-10-16T07:25:10.248926Z] INFO - e818fcbc-e0bb-4b51-8e49-1ccab6e9bf8d.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:50 UTC · 3 obs
+[2026-10-16T07:25:10.254435Z] INFO - 982f6b5a-f921-4a08-8a2f-e5560cd5df66.json · SOF_INKHA · HorizontalIrradiance · 16:49 UTC · 1 obs
+[2026-10-16T07:25:10.259687Z] INFO - 6c4266fe-a9c4-42ed-aeba-ba474a5b517c.json · SOF_INRAG · ActivePower · 16:50 UTC · 1 obs
+[2026-10-16T07:25:10.263982Z] INFO - 72a380e0-78ed-4c93-80f5-d7ca6dead847.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:50 UTC · 3 obs
+[2026-10-16T07:25:10.268255Z] INFO - d719d745-5266-40a7-b0dc-a0cfc1c9a7e9.json · SOF_INKHA · ActivePower · 16:50 UTC · 1 obs
+[2026-10-16T07:25:10.272816Z] INFO - 8332ff81-2ddf-4aa6-919b-34bf62baee78.json · SOF_INGU2 · ActivePower · 16:50 UTC · 1 obs
+[2026-10-16T07:25:10.277658Z] INFO - 85a7eea0-61e1-4124-b6e3-416ff1b927e8.json · SOF_INGU2 · HorizontalIrradiance, TiltedIrradiance · 16:50 UTC · 2 obs
+[2026-10-16T07:25:10.282895Z] INFO - ea373475-0fc9-4930-b45c-3c3ede91f608.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:51 UTC · 3 obs
+[2026-10-16T07:25:10.301248Z] INFO - df4a3a35-b16a-4103-a922-7c0e7ce9e62d.json · SOF_INKHA · TiltedIrradiance · 16:50 UTC · 1 obs
+[2026-10-16T07:25:10.308746Z] INFO - df7428e4-48e2-4256-8935-04c68e6b423c.json · SOF_INRAG · ActivePower · 16:51 UTC · 1 obs
+[2026-10-16T07:25:10.314873Z] INFO - ec3bce57-5981-4e33-98ac-386b6366f9db.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:51 UTC · 3 obs
+[2026-10-16T07:25:10.320897Z] INFO - 506a3cf5-1689-465f-98b6-01f917e59048.json · SOF_INKHA · ActivePower, TiltedIrradiance · 16:51 UTC · 2 obs
+[2026-10-16T07:25:10.326796Z] INFO - 1872cd0f-3ed3-40da-857a-799933ff4d50.json · SOF_INGU2 · ActivePower · 16:51 UTC · 1 obs
+[2026-10-16T07:25:10.331119Z] INFO - 9f6934e7-422e-4f75-b2b0-14aa0640df1e.json · SOF_INKHA · HorizontalIrradiance · 16:51 UTC · 1 obs
+[2026-10-16T07:25:10.335180Z] INFO - e89b523f-2931-4775-b829-aaf98ad8edba.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:52 UTC · 3 obs
+[2026-10-16T07:25:10.339336Z] INFO - 96b43b30-e7aa-40e4-b1be-eac5806a42d8.json · SOF_INRAG · ActivePower · 16:52 UTC · 1 obs
+[2026-10-16T07:25:10.343723Z] INFO - 564b1bae-f215-48d0-8e72-adf9174c0947.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:52 UTC · 3 obs
+[2026-10-16T07:25:10.347933Z] INFO - 1e9a47c5-3de0-4d42-9498-f059c83e3c6a.json · SOF_INKHA · TiltedIrradiance · 16:52 UTC · 1 obs
+[2026-10-16T07:25:10.352382Z] INFO - e202e6dc-8c17-4884-a6ad-6ea809b6fe33.json · SOF_INRAG · HorizontalIrradiance, TiltedIrradiance · 16:52 UTC · 2 obs
+[2026-10-16T07:25:10.356518Z] INFO - ac37f036-5ba6-4c18-bcce-2deaa1dd3245.json · SOF_INKHA · ActivePower · 16:52 UTC · 1 obs
+[2026-10-16T07:25:10.361078Z] INFO - 341636eb-2968-4ae1-80be-68e2f382df2c.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:53 UTC · 3 obs
+[2026-10-16T07:25:10.365525Z] INFO - 6ca0c036-1515-4412-a6d4-6e5c4959d038.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:53 UTC · 3 obs
+[2026-10-16T07:25:10.370297Z] INFO - c9742075-44e9-4c83-83c0-14065d70e5c4.json · SOF_INKHA · TiltedIrradiance · 16:53 UTC · 1 obs
+[2026-10-16T07:25:10.374860Z] INFO - c17b971c-da5e-47dd-96cc-5c28808ecb47.json · SOF_INRAG · ActivePower · 16:53 UTC · 1 obs
+[2026-10-16T07:25:10.380429Z] INFO - 9406553d-a61c-4c9c-8613-baa4d78f8315.json · SOF_INGU2 · ActivePower · 16:53 UTC · 1 obs
+[2026-10-16T07:25:10.384266Z] INFO - 0c667f4d-55e9-472b-87cb-0a021e593aa1.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:54 UTC · 3 obs
+[2026-10-16T07:25:10.389499Z] INFO - 992618a9-c7d1-415a-a9d7-56b6fe44de53.json · SOF_INKHA · ActivePower · 16:53 UTC · 1 obs
+[2026-10-16T07:25:10.394362Z] INFO - 1d5c590b-e442-4d3f-b2be-9cec5109edef.json · SOF_INRAG · ActivePower · 16:54 UTC · 1 obs
+[2026-10-16T07:25:10.398784Z] INFO - d07335fe-b500-4168-98a1-e5fdeb700a4a.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:54 UTC · 3 obs
+[2026-10-16T07:25:10.404622Z] INFO - e5759cfe-a7fe-45c2-84bb-3bdbbc80aeb5.json · SOF_INKHA · ActivePower, TiltedIrradiance · 16:54 UTC · 2 obs
+[2026-10-16T07:25:10.410104Z] INFO - 192f2d4a-7aed-4ba0-acff-cf20d371630f.json · SOF_INGU2 · ActivePower · 16:54 UTC · 1 obs
+[2026-10-16T07:25:10.415413Z] INFO - 394a9dca-80a1-4d87-b9da-1410daabc9df.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:55 UTC · 3 obs
+[2026-10-16T07:25:10.420285Z] INFO - 008c58bb-b96f-4b0c-aa09-85268612cd7d.json · SOF_INKHA · HorizontalIrradiance · 16:54 UTC · 1 obs
+[2026-10-16T07:25:10.424776Z] INFO - 127e924a-28e7-46f0-beb5-a85ecf7f42bb.json · SOF_INRAG · ActivePower · 16:55 UTC · 1 obs
+[2026-10-16T07:25:10.430009Z] INFO - a21a8255-edab-456a-acb3-ea3a749fdce4.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:55 UTC · 3 obs
+[2026-10-16T07:25:10.434377Z] INFO - 9c6bcfaf-91bd-4c92-a8c0-6dbc2ac7ccca.json · SOF_INKHA · ActivePower, TiltedIrradiance · 16:55 UTC · 2 obs
+[2026-10-16T07:25:10.439641Z] INFO - 8d8c849d-8433-4e01-91dc-866cb9f19317.json · SOF_INGU2 · ActivePower · 16:55 UTC · 1 obs
+[2026-10-16T07:25:10.444142Z] INFO - 67649201-f00f-40dd-8bae-c1fe25f3ec47.json · SOF_INGU2 · HorizontalIrradiance, TiltedIrradiance · 16:55 UTC · 2 obs
+[2026-10-16T07:25:10.448264Z] INFO - cb79f1fc-c050-4170-b63f-22d227f875c2.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:56 UTC · 3 obs
+[2026-10-16T07:25:10.453214Z] INFO - d16bebc5-a65b-4d56-b80b-193a7899d9e5.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:56 UTC · 3 obs
+[2026-10-16T07:25:10.458526Z] INFO - c0995697-f801-4514-8715-aeaee8298721.json · SOF_INKHA · TiltedIrradiance · 16:56 UTC · 1 obs
+[2026-10-16T07:25:10.462886Z] INFO - aa2c304b-258a-4387-af25-8f4bd988f739.json · SOF_INRAG · ActivePower · 16:56 UTC · 1 obs
+[2026-10-16T07:25:10.467880Z] INFO - b604f390-4741-48f5-aa93-42e3a4d3f728.json · SOF_INKHA · ActivePower · 16:56 UTC · 1 obs
+[2026-10-16T07:25:10.472463Z] INFO - ec27e879-079d-440d-a3cc-98d092355a60.json · SOF_INGU2 · ActivePower · 16:56 UTC · 1 obs
+[2026-10-16T07:25:10.476559Z] INFO - c9fbcef9-84a5-4825-b098-347bc1462916.json · SOF_INKHA · HorizontalIrradiance · 16:56 UTC · 1 obs
+[2026-10-16T07:25:10.481433Z] INFO - db1f8d38-c6a0-4bf6-92c5-26eccfa23502.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:57 UTC · 3 obs
+[2026-10-16T07:25:10.486801Z] INFO - 199e1907-a645-4de8-be25-59ca9c2f08ef.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:57 UTC · 3 obs
+[2026-10-16T07:25:10.493202Z] INFO - e2064f3f-679c-49b5-8796-40de4e4a065a.json · SOF_INRAG · ActivePower, HorizontalIrradiance, TiltedIrradiance · 16:57 UTC · 3 obs
+[2026-10-16T07:25:10.504576Z] INFO - e5245e41-5b2b-4b9d-891a-236feea1801b.json · SOF_INKHA · TiltedIrradiance · 16:57 UTC · 1 obs
+[2026-10-16T07:25:10.509626Z] INFO - edeea1ec-19ee-417a-a7fd-40b9bf303714.json · SOF_INKHA · ActivePower · 16:57 UTC · 1 obs
+[2026-10-16T07:25:10.514055Z] INFO - 1c989635-131d-4291-ae3e-c1bccb6d4f66.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:58 UTC · 3 obs
+[2026-10-16T07:25:10.518148Z] INFO - 9dc25a1a-b491-4953-9841-05eb911c386c.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:58 UTC · 3 obs
+[2026-10-16T07:25:10.522621Z] INFO - 63ced5a0-2036-4597-86b0-57351427aca1.json · SOF_INKHA · TiltedIrradiance · 16:58 UTC · 1 obs
+[2026-10-16T07:25:10.526850Z] INFO - 72ddd628-1e2a-4725-947d-e812bc897bb9.json · SOF_INGU2 · ActivePower · 16:58 UTC · 1 obs
+[2026-10-16T07:25:10.530692Z] INFO - 99620e32-5f4c-40c5-966b-85e5e091d08a.json · SOF_INRAG · ActivePower · 16:58 UTC · 1 obs
+[2026-10-16T07:25:10.534533Z] INFO - 4ef7fd05-4f27-495d-92f7-b832c78e65f6.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 16:59 UTC · 3 obs
+[2026-10-16T07:25:10.538552Z] INFO - 3add8486-ceb9-4f25-8925-6f403f5dc3e5.json · SOF_INKHA · ActivePower · 16:58 UTC · 1 obs
+[2026-10-16T07:25:10.542449Z] INFO - 83b40b6e-3914-46a4-9c94-9aec8514a865.json · SOF_INRAG · ActivePower · 16:59 UTC · 1 obs
+[2026-10-16T07:25:10.547259Z] INFO - d7df5e23-5bb1-4423-b19b-17b4c5840f35.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 16:59 UTC · 3 obs
+[2026-10-16T07:25:10.551271Z] INFO - b1434256-fd27-44c4-bdbb-d69932307191.json · SOF_INKHA · ActivePower, TiltedIrradiance · 16:59 UTC · 2 obs
+[2026-10-16T07:25:10.555050Z] INFO - 0bc6ccd0-0598-42c1-bd25-2853d0d6b7b1.json · SOF_INGU2 · ActivePower · 16:59 UTC · 1 obs
+[2026-10-16T07:25:10.559270Z] INFO - 0ff340a3-9347-4e12-8729-b6cd23dd7d2e.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:00 UTC · 3 obs
+[2026-10-16T07:25:10.564324Z] INFO - 88e1589e-5c29-470f-9bbe-102171216dc9.json · SOF_INKHA · HorizontalIrradiance · 16:59 UTC · 1 obs
+[2026-10-16T07:25:10.569851Z] INFO - d1d6eb00-ffb0-4174-b402-fcabe52c91ff.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 17:00 UTC · 3 obs
+[2026-10-16T07:25:10.574239Z] INFO - 60e8e174-d324-4c7f-b952-03e9fc60f3da.json · SOF_INKHA · ActivePower, TiltedIrradiance · 17:00 UTC · 2 obs
+[2026-10-16T07:25:10.579071Z] INFO - d5a3757e-c432-4cf5-9fd4-925f6a81a231.json · SOF_INGU2 · ActivePower · 17:00 UTC · 1 obs
+[2026-10-16T07:25:10.582823Z] INFO - 875d1caf-5a14-41c3-a4e9-0b27007a4402.json · SOF_INRAG · ActivePower · 17:00 UTC · 1 obs
+[2026-10-16T07:25:10.587447Z] INFO - 8a8105d4-6fab-493d-98b8-67c5404aada4.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:01 UTC · 3 obs
+[2026-10-16T07:25:10.593908Z] INFO - a813fd2f-ace7-4ab5-8f48-7b6f99ce0df8.json · WIF_INSE4 · WindSpeed · 17:01 UTC · 1 obs
+[2026-10-16T07:25:10.598620Z] INFO - f9cf5fe4-b193-4994-8ebb-735aafdd8e07.json · SOF_INRAG · ActivePower · 17:01 UTC · 1 obs
+[2026-10-16T07:25:10.602543Z] INFO - 4bdd037d-8526-43c9-b5b8-52211c5fc86f.json · WIF_INSE4 · ActivePower, WindDirection · 17:01 UTC · 2 obs
+[2026-10-16T07:25:10.606446Z] INFO - e7d1b6a7-e713-4ec1-af34-fe4287788b49.json · SOF_INKHA · ActivePower, TiltedIrradiance · 17:01 UTC · 2 obs
+[2026-10-16T07:25:10.611155Z] INFO - 98381a2e-b165-41ce-a88a-38f21a3f9b7c.json · SOF_INKHA · HorizontalIrradiance · 17:01 UTC · 1 obs
+[2026-10-16T07:25:10.615934Z] INFO - b54930e7-5493-4a10-a495-846e46ec0eb2.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:02 UTC · 3 obs
+[2026-10-16T07:25:10.620622Z] INFO - 06f9b022-a314-4b5f-895c-1ee5f493f95f.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 17:02 UTC · 3 obs
+[2026-10-16T07:25:10.625531Z] INFO - c70fb1c9-5759-4dec-8593-5fb908f17917.json · SOF_INKHA · TiltedIrradiance · 17:02 UTC · 1 obs
+[2026-10-16T07:25:10.630220Z] INFO - 9b0d6d90-252c-4f8c-a23d-6097e46b89c7.json · SOF_INRAG · ActivePower, HorizontalIrradiance, TiltedIrradiance · 17:02 UTC · 3 obs
+[2026-10-16T07:25:10.634406Z] INFO - d9a03188-442f-44ef-a2ff-4b985a70c76b.json · SOF_INKHA · ActivePower · 17:02 UTC · 1 obs
+[2026-10-16T07:25:10.640017Z] INFO - 1cb154c7-c9ce-4e3c-842c-89ac97e762f9.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:03 UTC · 3 obs
+[2026-10-16T07:25:10.645376Z] INFO - 2d575c40-5c2b-4f1d-81f9-89a586f4b48c.json · SOF_INRAG · ActivePower · 17:03 UTC · 1 obs
+[2026-10-16T07:25:10.652658Z] INFO - d40cc987-c493-4787-88ff-a7df0c2d3242.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 17:03 UTC · 3 obs
+[2026-10-16T07:25:10.658410Z] INFO - 363fe3c1-fd96-418d-ad9a-37f0460fbc9a.json · SOF_INKHA · TiltedIrradiance · 17:03 UTC · 1 obs
+[2026-10-16T07:25:10.663186Z] INFO - e48004f3-3c48-4054-ad45-33166d4191b2.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:04 UTC · 3 obs
+[2026-10-16T07:25:10.668524Z] INFO - d782163b-7bb2-454f-bced-d63b7644e5c0.json · SOF_INKHA · ActivePower · 17:03 UTC · 1 obs
+[2026-10-16T07:25:10.673941Z] INFO - 5542665a-43b4-4c7f-83a8-e4ddab919fca.json · SOF_INRAG · ActivePower · 17:04 UTC · 1 obs
+[2026-10-16T07:25:10.680371Z] INFO - 35bceab9-598f-40d7-ab54-b146751cd6cb.json · WIF_INSE4 · ActivePower, WindDirection, WindSpeed · 17:04 UTC · 3 obs
+[2026-10-16T07:25:10.687262Z] INFO - 49b1b3fa-fe48-441a-9133-5130a854dca6.json · SOF_INKHA · ActivePower, TiltedIrradiance · 17:04 UTC · 2 obs
+[2026-10-16T07:25:10.692200Z] INFO - d29ea125-f61c-481e-9c17-4d3ae884c7ea.json · WIF_INSE3 · ActivePower, WindDirection, WindSpeed · 17:05 UTC · 3 obs
+[2026-10-16T07:25:10.696979Z] INFO - 9ba087ea-6f37-47ad-ba35-0a8e89148e82.json · SOF_INKHA · HorizontalIrradiance · 17:04 UTC · 1 obs
+[2026-10-16T07:25:19.320724Z] INFO - ::endgroup::
+[2026-10-16T07:25:33.500593Z] INFO - DARWIN_BACKLOG={"snapshot_files": 100, "backlog_files": 5673, "oldest_pending_file_age_seconds": 52628.54478120804, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "retained_files": 2943, "incomplete_windows": 140, "oldest_incomplete_window": "2026-10-15T09:30:00+00:00"}
+[2026-10-16T07:26:12.437572Z] INFO - ::group::Publish 2086 points to TSDB
+[2026-10-16T07:26:19.816500Z] INFO - DARWIN_BACKLOG={"snapshot_files": 2086, "backlog_files": 2086, "acknowledged_files": 0, "quarantined_files": 0, "existing_quarantined_files": 0, "published_points": 0, "oldest_snapshot_source_timestamp": "2026-10-15T09:47:48.928000+00:00", "oldest_pending_file_age_seconds": 46.30834603309631}
+[2026-10-16T07:26:19.839233Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-16T07:26:19.839789Z] ERROR - 2026-10-16 07:26:19,839 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-16T07:26:19.870961Z] DEBUG - Specifying intact_client 2-s-scrapertool-service-application-ECFZKGWYADYUXMG and intact_secret
+[2026-10-16T07:26:19.871548Z] ERROR - 2026-10-16 07:26:19,871 - INFO - Running engie-tsdb:v0.53.0 against https://tsdb-uat.gems.myengie.com
+[2026-10-16T07:26:20.079457Z] ERROR - 2026-10-16 07:26:20,079 - INFO - Authenticate as Okta Technical/Service account with client_id=2-s-scrapertool-service-application-ECFZKGWYADYUXMG and secret_id=64 characters
+[2026-10-16T07:26:43.547703Z] ERROR - Task failed with exceptionConnectionError: Unexpected connection error
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_realtime_tsdb_dag.py, line 31 in publish_pending_batches
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 263 in run_from_environment
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/aggregation.py, line 419 in publish_aggregated
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/publisher.py, line 203 in publish_pending
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 337 in publish_batch
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/publication.py, line 143 in _write_payload
+    File /home/airflow/.local/lib/python3.12/site-packages/smp_common/tsdb/transport.py, line 161 in sdk_write
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/data_writer.py, line 519 in write_ts
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/data/data_writer.py, line 329 in send
+    File /home/airflow/.local/lib/python3.12/site-packages/engie_tsdb/catalog/request_handler.py, line 654 in _connect_socketio
+    File /home/airflow/.local/lib/python3.12/site-packages/socketio/simple_client.py, line 85 in connect
+    File /home/airflow/.local/lib/python3.12/site-packages/socketio/client.py, line 176 in connect
+
+[2026-10-16T07:26:43.548343Z] INFO - ::group::Post Execute
+[2026-10-16T07:26:43.591256Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a14399-7daf-7abc-8efa-c85107f73fed'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T07:20:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-b64ab5526b7887aed98919be2e3cdb77-cfec012cb01391ff-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 7, 24, 55, 206124, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 7, 26, 43, 551378, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-16T07:26:43.591719Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a14399-7daf-7abc-8efa-c85107f73fed'), task_id='publish_pending_batches', dag_id='india_darwin_realtime_tsdb_dag', run_id='scheduled__2026-10-16T07:20:00+00:00', try_number=1, dag_version_id=UUID('01a0c427-89ae-7ab0-b971-84e76e1ec81e'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-b64ab5526b7887aed98919be2e3cdb77-cfec012cb01391ff-00'}, queue='default', task=<Task(_PythonDecoratedOperator): publish_pending_batches>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2026, 10, 16, 7, 24, 55, 206124, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 7, 26, 43, 551378, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': ConnectionError('Unexpected connection error')}
+[2026-10-16T07:26:43.591839Z] DEBUG - Hook impls: []
+[2026-10-16T07:26:43.591914Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-16T07:26:43.592043Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed180a960>}
+[2026-10-16T07:26:43.592097Z] DEBUG - Hook impls: []
+[2026-10-16T07:26:43.592147Z] DEBUG - Result from 'before_stopping': []
+[2026-10-16T07:26:43.592196Z] INFO - ::endgroup::
+</pasted_content id="f33a">
+
+-- curious, are we doing bulk writes in tsdb?
+
+## 15:29 assistant (smp-india)
+
+Yes, the writes are bulk: one write call per series, carrying all of that series' points. `_write_payload` groups the 2,086 points by series, so this run would have made about 15 calls, not 2,086.
+
+The new failure is different, and it's specific to how confirmation works. The trace ends in `_connect_socketio` → `socketio … connect` → `ConnectionError`. To confirm storage, the SDK opens a **live socket connection** (socket.io, over websockets) to TSDB and waits for the "stored" event there. On my Mac over VPN that connected fine. From the cluster it can't connect, most likely because the corporate proxy the pods must use doesn't pass that kind of connection. Let me check what the SDK does there:
+
+## 15:30 assistant (smp-tool)
+
+Here's the cause, confirmed in the code. The cluster workers have `.myengie.com` in their `NO_PROXY`, so they talk to TSDB **directly**. Normal HTTP calls work that way: the writes and the old reads all went through. But the **live socket connection** used for "stored" confirmation can't connect from the cluster. Probably the network path in front of TSDB doesn't allow that kind of connection from EKS. It worked from my Mac because the VPN path is different. Nothing in our code can fix that, so **confirmation is off the table in the cluster**, at least without the TSDB team.
+
+So: pause the DAG again. Nothing was written this run, nothing is lost, and every run will fail the same way.
+
+That leaves three ways forward:
+
+1. **Write, then keep the files instead of deleting them.**
+   - After TSDB's intake accepts the write (the HTTP call that already works), **move** the files to a `published/` folder kept for a few days, instead of deleting them.
+   - No reads, no socket connection, about one write call per series, so runs fit easily in 5 minutes.
+   - If a gap ever turns up in TSDB, the raw files are still on EFS to republish by hand.
+   - The cost is honest: "accepted" isn't proof of "stored". We'd find out from monitoring or someone noticing, not from the publisher itself.
+2. **Write now, verify on the next run with one combined read.** TSDB's read API accepts a list of series, so the next run would check *all* of the previous run's writes in **a single Athena query**, then delete what it confirmed and rewrite what's missing.
+   - You keep real proof before deleting, at one Athena query per run.
+   - It's a more involved change to the publisher's bookkeeping: it has to track a "written, awaiting check" state.
+3. **Ask the TSDB team why the socket connection fails from EKS.** If they can open it up, today's change works as-is. But that's waiting on another team, and we'd still be guessing about their network setup.
+
+**Option 1 is the simplest and gets data flowing today.** It's still recoverable, because nothing is deleted for days. **Option 2 is the proper end state** if you want proof before anything is deleted. I'd do 1 now and keep 2 as a follow-up, unless you'd rather go straight to 2.
+
+The diagnosis rests on the SDK code plus the worker's proxy settings. I haven't actually tested a socket connection from inside a pod. If you want certainty before picking, Michael could try one from a worker pod with a one-line Python command.
+
+## 15:32 user (smp-tool)
+
+go with option 1, commit and push.
+
+I have a diff take. We keep this dag as the sole publishing step.. and then any readback or verification or whatever, we do it on another dag instead that runs more staggered frequency. The most impt thing is the every 5 minute, and we have to make sure the dag runs as fast as possible.
+
+## 15:32 assistant (smp-tool)
+
+Got it: the publisher just writes, as fast as possible, every 5 minutes, and verification moves to a separate, slower DAG later. That's a clean split. Implementing option 1 now. First, where the raw files actually get deleted, since that's what option 1 changes to "keep":
+
+## 15:32 assistant (smp-india)
+
+Red, as expected. Implementing:
+
+## 15:35 assistant (smp-india)
+
+Option 1 is in, and pushed to `smp-india` `dev` as three SCR-1273 commits (`bf59d61..fd038f5`). Git-sync puts it on dev Airflow within seconds, so you can unpause the DAG.
+
+**What the publisher does now:**
+- **Writes only.** No reads before writing, no read-back, no storage confirmation. Each run is one write per series, roughly 15–18 calls.
+- **An accepted write counts as done.** The outbox files for that run are cleared. A failed write keeps every file for the next run.
+- **Raw files are moved, not deleted.** They go to `publisher-state/published/<UTC day>/` and are kept for 7 days, so anything can be republished by hand if the later check finds a gap. Day folders keep cleanup cheap: each run lists about 8 folders instead of tens of thousands of files.
+- **Verification belongs to a separate DAG.** I wrote that into the Darwin contract README as the agreed design, and saved it to memory, so later sessions won't put reads back into the 5-minute run.
+
+**Tests:** written failing first. All 1,201 pass, ruff is clean, and the Airflow aggregation check passes. The new tests prove that:
+- a live run never reads, and writes without asking for confirmation;
+- a failed write keeps every file;
+- published raw files land in today's folder, and old day folders get removed.
+
+**What to watch on the first runs after unpausing:**
+- The logs should end with `acknowledged_files` above zero, and the backlog (currently about 5,600 pending) should start shrinking.
+- `Ingest 100 of …` means `DARWIN_PUBLISH_MAX_FILES` is still 100 in dev. Set it to 200 if you want the backlog to drain faster.
+
+"Accepted" isn't proof of "stored", which is the trade-off you chose, and nothing checks the data in TSDB until the verification DAG exists. The 7-day copies are only the safety net for gaps that check finds, so build the check within that week. Also, the run before the write took about 40 seconds of local file and state work on EFS. If that part turns out slow, it's the next thing to speed up.
+
+## 15:38 user (smp-india)
+
+thanks. one minor thing though. I honestly don't like the one task one dag design we did for darwin. Is there any chance we can make it more... granular? Like, think of them as methods. Are we really looking at 1 single method here?
+
+## 15:39 assistant (smp-india)
+
+No, it's not really one method. Inside that single task, `publish_aggregated` does about five distinct jobs in order:
+
+| Step | What it does | Touches TSDB? |
+|---|---|---|
+| 1. **Recover** | Finishes any ingestion a crashed run left halfway | No |
+| 2. **Ingest** | Takes up to N pending files, validates them, quarantines bad ones, records each minute's sample in the window state | No |
+| 3. **Aggregate** | Closes finished quarter-hours and freezes their averages | No |
+| 4. **Publish** | Builds the outbox and writes the points to TSDB | **Yes** |
+| 5. **Release** | Marks points published, moves raw files to `published/<day>`, prunes old days, logs backlog stats | No |
+
+Splitting it into Airflow tasks is feasible, and it fits well here. Every step already saves its result to disk on EFS before the next one starts, so tasks wouldn't need to pass data to each other, only counts. What you'd get:
+- **Visibility:** each step is its own box in the grid, with its own duration. You'd see straight away whether the 40 seconds are ingest or publish.
+- **Retries per step:** a failed TSDB write retries only the publish step, without redoing ingest.
+- **Clearer failures:** "Ingest failed: quarantine" reads very differently from "Publish failed: TSDB".
+
+The cost is speed, which you said matters most. Each Airflow task carries its own overhead: worker startup, about 1–15 seconds of DAG parsing in our logs, plus the scheduler gap before the next task starts. On dev that's often 5–30 seconds per handoff. Four tasks could add a minute or more to every run.
+
+That's why I'd go with three tasks rather than five, split where the failures differ:
+
+```
+ingest  (recover + ingest + aggregate)  →  publish  (write to TSDB)  →  release  (move/prune + stats)
+```
+
+Ingest and aggregate stay together, because they share the window state and never touch the network. Publish is alone, because that's what fails and retries. Release is cheap housekeeping.
+
+Before I touch anything, some questions:
+1. **Is three the granularity you had in mind,** or do you want all five steps visible?
+2. **How much slower can a run get?** If you'd rather not add handoff time at all, the in-between option is to keep one task but log each step's duration in its group. That's free, but it doesn't give per-step retries.
+3. **Same DAG, same 5-minute schedule, with `max_active_runs=1` still applying to the whole chain?** I'm assuming yes.
+
+The crash-safety reasoning is the part I'd check carefully. The current code relies on the steps running back to back in one process. Saving to disk between steps should make the split safe, but I'd confirm each step can be re-run on its own (for example, publish re-running after ingest has already finished) before claiming that.
+
+## 15:40 user (smp-india)
+
+1. not really. My CleanCode brain just want them to. be splitted. If you tell me it costs speed, then let's find the best compromise
+2. I dunno. Ideally NONE, but I don't like 1 task only as it's not easy to read and debug. 
+3. Yes of course
+
+## 15:41 assistant (smp-india)
+
+Here's my understanding: you want the publishing flow broken into clearly named pieces, so it's easy to read and debug, at little or no cost in speed. Since there's an overhead for each Airflow task, the best compromise is to **split the code, not the DAG**, and make every piece visible in the one task:
+
+**1. Split `publish_aggregated` into five named functions,** one per step:
+
+```python
+def publish_aggregated(...):
+    with step("Recover"):   recover_interrupted_ingestion(...)
+    with step("Ingest"):    snapshot = ingest_pending(...)
+    with step("Aggregate"): outputs = close_quarter_hours(...)
+    with step("Publish"):   write_outputs(...)
+    with step("Release"):   release_published_batches(...)
+```
+
+Each function does one job and can be read and tested on its own. The top-level function reads like the table above, about 10 lines instead of about 280.
+
+**2. Each step is its own collapsible log group, with its duration:** `::group::Ingest (100 of 5673 files)`, …, `::endgroup:: Ingest took 14.2s`. A failure also names the step it happened in, like `Publish failed: …`. Debugging becomes "open the Publish group".
+
+**3. No added cost:** it's still one task, one process and one worker startup. It isn't slower than today.
+
+What you don't get is separate boxes in the Airflow grid and per-step retries. The timings from point 2 tell us whether that's worth paying for: if handoffs prove cheap on dev, we can later make Publish its own task, which is the only step that really benefits from separate retries.
+
+A few questions before I start:
+- **Is this compromise what you want,** splitting the code with one task and timed groups? Or do you want real Airflow tasks anyway, at a measured cost?
+- **Behavior must not change.** It's a pure refactor of crash-safe code, so the existing 70-plus Darwin publisher and aggregation tests are the safety net, and I'd add one test for the step logging. Under your review rule, this restructures data-handling code, so I'd run one read-only Codex check on the refactor before pushing. OK?
+- **Commit and push when green,** scope SCR-1273?
+
+## 15:41 user (smp-india)
+
+yes go ahead, commit and push pls. 
+
+Take note: scopes should always be lowercase!
+
+## 15:41 assistant (smp-india)
+
+Noted: scopes are always lowercase (`scr-1273`, never `SCR-1273`). All the commits so far have been lowercase, and I'll save it as a rule so it stays that way.
+
+## 15:42 assistant (smp-india)
+
+Ruff is clean. I'm checking the extraction carefully: the three lines that clear stale outbox files sat *between* two blocks I cut, so they may have been dropped:
+
+## 15:44 assistant (smp-india)
+
+Confirmed: it's the same condition, reflowed onto one line. Every other line of the old function survives verbatim, so the refactor only moves code. Waiting for Codex, for up to about 8 minutes:
+
+## 15:44 assistant (smp-india)
+
+Codex is still running. My result poll used the wrong lookup, so I'll watch its log file directly:
+
+## 15:48 assistant (smp-india)
+
+Everything here is one logical change (the refactor plus its tests), so it goes in as a single commit:
+
+## 15:52 assistant (smp-india)
+
+The Darwin publisher is now split into five named steps, pushed to `smp-india` `dev` as `15e95cf refactor(scr-1273): …`. CI is green, and git-sync puts it live within seconds. It's still one Airflow task, so runs aren't any slower.
+
+**What changed:** `publish_aggregated` used to be one 320-line block. Now it's a short top-level function that calls one function per step:
+
+```
+Recover interrupted ingestion → Ingest → Aggregate quarter-hours → Publish → Release published raw batches
+```
+
+Each step is its own collapsible log group that ends with how long it took (e.g. `Ingest 100 of 5673 pending Darwin files took 14.2s`). If a step fails, the log names it: `Darwin step failed: Publish 1783 points to TSDB: …`. The noisy coverage lines now sit folded inside the Aggregate group. Behavior is otherwise unchanged.
+
+**How I checked nothing changed:**
+1. **The existing tests caught a mistake straight away.** My first extraction dropped the lines that clear stale outbox files. Three tests failed until I put them back.
+2. **A line-by-line comparison** of the old function against the new code: every line still exists, apart from the four deliberate swaps and one condition the formatter moved onto a single line.
+3. **The Codex review found one real ordering bug** in my restore. It ran in the background and finished this time. I'd put the outbox cleanup *after* the averages are frozen instead of before. If that cleanup ever failed, a quarter-hour average could be frozen too early: Codex reproduced the original publishing 20 MW where the refactor froze 10 MW. I moved it back to its original place.
+4. **A new test pins that order,** and it fails if the mistake comes back.
+
+All 1,203 tests pass, ruff is clean, and the isolated Airflow check shows the five timed groups.
+
+Commit scopes stay lowercase from now on; that's saved to memory.
+
+The step timings in the real dev logs will show where the 40 seconds before publishing actually go, likely the Ingest and Aggregate steps on EFS, so we can tell what to speed up next.
+
+## 16:30 user (smp-india)
+
+I haven’t had the chance to thoroughly test it but that 3 min in Airflow I saw several successful runs! The number of files being processed are around 70? Despite the 100 limit I set in the variable. Expected?
+
+## 16:31 assistant (smp-india)
+
+Yes, that's expected, and it's good news. `DARWIN_PUBLISH_MAX_FILES=100` is a **ceiling**, not a target. Each run takes **all pending files, up to 100**. Which number you're seeing tells us more:
+
+- **If it's the Ingest line** (`Ingest 70 of 70 pending Darwin files`): "of 70" means only 70 files were waiting, so **the backlog is drained**. Each run now just picks up what the collector wrote since the last one. About 70 is a little higher than I'd expect from 5 minutes (roughly 6–7 files a minute, so 30–35), which would fit runs starting about 10 minutes apart, for example right after the backlog cleared or when a run took a while.
+- **If it's `acknowledged_files` in the final `DARWIN_PUBLICATION` line:** raw files are only moved to `published/` once **everything** they feed is out, including their quarter-hour average. That only happens after a quarter-hour closes, plus the 5-minute grace. So releases come in bursts: small most runs, then a jump, which can easily be about 70.
+
+To tell them apart, paste the `Ingest … of …` line and the last `DARWIN_PUBLICATION={…}` line from one of those runs. The `X of Y` part and `backlog_files` will settle it.
+
+If it's the first case and runs are about 10 minutes apart rather than 5, that's worth a quick look at the run timestamps. With `max_active_runs=1`, one slow run delays the next one. I can't see the Airflow run history from here.
+
+## 16:33 user (smp-india)
+
+Nah I can’t check right now as I’m in transit on my way to a wedding. We’re talking through mobile lol. 
+
+That can’t be right coz the 70 figure I told u was based on a rough calc I saw between 2 runs:
+
+Ingesting N of 4700 files
+The next..
+Ingesting N of 4630 files
+
+Something like that.
+
+## 16:33 assistant (smp-india)
+
+Yes, that's expected. 70 is the **net** drop per run, not the number processed:
+
+- Each run takes **100** files (your limit).
+- During the 5 minutes between runs, the collector adds about **30** new ones.
+- So the backlog shrinks by 100 − 30 ≈ **70 per run**. That matches 4,700 → 4,630.
+
+At that pace, 4,700 files takes about 67 runs, roughly **5.5 hours** to fully drain. After that, each run just keeps up with about 30 new files.
+
+To clear it faster: since a run currently takes about 3 minutes, a limit of **200** would drain about 170 per run, roughly 2.5 hours. Only do it if the runs stay well under the 4-minute limit; it can wait until you're back.
+
+Enjoy the wedding! 🎉
+
+## 16:36 user (smp-india)
+
+So to clarify… now, we removed the readback validation. And instead of deleting, we move the ingested file to a dedicated folder. 
+
+Now I’m thinking for the “validator” dag I talked earlier, I’d assume this will iterate through each ingested file in the dedicated folder, readback, once confirmed THEN delete? Something like that?
+
+## 16:37 assistant (smp-india)
+
+Yes, that's the right shape, with one adjustment for Athena.
+
+**What we have now (confirmed):** the publisher writes only. Once a raw file's points have all been written, including its quarter-hour average, the file moves to `published/<day>/` instead of being deleted. That folder is kept for 7 days as a safety net.
+
+**For the validator, the adjustment is to check in bulk, not file by file.** Reading back one file at a time means thousands of Athena queries a day, which runs into the same 2-at-a-time limit that broke the publisher. Instead, each run would:
+1. Take a slice of `published/` (say, the last hour's files).
+2. Work out what TSDB *should* contain for that slice: the minute points come straight from the files, and the quarter-hour averages come from the frozen values the publisher saved.
+3. Run **one Athena query for many series at once** over that time range. The read API accepts a list of series.
+4. Compare. Matches get their raw files **deleted**; mismatches get the action we decide on.
+
+That's 1–2 Athena queries per run instead of thousands. Running it hourly, or even less often, is plenty.
+
+Questions for when you're back:
+1. **On a mismatch or missing point:** republish automatically (put the files back in the publisher's queue), or just alert and leave it to a human?
+2. **Should it check the quarter-hour averages too,** or only the minute points? Averages are the trickier part, since they come from saved state rather than the files.
+3. **How often:** hourly, or something else?
+
+No rush. This is a new piece of work, probably its own ticket, and the 7-day folder keeps everything safe until it exists.
+
+## 16:38 user (smp-india)
+
+1. Republish for sure… no?
+2. I honestly don’t know. Wdyt? 
+3. Hourly is a good start
+
+## 16:39 assistant (smp-india)
+
+1. **Republish, yes, but with a cap.** If a series is broken for a reason a retry can't fix (a permission problem, say), endless republishing just loops. So: republish, check again next hour, and **alert after about 3 failed attempts** for the same points.
+
+   One detail: the validator should **write the missing points itself**, through the same write path, rather than putting files back in the publisher's queue. The publisher marks points as already sent, so files fed back to it would just be skipped. Writing directly avoids touching its state.
+
+2. **I'd check both.** The quarter-hour averages are what most people actually use, so they're the most important thing to verify. It's also easy: the publisher saves every average it sends (the frozen value), so the validator compares TSDB against that exact number. No recalculating, no guesswork.
+
+3. **Hourly:** agreed.
+
+So the validator, hourly:
+- Read the last hour of `published/` plus the saved averages.
+- Check minute points and averages with 1–2 bulk Athena queries.
+- Delete what matches, rewrite what's missing, and alert if something still fails after about 3 tries.
+
+Want me to draft this as a ticket when you're back?
+
+## 16:41 user (smp-india)
+
+Agree on all EXCEPT the republishing. 
+
+Again, as much as possible, I like to SRP things. So in my head, it makes most sense to just send it back for republishing rather than having 2 darwin dags writing to tsdb, no?
+
+## 16:41 assistant (smp-india)
+
+You're right, and it's the better design. **A single writer to TSDB** keeps things clean, and it also preserves the publisher's assumption that it alone writes these series.
+
+Making it work only takes one small mechanism:
+
+- **The validator only detects.** It never writes to TSDB and never touches the publisher's state. For anything missing or wrong, it drops a small **republish request** into an inbox, e.g. `publisher-state/republish/<id>.json`, listing the series and timestamps.
+- **The publisher owns the fix.** At the start of each run, it reads the inbox and marks those points as "not sent yet" in its own state. For an average, that means re-opening the quarter-hour while keeping the same frozen value. Its normal Publish step then sends them again, and it deletes the request.
+
+Why requests instead of moving raw files back to `pending/`: the publisher records each minute as "already taken", so a raw file fed back in would just be skipped. The request tells it explicitly what to resend.
+
+The 3-tries cap stays with the validator: if the same points are still wrong after about 3 hourly checks, it alerts instead of asking again.
+
+I'll fold this into the ticket draft when you're back.
+
+## 16:42 user (smp-india)
+
+Yup. Write the ticket in Jira then pls. Keep it short and sweet
+
+## 16:43 assistant (smp-india)
+
+Jira needs the Tempo account. I'll use the same one as SCR-1283 (`SMP_CAPEX_INDIA_2026`):
+
+## 16:43 assistant (smp-india)
+
+I created the ticket: [SCR-1294](https://tractebel-et.atlassian.net/browse/SCR-1294), "Darwin TSDB validator DAG: verify published points hourly, request republish on mismatch".
+
+It has a short context, the goal (an hourly check, with the publisher as the only writer), the approach, five acceptance criteria and links to SCR-1273 and SCR-1268.
+
+The first attempt was rejected because Jira requires a Tempo account. I used the same one as SCR-1283, `SMP_CAPEX_INDIA_2026`.
+
+I left it unassigned, with no sprint, priority or story points, so set those as you see fit. Enjoy the wedding! 🎉
+
+## 16:48 user (smp-india)
+
+Thanks. Can you do me a solid: delegate this to a new session..
+
+To check and compare the adversarial review you are doing via codex vs the same but with just yourself, another claude agent. 
+
+I’m feel codex is taking sooooo long when you ask it to do the review, which got me thinking maybe if you just do it yourself by spawning a subagent, will yield the same findings + faster… hence the request. I dunno how you can test it deterministically, but pls try ur best haha
+
+## 16:49 assistant (smp-india)
+
+I've set it up as a separate session. It's a one-click task chip, "Benchmark Codex vs Claude subagent adversarial reviews". It only runs once you start it from the chip, so it won't use anything while you're at the wedding.
+
+How it tests as fairly as possible:
+- **Planted bugs with a known answer:** it makes about five copies of the Darwin aggregation code, each with exactly one deliberate bug:
+  - **A:** the real ordering bug Codex caught today, so it's a known-good test case.
+  - **B:** an off-by-one.
+  - **C:** raw files released too early.
+  - **D:** errors silently swallowed.
+  - **E:** one clean copy with no bug, to catch false alarms.
+- **Same prompt, same checklist:** Codex and a Claude subagent each review every copy twice, with identical read-only instructions and the ponytail-review checklist.
+- **What it measures:** time taken, whether the planted bug was found, false alarms, and any hangs. Codex gets a 15-minute cap, and a hang counts as a fail.
+- **Result:** a small table plus a recommendation: switch to Claude, keep Codex, or use both (for example, Claude by default and Codex for the riskiest data changes).
+
+It works in a throwaway copy of the repo, changes nothing in your real checkout, and doesn't commit.
+
+Two runs per bug is a small sample and models vary from run to run, so treat the result as a strong hint, not proof.
+
+## 16:54 user (smp-india)
+
+How did it go? I can’t see it from remote
+
+## 16:55 assistant (smp-india)
+
+It hasn't run, sorry. The task chip only starts when someone clicks it in the desktop app, and from your phone that can't happen. There's no benchmark session in your session list, and I don't have a tool to start a new session from here.
+
+I can run the same benchmark from this session instead, in the background:
+- **Codex** runs through its usual read-only review command.
+- **Claude** runs as a separate headless Claude Code process (`claude -p` in read-only plan mode). That's a fairer comparison than a subagent inside this conversation: both reviewers start cold, with the same prompt, in the same throwaway copy of the repo.
+- **The test** is the same plan: five copies of the aggregation code (four with one planted bug each, plus one clean), two runs per reviewer, timing, bugs found, false alarms and hangs.
+- **Nothing changes in your real checkout,** and nothing gets committed.
+
+It'll take a while, roughly 20 Codex reviews and 20 Claude reviews at a few minutes each, and it uses both Claude and Codex quota. When it's done, I'll post the results table here so you can read it on your phone.
+
+Should I start it now?
+
+## 16:56 user (smp-india)
+
+20??? Too much lol.
+
+## 16:56 assistant (smp-india)
+
+My mistake, I double-counted. The full plan was **20 reviews in total** (10 per reviewer), not 20 each. But it's still more than needed, so here's a lean version:
+
+| Variant | Why it's in |
+|---|---|
+| **A:** the real ordering bug Codex caught today | Known-good test, a direct comparison |
+| **C:** raw files released too early | A different kind of bug |
+| **E:** a clean refactor, no bug | Catches false alarms |
+
+That's **one run per reviewer, so 6 reviews in total,** maybe 15–20 minutes. It's less statistically solid, but it's enough to see whether Claude finds what Codex finds, and how much faster.
+
+Should I start this lean version?
+
+## 16:56 user (smp-india)
+
+Yes pls
+
+## 16:56 assistant (smp-india)
+
+Starting it. I'll set up three throwaway copies of `smp-india` at the commit before today's refactor, then apply the refactor as an uncommitted change: with the real ordering bug (A), with the early-release bug (C), and clean (E).
+
+## 16:58 assistant (smp-india)
+
+The Codex jobs are running. Now the three Claude subagents, with the same prompt, each pointed at its own copy:
+
+## 16:58 assistant (smp-india)
+
+All six reviews are running. I'll watch the Codex jobs in the background so their finish times are recorded:
+
+## 16:58 assistant (smp-india)
+
+The benchmark is now actually running. The first attempt failed in two ways, which I've worked around:
+
+- **The headless Claude login has expired** on your Mac (`OAuth session expired`), and only you can renew it. So the Claude side runs as **subagents from this session**, which is what you originally suggested. They start cold, with the same prompt.
+- **My first Codex launch died after 10 seconds,** taken down when my command ended. They're now running in Codex's own background mode.
+
+**What's running:** 6 reviews in parallel, 3 by Codex and 3 by Claude, each in its own throwaway copy of the repo:
+- **A, the real ordering bug from today:** the tests can't see this one, so it's the real test.
+- **C, raw files released too early:** tests do catch this one.
+- **E, a clean refactor:** this measures false alarms.
+
+The prompt is identical for all of them, read-only, and asks for a count of the problems found at the end.
+
+I'll post the results table here when they finish, probably within 15–20 minutes, with time taken, whether the bug was found, and any false alarms per reviewer. Nothing touches your real checkout.
+
+## 16:59 user (smp-india)
+
+<task-notification>
+<task-id>a05cf4fbd74051860</task-id>
+<tool-use-id>toolu_013Bc7DEYUoj9eCD8ArxDx11</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/tasks/a05cf4fbd74051860.output</output-file>
+<status>completed</status>
+<summary>Agent "Review variant C" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>What this change does: it splits `publish_aggregated` into helper functions (`_prepare`, `_ingest`, `_aggregate`, `_publish`, `_release`) and wraps each step in a `_step()` context manager that writes Airflow log groups and timings. Most of the split is faithful. One line in the release step changed behaviour, so this is not a pure refactor.
+
+**Must fix**
+
+1. **Raw batches get released before their quarter-hour average is published.** In `_release` (`dags/src/scripts/darwin_publish/aggregation.py`, around line 463), the condition that keeps a batch in `retained/` dropped its second half:
+   ```
+   - if not state["points"][selected][1] or (mapping.quarter_hour_series_id and not state["finalized"]):
+   + if not state["points"][selected][1]:
+   ```
+   Failure case: take a mapping with both `minute_series_id` and `quarter_hour_series_id`. A batch for the 10:00–10:15 window is ingested and its minute point is published at 10:16. The window is not finalized yet, because aggregation waits until start + 20 min (10:20). The old code keeps the raw batch in `retained/`. The new code moves it to `published/&lt;day&gt;/` straight away and adds it to `acknowledged_files`.
+   - The 15-minute average has not been written or checked yet. If it later fails or gets blocked, the raw batch is already gone from `retained/`.
+   - The `retained_files` and `acknowledged_files` metrics now report the batch as done too early.
+   - Old day folders in `published/` are deleted after the retention period, so that raw batch can be lost before the average is ever published.
+
+   Fix: put back the `or (mapping.quarter_hour_series_id and not state["finalized"])` clause.
+
+**Checked and found equivalent**
+- **`_prepare`:** returns the normalised `spool` and `now`, and callers use them.
+- **Snapshot inputs:** `paths[:max_files]` and `len(paths) &gt; max_files` (now passed as `snapshot_partial`) are worked out the same way and at the same time.
+- **`finalized_count`:** still starts at 0 when there are no outputs.
+- **`result`:** is changed in place exactly as before.
+- **`rejected`:** is still returned to the final quarantine check.
+- **Window state:** `_publish` changes the same state objects that `windows` holds, so the "finalized" and "blocked" counts are unchanged.
+- **Stale outbox clean-up:** still runs before aggregation.
+- **`_release`:** still runs even when there are no outputs.
+- **Errors:** `_step` logs an error and then re-raises it, so errors still reach the caller.
+- **Names:** `ruff --select F` passes, so no name is left undefined.
+
+I only read the code. I did not run the test suite, so I can't say whether a current test would catch this change.
+
+VERDICT: 1</result>
+<usage><subagent_tokens>76720</subagent_tokens><tool_uses>4</tool_uses><duration_ms>44237</duration_ms></usage>
+</task-notification>
+
+## 16:59 assistant (smp-india)
+
+Claude finished variant C in 44 seconds and found the planted bug: raw files released before their quarter-hour average is finalized. It reported no false alarms. I'm waiting for the other five.
+
+## 16:59 user (smp-india)
+
+<task-notification>
+<task-id>af85813c8a999980d</task-id>
+<tool-use-id>toolu_017vNqbu3yA2gWPGDfjkYTXf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/tasks/af85813c8a999980d.output</output-file>
+<status>completed</status>
+<summary>Agent "Review variant E" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I found no real behaviour differences. The refactor keeps the same data handling, control flow, side effects, order of operations and returned results. The only changes are in log output, and one existing test checks log output.
+
+**Checked against the original:**
+- **Input checks and setup (`_prepare`):** same checks, same order, same directory and manifest setup. It hands back `spool`, `pending`, `root` and `now` already converted, the same way the original did inline.
+- **Ingestion (`_ingest`):** it gets exactly `paths[:max_files]`, so the snapshot is unchanged. Pre-validation, the order of journal and window writes, quarantine, and `result["quarantined_files"]` are the same. It returns `rejected`, which the final `QuarantinedDataError` check still uses.
+- **Aggregation (`_aggregate`):** `snapshot_partial` is `len(paths) &gt; max_files`, the same as the old inline check. The window state dicts are the same objects as in `windows`. So the in-place changes (`aggregate_intent`, and later `finalized`, `blocked_*` and point acknowledgements) still feed the final `finalized` and `blocked` counts.
+- **Publishing (`_publish`):** it only runs when `outputs` is non-empty, as before. `finalized_count` starts at 0 when nothing is published and is only incremented in the acknowledgement loop, as before. The `QuarantinedDataError` from `publish_pending` is still caught inside, the `published_points` recount is unchanged, and `result` is changed in place.
+- **Release (`_release`):** the code is unchanged. It still uses `datetime.now()`, not `now`, exactly as before.
+- **The `_step()` context manager:** it logs and re-raises any `Exception`. `BaseException` passes through untouched and the original traceback is kept. Nothing is swallowed and no return value changes.
+- **Stale outbox cleanup and `DARWIN_BACKLOG`:** both still run at the same point, between ingestion and aggregation, and produce the same content.
+
+**Log-only changes (not counted):**
+- There are new groups for "Recover interrupted ingestion", "Aggregate quarter-hours" and "Release published raw batches".
+- Each step now logs a duration line, and a failure is logged before it is re-raised.
+- Log groups are now closed even when a step fails.
+- The Publish group now also covers writing the outbox files and recording acknowledgements.
+
+Because of this, `dags/test/test_darwin_aggregation.py::test_logs_one_line_per_minute_file_in_collapsible_groups` fails: it expects `::endgroup::` twice and now gets it 5 times. The other 70 tests pass. That test needs updating; it is not a data-path regression.
+
+I did not run `test_darwin_real_integration.py`, and the coverage gate failure is only because I ran a subset of the tests. File reviewed: `/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/scratchpad/bench/E/dags/src/scripts/darwin_publish/aggregation.py`. I changed nothing.
+
+VERDICT: 0</result>
+<usage><subagent_tokens>78954</subagent_tokens><tool_uses>6</tool_uses><duration_ms>60582</duration_ms></usage>
+</task-notification>
+
+## 16:59 assistant (smp-india)
+
+Claude finished variant E, the clean copy, in 61 seconds, with no false alarms. It correctly found zero behavior changes, and noticed the log test that would need updating. Still waiting on Claude A and all three Codex reviews.
+
+## 16:59 user (smp-india)
+
+<task-notification>
+<task-id>a054039a61a1de09b</task-id>
+<tool-use-id>toolu_01G29oLtarJxnvUtYeAreAYK</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/tasks/a054039a61a1de09b.output</output-file>
+<status>completed</status>
+<summary>Agent "Review variant A" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I found one real behaviour difference. It only shows up when a run fails partway, and the effect is small. Everything else is a faithful move into helpers.
+
+**What this change does:** It splits `publish_aggregated` into helpers that run in the same order as before: `_prepare`, `_ingest`, `_aggregate`, `_publish`, `_release`. It wraps each step in a `_step()` log group. Each helper gets the same variables the old inline code used. The helpers change the same `state` dicts, `result` and `windows` lists as before, so `finalized`, `blocked`, `published_points` and `finalized_windows` come out the same. Ruff finds no undefined names.
+
+**Behaviour difference 1: the old outbox files are deleted later in the run.**
+- **Before:** the files in `publisher-state/outbox/pending/*.json` were deleted right after `windows` was loaded, before the aggregation loop.
+- **Now:** they are deleted after `_aggregate` and after the `DARWIN_BACKLOG` log line.
+- **Failure case:** a durable window's stored mapping no longer matches `mappings`. `_aggregate` raises `ValueError("Mapping changed for durable window; explicit migration required")`. Old outbox files from an earlier interrupted run are still there. The old code had already emptied `outbox/pending` when the error hit. The new code leaves those files on disk. The same happens if the `aggregate_intent` write (`_atomic(path, state)`) fails during the loop.
+- **Impact:** low. Nothing outside `aggregation.py` reads `outbox/pending`; I grepped `dags/`. The next run that gets past aggregation deletes the files before `publish_pending`, so they are never republished. The difference is only on-disk state after a failed run.
+- **Fix:** move the 3-line outbox delete back above the `_aggregate` call, or accept the difference on purpose.
+
+**Things I checked that are not differences:**
+- `_step` re-raises every exception, so nothing is swallowed. Its `finally` block only logs.
+- The over-limit check `len(paths) &gt; max_files` is now passed in as `snapshot_partial`, with the same meaning.
+- `finalized_count` is still 0 when there are no outputs.
+- `_prepare` still returns the converted `now`, `spool`, `pending` and `root`.
+- `_release`'s body is unchanged and runs at the same point.
+
+**Tests:** in `dags/test/test_darwin_aggregation.py` and `dags/test/test_darwin_end_to_end.py`, 40 pass and 1 fails. The failure is `test_logs_one_line_per_minute_file_in_collapsible_groups`, which now counts 5 `::endgroup::` lines instead of 2. That is a log-only change, so I left it out of the count, but it will fail CI until the test is updated.
+
+I did not check the other `test_darwin_*` files or how the publisher behaves under real load. Running pytest and ruff left `.coverage`, `.pytest_cache/` and `.ruff_cache/` in the repo, at least partly from my runs. All three are gitignored and no tracked file changed.
+
+VERDICT: 1</result>
+<usage><subagent_tokens>79319</subagent_tokens><tool_uses>8</tool_uses><duration_ms>96912</duration_ms></usage>
+</task-notification>
+
+## 16:59 assistant (smp-india)
+
+Claude finished variant A, the bug tests can't see, in 97 seconds. It found the right problem (the outbox cleanup moved after aggregation), with the right fix (move it back above `_aggregate`). But it **rated it low impact**, and missed the serious consequence Codex found this morning: a cleanup failure could freeze a quarter-hour average from incomplete minutes, so the wrong value gets published. I'll score that as **found, but the impact was underestimated**. Waiting on the three Codex reviews.
+
+## 17:01 user (smp-india)
+
+<task-notification>
+<task-id>b2dmrj9q3</task-id>
+<tool-use-id>toolu_01K18EQTapH6stcv8AHQT3my</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/tasks/b2dmrj9q3.output</output-file>
+<status>completed</status>
+<summary>Background command "S=/private/tmp/claude-501/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e/scratchpad/bench; J=$(ls -d /Users/qn5792/.claude/plugins/data/codex-openai-codex/state/*/jobs | head -5); deadline=$(( $(date +%s) + 1200 )); while read v st id; do echo "$v $id" ; done &lt; $S/codex_jobs.txt; until [ $(date +%s) -gt $deadline ]; do done=0; while read v st id; do f=$(ls /Users/qn5792/.claude/plugins/data/codex-openai-codex/state/*/jobs/$id.json 2&gt;/dev/null | head -1); s=$(python3 -c "import json;print(json.load(open('$f')).get('status',''))" 2&gt;/dev/null); if [ "$s" = completed ] || [ "$s" = failed ]; then done=$((done+1)); grep -q "^$v " $S/codex_done.txt 2&gt;/dev/null || echo "$v $s end=$(date +%s)" &gt;&gt; $S/codex_done.txt; fi; done &lt; $S/codex_jobs.txt; [ $done -eq 3 ] &amp;&amp; break; sleep 10; done; cat $S/codex_done.txt" completed (exit code 0)</summary>
+</task-notification>
+
+## 17:01 assistant (smp-india)
+
+All six reviews are done. Removing the throwaway copies first:
+
+## 17:25 assistant (smp-india)
+
+The lean benchmark is done. In short: **Claude was about 2.5–4× faster and caught every planted bug, but Codex judged the dangerous one more accurately.**
+
+| Variant | Codex | Claude subagent |
+|---|---|---|
+| **A: real ordering bug** (tests can't see it) | **3.6 min.** Found it, and **correctly showed the real damage**: a wrong average gets published (20 MW vs 10 MW), proven by running both versions. | **1.6 min.** Found it and the right fix, but **called it low impact** and missed the wrong-average consequence. |
+| **C: raw files released too early** (tests catch it) | 3.1 min. Found it. | **0.7 min.** Found it, same quality. |
+| **E: clean refactor** | 2.2 min. No false alarms. | **1.0 min.** No false alarms. |
+
+**What it tells us:**
+- **Speed:** Claude was clearly faster on every variant, and nothing hung this time.
+- **Detection:** both found every planted bug, and neither raised a false alarm.
+- **Judging severity:** Codex was better. On the one bug the tests couldn't catch, Codex *ran* both versions and showed the real-world harm. Claude only read the code and understated it. That's exactly the case where a review matters most.
+
+**My recommendation:** use a **Claude subagent by default**, since it's fast and catches the issues. For the high-stakes cases in your review rule (data integrity, deletions, crash recovery), also **run Codex at the same time**. Running them side by side adds no waiting, because Claude's answer arrives first and Codex's deeper analysis follows. If you'd like, I can update your global review rule to say exactly that.
+
+This was one run per reviewer, on 3 variants of one file. It's a strong hint, not proof, and results vary from run to run. The throwaway copies are removed, nothing changed in your repo, and the headless `claude` command-line login on your Mac has expired; you'd need to log in again to use that route.
+
+## 18:06 user (smp-india)
+
+Yes pls. Let’s do this route then. I’ll trust your firm judgement on when to ask for codex review is appropriate.
+
+## 18:07 assistant (smp-india)
+
+I updated the review rule in your global `~/.claude/CLAUDE.md`, so it applies in every project from now on:
+
+- **Still skipped by default:** speed first. I decide when a review is warranted, without asking.
+- **Default reviewer: a read-only Claude subagent,** run in the background with the ponytail-review checklist.
+- **Highest-stakes cases also get Codex, in parallel:** data integrity, deletions, crash recovery, money or prod data. I poll the Codex job with a cap of about 15 minutes, so a hang can't block anything.
+- **The benchmark is noted in the rule** (Claude about 2.5–4× faster, Codex better at judging impact), so the reason for the split is clear later.
+- **Unchanged:** reviews happen once at design time, or on the diff for a pure refactor, and I check every finding myself before acting on it.
+
+I replaced the old line in place rather than adding a second one, so there aren't two conflicting review rules.

@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-15. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
+As of 2026-10-18. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)
@@ -23,6 +23,9 @@ As of 2026-10-15. These are the India data products built on [[smp-platform]]. S
 - Darwin assets for Tuticorin and four Gujarat sites are moving from access-blocked design to rollout. See [[darwin-collector]].
 - Grid India (`SCR-1230`) and the national H. India site: blocked on access. See [[smp-india-access]].
 - Khaba QA pauses in early October were intentional operational choices, not a DAG pause-logic defect: QA was kept runnable for testing while avoiding unnecessary side-by-side production cost.
+- Khaba forecasts are now a separate CDH dataset/DAG (`india_khaba_forecasts`) rather than fields embedded in the actual-generation export. Phase 1 (the DAG, registration, and CDH dataset) is promoted through prod; the one-time prod backfill completed, but live-data and SQL-Lab visibility were not independently verified in the capture. Phase 2 dashboard JSON is on `smp-dashboard` main and the matching actual-only export is on `smp-india` dev, awaiting Grafana import before India promotion.
+- Khavda forecast reads were redesigned to bulk-read consecutive delivery dates in nine-day chunks, then split locally: three TSDB reads per run rather than 27. This is on `dev` only (`f9ec583`), tested offline, and still needs live TSDB observation before promotion.
+- Khaba actuals for 2026-10-13 and 2026-10-14 still need a reconciliation rerun.
 - Not urgent: a KPI dashboard Mateo wants to pair on (TSDB → calculations → CDH → Grafana), and adapting the Aurora XLSX loader, which needs dataset, format, and ownership answers first.
 
 ## Background
@@ -67,6 +70,7 @@ As of 2026-10-15. These are the India data products built on [[smp-platform]]. S
 - 2026-10-13: Khaba source parsing and missing-file handling hardened after the October 9 inverter expansion, and HPX `SCR-1274` scope expanded to include HPDAM plus 32 total TSDB series.
 - 2026-10-15: HPX scope corrected from 33 to 29 series when Lou supplied the final IDs and confirmed GDAM excludes MCV; mappings were validated in UAT and prod.
 - 2026-10-15: Khaba missing-current-source handling promoted through QA and prod; REC TSDB/CDH recovery confirmed through 30 September.
+- 2026-10-17: Khaba forecast CDH dataset promoted through prod; dashboard/export separation is awaiting Grafana import and the associated India promotion.
 
 ## Open Questions
 
@@ -78,6 +82,9 @@ As of 2026-10-15. These are the India data products built on [[smp-platform]]. S
 - UNCERTAIN: What exact delay target Adrien will accept for `SCR-1284` RTM.
 - UNCERTAIN: Whether the deployed Khaba DAGs have been observed skipping a missing source in the live Airflow environments, and whether the temporary 1440-minute Variable has been removed.
 - UNCERTAIN: Whether the REC scraper completed unattended on 2026-10-16 and whether Grafana shows the five recovered sessions.
+- UNCERTAIN: Whether `india_khaba_forecasts_latest` is populated and queryable in CDH/Grafana after the first production run.
+- UNCERTAIN: Whether the two updated Khaba dashboards were imported before promoting `smp-india` dev, and whether the 13-14 October actuals were reconciled.
+- UNCERTAIN: Whether Khavda's bulk-read change behaves correctly against live TSDB under shared Athena-slot contention.
 
 ## Sources
 
@@ -107,5 +114,8 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-15-claude-smp-8ce08f10.txt`
 - `sources/claude-conversations/2026-10-15-claude-smp-822de913.txt`
 - `sources/claude-conversations/2026-10-15-claude-smp-cbea7fa4.txt`
+- `sources/claude-conversations/2026-10-16-claude-smp-4e922cd7.txt`
+- `sources/claude-conversations/2026-10-17-claude-smp-4e922cd7.txt`
+- `sources/claude-conversations/2026-10-17-claude-smp-e4dded4d.txt`
 
-Last Updated: 2026-10-15
+Last Updated: 2026-10-18

@@ -1,0 +1,672 @@
+# Claude Conversation - 2026-10-16
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `36b94912-7f68-4c00-a812-37f2a6c0149d`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d.jsonl`
+Resume: `claude --resume 36b94912-7f68-4c00-a812-37f2a6c0149d`
+
+## 10:13 user
+
+I enabled in dev and the run was successful in less than a second lol. 
+
+<pasted_content id="f04e">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-16T02:00:00+00:00/task_id=check_darwin_freshness/attempt=1.log
+::endgroup::
+[2026-10-16T02:12:37.056259Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a1427b-91c2-71c6-b016-11d7c9303424 dag_id=india_darwin_freshness_dag task_id=check_darwin_freshness run_id=scheduled__2026-10-16T02:00:00+00:00 try_number=1 map_index=-1
+[2026-10-16T02:12:37.081965Z] DEBUG - Loading plugins
+[2026-10-16T02:12:37.083748Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-16T02:12:37.391727Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-16T02:12:37.413655Z] DEBUG - Loading plugins from entrypoints
+[2026-10-16T02:12:37.413998Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-16T02:12:37.415493Z] DEBUG - Loading 2 plugin(s) took 331.90 ms
+[2026-10-16T02:12:37.415681Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f005bedaf00>}
+[2026-10-16T02:12:37.415755Z] DEBUG - Hook impls: []
+[2026-10-16T02:12:37.415837Z] DEBUG - Result from 'on_starting': []
+[2026-10-16T02:12:37.416511Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-16T02:12:37.417060Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-16T02:12:37.417571Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-16T02:12:37.434146Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-16T02:12:37.434748Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-16T02:12:37.436321Z] DEBUG - Found DAG india_darwin_freshness_dag
+[2026-10-16T02:12:37.436749Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-16T02:12:37.437879Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag>
+[2026-10-16T02:12:37.438399Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=21 
+[2026-10-16T02:12:37.438846Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py 
+[2026-10-16T02:12:37.439258Z] DEBUG - Integrate Macros plugins
+[2026-10-16T02:12:37.481073Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1427b-91c2-71c6-b016-11d7c9303424'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T02:00:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-543959a5e6c093b864e28b0f4f17dacd-e36c320a826a903f-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 80072, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-16T02:12:37.481183Z] DEBUG - Hook impls: []
+[2026-10-16T02:12:37.481265Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-16T02:12:37.481481Z] INFO - ::endgroup::
+[2026-10-16T02:12:37.840238Z] INFO - DARWIN_FRESHNESS={"stale": [], "source_age_minutes": {"SOF_INGU2/ActivePower": 0, "SOF_INGU2/HorizontalIrradiance": 0, "SOF_INGU2/TiltedIrradiance": 0, "SOF_INKHA/ActivePower": 0, "SOF_INKHA/HorizontalIrradiance": 0, "SOF_INKHA/TiltedIrradiance": 0, "SOF_INRAG/ActivePower": 0, "SOF_INRAG/HorizontalIrradiance": 0, "SOF_INRAG/TiltedIrradiance": 0, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 0, "WIF_INSE4/WindDirection": 0, "WIF_INSE4/WindSpeed": 0}}
+[2026-10-16T02:12:37.840483Z] INFO - Done. Returned value was: {'stale': [], 'source_age_minutes': {'SOF_INGU2/ActivePower': 0, 'SOF_INGU2/HorizontalIrradiance': 0, 'SOF_INGU2/TiltedIrradiance': 0, 'SOF_INKHA/ActivePower': 0, 'SOF_INKHA/HorizontalIrradiance': 0, 'SOF_INKHA/TiltedIrradiance': 0, 'SOF_INRAG/ActivePower': 0, 'SOF_INRAG/HorizontalIrradiance': 0, 'SOF_INRAG/TiltedIrradiance': 0, 'WIF_INSE3/ActivePower': 0, 'WIF_INSE3/WindDirection': 0, 'WIF_INSE3/WindSpeed': 0, 'WIF_INSE4/ActivePower': 0, 'WIF_INSE4/WindDirection': 0, 'WIF_INSE4/WindSpeed': 0}}
+[2026-10-16T02:12:37.840628Z] INFO - ::group::Post Execute
+[2026-10-16T02:12:37.840792Z] INFO - Pushing xcom ti=RuntimeTaskInstance(id=UUID('01a1427b-91c2-71c6-b016-11d7c9303424'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T02:00:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-543959a5e6c093b864e28b0f4f17dacd-e36c320a826a903f-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 80072, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-16T02:12:37.882624Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a1427b-91c2-71c6-b016-11d7c9303424'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T02:00:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-543959a5e6c093b864e28b0f4f17dacd-e36c320a826a903f-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 80072, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 859707, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-16T02:12:37.883187Z] DEBUG - Calling 'on_task_instance_success' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a1427b-91c2-71c6-b016-11d7c9303424'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T02:00:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-543959a5e6c093b864e28b0f4f17dacd-e36c320a826a903f-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 80072, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 2, 12, 37, 859707, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.SUCCESS: 'success'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-16T02:12:37.883368Z] DEBUG - Hook impls: []
+[2026-10-16T02:12:37.883605Z] DEBUG - Result from 'on_task_instance_success': []
+[2026-10-16T02:12:37.883777Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f005adf7bf0>}
+[2026-10-16T02:12:37.883937Z] DEBUG - Hook impls: []
+[2026-10-16T02:12:37.884097Z] DEBUG - Result from 'before_stopping': []
+[2026-10-16T02:12:37.884252Z] INFO - ::endgroup::
+</pasted_content id="f04e">
+
+-- expected?
+
+## 10:14 assistant (smp-tool)
+
+Yes, that's expected. The check only reads one small JSON file from EFS, with no TSDB or network calls, so under a second is right. The task itself took about 0.4 s (02:12:37.48 → .84).
+
+**What the run tells us:**
+- **The dev collector is live and current.** All 15 streams it checked are 0 minutes old.
+- **Tithwa (`WIF_INGUV`) is absent,** as intended, since it's only enabled in prod.
+- **The `Okta configuration is missing` error is unrelated.** It's the worker loading a webserver auth plugin at startup, before our task runs.
+
+**One thing worth a look: Khaba (`SOF_INNS7`) is missing too.** It's enabled for dev in smp-tool (`9b9b914`, added 2026-10-15 at 10:50 +08), but none of its 3 streams are in the collector's state. So the collector has never accepted data for Khaba. The likely cause is that the running dev collector was deployed before Khaba was enabled, so it isn't configured to poll it. The other possibility is that Darwin returns nothing for `SOF_INNS7`. I can't check which from here without cluster access.
+
+This is exactly the known limit of our check: a stream that never produced data isn't flagged, so the DAG stayed green.
+
+**To confirm:** check whether the running deployment's `DARWIN_ENTITY_TAGS_JSON` includes `SOF_INNS7`. If it doesn't, rerun `deploy_darwin.sh --env dev` from smp-tool. Once Khaba produces data, the freshness check picks it up automatically.
+
+**Still open:** the night-time question. 02:12 UTC is 07:42 IST, so this was a daytime run. India's night is roughly 13:00 to 00:30 UTC, and the next few runs in that window will show whether solar streams keep advancing.
+
+## 10:22 user (smp-tool)
+
+highly likely. In broad strokes, what do we ask Michael to deploy?
+
+* get latest smp-india image from gh
+* then deploy using script?
+
+## 10:23 assistant (smp-india)
+
+It's simpler than that: no new image is needed.
+
+- **The collector code hasn't changed since 2026-10-01** (`0254884`, tag `darwin-collector-025488487ab7`). Enabling Khaba was a config change in smp-tool (`enabled_sites.json`), not a code change.
+- **Without `--tag`, `deploy_darwin.sh` keeps the image already running.** It re-renders the manifest from the latest config and shows the live diff before applying. So it's one step for Michael.
+
+Message draft:
+
+```
+Hi Michael, could you redeploy the India dev Darwin collector so it picks up Khaba (SOF_INNS7)? Config-only change, same image.
+
+In smp-tool, on latest dev:
+scripts/deploy_darwin.sh --env dev --context <india-dev-context>
+
+The diff should only show SOF_INNS7 added to DARWIN_ENTITY_TAGS_JSON. Thanks!
+```
+
+If the diff shows more than that, have him stop and send it to us before confirming. That would mean the running deployment had drifted from the config.
+
+## 10:24 user (smp-india)
+
+i see and deploy_darwin.sh is smart enough to take whatever current value of enabled_sites?
+
+## 10:24 assistant (smp-tool)
+
+Yes. It reads `config/india/<env>/darwin/enabled_sites.json` from Michael's checkout every time it runs (`render_darwin.py` lines 37-46). There's no flag to override it, and the comment there explains why: "a missed flag can't drop a site". It then turns those sites into the collector's `DARWIN_ENTITY_TAGS_JSON` setting, using `sites.json`.
+
+**The catch: it reads the local file, not GitHub.** Michael has to be on an up-to-date smp-tool `dev`, with Khaba added in `9b9b914`. If his checkout is older, the rendered manifest won't include Khaba, `kubectl diff` will show no change, and the script exits with "nothing to apply". So the message needs the pull step spelled out.
+
+Two features make this safe to hand over:
+- **It prints the site list before the diff** (`Sites: tuticorin, khavda, sharpar, raganesda, khaba`), so he can confirm Khaba is there before applying.
+- **After the rollout it shows the collector's last 20 log lines** and tells him to look for `poll_complete` with `"failed_entities": 0`. That's the quickest check that Khaba is polling.
+
+Updated draft:
+
+```
+Hi Michael, could you redeploy the India dev Darwin collector so it picks up Khaba (SOF_INNS7)? Config-only change, same image.
+
+In smp-tool:
+git checkout dev && git pull --ff-only
+scripts/deploy_darwin.sh --env dev --context <india-dev-context>
+
+"Sites:" should list khaba, and the diff should only add SOF_INNS7 to DARWIN_ENTITY_TAGS_JSON. Thanks!
+```
+
+## 10:25 user (smp-tool)
+
+what's the relationship between darwin code and the enabled_sites? I find it strange that the code is in smp-india while the config of which sites are enabled is in tool....
+
+## 10:25 assistant (smp-tool)
+
+The split is deliberate. It was decided on 2026-10-13 in SCR-1283, after both alternatives were tried.
+
+**How they relate:**
+- **The collector code (smp-india)** is generic. It knows nothing about sites. At startup it reads a `DARWIN_ENTITY_TAGS_JSON` environment variable that says which entities and tags to poll, and polls exactly those.
+- **The deployment (smp-tool)** decides what goes in that variable. `sites.json` lists every known site and its entities, `enabled_sites.json` picks which ones each environment collects, and `render_darwin.py` combines them into the variable when it builds the Kubernetes manifest.
+
+So "which sites" is treated like any other deployment setting (image tag, proxy, secret names), not like code. That's the same split as Airflow: smp-india holds the DAG code, and smp-tool holds the Helm values and cluster config. Michael, as cluster owner, expects it that way.
+
+**Why the deployment didn't move into smp-india** (from my notes on SCR-1283):
+- For smp-tool to read smp-india, it would need a personal token. Deploy keys are disabled in qrm-dms, and fine-grained tokens need owner approval.
+- Deploying from smp-india would duplicate smp-tool's cluster config and need new EKS permissions.
+
+**What it costs, and I think this is what feels off:** adding a site touches both repos, in a fixed order.
+1. **smp-india first:** add the site's TSDB destinations to `mappings.json`, so the publisher knows where to write. Khaba's was `8bae384`.
+2. **smp-tool second:** add the site to `enabled_sites.json` and redeploy. Khaba's was `9b9b914`.
+
+If the order is reversed, the publisher receives data it has no mapping for and quarantines it. The collector README calls that out ("install and validate each site's publisher mappings before enabling collection"). Nothing enforces the order; it's a convention.
+
+The freshness DAG follows this split: it checks what the collector actually collected (the state file), filtered by what the publisher maps. That's why a site enabled in smp-tool but never deployed, like Khaba right now, isn't flagged.
+
+If the two-repo step becomes a real nuisance as more sites are added, it's worth raising with the team. But the reasons for the split still hold, so I wouldn't change it now.
+
+## 10:27 user (smp-tool)
+
+hmmm, the more reason it feels weird then. 
+
+If we already have definitions of sites in mappings.json (i.e. khaba goes to tsdb id1, khavda to 2, etc.), we also have definitions of the same context in enabled_sites....? Don't you think it's better to just have 1 master json config file..? I might be wrong though!
+
+## 10:27 assistant (smp-tool)
+
+You're not wrong. There is real duplication, though only partly. Here's what each file holds:
+
+| File | Repo | Contents |
+|---|---|---|
+| `sites.json` | smp-tool | site → entities → tags (e.g. khaba → `SOF_INNS7` → ActivePower, …) |
+| `enabled_sites.json` | smp-tool, one per environment | which sites each environment collects |
+| `mappings.json` | smp-india | entity/tag → units, scale, aggregation, TSDB IDs |
+
+- **Duplicated:** the list of entities and tags is in both `sites.json` and `mappings.json`. Adding a tag means editing both, and nothing checks that they match.
+- **Not duplicated:** the per-environment on/off switch exists only in smp-tool, and the TSDB IDs and units only in smp-india.
+
+**A single master file would work if it lives in smp-india.** It couldn't go in smp-tool, because the publisher DAG needs the mappings and cross-repo reading is blocked. In smp-india it could work like this:
+1. One file (say an extended `mappings.json`) holds site → entity/tag → TSDB IDs/units, plus which environments each site is enabled in (Tithwa: prod only).
+2. **The publisher** reads it as it does today.
+3. **The collector image** bundles the file. At startup the collector picks its streams from it using its environment name, instead of receiving `DARWIN_ENTITY_TAGS_JSON` from smp-tool.
+4. **smp-tool** still owns deployment and just passes the environment name. That doesn't reopen the SCR-1283 decision: deployment stays where it is.
+
+**Side benefit:** the freshness DAG would know exactly which streams each environment should have, which closes today's gap where a stream that never produced data isn't flagged. With this, Khaba would have shown up as missing this morning.
+
+**The trade-off:** enabling a site would mean an smp-india change, a new image (CI builds it), and a redeploy with the new `--tag`. Today it's an smp-tool change and a redeploy with the same image. It's one more step per site, but it can't get out of sync.
+
+Questions before going further:
+1. **Is that trade-off acceptable to you,** a new image per site change in exchange for one source of truth?
+2. **Scope:** this is outside SCR-1268, so I'd treat it as its own ticket. It touches the collector, the publisher, smp-tool's renderer and the freshness DAG, and it changes what Michael does on each deploy, so he should hear about it first. Should I propose it as a separate session, or do you want to raise it with Michael and the team first?
+
+## 10:30 user (smp-tool)
+
+1. For me, absolutely. Coz I see no situation where both darwin code and enabled_sites to drift, meaning.. we have collection code for sites ABC, but only enable AB? Certainly not the other way around too.. so enabling/disabling will always be done on both ends, so might as well merge them no?
+2. considering we've yet to deploy to prod, let's take it in the same ticket. Part of the preprod work of Darwin.
+
+## 10:30 assistant (smp-tool)
+
+Agreed on both. One detail affects the design: the switch is per environment (Tithwa is prod-only), so the master file needs a per-environment "enabled" list, not just one global list. I'll map out every piece this touches before designing:
+
+## 10:31 assistant (smp-india)
+
+Before designing, I'll find everything that reads entity/tag config across both repos:
+
+## 10:32 assistant
+
+Today's files are consistent:
+- `sites.json` is identical in all three environments.
+- Its entity/tag list matches `mappings.json` exactly (21 streams).
+- Tithwa is the only per-environment difference (prod only).
+
+So the master file can reproduce today's setup exactly. I'll continue once the review comes back.
+
+## 10:37 user
+
+<task-notification>
+<task-id>btr6g377v</task-id>
+<tool-use-id>toolu_01MuGZPaKzvCrxMu6RDBwVEp</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d/tasks/btr6g377v.output</output-file>
+<status>completed</status>
+<summary>Background command "Run read-only Codex design review on the master-config plan" completed (exit code 0)</summary>
+</task-notification>
+
+## 10:38 assistant
+
+Codex finished and named the checklist it used. Before weighing its findings: smp-tool now shows one changed file, and Codex said it changed nothing. Checking what it is:
+
+## 10:38 assistant (smp-tool)
+
+That's an untracked `docs/spikes/` folder last modified in August, so it was already there; Codex didn't change it. Now checking its P1 claim myself:
+
+## 10:38 assistant (smp-india/services/darwin-collector)
+
+The review was worth it: it found a real problem with my design, and a simpler design that avoids it.
+
+**P1, confirmed:** my plan would make a normal deploy break collection. `deploy_darwin.sh` without `--tag` keeps the running image. After the change, the old image would receive only `DARWIN_ENVIRONMENT`, which it doesn't understand. It would fail with `explicit nonempty entities and tags required` (I found that line in `collector.py:96`). And because the deployment uses `Recreate`, the healthy pod is stopped first, so collection is down until someone redeploys with the right tag.
+
+**Codex's simpler design avoids that entirely:**
+- **One master file in smp-india,** next to `targets.py` in `dags/src`, where the publisher and the freshness DAG read it like any normal DAG file. That also removes my "Airflow reads outside `dags/src`" concern.
+- **smp-tool's renderer reads that file** from Michael's smp-india checkout and keeps emitting `DARWIN_ENTITY_TAGS_JSON` exactly as today.
+- **No collector change, no new image, no change to how the image is built or tagged.** The deploy command stays the same, plus one argument pointing at smp-india.
+
+| | My design (bundled in image) | Codex's design (renderer reads smp-india) |
+|---|---|---|
+| Single source of truth | ✅ | ✅ |
+| Collector or image changes | Yes | None |
+| Can a normal deploy break collection? | Yes (P1) | No |
+| Airflow reads outside `dags/src` | Yes | No |
+| Deploy depends on | The image tag | An up-to-date smp-india checkout as well |
+
+**The catch, and why I'm asking:** smp-tool's deploy would read a file from a local smp-india checkout. My notes from SCR-1283 say not to propose cross-repo checkouts again. But that was about a CI workflow needing a token to read smp-india. This is a local file Michael already has: his runbook's step 1 is "fetch and fast-forward dev in both smp-india and smp-tool". So I think it doesn't reopen that decision, but it is a new dependency for Michael. If his smp-india checkout is stale, he'd render an old site list. That's the same kind of risk as a stale smp-tool checkout today, and the script prints the sites before applying.
+
+Codex's other two findings become acceptance tests either way:
+- **P2:** the master file must reproduce all 21 current mappings exactly, or the publisher's saved windows would stop matching.
+- **P3:** a test asserting exactly 18 streams in dev/qa and 21 in prod, so Tithwa can't be enabled in UAT by accident.
+
+Go with Codex's design?
+
+## 10:59 user (smp-india/services/darwin-collector)
+
+wait wait I'm lost. So with the updated design, we have another cross-repo dependency? I thought we'd be able to remove that?
+
+Might I remind you, this whole michael does the deployment thing is a temporary thing until we have the pipeline sorted out. But ideally, from what I'm envisioning, whatever change in darwin, be it enabling of entities or refining the collector logic, should be purely done in smp-india.
+
+## 10:59 assistant (smp-india/services/darwin-collector)
+
+You're right, and I lost sight of the goal. Codex's design removes the duplicate data but keeps (in fact adds) the cross-repo link, which is the opposite of what you want.
+
+**What you want:**
+- **Every Darwin change happens in smp-india only:** enabling or disabling entities, changing collector logic, TSDB mappings.
+- **smp-tool, and Michael's manual deploy, is temporary.** It should only need "which image, which environment", and know nothing about sites.
+
+**That's my original design:** the master file is bundled into the collector image, and smp-tool only passes `DARWIN_ENVIRONMENT`. It fits your plan:
+- Enabling a site = an smp-india commit → CI builds a new image → deploy that tag. smp-tool never changes.
+- When the pipeline moves into smp-india later, smp-tool's Darwin pieces can go entirely.
+
+**Fixing the problem Codex found, without giving up that design:** the risk only exists during the switch. One image is incompatible (the one running in dev now, `darwin-collector-025488487ab7`); qa and prod have never been deployed. So `deploy_darwin.sh` gets a hard check: before applying anything, it refuses images from before this change, including the case where it keeps the running image. A normal deploy can then never pair the old image with the new manifest, and it fails safely before touching the running collector. It's one explicit check, which can be deleted once dev is on the new image.
+
+The rest of the plan stays:
+- **The master file lives in the collector package,** so the image picks it up with no build changes. The publisher reads it from the repo (Codex found no current problem with that path; I'll find it relative to the code's own location and check it in a real Airflow task).
+- **The publisher keeps all sites' mappings;** only the collector and the freshness DAG filter by environment.
+- **The freshness DAG** knows the expected streams per environment, so Khaba-type gaps get flagged.
+- **Codex's P2 and P3 become tests:** all 21 mappings identical to today, and exactly 18 streams in dev/qa and 21 in prod.
+
+**What changes for Michael:** the first dev deploy after this needs the new `--tag`, and the script will refuse otherwise. After that, adding a site is: we push to smp-india, then he deploys the new tag.
+
+Shall I go ahead with this?
+
+## 11:00 user (smp-india/services/darwin-collector)
+
+To clarify, when you say "deploy the new tag", operationally that'd mean him downloading the latest image artifact from gh, and then running the smp-tool local ?
+
+## 11:00 assistant (smp-india/services/darwin-collector)
+
+It depends on whether CI is allowed to push images to ECR. If it is, Michael doesn't download anything. Checking how the repo is set up:
+
+## 11:01 assistant (smp-india/services/darwin-collector)
+
+Today, yes, plus a manual push to ECR in between.
+
+**How it works right now:** the two AWS role variables are set on smp-india, but `DARWIN_COLLECTOR_ECR_PUSH` is not. So the latest dev CI run fell back to attaching the image as a GitHub artifact ("DARWIN_COLLECTOR_ECR_PUSH is not true; uploading the image as an artifact instead"). For each new tag, Michael does:
+
+1. Download the image from the CI run: `gh run download <run-id> -R qrm-dms/smp-india -n darwin-collector-image`. Artifacts are kept for only 7 days.
+2. `docker load`, log in to ECR, and `docker push` the image. The CI run summary prints these commands with the real values.
+3. From smp-tool: `scripts/deploy_darwin.sh --env dev --context <ctx> --tag darwin-collector-<sha>`.
+
+**It can be shorter:** if `DARWIN_COLLECTOR_ECR_PUSH` is set to `true`, CI pushes the image to ECR itself on every dev/qa/prod push. Steps 1 and 2 disappear, and Michael only runs step 3. The CI summary already prints that exact command with the tag.
+
+What it needs:
+- **A repo variable.** That's a settings change I won't make myself; you or a repo admin would set it.
+- **AWS trust.** The `dms-smp-india-deploy` roles must trust `qrm-dms/smp-india` for GitHub OIDC. The variables exist, but I can't verify the trust from here. The first CI push would show it: if the trust is missing, the push step fails clearly.
+
+That's also a first step toward your target: once CI pushes the images, the only thing left outside smp-india is the deploy command itself.
+
+So with the design we just agreed: a site change = smp-india commit → CI → (artifact + manual push today, or automatic with the variable set) → Michael runs the deploy command with the new tag. Shall I go ahead with the implementation? And do you want to set `DARWIN_COLLECTOR_ECR_PUSH`, or ask Michael whether the role trust is in place first?
+
+## 11:02 user (smp-india/services/darwin-collector)
+
+do the implementation, we'll sort out everything else later.
+
+## 11:02 assistant
+
+The master file reproduces today's setup exactly: Tithwa is prod-only, and every other site is enabled in all three environments. Now the collector side. I'll read its config loader:
+
+## 11:03 assistant (smp-india/services/darwin-collector)
+
+Adding the collector tests, including Codex's P3: exact stream counts per environment, and Tithwa prod-only:
+
+## 11:03 assistant (smp-india/services/darwin-collector)
+
+Both are just over-long lines; the formatter will wrap them:
+
+## 11:03 assistant (smp-india/services/darwin-collector)
+
+Collector done (77 tests and lint pass). Now the publisher side: `targets.py` reads the master file instead of `mappings.json`, with the same validation as before.
+
+## 11:04 assistant (smp-india)
+
+Updating the freshness tests to match: a missing expected stream now counts as stale (the Khaba case), and unexpected streams are ignored:
+
+## 11:04 assistant (smp-india)
+
+That failure is the test, not the code: it writes only one of the two expected streams, and the missing one now correctly counts as stale. Fixing the test data:
+
+## 11:04 assistant (smp-india)
+
+Next: delete `mappings.json` and update everything that still points at it. That's an invalid-mapping test, one script, the catalogue checker and the docs.
+
+## 11:05 assistant (smp-india/services/darwin-collector)
+
+The system `python3` is 3.9, too old for this script. Running it with the collector's own Python 3.13 instead:
+
+## 11:05 assistant (smp-india/services/darwin-collector)
+
+The smoke test passes from source. Docker isn't running locally, so CI will be the first to run it against the built image. Now the docs that mention `mappings.json` or the smp-tool site files:
+
+## 11:05 assistant (smp-india)
+
+No references to `mappings.json` remain. I'll update the freshness DAG's catalogue entry to say it expects the environment's streams, then run the full smp-india checks:
+
+## 11:07 assistant (smp-tool)
+
+Now the smp-tool renderer. It drops the site files, emits only `DARWIN_ENVIRONMENT`, and refuses the known incompatible image:
+
+## 11:07 assistant (smp-tool)
+
+Now `deploy_darwin.sh`: an image is required on every deploy, and the site-list line goes:
+
+## 11:08 assistant (smp-tool)
+
+These failures are from the test runner, not my change: the system `python3` is 3.9 and these tests use `enterContext`, which needs Python 3.11+. I'll check what smp-tool's CI uses:
+
+## 11:08 assistant (smp-tool)
+
+CI runs `uv run --no-sync python -m unittest discover -s tests` on Python 3.12. I'll use that, and fix the first live test, which still passes `sites=()` and expects the old variable:
+
+## 11:08 assistant (smp-tool)
+
+All 37 smp-tool tests pass. Last part on this side is the docs: Michael's runbook and `scripts/README.md` still describe `enabled_sites.json` and the "keep the running image" default.
+
+## 11:09 assistant (smp-tool)
+
+Both repos pass. Committing smp-india as two micro commits (the collector catalogue, then the publisher and freshness switching to it), checking that each commit passes the tests on its own:
+
+## 11:14 assistant (smp-india)
+
+CI is green, and the smoke test passed inside the built image. I'll get the new image tag, then commit and push smp-tool:
+
+## 11:15 assistant (smp-tool)
+
+Both repos are pushed. I'll check whether smp-tool's CI ran on that push, then update Jira and my notes:
+
+## 11:20 user
+
+remind me again, why will the fresshness dag fail?
+
+## 11:21 assistant
+
+Because the check now does what we designed it to do, and today it finds a real gap.
+
+**What changed:** the freshness DAG now expects every stream that `sites.json` enables for dev: 18 streams, including Khaba's three (`SOF_INNS7`). Before this change it only checked streams already in the collector's state file, so streams that never produced data went unnoticed.
+
+**Why it will fail:** the dev collector running now is the old image, deployed before Khaba was enabled. It has never polled Khaba, so Khaba's 3 streams aren't in its state file. In yesterday's dev run, only 15 streams showed up. So each run will fail with:
+
+```
+SOF_INNS7/ActivePower: no source data recorded yet
+SOF_INNS7/HorizontalIrradiance: no source data recorded yet
+SOF_INNS7/TiltedIrradiance: no source data recorded yet
+```
+
+**Why now:** Airflow git-syncs the DAG change automatically, so the new check is already live in dev. The collector change only takes effect once Michael redeploys the new image.
+
+**When it stops:** once Michael deploys `darwin-collector-6bec64a36575`. The new collector polls Khaba, its streams appear in the state file within a minute, and the next run passes and sends one recovery notice.
+
+So the failures aren't a bug: they're the Khaba gap we found yesterday, now reported. The only question is whether you want an alert to Teams every 15 minutes until the redeploy. If not, pause the DAG until then.
+
+## 11:21 user
+
+AHHH. okay. Not exactly related to the recent design change on the sites thing?
+
+## 11:21 assistant
+
+It's related, but only as the messenger.
+
+- **The cause has nothing to do with the redesign:** Khaba was never collected in dev because the running collector was deployed before Khaba was enabled. That was true yesterday too.
+- **What the redesign changed is that it's now reported.** Before, the check only looked at streams the collector had already produced, so Khaba was invisible. Now it reads the expected streams for dev from `sites.json`, so it notices the missing ones.
+
+There is one thing the redesign did change that's still unproven: the **publisher** (`india_darwin_realtime_tsdb_dag`) now reads its TSDB mappings from the collector's `sites.json`. That file is outside `dags/src`, so this relies on git-sync checking out the whole repo. I checked the config (it does), but no real Airflow run has confirmed it yet. If it's wrong, the publisher fails with a `FileNotFoundError` naming the path, and you'd get its usual failure alert. The next publisher run in dev (it runs every 5 minutes) will settle it. Worth a glance at its log.
+
+## 11:23 user
+
+I see....... why didn't we put it inside src?
+
+## 11:23 assistant
+
+Because one file has to reach two places that are built differently, and it can only live in one of them.
+
+- **The collector image** is built from `services/darwin-collector`, and its Dockerfile only copies that folder's `src/`. It can't see anything under `dags/src`.
+- **Airflow** sees the whole repo through git-sync, but treats `dags/src` as its DAG folder.
+
+**If `sites.json` lived in `dags/src`:** Airflow would read it the normal way, but the image build would have to reach outside its folder. That means:
+- a CI build change, either an extra build context or building from the repo root with a new `.dockerignore`;
+- a Dockerfile change;
+- changing the image-tag rule (today the tag is the last commit touching `Dockerfile`/`src`). Otherwise enabling a site wouldn't produce a new tag, which would quietly break "change sites, deploy the new tag";
+- updating the local build instructions;
+- the collector's own tests looking for the file outside their package.
+
+**In the collector's `src` (what I did):** no build changes at all, and the tag changes automatically whenever `sites.json` changes. The only cost is that the publisher reads a file outside `dags/src`, which works because git-sync clones the whole repo.
+
+I chose the option with fewer moving parts. The risk sits in one place, and the next dev publisher run will confirm it. If you'd rather have Airflow-side code stay strictly inside `dags/src`, the other option works too. It's mainly the build and tag changes listed above, and I'd only switch if that dev run shows a problem.
+
+## 11:25 user
+
+<pasted_content id="f04e">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-16T03:15:00+00:00/task_id=check_darwin_freshness/attempt=1.log
+::endgroup::
+[2026-10-16T03:15:00.399527Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a142b4-af70-7187-ac43-5e7c601926e4 dag_id=india_darwin_freshness_dag task_id=check_darwin_freshness run_id=scheduled__2026-10-16T03:15:00+00:00 try_number=1 map_index=-1
+[2026-10-16T03:15:00.428857Z] DEBUG - Loading plugins
+[2026-10-16T03:15:00.431085Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-16T03:15:00.791019Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-16T03:15:00.817843Z] DEBUG - Loading plugins from entrypoints
+[2026-10-16T03:15:00.818037Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-16T03:15:00.820261Z] DEBUG - Loading 2 plugin(s) took 389.28 ms
+[2026-10-16T03:15:00.820531Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed85d1f40>}
+[2026-10-16T03:15:00.820620Z] DEBUG - Hook impls: []
+[2026-10-16T03:15:00.820702Z] DEBUG - Result from 'on_starting': []
+[2026-10-16T03:15:00.821495Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-16T03:15:00.822162Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-16T03:15:00.822791Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-16T03:15:00.842870Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-16T03:15:00.843571Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-16T03:15:00.845255Z] DEBUG - Found DAG india_darwin_freshness_dag
+[2026-10-16T03:15:00.845995Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-16T03:15:00.847131Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag>
+[2026-10-16T03:15:00.847883Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=1  dag_file_parse_ms=25 
+[2026-10-16T03:15:00.848816Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py 
+[2026-10-16T03:15:00.849297Z] DEBUG - Integrate Macros plugins
+[2026-10-16T03:15:00.885987Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a142b4-af70-7187-ac43-5e7c601926e4'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T03:15:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-126de77908a0abf63d9a6fd28400624b-4795063b49171fb0-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 3, 15, 0, 426973, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-16T03:15:00.886368Z] DEBUG - Hook impls: []
+[2026-10-16T03:15:00.886617Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-16T03:15:00.886846Z] INFO - ::endgroup::
+[2026-10-16T03:15:00.921987Z] INFO - DARWIN_FRESHNESS={"stale": ["SOF_INNS7/ActivePower: no source data recorded yet", "SOF_INNS7/HorizontalIrradiance: no source data recorded yet", "SOF_INNS7/TiltedIrradiance: no source data recorded yet"], "source_age_minutes": {"SOF_INGU2/ActivePower": 1, "SOF_INGU2/HorizontalIrradiance": 1, "SOF_INGU2/TiltedIrradiance": 1, "SOF_INKHA/ActivePower": 1, "SOF_INKHA/HorizontalIrradiance": 3, "SOF_INKHA/TiltedIrradiance": 1, "SOF_INNS7/ActivePower": null, "SOF_INNS7/HorizontalIrradiance": null, "SOF_INNS7/TiltedIrradiance": null, "SOF_INRAG/ActivePower": 1, "SOF_INRAG/HorizontalIrradiance": 1, "SOF_INRAG/TiltedIrradiance": 1, "WIF_INSE3/ActivePower": 1, "WIF_INSE3/WindDirection": 1, "WIF_INSE3/WindSpeed": 1, "WIF_INSE4/ActivePower": 1, "WIF_INSE4/WindDirection": 1, "WIF_INSE4/WindSpeed": 1}}
+[2026-10-16T03:15:00.922430Z] ERROR - Task failed with exceptionStaleDarwinDataError: Darwin source data stale:
+SOF_INNS7/ActivePower: no source data recorded yet
+SOF_INNS7/HorizontalIrradiance: no source data recorded yet
+SOF_INNS7/TiltedIrradiance: no source data recorded yet
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py, line 45 in check_darwin_freshness
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 54 in run_from_environment
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 45 in check_freshness
+
+[2026-10-16T03:15:00.922721Z] INFO - ::group::Post Execute
+[2026-10-16T03:15:00.987476Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a142b4-af70-7187-ac43-5e7c601926e4'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T03:15:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-126de77908a0abf63d9a6fd28400624b-4795063b49171fb0-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 3, 15, 0, 426973, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 3, 15, 0, 924689, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-16T03:15:00.987870Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a142b4-af70-7187-ac43-5e7c601926e4'), task_id='check_darwin_freshness', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-16T03:15:00+00:00', try_number=1, dag_version_id=UUID('01a13eab-8965-7a9b-9260-55f2e9444ab2'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-dev.svc.cluster.local', context_carrier={'traceparent': '00-126de77908a0abf63d9a6fd28400624b-4795063b49171fb0-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_darwin_freshness>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 16, 3, 15, 0, 426973, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 16, 3, 15, 0, 924689, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.UP_FOR_RETRY: 'up_for_retry'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': StaleDarwinDataError('Darwin source data stale:\nSOF_INNS7/ActivePower: no source data recorded yet\nSOF_INNS7/HorizontalIrradiance: no source data recorded yet\nSOF_INNS7/TiltedIrradiance: no source data recorded yet')}
+[2026-10-16T03:15:00.987956Z] DEBUG - Hook impls: []
+[2026-10-16T03:15:00.988031Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-16T03:15:00.988097Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f3ed8d93470>}
+[2026-10-16T03:15:00.988147Z] DEBUG - Hook impls: []
+[2026-10-16T03:15:00.988196Z] DEBUG - Result from 'before_stopping': []
+[2026-10-16T03:15:00.988245Z] INFO - ::endgroup::
+</pasted_content id="f04e">
+
+## 11:25 assistant
+
+That's exactly the expected failure, and it also answers the open question from before.
+
+- **The failure:** it names Khaba's three streams as "no source data recorded yet", and every other dev stream is 1–3 minutes old. The run goes to `up_for_retry` first (the task has 1 retry), then fails and alerts.
+- **The Airflow path question is settled.** This run built its expected list by reading `sites.json` from `services/darwin-collector/src/...`, outside `dags/src`. The publisher uses the same loader and the same path, so the publisher works too. The concern from my last two messages is gone.
+
+What remains is Michael's redeploy. CI's ECR push is still off, so the image comes from the CI run as an artifact. Draft:
+
+```
+Hi Michael, could you redeploy the India dev Darwin collector with the new image? It now bundles the site list (incl. Khaba), so smp-tool only passes the environment.
+
+1. Image (CI run 38844354694, ECR push is off):
+gh run download 38844354694 -R qrm-dms/smp-india -n darwin-collector-image
+docker load -i darwin-collector.tar
+then the ECR login + docker push from that run's summary.
+
+2. Deploy, from smp-tool on latest dev:
+scripts/deploy_darwin.sh --env dev --context <india-dev-context> --tag darwin-collector-6bec64a36575
+
+The diff should show the image change and DARWIN_ENTITY_TAGS_JSON replaced by DARWIN_ENVIRONMENT=dev. Thanks!
+```
+
+Within about 15 minutes of his deploy, the freshness DAG should pass with all 18 streams and send one recovery notice.
+
+## 12:02 user
+
+sent. We wait for Michael to deploy. Until then...
+
+Once we confirm everything is okay on all ends on dev, how do we promote to qa? A simple redeploy but this time targeting qa and prod?
+
+## 12:02 assistant
+
+Almost. The deploy itself is the same command with a different `--env`, but qa and prod have never had the collector, so there are a few one-time steps. In order:
+
+**1. Promote the code (us):**
+- **smp-india:** merge dev into qa, then qa into prod, the usual way. Airflow in each environment git-syncs its branch, so the publisher and freshness DAGs arrive automatically. Both start paused, so nothing runs yet.
+- **smp-tool:** the same merges, so Michael's renderer has the `DARWIN_ENVIRONMENT` version on those branches.
+
+**2. The image for each environment:** each environment has its own ECR repo, and pushing to the qa/prod branches makes CI build there:
+- qa: `624915953606…/smp-india-qa-airflow`
+- prod: `154989746575…/smp-india-prod-airflow`
+
+The tag name stays `darwin-collector-6bec64a36575`, because it comes from the last commit touching the collector, which is the same commit. While ECR push is off, Michael downloads the artifact from the qa (or prod) CI run and pushes it to that environment's repo, as he did for dev.
+
+**3. One-time setup per environment (Michael):** from runbook step 2, done once per namespace:
+- the `darwin-api-credentials` Secret in `smp-india-qa` / `smp-india-prod`;
+- check that the EFS PVC is Bound;
+- prod only: confirm proxy egress from the prod cluster to Okta and `api.darwin4res.com`. qa shares the dev cluster, so it should already work there.
+
+**4. Deploy (Michael):**
+```
+scripts/deploy_darwin.sh --env qa --context <india-qa-context> --tag darwin-collector-6bec64a36575
+```
+Prod is the same with `--env prod`. Nothing else is needed for prod: the image selects prod's 21 streams, including Tithwa, by itself.
+
+**5. Switch on Airflow (us):** once the collector is running in that environment:
+- set `DARWIN_PUBLISH_MAX_FILES=200`, as the runbook prepared for dev;
+- unpause the publisher, check that it publishes and reads back (qa writes to TSDB UAT, prod to prod TSDB);
+- unpause the freshness DAG.
+
+That order means the freshness DAG never alerts on a collector that hasn't been deployed yet.
+
+So for us it's mostly the usual branch promotion. For Michael it's the dev procedure plus one-time Secret and storage checks per namespace. If you want, I can prepare the qa handover message now, so it's ready once dev checks out.
+
+## 12:04 user
+
+maaaan. this whole situation really emphasizes the importance of CI/CD, no? Yeesh. Anyway, anything we can improve further on that front while we wait? Doesn't have to be darwin related
+
+## 12:04 assistant
+
+Yes, very much. I'll check what smp-tool's CI actually covers before suggesting anything, because I noticed earlier that my smp-tool push didn't trigger a test run:
+
+## 12:05 assistant (smp-tool)
+
+Here's what I'd do, in order of value per effort. The first finding came from this check.
+
+**1. smp-tool has no CI that runs its tests.** Its four workflows are all manual (`workflow_dispatch`), scheduled, or per-branch infra deploys. Nothing runs `unittest` on push or PR. So `deploy_darwin.sh`, the renderer, and every other tested script in smp-tool are only tested when someone remembers to run them locally. My push this morning was never tested in CI.
+- **Fix:** a ~15-line workflow that runs `uv run python -m unittest discover -s tests` on push and PR. Needs nobody else. **I can do this now.**
+
+**2. Turn on ECR push for the collector image:** set `DARWIN_COLLECTOR_ECR_PUSH=true` on smp-india. That removes the "download the artifact, docker load, log in, push" steps for Michael, for every environment. It's one repo variable, and the first CI run will show whether the role trust is in place. You or a repo admin needs to set it.
+
+**3. Deploy Darwin from GitHub Actions instead of Michael's laptop.** This turned out more feasible than I'd thought: smp-tool's `docker-build.yml` already deploys Airflow to these same EKS clusters through GitHub OIDC (`aws eks update-kubeconfig` on `eks-qrm-dms-noprod-6196` / `…-prod-bba1`). A manual "deploy Darwin" workflow (inputs: environment and tag) could reuse that role and kubeconfig setup and run `deploy_darwin.sh --yes`.
+- Then Michael's whole procedure becomes clicking "Run workflow", or anyone on the team could do it.
+- **Needs from Michael:** confirming that the role allowed to deploy Airflow may also manage the `darwin-collector` Deployment in `smp-india-*`. It probably can, since Helm already deploys into those namespaces.
+
+**4. The end state you described: everything from smp-india.** On merge to dev/qa/prod, smp-india CI builds the image and deploys it, and the smp-tool Darwin pieces go away.
+- **Needs:** EKS access for smp-india's own `dms-smp-india-deploy` role, which today only has ECR rights. That's a platform/Michael request.
+- With #2 and #3 in place, it's mostly moving the job between repos.
+
+**Lower priority:** branch promotion (dev → qa → prod) is manual merges. It works, and a "promote if CI is green" workflow would only save a few commands.
+
+I'd do #1 now. For #2 to #4 I can draft a short message to Michael covering the role access questions. Shall I start on #1?
+
+## 12:08 user (smp-tool)
+
+yes pls. 
+
+for 2, we're still waiting for the role to be approved
+for 3, same with above... waiting to be approved lol
+for 4, isn't the catch here we'd need to define all the cluster config kube kube helm whatever in two places? smp-india and smp-tool? At least that's what Michael tells me, hence we keep everything cluster related to smp-tool. Everything infra!
+
+## 12:08 assistant (smp-tool)
+
+On #4, Michael is right, and it's the same reason SCR-1283 kept deployment in smp-tool. I'd drop "move everything to smp-india" as the goal. The catalogue change already gives you what you wanted from it:
+
+- **smp-india owns what runs:** collector code, sites, tags, TSDB mappings, all in one image. Every Darwin change happens there.
+- **smp-tool owns where and how it runs:** manifest, namespace, PVC, Secret, proxy, cluster access. That's infra, and it rarely changes.
+
+The only link between them is the image tag. So the realistic end state is #2 plus #3: CI pushes the image, and a smp-tool workflow deploys a given tag. If you ever want it fully hands-off, smp-india CI could trigger smp-tool's deploy workflow after building, so no cluster config gets duplicated. That needs a cross-repo token, so it's a later question.
+
+Now #1. Checking how smp-tool's existing workflows set up Python and uv, and what its tests depend on:
+
+## 12:09 assistant
+
+The tests and the scripts they cover only use the standard library, so the workflow needs no dependency install and no secrets. Confirming with a bare Python 3.12, outside the project's virtualenv:
+
+## 12:09 assistant (smp-tool)
+
+That isn't a clean test yet: `sys.prefix` shows it still picked up the project's `.venv`, probably through `VIRTUAL_ENV` from direnv. Retrying with a throwaway virtualenv that has nothing installed:
+
+## 12:09 assistant (smp-tool)
+
+All 37 tests pass in an empty Python 3.12 environment. I'll copy the runner and trigger conventions from smp-india's CI:
+
+## 12:09 assistant (smp-tool)
+
+smp-tool has more long-lived branches (`dev`, `main`, and the `*-india` / `*-japan` infra branches), and the job is cheap and needs no secrets, so I'll run it on every push and PR:
+
+## 12:10 assistant (smp-tool)
+
+smp-tool's unit tests now run in CI on every push and pull request.
+
+- **The workflow:** [tests.yml](smp-tool/.github/workflows/tests.yml), commit `cc97dca` on smp-tool dev.
+- **First run:** passed, 37 tests in 0.7 s. That includes this morning's `deploy_darwin.sh` and renderer changes, which until now had only been tested on my machine.
+- **Runs without secrets:** the tests and the scripts they cover only use the standard library (I confirmed this in an empty Python 3.12 environment), so it runs on a standard GitHub runner. If a test ever needs the private packages, the workflow will need a `uv sync` step; there's a comment in the file saying so.
+
+The infra branches (`dev-india`, `qa-japan`, etc.) only get the workflow once this commit is merged into them. I left those branches alone, since they have their own deploy flow.
+
+On #2 and #3: once the role approvals come through, setting the ECR push variable and the smp-tool "deploy Darwin" workflow are each small changes, and I can pick them up then. #4 is dropped: the current split (smp-india owns the image, smp-tool owns the infra, linked by the image tag) is already the end state.
+
+## 12:28 user (smp-tool)
+
+He said he completed the deployment but it got me asking, did he have to also pull latest smp-tool? Or not necessary?
+
+## 12:28 assistant (smp-tool)
+
+Yes, it was needed, but a stale checkout would have failed quietly rather than loudly:
+
+- **With the latest smp-tool:** the manifest sets only `DARWIN_ENVIRONMENT=dev`, and the collector takes its sites from the `sites.json` bundled in the image. That's the intended setup.
+- **With an old smp-tool:** the old renderer still emits `DARWIN_ENTITY_TAGS_JSON` from its old site files, which also include Khaba. The new collector still accepts that variable (I kept it for mocks and demos). So the deploy would succeed, Khaba would be collected, and the freshness DAG would turn green. It would look identical, but `sites.json` wouldn't be in control. The old script also has no guard against the incompatible image, and still allows reusing the running image.
+
+**How to tell which one he used:** either of these settles it.
+- **What the script printed:** the new one says `Sites: enabled for dev in the image's bundled sites.json (smp-india)`. The old one lists site names (`Sites: tuticorin, khavda, …`).
+- **Or he runs:**
+  ```bash
+  kubectl -n smp-india-dev get deploy darwin-collector -o jsonpath='{.spec.template.spec.containers[0].env[*].name}'
+  ```
+  The list should contain `DARWIN_ENVIRONMENT` and no `DARWIN_ENTITY_TAGS_JSON`.
+
+If it turns out he used the old checkout, nothing is broken. He just pulls smp-tool dev and reruns the same deploy command. The diff will show the variable swap and nothing else.
+
+Separately, the next freshness DAG run should pass with all 18 streams and send the recovery notice. That shows Khaba is collected, but not which configuration path did it, so the check above is still worth doing.

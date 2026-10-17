@@ -1,0 +1,135 @@
+# Claude Conversation - 2026-10-16
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `c410edb9-9414-4da4-a9d3-3dee69b678eb`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/c410edb9-9414-4da4-a9d3-3dee69b678eb.jsonl`
+Resume: `claude --resume c410edb9-9414-4da4-a9d3-3dee69b678eb`
+
+## 15:12 user
+
+In /Users/qn5792/repos/smp/smp-india, `uv run --no-sync python scripts/test_darwin_poc_airflow.py --aggregation` fails with `KeyError: 'quarter_hour_series_id'` at scripts/test_darwin_poc_airflow.py line ~79 (the `expected = {row["quarter_hour_series_id"]: ...  for row in mappings}` block). It started with commit 42ee7f3 "feat(scr-1268): read Darwin TSDB destinations and expected streams from the collector catalogue", which changed where Darwin publisher mappings come from; the script still assumes the old dags/src/scripts/darwin_publish/mappings.json row shape. The default mode (no --aggregation), which CI runs, still passes. Update the script to read destinations the same way the publisher now does (see scripts/darwin_publish/targets.py load_mappings and the SCR-1268 commits), keep its assertions equivalent, and verify both `scripts/test_darwin_poc_airflow.py` and `--aggregation` exit 0, plus `uv run --no-sync pytest dags/test/ -q`. Do not commit unless asked.
+
+## 15:12 assistant (smp-india)
+
+The partial port dropped `tag_code` and `quarter_hour_series_id`. Restoring the full row shape from `load_mappings()` fixes it without touching the assertions.
+
+## 15:13 assistant (smp-india)
+
+The `--aggregation` run works again. Commit 42ee7f3 started reading rows from `load_mappings()` in the publisher, but it only copied over `entity_code` and `minute_series_id`. The assertions further down also use `tag_code` and `quarter_hour_series_id`, so those rows were missing fields.
+
+**Fix:** in [scripts/test_darwin_poc_airflow.py:54](smp-india/scripts/test_darwin_poc_airflow.py:54), each row built from `load_mappings()` now includes all four fields the assertions use: `entity_code`, `tag_code`, `minute_series_id` and `quarter_hour_series_id`. The assertions themselves are unchanged.
+
+All three checks exit 0:
+- **Default mode:** 5 fake TSDB points, 0 pending files.
+- **`--aggregation`:** 60 minute points, 12 quarter-hour points, 0 pending files.
+- **`pytest dags/test/ -q`:** 1200 passed, coverage 91.52%.
+
+Nothing is committed.
+
+I didn't check what happens when the catalogue gains a second site. The script reads every site's mappings, the same as the publisher does, so the assertions should still hold.
+
+## 15:14 user (smp-india)
+
+right. commit and push pls. no scope
+
+## 15:14 assistant (smp-india)
+
+The fix is committed and pushed to `dev` on qrm-dms/smp-india as `0f91f3e fix: restore tag and quarter-hour destinations in the Darwin Airflow aggregation check`, with no scope.
+
+The pre-commit hooks passed, and the push went through. GitHub's "Changes must be made through a pull request" notice is the expected rule bypass for pushes to `dev`. I didn't check whether CI passed on the new commit.
+
+## 15:15 user (smp-india)
+
+aren't we supposed to run the tests in CI though? or it's not as simple as it sounds...
+
+## 15:16 user (smp-india)
+
+yes pls. follow the CI to green
+
+## 15:16 assistant (smp-india)
+
+I pushed `bf59d61` to `dev` and I'm waiting for its CI run, 38866158604, which is still queued. I'll check its result when it finishes.
+
+## 15:16 user (smp-india)
+
+<task-notification>
+<task-id>b3n006g18</task-id>
+<tool-use-id>toolu_01Uxh4hcRWEc75SBg89xojYM</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/c410edb9-9414-4da4-a9d3-3dee69b678eb/tasks/b3n006g18.output</output-file>
+<status>completed</status>
+<summary>Background command "export GH_TOKEN=[REDACTED] auth token -u QN5792_engieco); timeout 1500 gh run watch 38866158604 --exit-status --interval 30 &gt; /dev/null 2&gt;&amp;1; echo "exit $?"; gh run view 38866158604 --json conclusion,jobs --jq '.conclusion, (.jobs[] | "\(.name): \(.conclusion)")'" completed (exit code 0)</summary>
+</task-notification>
+
+## 15:16 assistant (smp-india)
+
+`timeout` isn't on macOS, so the watch never started. Checking the run directly.
+
+## 15:17 assistant (smp-india)
+
+The first watch never ran because `timeout` isn't installed on macOS. I've restarted it without that. The run is in progress, and the `tests` job is still queued for the self-hosted runner.
+
+## 15:19 user (smp-india)
+
+thanks. if this turned out well, are there any other non-dag tests we're not running in CI? Or just darwin? And why do we even have these non-dag tests?
+
+## 15:19 assistant (smp-india)
+
+Three `demo_darwin*` scripts run offline and contain assertions. I'll check whether they still pass, because 42ee7f3 could have broken them the same way.
+
+## 15:20 assistant (smp-india)
+
+CI passed on `bf59d61`: lint, docs, tests and darwin-collector all succeeded. The `tests` job log shows both modes of the Darwin Airflow script passing, the new `--aggregation` one included (60 minute points and 12 quarter-hour points).
+
+**Is anything else missing from CI?** No, that was the only gap, and it was Darwin only. Here's how the other tests outside `dags/test/` are covered:
+
+| Script | How CI covers it |
+|---|---|
+| `scripts/test_darwin_poc_airflow.py` | Its own CI step, with `--aggregation` now as well |
+| `scripts/demo_darwin.py` | pytest calls `run_demo()` in `test_darwin_end_to_end.py` |
+| `scripts/demo_darwin_aggregation.py` | pytest calls `run_demo()` in `test_darwin_real_integration.py` |
+| `scripts/demo_darwin_sites.py` | pytest calls `run_demo()` in `test_darwin_sites.py`, three variants |
+| `scripts/smoke_darwin_container.py` | Runs in the darwin-collector job against the built image |
+| `services/darwin-collector/tests/` | Runs as the darwin-collector job's own pytest |
+
+I also ran the three `demo_darwin*` scripts directly, and each exits 0 in about 2 seconds. The other scripts in `scripts/` (`probe_*`, `discover_darwin_live`, `soak_darwin`, `benchmark_*`, `sync_local`) aren't tests. They hit live endpoints or need Docker and real time. `dags/src/india/test_lorenz_dag.py` only looks like a test: it's a DAG whose name starts with `test_`.
+
+**Why do these tests live outside `dags/test/`?** Each one checks something a normal unit test inside a single package can't:
+- **The demos run the collector and the publisher together.** The collector lives in `services/darwin-collector` and the publisher in `dags/src`, as separate packages. Each demo adds both to `sys.path` and runs real OAuth and HTTP calls against local mock servers, then publishes to a fake TSDB. They're also documented in `contracts/darwin/README.md` as runnable demonstrations. pytest gets around the package split by importing the scripts and calling `run_demo()` on them.
+- **The Airflow script needs a process of its own.** It runs a real `dag.test()` against a disposable Airflow home and metadata database. Airflow reads its config from environment variables once per process, so this can't safely run inside the main pytest process. That's why it starts a subprocess with a stripped environment.
+- **The container smoke test needs the built Docker image**, so it can only run after the image build in the darwin-collector job.
+
+Only the Airflow script fell through because it's a standalone script rather than something pytest imports. CI had a step only for its default mode.
+
+## 15:21 user (smp-india)
+
+I see. I'm curious, what's stopping us now to write a more "e2e" or integration tests for the rest of the dags as practice? Or you feel dag unit test is more than enough?
+
+## 15:21 assistant (smp-india)
+
+I wouldn't add end-to-end tests for every DAG. The unit tests leave a real gap, but full e2e coverage would mostly not catch the problems this repo has actually had.
+
+**What the DAG unit tests cover today.** The 17 non-Darwin test files build the DAG, check its settings (schedule, retries, catchup), and call each task's `python_callable` on its own with mocks. See [test_india_iex_rec_tsdb_dag.py](smp-india/dags/test/test_india_iex_rec_tsdb_dag.py). None of them runs `dag.test()`, so these never get exercised:
+- data passed between tasks (XCom), and the shapes one task returns to the next;
+- trigger rules and task order, such as the `ALL_DONE` upload problem we hit in scraper-dags;
+- the real Airflow runtime context and the output paths it produces.
+
+A run-the-whole-DAG test would catch that kind of bug cheaply.
+
+**What has actually gone wrong recently.** The REC scraper stopped being scheduled while its TSDB data went stale, the Khaba CSV changed layout and shifted its columns, and the CDH crawler prefix was wrong. All three were changes or misconfiguration in something outside our code. An e2e test with fakes would have passed in every case, because the fakes behave the way we assume the real systems do. Those failures get caught by freshness monitoring (like the SCR-1268 Darwin freshness DAG) and by contract tests built on real recorded responses.
+
+**What's stopping us is cost, not anything technical.** Darwin's e2e harness was cheap because Darwin already had a fixture contract and a SQLite fake TSDB. Each other DAG would need a fake for every external system it touches: the IEX/HPX APIs, TSDB reads and writes, and uploads to S3, CDH or SharePoint. Every run also needs its own process, because Airflow reads its config once per process (the reason `test_darwin_poc_airflow.py` starts a subprocess). That's roughly 20 DAGs' worth of fakes to build and keep current. As practice it's fine. As coverage it's a poor return.
+
+**What I'd do instead:**
+1. **A spike on one high-risk DAG.** `india_khaba_generation_realtime_dag` is the candidate: it chains several tasks, and its forecasts only reach Grafana inside the actuals file. Generalise the Airflow harness into a fixture, patch only the outside boundaries, and run `dag.test()`. That shows the real cost per DAG before anyone commits to more.
+2. **Contract tests built on recorded real responses** for the sources that have already drifted (Khaba CSV, IEX), so a format change fails a test instead of reaching prod.
+3. **Leave the rest on unit tests and freshness alerts.**
+
+If the spike turns out cheap, extending it to the IEX RTM and Khaba reconciliation DAGs is next. I'd stop there.
+
+## 15:22 user (smp-india)
+
+Just discussing
+
+## 15:22 assistant (smp-india)
+
+Fine, I'll leave it there. All the fixes from today are on `dev` and CI is green. If you want the Khaba spike later, it should give you a per-DAG cost before anyone commits to more.

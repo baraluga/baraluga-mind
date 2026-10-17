@@ -1,0 +1,556 @@
+# Claude Conversation - 2026-10-16
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `4e922cd7-cb9f-48f8-8072-468a23f5ee5c`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/4e922cd7-cb9f-48f8-8072-468a23f5ee5c.jsonl`
+Resume: `claude --resume 4e922cd7-cb9f-48f8-8072-468a23f5ee5c`
+
+## 13:52 user
+
+From Lou:
+
+"
+
+<pasted_content id="d414">
+Hello Team, 
+ 
+We have noticed that the forecasts (DA/ID) from Manikaran for Khaba were unavailable on Grafana between 13/10/2026 (23:45) and 15/10/2026 (00:00).
+ 
+However, the data is present in the TSDB. I checked for any issues with the DAGs, but I was unable to identify the cause of the problem. Could you help me investigate?
+</pasted_content id="d414">
+
+ "
+
+## 13:53 assistant
+
+Looking at the Khavda forecast DAG (`india_khavda_generation_forecasts`) and how it publishes to CDH; next I'll check the Grafana query and then the real data.
+
+## 13:53 assistant
+
+Now the Grafana query.
+
+## 13:53 assistant (smp-dashboard)
+
+Khaba panels read `india_khaba_generation_latest` (actuals + DA/ID series in one dataset). Checking which DAG writes the forecasts there.
+
+## 13:54 assistant
+
+Next: write a one-shot probe to confirm with real data (CDH file write times + forecast row counts, and when the 14 Oct forecasts landed in TSDB). Checking how existing probes authenticate.
+
+## 13:54 assistant (smp-india)
+
+Prod TSDB creds are in `.envrc`. Running a read-only probe of the two Khaba forecast series to see when the 14 Oct values were published.
+
+## 13:59 assistant (smp-india)
+
+While that runs (it may need VPN), checking the Khaba realtime/reconciliation DAG schedules to pin when each daily file gets rewritten.
+
+## 14:00 user (apac-tsdb-scraper)
+
+are you trying to read through tsdb? Remember, it needs vpn ha... so keep in mind to stop trying to run this yourself lol
+
+## 14:00 assistant (apac-tsdb-scraper)
+
+Yes, that was me, and you're right. I've stopped it and won't run TSDB reads myself again.
+
+## 14:00 assistant
+
+I've saved a memory note so I don't try running TSDB reads myself again. Here's what I found from the code, without the data check yet.
+
+**Likely cause (Khaba, not Khavda):** the Khaba forecast panels read `india_khaba_generation_latest`. Each daily file there holds the actuals plus the DA/ID forecasts, and the forecasts are copied from TSDB only at the moment the file is written ([cdh_export.py](smp-india/dags/src/scripts/khaba_generation_tsdb/cdh_export.py)).
+- If a forecast series has no data in TSDB at write time, the code logs a warning and writes the file without it. The DAG stays green, which is why Lou saw nothing wrong in Airflow.
+- The forecasts for 14 Oct can only appear in two files: the 13 Oct file (last rewritten around 14 Oct 12:00 IST) and the 14 Oct file (last rewritten around 15 Oct 12:00 IST, by `india_khaba_generation_reconciliation`). After that, nothing rewrites either file.
+- So if Manikaran's 14 Oct values reached TSDB after about 15 Oct 12:00 IST, they would be in TSDB but never on Grafana. That matches the exact gap: all of IST 14 Oct is missing, and 15 Oct is fine.
+
+**Quick fix for Lou, no code needed:** trigger `india_khaba_generation_reconciliation` with `target_date=2026-10-14`. It rewrites that day's file with the forecasts now in TSDB.
+
+**To confirm, run on VPN** (read-only; should take under a few minutes). It prints, for each forecast series and each IST date from 12 to 16 Oct, the row count and the version timestamps:
+```bash
+cd ~/repos/smp/smp-india && set -a && source <(grep "^export SMP_SERVICE_APP_OKTA_CLIENT" .envrc) && .venv/bin/python -I /tmp/khaba_fc_probe.py 2>&1 | grep -v "^INFO\|DEBUG" | tail -40
+```
+If the 14 Oct versions (`forecast_date` or `publication_date`) are later than 15 Oct 06:30 UTC (12:00 IST), the cause is confirmed.
+
+The lasting fix would be to make a missing forecast visible instead of silent, or to re-export recent days once forecasts arrive. I haven't changed any code.
+
+I haven't checked Airflow logs for the "Skipping unavailable forecast" warning or looked at the CDH file timestamps. I also haven't worked out why the Manikaran scraper fetches `today-2..today-1`, which may be why the forecasts land late.
+
+## 14:05 user
+
+check terminal pls
+
+## 14:05 assistant
+
+The probe needs a `forecast_date` filter. I've added one covering 10–17 Oct.
+
+## 14:05 assistant
+
+The probe failed because TSDB wouldn't run the query (`CatalogDataFilteringTooWide`). These series are stored by `forecast_date`, so a read has to give a `forecast_date` range. I've added a 10–17 Oct range to `/tmp/khaba_fc_probe.py`. Please re-run the same command on VPN:
+
+```bash
+cd ~/repos/smp/smp-india && set -a && source <(grep "^export SMP_SERVICE_APP_OKTA_CLIENT" .envrc) && .venv/bin/python -I /tmp/khaba_fc_probe.py 2>&1 | grep -v "^INFO\|DEBUG" | tail -40
+```
+
+Then say "check terminal" again. If the 14 Oct values were issued after 15 Oct 12:00 IST, my explanation is confirmed. If they were issued earlier, it's wrong and I'll look elsewhere.
+
+## 14:07 user
+
+cd ~/repos/smp/smp-india && set -a && source <(grep "^export SMP_SERVICE_APP_OKTA_CLIENT" .envrc) && .venv/bin/python -I /tmp/khaba_fc_probe.py 2>&1 | grep -v "^INFO\|DEBUG" | tail -40
+
+## 14:07 user
+
+[Request interrupted by user]
+
+## 14:08 user
+
+check terminal pls
+
+## 14:08 assistant
+
+Different error this time: the forecasts are revised often, so 7 days of versions came to more than 50k rows. I'll read one forecast-day at a time and print just a summary per delivery date.
+
+## 14:08 assistant
+
+Please run the same command again on VPN:
+
+```bash
+cd ~/repos/smp/smp-india && set -a && source <(grep "^export SMP_SERVICE_APP_OKTA_CLIENT" .envrc) && .venv/bin/python -I /tmp/khaba_fc_probe.py 2>&1 | grep -v "^INFO\|DEBUG" | tail -80
+```
+
+It makes 12 small reads, each covering one day of forecast versions and printing a progress line, so it should take about 1–3 minutes. For each delivery date from 13 to 15 Oct, it shows when the first and last forecast versions were issued, plus how many rows were issued in each hour. If the 14 Oct versions only start after 15 Oct 12:00 IST, the late-arrival explanation is confirmed.
+
+## 14:09 user
+
+there
+
+## 14:10 assistant
+
+Please run it again on VPN. I've changed it to throw away the SDK's error logging (`2>/dev/null`), so only the summary prints:
+
+```bash
+cd ~/repos/smp/smp-india && set -a && source <(grep "^export SMP_SERVICE_APP_OKTA_CLIENT" .envrc) && .venv/bin/python -I /tmp/khaba_fc_probe.py 2>/dev/null | tail -100
+```
+
+It should still take about 1–3 minutes. Every day prints one line, either `rows N` or `no data`, then the per-date summary tables.
+
+## 14:13 user
+
+there
+
+## 14:14 assistant (smp-common)
+
+I can't read that bucket locally either: CDH S3 access only works from the Airflow pods. Grafana can query the exact data the panels use, so the quickest check is one SQL query in Grafana Explore. You'll need VPN for that too.
+
+**Grafana → Explore → the Athena datasource the R&F dashboard uses**, switch to raw SQL, paste this, and set the time range to the last 7 days:
+
+```sql
+SELECT
+  regexp_extract("$path", '[^/]+$') AS file,
+  metric,
+  MAX(as_of_date)                    AS as_of,
+  COUNT(*)                           AS rows,
+  COUNT(value)                       AS non_null,
+  MIN(ts)                            AS first_ts_utc,
+  MAX(ts)                            AS last_ts_utc
+FROM india_khaba_generation_latest
+WHERE ts >= '2026-10-13 12:00:00'   -- 13 Oct 17:30 IST
+  AND ts <  '2026-10-15 00:00:00'   -- 15 Oct 05:30 IST
+GROUP BY 1, 2
+ORDER BY 1, 2
+```
+
+For each file covering 13–15 Oct, it shows whether `day_ahead_forecast` and `intraday_forecast` rows exist, whether they're NULL, and when the file was last written (`as_of`). That separates the remaining possibilities:
+- **The forecast rows exist and aren't NULL:** the data reached CDH, so the problem is in the panel query or its deduplication.
+- **The rows are missing from both the 13 Oct and 14 Oct files:** the export read failed silently. I'd then check the warnings in the Airflow task logs.
+- **The rows exist but are NULL:** something went wrong while the export built its frame.
+
+Paste the result here (or say "check terminal" if you save it there).
+
+## 14:43 user (smp-common)
+
+<pasted_content id="d414">
+file
+metric
+as_of
+rows
+non_null
+first_ts_utc
+last_ts_utc
+india_khaba_generation_2026-10-12.parquet
+day_ahead_forecast
+2026-10-13
+26
+26
+2026-10-13 12:00:00
+2026-10-13 18:15:00
+india_khaba_generation_2026-10-12.parquet
+intraday_forecast
+2026-10-13
+26
+26
+2026-10-13 12:00:00
+2026-10-13 18:15:00
+india_khaba_generation_2026-10-15.parquet
+active_power
+2026-10-16
+22
+22
+2026-10-14 18:30:00
+2026-10-14 23:45:00
+india_khaba_generation_2026-10-15.parquet
+day_ahead_forecast
+2026-10-16
+22
+22
+2026-10-14 18:30:00
+2026-10-14 23:45:00
+india_khaba_generation_2026-10-15.parquet
+intraday_forecast
+2026-10-16
+22
+22
+2026-10-14 18:30:00
+2026-10-14 23:45:00
+</pasted_content id="d414">
+
+## 14:43 assistant (smp-common)
+
+Found it. **There are no Khaba daily files for 13 Oct or 14 Oct in CDH at all.** The forecasts aren't the problem: those days have no actuals either. Checking the git history to see why the files weren't written.
+
+## 14:44 assistant
+
+**Root cause:** the daily Khaba files for 13 Oct and 14 Oct were never written to CDH. Your query found no rows from either file, for actuals or forecasts.
+
+The forecasts aren't a separate feed on Grafana. Each `india_khaba_generation_<D>.parquet` holds day D's actuals plus the Manikaran forecasts for D and D+1. That file is only written when day D's Khaba SCADA CSV exists. No CSV means no file, which means no forecasts, even though the forecasts are in TSDB.
+
+That accounts for Lou's exact window:
+- **Until 13 Oct 23:45 IST:** the 12 Oct file's forecasts cover 12 and 13 Oct, and its last point is 13 Oct 23:45 IST (18:15 UTC in your output).
+- **From 15 Oct 00:00 IST:** the 15 Oct file starts there.
+- **In between:** nothing. The TSDB probe showed the forecasts were issued on time, so Manikaran isn't the cause.
+
+Lou probably only noticed the forecasts, but Khaba actuals for 13 and 14 Oct should be missing on Grafana as well.
+
+I haven't confirmed why the two files are missing. The 15 Oct commit `eb90588` mentions upstream CSV upload outages. The other candidate is the 9–12 Oct CSV parsing break, whose fix only reached prod on 13 Oct at 13:37. Either way, the `india_khaba_generation_reconciliation` runs for those dates (on 14 and 15 Oct at 12:00 IST) should have failed, so it's worth checking them in Airflow.
+
+**Fix:** trigger `india_khaba_generation_reconciliation` with `target_date=2026-10-13`, then again with `2026-10-14`. If the CSVs are now in S3, this rewrites both files with actuals and forecasts and the gap closes. If either run fails on the source check, the CSVs never arrived and it's an upstream issue for whoever uploads the Khaba files.
+
+Reply for Lou:
+```
+Hi Lou, found it. Grafana gets the Khaba forecasts from the same daily file as the actual generation. That file is only built when the day's Khaba SCADA CSV arrives, and for 13 and 14 Oct it was never built. That's why the forecasts are in TSDB but not on Grafana (and why actuals for those days are probably missing too). We're re-running reconciliation for those two dates. If the CSVs are there now, the gap will fill. If not, we'll chase the upstream upload.
+```
+
+The longer-term fix is to publish the forecasts separately so a missing CSV doesn't hide them. I haven't started on it. I've saved a memory note about this link between the forecasts and the daily file.
+
+## 14:45 user
+
+wait, this is different ha. I think she's talking about khavda manikaran?
+
+## 14:45 assistant
+
+You're right, I mixed them up. Lou wrote "Khaba", but the Manikaran forecasts are on the Khavda side, so I'll redo the check against `india_khavda_generation`.
+
+That DAG works differently: every 10 minutes it rewrites one file per day for the last 7 days plus tomorrow, so a gap left by a one-off failure should fill itself in on the next run. A gap that's still there on the 16th means either the 14 Oct file is being rewritten without forecasts on every run, or the DAG hasn't succeeded since.
+
+The same Grafana Explore check will tell us which. Same datasource, time range the last 7 days:
+
+```sql
+SELECT
+  regexp_extract("$path", '[^/]+$') AS file,
+  metric,
+  MAX(as_of_date)  AS as_of,
+  COUNT(*)         AS rows,
+  COUNT(value)     AS non_null,
+  MIN(ts)          AS first_ts_utc,
+  MAX(ts)          AS last_ts_utc
+FROM india_khavda_generation_latest
+WHERE ts >= '2026-10-12 18:30:00'   -- 13 Oct 00:00 IST
+  AND ts <  '2026-10-15 18:30:00'   -- 16 Oct 00:00 IST
+GROUP BY 1, 2
+ORDER BY 1, 2
+```
+
+Also, please check `india_khavda_generation_forecasts` in Airflow prod. Are recent runs green? If they are, open one run's `extract_and_validate` log and copy the `KHAVDA_TSDB_SERIES ... date=2026-10-14` lines. They show how many rows the DAG read for each series, so we'll know whether it's getting forecasts from TSDB for the 14th right now.
+
+You can ignore my Khaba conclusion, and I've dropped the memory note I saved for it. Missing 13 and 14 Oct Khaba files is still a real gap, though (actuals too), and worth a separate look later.
+
+## 14:56 user
+
+can't connect right now in vpn. You can try here in CDH? I have it in the browser. Remember, anything you need via Athena, we can do it here in CDH
+
+## 14:56 assistant
+
+SMP_DATASOURCE_PRD is open. I'll use its SQL Lab tab.
+
+## 14:56 user
+
+[Request interrupted by user]
+
+## 14:56 user
+
+sorry wrong project. There, corrected
+
+## 14:56 assistant
+
+SMP_INDIA_CDH_PROD is open. Opening its SQL Lab.
+
+## 14:57 assistant
+
+Both Khavda tables are there. Running the per-file query (read-only SELECT).
+
+## 14:57 assistant
+
+The table needs its database prefix. Re-running with it.
+
+## 14:57 assistant
+
+My edit didn't take: the click missed the editor. Locating the editor itself.
+
+## 14:58 assistant (smp-common)
+
+I didn't run anything in Airflow and didn't change any code. The Lou reply above is ready to send whenever you want.
+
+## 15:00 user (smp-common)
+
+wait wait wait... so... there's no issue? We didn't do anything ha!
+
+## 15:00 assistant (smp-common)
+
+Right, we didn't fix anything, and the data looks fine now. But that doesn't mean nothing went wrong.
+
+**What we know:** CDH has every 14 Oct forecast point right now, and the Grafana panels read straight from those files. So either:
+1. **It fixed itself.** The forecasts really were missing for a while, and a later run of the job, which republishes the last 7 days every 10 minutes, filled them in. That fits Lou's report and "the data is in TSDB".
+2. **The data was never missing,** and Lou saw a display problem (time range, cache, a panel that hadn't refreshed).
+
+We can't tell which without Airflow logs from 14–15 Oct, which need VPN.
+
+**Why it still matters if it's (1):** the job turns an empty forecast read into a green run that publishes no forecasts. That's how Lou saw a gap while every DAG looked fine. Nothing is broken today, but it can happen again silently.
+
+**What I'd do:**
+- Now: ask Lou to refresh and confirm the 14th is there. If it's still missing, it's a Grafana problem, not data.
+- When you're back on VPN: look at one 14 Oct run log for `rows=0` on the forecast series. That settles (1) versus (2).
+- Only if it was (1): a small change so that when today's or tomorrow's forecasts read as empty, the run raises a Teams alert instead of passing. Your call whether that's worth a ticket.
+
+Shorter reply for Lou, since we didn't actually fix anything:
+```
+Hi Lou, I checked the dashboard data and the Khavda DA/ID forecasts for 14 Oct are all there now (96/96 points). The job republishes the last 7 days every 10 minutes, so a temporary empty read would have been filled in automatically. Could you refresh and confirm you see them? I'll check the job logs to see what happened on the 14th.
+```
+
+## 15:00 user (smp-common)
+
+which dashboard is she likely referring to?
+
+## 15:01 assistant
+
+It's almost certainly **"R&F Assets - Forecasts DA/ID - Generation"** ([rf_assets_forecasts_da_id_generation.json](smp-dashboard/dashboards/india/rf_assets_forecasts_da_id_generation.json), uid `ad8nwwj`). It's the only dashboard that reads the Manikaran forecasts, and its title uses Lou's own wording, "Forecasts DA/ID".
+
+It has two sections:
+- **KHABA:** Khaba generation from the SFTP feed plus DA/ID forecasts, read from `india_khaba_generation_latest`.
+- **KHAVDA:** Khavda generation plus DA/ID forecasts, read from `india_khavda_generation_latest`.
+
+This brings back the Khaba-or-Khavda question. Lou literally wrote "Khaba", and the dashboard has a Khaba section showing Manikaran DA/ID forecasts too (series `7911faa6…` and `f60cf7f8…`). That section does have a real gap. The Khaba files for 13 and 14 Oct are missing from CDH, but the 12 Oct file includes forecasts up to 13 Oct 23:45 IST, and the 15 Oct file starts at 15 Oct 00:00 IST. That matches Lou's window exactly: "13/10 (23:45) to 15/10 (00:00)".
+
+The Khavda section, by contrast, is complete. So the data points to Khaba, as Lou wrote, and my Khaba finding from earlier stands:
+- **Cause:** no Khaba SCADA CSV was processed for 13 or 14 Oct, so those daily files were never written. The forecasts only reach Grafana inside those files.
+- **Fix:** re-run `india_khaba_generation_reconciliation` for `2026-10-13` and `2026-10-14`. Note this needs the CSVs to be in S3 now, and that's not confirmed yet.
+
+If you want certainty, ask Lou which section she was looking at. The dates already answer it, though.
+
+## 17:02 user
+
+Remind me again… do we have separate dags for khaba vs khavda?? Or did we do them in a single dag? Francois’ assessment was, due to the recent failure of khava csv presence, khavda is affected due to the skip thing we did recently. 
+
+Fucked up if true lol
+
+## 17:02 assistant (smp-india)
+
+They're separate DAGs, and Francois's theory doesn't hold. You're not in trouble.
+
+**Khavda:** `india_khavda_generation_forecasts`
+- Reads actuals and forecasts from TSDB only. There's no CSV, and no Khaba code anywhere in it (I grepped).
+- Its CDH data for 13–15 Oct is complete right now: 96/96 day-ahead and intraday points per day.
+
+**Khaba:** `india_khaba_generation_realtime` (every 10 min), `_reconciliation` (daily 12:00 IST), and the minute DAGs
+- These read the Khaba SCADA CSV from S3, and they're the only DAGs the skip change (`eb90588`) touched.
+
+**Why the skip change isn't the cause, even for Khaba:**
+1. **Timing.** `eb90588` reached prod on 15 Oct at 12:09. The gap starts at 13 Oct 23:45 IST, more than a day earlier.
+2. **Same outcome either way.** Before the change, a missing CSV made the realtime runs fail (red, with Teams alerts). Now they skip (grey). In both cases no file gets written, so the change only altered how the gap looked in Airflow.
+3. **Reconciliation was untouched.** `skip_if_missing` is only passed by the realtime and minute DAGs. Reconciliation still fails when the CSV is missing, so the daily outage alert still exists.
+
+**What is true in Francois's theory:** Khaba's forecasts only reach Grafana inside the daily actuals file. When the CSV is missing, the Manikaran forecasts vanish from the dashboard even though they're in TSDB. That's an old design limitation, not something the skip change introduced.
+
+Short version for Francois:
+```
+Khavda and Khaba are separate DAGs. Khavda reads only TSDB, has no CSV dependency, and its 13–15 Oct data is complete in CDH. Lou's gap is in the Khaba section: the 13 and 14 Oct Khaba CSVs weren't processed, so those daily files were never written, and the Khaba forecasts only reach Grafana inside those files. The skip change shipped 15 Oct 12:09, after the gap started. Before it, those runs failed instead of skipping, with the same result (no file). Fix: re-run Khaba reconciliation for 13 and 14 Oct once the CSVs are there, and later publish the forecasts separately from the CSV.
+```
+
+I haven't checked whether the 13 and 14 Oct CSVs are in S3 now, which decides whether the reconciliation re-run works. I also haven't confirmed that the reconciliation runs on 14 and 15 Oct failed. You could check both in Airflow when you're back on VPN.
+
+## 17:04 user (smp-india)
+
+Ahhhh. So the data is there, but since we charted khavda to somehow depend on khaba… means no khavda if no khaba…??
+
+## 17:04 assistant (smp-india)
+
+No. Nothing about Khavda depends on Khaba. The dependency is inside Khaba only:
+
+- **Khaba's** own Manikaran forecasts (series `7911faa6…` and `f60cf7f8…`) only reach Grafana inside the Khaba daily file. That file is only written when the Khaba CSV arrives. **No Khaba CSV means no Khaba forecasts on Grafana**, even though they're in TSDB.
+- **Khavda's** forecasts are different series (`2cbc4e97…` and `b65abeb4…`). They're published by their own DAG straight from TSDB into their own table, `india_khavda_generation_latest`. The Khavda panels only query that table (I checked every panel's SQL earlier). So a missing Khaba CSV has no effect on Khavda, which is why Khavda's 13–15 Oct data is complete.
+
+The design flaw is that we bundled Khaba's forecasts with Khaba's actuals. That's the part to fix: publish the Khaba forecasts the way Khavda does, as their own TSDB-to-CDH refresh, so a missing CSV only blanks the actuals. I'll put that in a separate session so it doesn't get lost.
+
+## 17:04 assistant (smp-india)
+
+I've put the decoupling work on a "New task" card in this conversation; it starts whenever you click it. To fill the 13–14 Oct gap now, re-run `india_khaba_generation_reconciliation` for those two dates once you're back on VPN. That only works if the CSVs have since landed in S3.
+
+## 23:22 user (smp-india)
+
+wait so we have 2 diff forecasts: khaba and khavda. Both forecasts come from tsdb. Khavda has its own dag while khaba csv + forecasts are in the same dag...?
+
+## 23:22 assistant (smp-india)
+
+Yes, exactly.
+
+| | Khaba | Khavda |
+|---|---|---|
+| Manikaran forecasts (DA/ID) | TSDB `7911faa6…` / `f60cf7f8…` | TSDB `2cbc4e97…` / `b65abeb4…` |
+| Actuals | Khaba SCADA CSV from S3, written to TSDB by our DAG | TSDB (written outside smp-india) |
+| DAG(s) | `india_khaba_generation_realtime` (every 10 min) and `_reconciliation` (daily) handle CSV → TSDB → CDH. The forecasts are added to the same daily file during the CDH step. | `india_khavda_generation_forecasts` (every 10 min): TSDB → CDH only |
+| CDH table | `india_khaba_generation_latest` | `india_khavda_generation_latest` |
+| If the CSV is missing | No daily file, so neither actuals nor forecasts reach Grafana | Not affected |
+| Self-healing | No. Each day's file is only rewritten that day and once more by the next day's reconciliation | Yes. It rewrites the last 7 days plus tomorrow on every run |
+
+So the Khaba forecasts are an add-on inside the Khaba CSV pipeline. They come from TSDB just like Khavda's, but they only get published when the CSV path runs. The task card I proposed would move them to their own TSDB-to-CDH refresh, as Khavda does, likely as a small Khaba-forecasts DAG or by adding the Khaba forecast series to a shared TSDB → CDH job.
+
+## 23:23 user (smp-india)
+
+yeaaaaa. so in other words, even if khaba forecast tsdb has values, if no csv arrives, it wouldn't be processed?
+
+## 23:23 assistant (smp-india)
+
+Yes. If no CSV arrives for a day, that day's Khaba forecasts never reach Grafana, even when TSDB has every value.
+
+The 12 Oct file hid this for one extra day. Each Khaba daily file includes forecasts for that day and the next (a 2-day window), so 13 Oct's forecasts came from the 12 Oct file. 14 Oct had no file that covered it, which is the gap Lou saw.
+
+One more thing: the Khaba DAG only republishes recent days once (the next day's reconciliation run), never later. So even when the CSVs eventually arrive, those days stay blank until someone re-runs reconciliation for them by hand. Khavda doesn't have this problem because its job republishes the last 7 days on every run.
+
+## 23:24 user (smp-india)
+
+yikes. This is bad. Can we make a ruling then, to make sure we maintain a 1:1 source-dag relationship? As long as it makes sense that is. To avoid this unnecessary coupling. Yget what I mean?
+
+## 23:25 assistant
+
+I added the rule to the Shared Rules section of [AGENTS.md](AGENTS.md#L41), which covers every repo:
+
+> One source per DAG: a DAG publishes data from a single upstream source, and one source's outage must never block another source's data. Companion DAGs for the same source (realtime, reconciliation, backfill) and trigger-only orchestrators are fine. To show sources together, join in Grafana or in a separate DAG that reads only already-published data and publishes its own output.
+
+It also gives the Khaba forecasts as the counter-example. I saved the same ruling to my memory, so I'll apply it when designing or reviewing DAGs.
+
+The smp root isn't a git repo, so there's nothing to commit. If you want the rule in the team's checked-in docs as well, it would also need to go into `smp-india/AGENTS.md` and `smp-japan/AGENTS.md`.
+
+As you asked, I didn't audit the existing DAGs. Khaba still breaks this rule until the "Decouple Khaba forecasts" task card is started.
+
+## 23:26 user
+
+Thanks. Now to the actual fix. How should we approach?
+
+## 23:26 assistant
+
+Here's my recommendation before any code. Nothing changes until you agree.
+
+**Recommended: a Khaba forecasts DAG modeled on Khavda**
+
+1. **New DAG `india_khaba_forecasts`** (every 10 min). It reads only the two Manikaran TSDB series (`7911faa6…` DA, `f60cf7f8…` ID) and rewrites one file per day for the last 7 days plus tomorrow. That's the Khavda refresh pattern, so a gap fills itself once the data is in TSDB. It reuses the Khavda read and normalisation helpers rather than copying them.
+2. **Remove the forecast step from the Khaba CSV export.** `write_khaba_cdh_parquet` then publishes actuals only. That deletes `read_forecast_frame` and the swallowed `ForecastUnavailableError`.
+3. **Add a freshness guard the Khavda DAG lacks.** If today's DA forecast reads as empty, the run fails and alerts Teams. Today's DA is always issued the day before (around 07:46 IST), so empty means something is broken rather than not yet published. That closes the "green run, no forecasts" hole.
+4. **Update the Grafana Khaba panels** in both dashboard repos to take actuals from the Khaba files and forecasts from the new files.
+
+**The one real decision is where the new files go:**
+
+| | A. New CDH dataset `india_khaba_forecasts/latest` | B. Same dataset, new file names `india_khaba_forecasts_YYYY-MM-DD.parquet` |
+|---|---|---|
+| CDH registration | Yes, once per env (dev/qa/prod) with your CDH token | None; the existing table already reads every file in the folder |
+| Grafana change | Panels read actuals and forecasts from two tables | Panels pick forecast rows from the forecast files by `$path` |
+| Cleanliness | One DAG, one dataset, mirrors Khavda | Two DAGs writing to one table, which is easy to trip over later |
+| Old forecast rows already in Khaba daily files | Ignored, since panels read forecasts from the new table | Panels must explicitly skip them |
+
+I lean towards **A**. It's the clean version of the rule you just made, and the registration is a one-time chore. B ships faster but leaves two DAGs writing to one table, which is the kind of coupling we're trying to remove.
+
+**Rollout:** dev → qa → prod as usual. Once the DAG runs in prod, the 13–14 Oct Khaba forecasts fill in by themselves. Khaba actuals for those days still need the reconciliation re-run.
+
+**Out of scope:** Khavda stays as it is. It reads Darwin actuals and Manikaran forecasts together, but only from TSDB, and a missing input doesn't block the other, so the rule allows it. Its silent empty read is a separate small fix, if you want one.
+
+Because this changes a CDH dataset and Grafana panels, once you pick A or B I'll write a short plan and run one read-only Codex review on it before any code.
+
+## 23:32 assistant
+
+The Codex review finished, but the output I captured cut off before its findings. Fetching the final result.
+
+## 23:32 assistant
+
+The review is still running. I'll wait for it in the background.
+
+## 23:32 assistant
+
+The review seems to have stalled: its log stopped updating at 23:31. Before it stalled, it reported two findings. I'm checking both myself.
+
+## 23:32 assistant
+
+Correction: the review hasn't stalled. It's 23:32 now, so the log is only a minute old. Meanwhile I'll check the other-dashboard finding.
+
+## 23:32 assistant (smp-dashboard)
+
+The review is still running in the background. I'll pick it up as soon as it finishes.
+
+## 23:53 user (smp-dashboard)
+
+<task-notification>
+<task-id>b0uat27u3</task-id>
+<tool-use-id>toolu_01CeXBzemGHmjS5ijkGa9xFm</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-qn5792-repos-smp/4e922cd7-cb9f-48f8-8072-468a23f5ee5c/tasks/b0uat27u3.output</output-file>
+<status>completed</status>
+<summary>Background command "C="$(jq -r '.plugins["codex@openai-codex"][0].installPath' ~/.claude/plugins/installed_plugins.json)/scripts/codex-companion.mjs"; cd /Users/qn5792/repos/smp; for i in $(seq 1 80); do node "$C" result 2&gt;&amp;1 | grep -q "still running" || break; sleep 15; done; node "$C" result 2&gt;&amp;1 | tail -150" completed (exit code 0)</summary>
+</task-notification>
+
+## 23:53 assistant
+
+I'm checking the history question myself in CDH SQL Lab: how far back Khaba forecasts go in the old table, which decides how much backfill the new dataset needs.
+
+## 23:54 assistant
+
+Running a history-range query in CDH SQL Lab to size the backfill.
+
+## 23:54 assistant
+
+Here's the final plan, updated with the review findings and two checks I ran myself. Nothing is coded yet.
+
+**Review results.** Codex died partway through, but it covered the guard timing and found two real issues. I checked both, then covered rollout and history myself.
+- **Guard timing is safe.** The DA forecast for day D is always issued on D-1, by 21:26 IST at the latest. So "today's DA is empty → fail" won't false-alarm at midnight.
+- **Alignment check.** The Khavda normaliser I planned to reuse doesn't check that timestamps fall on 15-minute boundaries. The new module keeps the Khaba check.
+- **A second dashboard reads Khaba forecasts.** `iex_dam_gdam_rtm_mcp_volume_trends.json` has its own "Khaba Generation vs Forecast" panel, with a test pinning it. It gets switched too.
+- **History.** Khaba forecasts in CDH go back to 2 Sep 2026 (I checked in SQL Lab). The new DAG only refreshes 7 days, so it needs a one-off backfill from 2 Sep, or the panels would lose older forecasts.
+- **Rollout.** Doing everything in one deploy risks blank Khaba forecasts between the India deploy and the dashboard switch, so it's split into two phases.
+
+**Phase 1: add the new feed (old one untouched, nothing visible changes)**
+- smp-india: new DAG `india_khaba_forecasts` (every 10 min, last 7 days + today + tomorrow, manual `start_date`/`end_date` for backfill). It writes `india_khaba_forecasts/latest/india_khaba_forecasts_<D>.parquet` in the same columns as today and fails with a Teams alert if today's DA is empty. It reuses the Khavda date/read/normalise helpers, keeps the 15-minute check, and gets tests plus a DATA_CATALOGUE entry.
+- smp-dashboard: register `india_khaba_forecasts`, following the `india_noc_tsdb` commit (catalog, rendered dev/qa/prd definitions, schema parquet, test).
+- You: deploy, run the registration once per environment with your CDH token, trigger one backfill run for 2026-09-02 → today, and I'll check the result in SQL Lab.
+
+**Phase 2: switch over (only once Phase 1 data is confirmed)**
+- smp-dashboard: both dashboards read actuals from `india_khaba_generation_latest` and forecasts from `india_khaba_forecasts_latest`. Update the tests.
+- smp-india: the Khaba CSV export publishes actuals only. Remove the forecast code and update the tests and catalogue.
+
+**Separate from this:** re-running Khaba reconciliation for 13 and 14 Oct, for the actuals, once the CSVs are in S3.
+
+**Not done:** Khavda's silent empty read stays as it is.
+
+## 23:58 user
+
+Yes, go ahead with Phase 1 as planned.
+
+## 23:58 assistant (smp-india)
+
+Writing the forecasts module now. It reuses the Khavda date/read helpers and the Khaba TSDB client config, and adds the 15-minute alignment check.
+
+## 23:59 assistant (smp-india)
+
+Now the tests. Checking how the Khavda tests stub TSDB config and the parquet writer.

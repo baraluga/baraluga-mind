@@ -2,11 +2,13 @@
 
 ## Current State
 
-As of 2026-10-14, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
+As of 2026-10-18, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
 
 Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 work also showed a practical personal-tooling pattern: Claude mods can expose usage and work-time signals in the prompt/footer UI, while Codex can be used as an adversarial reviewer when Brian or Claude remains the main driver.
 
 As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configured for marketplace auto-update; this remains a personal-tooling convenience rather than a controlled team dependency.
+
+Brian's current review rule is proportional: default to a read-only Claude subagent when a review is warranted; additionally run Codex in parallel for data integrity, deletions, crash recovery, money, or production-data changes. A small controlled comparison found Claude faster while Codex better demonstrated impact for an ordering defect; this is a local working preference, not a general model-quality claim.
 
 ## Background
 
@@ -52,6 +54,7 @@ As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configur
 - October 13 Claude mod work created two persistent local mods: `usage-band`, which shows session limit usage near the prompt footer, and `work-clock`, which counts engaged Claude work time from a 6am day boundary, asks whether today is a workday, shows `/time` for the current week, and nags after 3h of working time.
 - October 13 SMP collaboration clarified "pair program with Codex": Claude/Brian remains the main driver, while Codex is used for adversarial review. Codex caught a real bug in the Khaba duplicate-resolution logic before the change was committed.
 - October 15: Ponytail was updated from 5.0.0 to 5.2.0 and its marketplace auto-update was enabled locally.
+- October 16: a controlled three-variant Darwin review comparison informed the proportional Claude-plus-Codex review rule.
 
 ## Open Questions
 
@@ -114,5 +117,6 @@ As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configur
 - `sources/claude-conversations/2026-10-13-claude-smp-54bea59b.txt`
 - `sources/claude-conversations/2026-10-13-claude-scratch-75ac0d14.txt`
 - `sources/codex-conversations/2026-10-13-codex-conversations.txt`
+- `sources/claude-conversations/2026-10-16-claude-smp-68dedda3.txt`
 
-Last Updated: 2026-10-16
+Last Updated: 2026-10-18
