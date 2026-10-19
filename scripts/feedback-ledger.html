@@ -1,91 +1,131 @@
 <title>Feedback Ledger</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Caveat:wght@600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
-/* Layout: a ledger. Summary strip, then one card per person; strengths left, growth right, the ask set apart. */
+/* Layout: an observer's ledger. Ink band up top, then one gift tag per person:
+   handwritten headline, receipts on the left ("keep doing"), the gift on the right. */
 :root {
-  --bg: #f3f5f6; --surface: #ffffff; --ink: #18232b; --muted: #5b6b75; --line: #d9e0e4;
-  --accent: #0f6e78; --plus: #2f7a4b; --plus-soft: #e6f2ea; --delta: #a35d12; --delta-soft: #fbf0e2;
+  --bg: #eef1f5; --card: #ffffff; --ink: #172033; --muted: #5a6577; --line: #d8dee7;
+  --band: #1d2a44; --band-ink: #f3f5fa; --band-muted: #b7c0d4;
+  --ribbon: #c2416b; --ribbon-soft: #f9e8ee; --keep: #2c7a50; --keep-soft: #e5f2ea;
+  --tag-s: 55%; --tag-l: 88%; --tag-ink: #172033;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --hand: "Caveat", "Segoe Print", "Comic Sans MS", cursive;
   --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #11181d; --surface: #182229; --ink: #e4ebef; --muted: #93a3ad; --line: #2a3740;
-  --accent: #5cc3cc; --plus: #7fcf99; --plus-soft: #1c2e24; --delta: #f0b267; --delta-soft: #33261a; color-scheme: dark } }
+  --bg: #0f1522; --card: #172034; --ink: #e6eaf3; --muted: #9aa5ba; --line: #283350;
+  --band: #0a0f1a; --band-ink: #eef1f8; --band-muted: #8f9bb3;
+  --ribbon: #f07a9f; --ribbon-soft: #3a2030; --keep: #7fd3a1; --keep-soft: #183026;
+  --tag-s: 45%; --tag-l: 30%; --tag-ink: #eef1f8; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #11181d; --surface: #182229; --ink: #e4ebef; --muted: #93a3ad; --line: #2a3740;
-  --accent: #5cc3cc; --plus: #7fcf99; --plus-soft: #1c2e24; --delta: #f0b267; --delta-soft: #33261a; color-scheme: dark }
-body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); }
-.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; gap: 24px; }
-header { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; }
-h1 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
-.meta { color: var(--muted); font-size: 14px; margin-top: 6px; }
-.meta b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-button { font: 600 14px var(--body); color: var(--accent); background: var(--surface); border: 1px solid var(--line);
-  border-radius: 8px; padding: 8px 14px; cursor: pointer; }
-button:hover { border-color: var(--accent); }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  --bg: #0f1522; --card: #172034; --ink: #e6eaf3; --muted: #9aa5ba; --line: #283350;
+  --band: #0a0f1a; --band-ink: #eef1f8; --band-muted: #8f9bb3;
+  --ribbon: #f07a9f; --ribbon-soft: #3a2030; --keep: #7fd3a1; --keep-soft: #183026;
+  --tag-s: 45%; --tag-l: 30%; --tag-ink: #eef1f8; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1180px; margin: 0 auto; }
+.band { background: var(--band); color: var(--band-ink); padding-block: 36px 40px; }
+.band .inner { display: flex; flex-wrap: wrap; gap: 20px; align-items: end; justify-content: space-between; }
+.eyebrow { font: 600 26px/1 var(--hand); color: var(--ribbon); transform: rotate(-2deg); display: inline-block; margin-bottom: 6px; }
+h1 { font: 800 clamp(36px, 6vw, 60px)/0.95 var(--display); margin: 0; letter-spacing: -0.02em; }
+.lede { color: var(--band-muted); margin: 12px 0 0; max-width: 60ch; }
+.lede b { color: var(--band-ink); font-variant-numeric: tabular-nums; }
+.band button { background: var(--ribbon); color: #fff; border-color: transparent; }
+.band button:hover { filter: brightness(1.08); border-color: transparent; }
+main { padding-block: 24px 72px; }
+main .inner { display: grid; gap: 22px; }
+button { font: 600 14px var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+button:hover { border-color: var(--ribbon); }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--ribbon); outline-offset: 2px; }
 .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.bar input { flex: 1 1 220px; min-width: 0; font: 15px var(--body); color: var(--ink); background: var(--surface);
-  border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
-.chip { color: var(--muted); font-weight: 400; }
-.chip[aria-pressed="true"] { color: var(--surface); background: var(--accent); border-color: var(--accent); }
-.index { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
-.index a { color: var(--muted); text-decoration: none; }
-.index a:hover { color: var(--accent); }
-.index span { font-family: var(--mono); font-size: 12px; }
-h2 { font: 500 13px var(--body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 8px 0 0; }
-.cards { display: grid; gap: 16px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
-.head { display: flex; gap: 12px; justify-content: space-between; align-items: start; }
-.head h3 { font: 700 22px/1.2 var(--display); margin: 0; }
-.role { color: var(--muted); font-size: 14px; margin: 4px 0 0; max-width: 80ch; }
-.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
-.col { min-width: 0; display: grid; gap: 10px; align-content: start; }
-.col h4 { margin: 0; font: 600 13px var(--body); text-transform: uppercase; letter-spacing: 0.06em; }
-.plus h4 { color: var(--plus); } .delta h4 { color: var(--delta); }
-.note { display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--line); }
-.plus .note { border-left-color: var(--plus); } .delta .note { border-left-color: var(--delta); }
+.bar input { flex: 1 1 240px; min-width: 0; font: 15px var(--body); color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.index { display: flex; flex-wrap: wrap; gap: 8px; }
+.index a { display: inline-flex; gap: 8px; align-items: center; color: var(--ink); text-decoration: none; font-size: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px 3px 3px; }
+.index a:hover { border-color: var(--ribbon); }
+.dot { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 11px var(--body);
+  background: hsl(var(--h) var(--tag-s) var(--tag-l)); color: var(--tag-ink); }
+h2 { display: flex; align-items: baseline; gap: 12px; margin: 18px 0 0; font: 800 26px/1.1 var(--display); }
+h2 span { font: 600 22px var(--hand); color: var(--ribbon); font-weight: 600; }
+.cards { display: grid; gap: 18px; }
+.card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 16px; min-width: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: transform .2s ease, box-shadow .2s ease; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px -18px rgb(23 32 51 / .45); }
+}
+.head { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: start; }
+.tag { position: relative; width: 56px; height: 56px; border-radius: 14px 50% 50% 14px; display: grid; place-items: center;
+  font: 800 20px var(--display); background: hsl(var(--h) var(--tag-s) var(--tag-l)); color: var(--tag-ink); }
+.tag::after { content: ""; position: absolute; right: 9px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px;
+  border-radius: 50%; background: var(--card); box-shadow: 0 0 0 1px var(--line); }
+.who { min-width: 0; }
+.who h3 { font: 800 24px/1.1 var(--display); margin: 0; letter-spacing: -0.01em; }
+.headline { font: 600 24px/1.15 var(--hand); color: var(--ribbon); margin: 4px 0 0; transform: rotate(-0.6deg); transform-origin: left; }
+.meter { display: flex; gap: 3px; margin-top: 10px; flex-wrap: wrap; }
+.meter i { width: 14px; height: 6px; border-radius: 3px; background: var(--keep); }
+.meter i.g { background: var(--ribbon); }
+.meter small { margin-left: 8px; font-size: 13px; color: var(--muted); }
+.pill { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  border: 1px dashed var(--muted); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+details.ctx { font-size: 14px; color: var(--muted); }
+details.ctx summary { cursor: pointer; width: fit-content; }
+details.ctx p { margin: 6px 0 0; max-width: 80ch; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } .head { grid-template-columns: auto 1fr; } .head > button { grid-column: 1 / -1; justify-self: start; } }
+.col { min-width: 0; display: grid; gap: 12px; align-content: start; }
+.col h4 { margin: 0; font: 800 15px var(--display); display: flex; gap: 8px; align-items: center; }
+.keep h4 { color: var(--keep); } .gift h4 { color: var(--ribbon); }
+.note { display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px; }
+.keep .note { background: var(--keep-soft); } .gift .note { background: var(--ribbon-soft); }
 .note p { margin: 0; }
-.ask { background: var(--delta-soft); border-radius: 6px; padding: 6px 10px; font-size: 15px; }
-.ask b { color: var(--delta); }
+.ask { font-weight: 600; }
+.ask::before { content: "The ask → "; font: 600 20px/1 var(--hand); color: var(--ribbon); }
 .src { font: 12px/1.4 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
-.src .from { color: var(--accent); }
-.empty { color: var(--muted); font-size: 14px; font-style: italic; }
-.caveat { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.src .from { color: var(--ink); }
+.empty { color: var(--muted); font: 600 20px var(--hand); margin: 0; }
+.caveat { font-size: 14px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.caveat::before { content: "Observer's note: "; font: 600 19px var(--hand); color: var(--ink); }
 .hide-src .src .path { display: none; }
 .toast { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 14px; }
-@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+  background: var(--ink); color: var(--card); padding: 10px 16px; border-radius: 999px; font-size: 14px; }
+footer { color: var(--muted); font: 600 20px var(--hand); text-align: center; padding-top: 12px; }
 </style>
 
-<div class="wrap" id="app">
-  <header>
-    <div>
-      <h1>Feedback Ledger</h1>
-      <div class="meta" id="meta"></div>
-    </div>
-    <div class="bar">
-      <button type="button" id="copy-refresh" title="Paste this into Claude Code to rebuild the page from Baraluga Mind">Copy refresh prompt</button>
+<div id="app">
+  <header class="band gutter">
+    <div class="inner">
+      <div>
+        <span class="eyebrow">field notes from a quiet observer</span>
+        <h1>Feedback Ledger</h1>
+        <p class="lede" id="meta">Nothing built into this page yet.</p>
+      </div>
+      <button type="button" id="copy-refresh" title="Paste into Claude Code to rebuild the page from Baraluga Mind">Copy refresh prompt</button>
     </div>
   </header>
-  <div class="bar" role="toolbar" aria-label="Filters">
-    <input id="q" type="search" placeholder="Search people or notes" aria-label="Search people or notes">
-    <button type="button" class="chip" data-filter="all" aria-pressed="true">Everyone</button>
-    <button type="button" class="chip" data-filter="growth" aria-pressed="false">Has growth areas</button>
-    <button type="button" class="chip" data-filter="thin" aria-pressed="false">Thin evidence</button>
-    <button type="button" class="chip" id="toggle-src" aria-pressed="true">Sources</button>
-  </div>
-  <nav class="index" id="index" aria-label="People"></nav>
-  <h2>Feedback to give</h2>
-  <section class="cards" id="give"></section>
-  <h2 id="self-h">Feedback you've received</h2>
-  <section class="cards" id="self"></section>
+  <main class="gutter">
+    <div class="inner">
+      <div class="bar" role="toolbar" aria-label="Filters">
+        <input id="q" type="search" placeholder="Find a person, a project, a habit…" aria-label="Search people or notes">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true">Everyone</button>
+        <button type="button" class="chip" data-filter="growth" aria-pressed="false">Has a gift waiting</button>
+        <button type="button" class="chip" data-filter="thin" aria-pressed="false">Thin file</button>
+        <button type="button" class="chip" id="toggle-src" aria-pressed="true">Receipts</button>
+      </div>
+      <nav class="index" id="index" aria-label="People"></nav>
+      <h2>Feedback to give <span>the gifts</span></h2>
+      <section class="cards" id="give"></section>
+      <h2 id="self-h">Mirror, mirror <span>what they told you</span></h2>
+      <section class="cards" id="self"></section>
+      <footer>Be specific, be kind, bring receipts.</footer>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -95,54 +135,59 @@ const REFRESH_PROMPT = "Refresh my Feedback Ledger: mine baraluga-mind sources n
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = (d) => new Date(d + "T00:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+const initials = (n) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+const hue = (s) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+const strengths = (p) => p.items.filter((i) => i.kind.endsWith("strength"));
+const gifts = (p) => p.items.filter((i) => i.kind.endsWith("growth"));
 let filter = "all";
 
 function isThin(p) { return p.items.length < 3 || p.caveats.some((c) => /thin|only from/i.test(c)); }
 function noteHtml(i) {
-  const ask = i.ask ? `<div class="ask"><b>Ask:</b> ${esc(i.ask)}</div>` : "";
+  const ask = i.ask ? `<p class="ask">${esc(i.ask)}</p>` : "";
   const from = i.from ? `<span class="from">from ${esc(i.from)}</span> · ` : "";
   return `<div class="note"><p>${esc(i.text)}</p>${ask}<div class="src">${from}${fmt(i.date)}<span class="path"> · ${esc(i.source)}</span></div></div>`;
 }
-function column(cls, title, items) {
-  const body = items.length ? items.map(noteHtml).join("") : `<p class="empty">Nothing captured yet.</p>`;
-  return `<div class="col ${cls}"><h4>${title} <span class="chip">${items.length}</span></h4>${body}</div>`;
+function column(cls, title, items, empty) {
+  const body = items.length ? items.map(noteHtml).join("") : `<p class="empty">${empty}</p>`;
+  return `<div class="col ${cls}"><h4>${title}</h4>${body}</div>`;
 }
 function cardHtml(p) {
   const self = p.slug === SELF;
-  const plus = p.items.filter((i) => i.kind.endsWith("strength"));
-  const delta = p.items.filter((i) => i.kind.endsWith("growth"));
-  const caveats = p.caveats.map((c) => `<div class="caveat">${esc(c)}</div>`).join("");
-  return `<article class="card" id="${p.slug}"><div class="head"><div><h3>${esc(p.name)}</h3><p class="role">${esc(p.role)}</p></div>
-    <button type="button" data-copy="${p.slug}">Copy</button></div>
-    <div class="cols">${column("plus", self ? "Strengths noted" : "Strengths", plus)}${column("delta", self ? "To work on" : "Growth areas", delta)}</div>${caveats}</article>`;
+  const k = strengths(p), g = gifts(p);
+  const meter = k.map(() => "<i></i>").join("") + g.map(() => '<i class="g"></i>').join("");
+  const tally = self ? `${k.length} praised · ${g.length} asked` : `${k.length} keep doing · ${g.length} ${g.length === 1 ? "gift" : "gifts"}`;
+  const thin = isThin(p) ? '<span class="pill">Thin file</span>' : "";
+  return `<article class="card" id="${p.slug}" style="--h:${hue(p.slug)}">
+    <div class="head"><div class="tag" aria-hidden="true">${initials(p.name)}</div>
+      <div class="who"><h3>${esc(p.name)} ${thin}</h3>${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
+        <div class="meter" aria-label="${tally}">${meter}<small>${tally}</small></div></div>
+      <button type="button" data-copy="${p.slug}">Copy for 1:1</button></div>
+    <details class="ctx"><summary>Who's this?</summary><p>${esc(p.role)}</p></details>
+    <div class="cols">${column("keep", self ? "What they liked" : "Keep doing", k, "No receipts yet.")}${column("gift", self ? "What they asked of you" : "The gift", g, "Nothing yet. Suspiciously flawless.")}</div>
+    ${p.caveats.map((c) => `<div class="caveat">${esc(c.replace(/^UNCERTAIN:\s*/, ""))}</div>`).join("")}</article>`;
 }
 function asText(p) {
   const line = (i) => `- ${i.text}${i.ask ? ` Ask: ${i.ask}` : ""} (${i.date})`;
-  const plus = p.items.filter((i) => i.kind.endsWith("strength")).map(line);
-  const delta = p.items.filter((i) => i.kind.endsWith("growth")).map(line);
-  return `${p.name}\n\nWhat's working\n${plus.join("\n") || "- (none captured)"}\n\nWhat to work on\n${delta.join("\n") || "- (none captured)"}`;
+  return `${p.name}\n\nWhat's working\n${strengths(p).map(line).join("\n") || "- (none captured)"}\n\nWhat to work on\n${gifts(p).map(line).join("\n") || "- (none captured)"}`;
 }
 function matches(p, q) {
-  if (filter === "growth" && !p.items.some((i) => i.kind.endsWith("growth"))) return false;
+  if (filter === "growth" && !gifts(p).length) return false;
   if (filter === "thin" && !isThin(p)) return false;
-  if (!q) return true;
-  return JSON.stringify(p).toLowerCase().includes(q);
+  return !q || JSON.stringify(p).toLowerCase().includes(q);
 }
 function render() {
-  if (!DATA) { $("#give").innerHTML = `<p class="empty">No data built into this page yet. Use "Copy refresh prompt" and paste it into Claude Code.</p>`; return; }
+  if (!DATA) { $("#give").innerHTML = `<p class="empty">Nothing built in yet. Copy the refresh prompt and paste it into Claude Code.</p>`; $("#self-h").hidden = true; return; }
   const q = $("#q").value.trim().toLowerCase();
-  const others = DATA.people.filter((p) => p.slug !== SELF);
-  const me = DATA.people.filter((p) => p.slug === SELF);
-  const shown = others.filter((p) => matches(p, q));
-  $("#give").innerHTML = shown.map(cardHtml).join("") || `<p class="empty">No one matches.</p>`;
-  const meShown = me.filter((p) => matches(p, q));
-  $("#self").innerHTML = meShown.map(cardHtml).join("");
-  $("#self-h").hidden = !meShown.length;
-  $("#index").innerHTML = shown.map((p) => `<a href="#${p.slug}">${esc(p.name)} <span>${p.items.length}</span></a>`).join("");
+  const shown = DATA.people.filter((p) => p.slug !== SELF && matches(p, q));
+  const me = DATA.people.filter((p) => p.slug === SELF && matches(p, q));
+  $("#give").innerHTML = shown.map(cardHtml).join("") || `<p class="empty">No one matches. Try a project name.</p>`;
+  $("#self").innerHTML = me.map(cardHtml).join("");
+  $("#self-h").hidden = !me.length;
+  $("#index").innerHTML = shown.map((p) => `<a href="#${p.slug}" style="--h:${hue(p.slug)}"><span class="dot">${initials(p.name)}</span>${esc(p.name)}</a>`).join("");
 }
 function toast(msg) {
   const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
-  document.body.append(t); setTimeout(() => t.remove(), 1800);
+  document.body.append(t); setTimeout(() => t.remove(), 2000);
 }
 async function copy(text, label) {
   try { await navigator.clipboard.writeText(text); toast(label); }
@@ -150,9 +195,10 @@ async function copy(text, label) {
 }
 
 if (DATA) {
-  const n = DATA.people.filter((p) => p.slug !== SELF).length;
+  const others = DATA.people.filter((p) => p.slug !== SELF);
   const notes = DATA.people.reduce((s, p) => s + p.items.length, 0);
-  $("#meta").innerHTML = `<b>${n}</b> people · <b>${notes}</b> dated notes · built ${esc(DATA.built)} from Baraluga Mind`;
+  const built = new Date(DATA.built.replace(" ", "T")).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+  $("#meta").innerHTML = `<b>${notes}</b> dated receipts on <b>${others.length}</b> people, plus a mirror for you. Last rebuilt ${esc(built)} from Baraluga Mind.`;
 }
 document.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => {
   filter = b.dataset.filter;
@@ -169,7 +215,7 @@ $("#copy-refresh").addEventListener("click", () => copy(REFRESH_PROMPT, "Refresh
 document.addEventListener("click", (e) => {
   const slug = e.target.closest("[data-copy]")?.dataset.copy;
   const p = slug && DATA.people.find((x) => x.slug === slug);
-  if (p) copy(asText(p), `${p.name} copied`);
+  if (p) copy(asText(p), `${p.name} copied. Go be kind.`);
 });
 render();
 </script>

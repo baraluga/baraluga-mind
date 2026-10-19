@@ -32,10 +32,14 @@ def parse(path: Path) -> dict | None:
         "slug": path.stem,
         "name": text.splitlines()[0].lstrip("# ").strip(),
         "role": state.split("\n")[0],
+        "headline": None,
         "items": [],
         "caveats": [],
     }
     for line in notes.splitlines():
+        if line.startswith("- **Headline**: "):
+            person["headline"] = line.split(": ", 1)[1].strip()
+            continue
         if line.startswith("- UNCERTAIN:"):
             person["caveats"].append(line[2:].strip())
             continue
@@ -63,6 +67,7 @@ if __name__ == "__main__":
     data = build()
     sample = parse(ROOT / "wiki/people/michael.md")
     assert sample and any(i["ask"] for i in sample["items"]), "parser lost growth asks"
+    assert sample["headline"], "parser lost the headline"
     assert all(i["source"] for p in data["people"] for i in p["items"]), "item without a source"
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "outputs/feedback-ledger.html"
     template = (ROOT / "scripts/feedback-ledger.html").read_text()
