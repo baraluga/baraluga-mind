@@ -55,3 +55,13 @@ Every durable page created from captured material should include:
 
 Last Updated: YYYY-MM-DD
 ```
+
+## Feedback Notes
+
+People pages may carry a `## Feedback Notes` section: observed behaviour Brian could give as feedback, written as a neutral third-party observer. Add to it during ingest when a source shows a concrete behaviour (what they did, its effect), never personality labels or hearsay presented as fact.
+
+- One line per observation: `- **Strength** (YYYY-MM-DD): what happened and its effect. \`sources/...\``
+- Growth items end with a concrete ask: `- **Growth** (YYYY-MM-DD): pattern with dated examples. Ask: one specific change. \`sources/...\``
+- On `brian-peralta.md`, feedback Brian received uses `**Received strength**` / `**Received growth**` and names who gave it.
+- Mark secondhand or unconfirmed items `UNCERTAIN:`. Replace an item when newer evidence supersedes it; this section is not append-only.
+- The Feedback Ledger artifact renders these sections; keep the line format stable.
