@@ -1,0 +1,459 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `36b94912-7f68-4c00-a812-37f2a6c0149d`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/36b94912-7f68-4c00-a812-37f2a6c0149d.jsonl`
+Resume: `claude --resume 36b94912-7f68-4c00-a812-37f2a6c0149d`
+
+## 10:46 user
+
+<command-message>ponytail:ponytail</command-message>
+<command-name>/ponytail:ponytail</command-name>
+<command-args>band</command-args>
+
+## 10:46 assistant
+
+Done: I've hidden the ponytail band above the prompt. The level stays at full, and `/ponytail band` brings the band back.
+
+## 11:11 user
+
+Freshness check is still failing!
+
+<pasted_content id="f04e">
+[2026-10-19 10:46:03] ERROR - Task failed with exception
+StaleDarwinDataError: Darwin source data stale:
+SOF_INNS7/ActivePower: no source data recorded yet
+SOF_INNS7/HorizontalIrradiance: no source data recorded yet
+SOF_INNS7/TiltedIrradiance: no source data recorded yet
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 1576 in run
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 189 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 2120 in _execute_task
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py", line 398 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 231 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 254 in execute_callable
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py", line 97 in run
+
+File "/opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py", line 45 in check_darwin_freshness
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 54 in run_from_environment
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 45 in check_freshness
+</pasted_content id="f04e">
+
+-- is it likely because Michael has yet to do a more current deploy? He's last deploy was ~11:00 of Friday. When did we make the INNS7 change?
+
+## 11:11 assistant
+
+I'll pull the exact times rather than guess:
+
+## 11:12 assistant
+
+Partly. The timeline doesn't fully explain it:
+
+| When (+08) | What |
+|---|---|
+| **Thu 15 Oct, 10:48–10:50** | Khaba added: TSDB mappings in smp-india (`8bae384`), enabled for collection in smp-tool (`9b9b914`) |
+| Fri 16 Oct, 11:00 | Michael's last deploy, by his account |
+| Fri 16 Oct, 11:10–11:15 | New image (`6bec64a`, CI finished 11:14) and new smp-tool renderer (`87c19cf`) |
+
+**So yes, his 11:00 deploy came before the new image and renderer existed.** It can't be the `darwin-collector-6bec64a36575` deploy I asked for in my second message; it was probably the first, config-only request.
+
+**But that alone shouldn't leave Khaba missing.** Khaba was enabled in smp-tool on Thursday, so an 11:00 Friday deploy from an up-to-date smp-tool would already have included `SOF_INNS7` in `DARWIN_ENTITY_TAGS_JSON`, and Khaba would have data after 3 days. Since it doesn't, it's one of:
+1. **His smp-tool checkout was older than Thursday:** the script found nothing to change, said "nothing to apply", and he took that as done.
+2. **Khaba is configured, but Darwin returns nothing usable for `SOF_INNS7`:** the collector would log `poll_entity_failed` or `missing_tags`. The state file only records data it accepted, so the freshness check can't tell this apart from case 1.
+
+Either way the next step is the same: the new-image deploy. Before that, these two commands from Michael would settle which case it was:
+
+```bash
+kubectl -n smp-india-dev get deploy darwin-collector -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}{.spec.template.spec.containers[0].env[*].name}{"\n"}'
+```
+```bash
+kubectl -n smp-india-dev logs deploy/darwin-collector -c collector --since=1h | grep -E 'SOF_INNS7|poll_complete' | tail -20
+```
+
+- If the image is still `…025488487ab7`, the env list has `DARWIN_ENTITY_TAGS_JSON`, and there are no `SOF_INNS7` lines, it's case 1. The new-image deploy fixes it.
+- If there are `SOF_INNS7` lines with `poll_entity_failed` or `missing_tags`, it's case 2: a Darwin-side access or tag problem, which redeploying won't fix.
+
+I haven't seen the cluster myself, so this rests on Michael's "~11:00" and the git timestamps.
+
+## 11:16 user
+
+any other way I can check this without kubectl? I wanna minimize dependency from other people
+
+## 11:17 assistant
+
+Possibly. Two things in the repos look like they could help, so I'll check them before answering:
+
+## 11:17 assistant (discovery/scr-khaba-darwin)
+
+Yes, and there's already evidence that narrows it down.
+
+**Case 2 is very unlikely.** On Thu 15 Oct at 10:39 +08 we probed Darwin for Khaba ([probe.py](discovery/scr-khaba-darwin/probe.py)), using the collector's own client code. Darwin returned fresh values for all three tags (`ActivePower`, `HorizontalIrradiance`, `TiltedIrradiance`) across 4 reads ([inns7-reads.json](discovery/scr-khaba-darwin/inns7-reads.json)). So Darwin does serve `SOF_INNS7` data. That points almost certainly at case 1: the running collector simply isn't configured to poll Khaba.
+
+**To confirm it yourself without Michael:** Rancher. smp-tool's README lists Rancher as the standard team access for Kubernetes ("KubeConfig from Rancher", linked to the onboarding page). Its web UI is a browser page, not kubectl:
+1. Open Rancher (on the VPN) → the noprod cluster → namespace `smp-india-dev` → Workloads → `darwin-collector`.
+2. **Image:** if it still says `…:darwin-collector-025488487ab7`, the new deploy never happened.
+3. **Environment variables:** look for `DARWIN_ENTITY_TAGS_JSON` and whether it contains `SOF_INNS7`.
+4. **Pod logs:** search for `SOF_INNS7` or `poll_complete`.
+
+Rancher also lets you download your own kubeconfig. Read-only access would then let you run the two kubectl commands yourself, and you'd stop depending on Michael for checks like this.
+
+**What doesn't work:** Airflow and EFS only show what the collector collected, not how it's configured. That's why the freshness DAG can say Khaba is missing but not why.
+
+I haven't confirmed you have a Rancher account. If the onboarding page's access request is still pending for you, that's the one dependency left.
+
+## 11:19 user (discovery/scr-khaba-darwin)
+
+Ughh. I don't have access to rancher lol. Aren't we maybe putting some sort of version on the metadata json in the execution itself?
+
+## 11:19 assistant (discovery/scr-khaba-darwin)
+
+No. Nothing the collector writes to EFS says which version or configuration it's running:
+
+- **Batches** (`pending/*.json`): only `schema_version`, `batch_id`, `collected_at` and the observations.
+- **State** (`collector-state/sampling.json`): only `version: 1` (the file format), the per-stream high-water marks, and the outbox.
+- **The image** does carry the git commit, but as a Docker label, which you can only see from the cluster.
+
+**But it's a cheap addition, and it fixes exactly this blind spot.** When the collector starts, it could write one small file next to its state, say `collector-state/runtime.json`:
+
+```json
+{"image_tag": "darwin-collector-6bec64a36575", "environment": "dev",
+ "streams": {"SOF_INNS7": ["ActivePower", "..."], ...}, "started_at": "..."}
+```
+
+The freshness DAG already reads that folder, so its alert could then tell the two cases apart by itself:
+- *"SOF_INNS7 expected but the running collector (darwin-collector-025488487ab7) isn't configured for it"*: a deploy problem;
+- *"SOF_INNS7 configured, but no data"*: a Darwin problem.
+
+All of it would be visible in the Airflow logs you already have.
+
+What it involves:
+- the collector writes the file at startup (a few lines, using its existing safe-write helper);
+- CI passes the image tag into the build, with one Dockerfile line;
+- the freshness check reads it and reports configured-vs-expected streams;
+- tests for each part.
+
+One caveat for today: the image running now is the old one, so it won't write this file. That also helps, though: once `runtime.json` shows up on EFS, you know the new image is deployed. Until Michael does the `6bec64a` deploy, the answer stays "Khaba isn't configured", and the Darwin probe evidence already points that way.
+
+Should I build it as part of SCR-1268?
+
+## 11:22 user (discovery/scr-khaba-darwin)
+
+yes pls. anything useful for debugging for sure. 
+
+What about also adding it in the freshness check? So apart from data freshness, we also check the state of darwin itself? Or too complicated/not feasible?
+
+## 11:22 assistant (discovery/scr-khaba-darwin)
+
+Feasible, and not complicated. It's the same file, just kept up to date. Here's how I understand it: besides "is the data fresh?", the freshness check should also answer "what state is the collector itself in?", so an alert says *why*, not just *what*.
+
+**Design:** the collector maintains `collector-state/runtime.json`:
+- **At startup:** image tag, environment, the streams it's configured to poll, and the start time.
+- **After every poll cycle (every 15 s):** when it finished, how many observations it got, and which entities failed.
+
+**Each freshness run then checks, in order:**
+
+| Check | Alert text | Meaning |
+|---|---|---|
+| `runtime.json` missing | collector status missing | the running image predates this change (dev right now), or the wrong volume is mounted |
+| Last poll too old | collector not polling: last poll *N* min ago | the collector is down or stuck |
+| Expected stream not configured | SOF_INNS7: not configured in running collector `<image tag>` | a deploy problem: wrong or old image (today's Khaba case) |
+| Entities failing in the last poll | SOF_INNS7: polling failed | a Darwin or access problem for that entity |
+| Data stale (today's check) | newest source minute is *N* min old | the source isn't sending new data |
+
+It also always logs the image tag and start time, so every run shows what's deployed, without kubectl.
+
+**One rule I'd put in:** writing the status file must never crash the collector. Today a disk error in the collector deliberately stops the process, to protect the data. For this status file, a failed write is just logged, and collection continues. Otherwise monitoring could cause the very outage it's meant to detect. The "last poll" check reuses the existing 10-minute threshold, so there's no new Variable.
+
+**Cost:** one small extra write to EFS every 15 seconds, and a few dozen lines across the collector, the check and the tests.
+
+Shall I go ahead?
+
+## 11:24 user (discovery/scr-khaba-darwin)
+
+how will the checker dag know what's the latest version though? Or do we only check the existence?
+
+## 11:24 assistant (discovery/scr-khaba-darwin)
+
+It doesn't need to know the latest version. It compares what the version decides:
+
+- **Expected:** the streams `sites.json` enables for this environment, read from the repo commit Airflow is synced to (smp-india dev, for dev).
+- **Configured:** the streams the running collector reports in `runtime.json`.
+
+If they differ, the running image is out of step with the repo. That's exactly the Khaba case: the repo expects `SOF_INNS7`, and the running collector isn't polling it. The alert names the image tag it found, for whoever investigates. So it isn't just "the file exists": it's a check of what that version actually does, which is what matters for the data.
+
+**What this doesn't catch:** a deployed image that has the same streams but older collector logic, for example a fix that was never deployed. To catch that, the DAG would have to work out the latest image tag itself (the last commit touching the collector), which needs git inside Airflow. I wouldn't add that now. Logic changes don't create data gaps by themselves, and the logged tag lets you spot it by eye. I'll mark it in the code as a known limit.
+
+**The reverse mismatch:** if the collector polls streams the repo doesn't expect (the image is newer than the DAG code, or a site was disabled but not redeployed), I'd log it as a warning rather than fail. Those streams are still published, so it's not urgent.
+
+Shall I go ahead?
+
+## 11:25 user (discovery/scr-khaba-darwin)
+
+Right. As long as runtime json doesn't bloat, we good
+
+## 11:25 assistant (discovery/scr-khaba-darwin)
+
+Agreed. The file is overwritten in place, never appended to, so its size is fixed: about a dozen fields plus at most 21 streams, roughly 1–2 KB however long it runs. I'll read the collector's poll loop first:
+
+## 11:25 assistant (smp-india)
+
+The design is clear. In the collector, `poll_once` records the outcome of each poll, `write_status` writes it best-effort, and `run` and `--once` call it. Implementing:
+
+## 11:25 assistant (smp-india)
+
+Now CI passes the image tag into the build, using the same formula it uses to name the tag:
+
+## 11:26 assistant (smp-india)
+
+Now the freshness check: it reads `runtime.json` and checks the collector's status before the data.
+
+## 11:26 assistant (smp-india)
+
+Now the freshness tests. The existing ones only write `sampling.json`, so I'll make the helper also write a healthy `runtime.json` by default, then add one test per new case:
+
+## 11:27 assistant (smp-india/services/darwin-collector)
+
+81 collector tests pass. I'll add a `runtime.json` check to the container smoke test (it runs `--once`, which now writes it), then update the docs:
+
+## 11:28 user (smp-india)
+
+Commit as micro commits and push to smp-india dev, then confirm CI is green.
+
+## 11:28 assistant (smp-india)
+
+Both commits are made. I'll test each one on its own in a clean worktree:
+
+## 11:30 assistant (smp-india)
+
+Both commits pass on their own. Pushing dev and watching CI, including the image build with the new tag build-arg:
+
+## 11:34 assistant (smp-india)
+
+Pushed to smp-india dev, and CI is green: lint, tests, docs and the collector image build all passed.
+
+- `fce5548 feat(scr-1268): write Darwin collector status to collector-state/runtime.json`
+- `4c21bd7 feat(scr-1268): check Darwin collector status in the freshness DAG`
+
+Both commits pass the full test suite and the smoke test on their own. CI's image build now passes the tag in.
+
+**This changes Michael's deploy:** the collector code changed, so there's a new image tag, **`darwin-collector-fce554866e74`**, which replaces `6bec64a36575`. If he hasn't deployed yet, he should use the new one. Same steps: the artifact from CI run 39195032953, then `deploy_darwin.sh --env dev … --tag darwin-collector-fce554866e74`.
+
+**What dev shows now:** Airflow already has the new check, but the old collector is still running, so the alert changes to *"collector status missing: the running image predates runtime.json"*. That confirms what you suspected: the new deploy hasn't happened yet. Once it lands, every run logs the running image tag, and the Khaba streams should go green.
+
+The Jira acceptance criteria still name `6bec64a36575`; I'll update that once Michael confirms which tag he deployed. Nothing has run in the cluster with the new image yet, so `runtime.json` has only been tested in CI and locally.
+
+## 11:46 user (smp-india)
+
+thanks. here's the last failed run...[2026-10-19 11:31:02] INFO - DARWIN_FRESHNESS={"stale": ["collector status missing: the running image predates runtime.json, or the spool is wrong", "SOF_INNS7/ActivePower: no source data recorded yet", "SOF_INNS7/HorizontalIrradiance: no source data recorded yet", "SOF_INNS7/TiltedIrradiance: no source data recorded yet"], "collector": null, "source_age_minutes": {"SOF_INGU2/ActivePower": 1, "SOF_INGU2/HorizontalIrradiance": 1, "SOF_INGU2/TiltedIrradiance": 1, "SOF_INKHA/ActivePower": 1, "SOF_INKHA/HorizontalIrradiance": 4, "SOF_INKHA/TiltedIrradiance": 1, "SOF_INNS7/ActivePower": null, "SOF_INNS7/HorizontalIrradiance": null, "SOF_INNS7/TiltedIrradiance": null, "SOF_INRAG/ActivePower": 1, "SOF_INRAG/HorizontalIrradiance": 1, "SOF_INRAG/TiltedIrradiance": 1, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 1, "WIF_INSE4/WindDirection": 1, "WIF_INSE4/WindSpeed": 1}}
+[2026-10-19 11:31:02] ERROR - Task failed with exception
+StaleDarwinDataError: Darwin collection unhealthy:
+collector status missing: the running image predates runtime.json, or the spool is wrong
+SOF_INNS7/ActivePower: no source data recorded yet
+SOF_INNS7/HorizontalIrradiance: no source data recorded yet
+SOF_INNS7/TiltedIrradiance: no source data recorded yet
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 1576 in run
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 189 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 2120 in _execute_task
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py", line 398 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 231 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 254 in execute_callable
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py", line 97 in run
+
+File "/opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py", line 45 in check_darwin_freshness
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 98 in run_from_environment
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 89 in check_freshness
+
+-- I'd prefer it to be properly segragated though instead of everything appearing under "pre execute". Best case is separate tasks, but iirc, that takes a bit more airflow running (correct me if I'm wrong), so the next best thing is srp in the task itself. Wdyt?
+
+## 11:46 assistant (smp-india)
+
+Here's how I read it: you want the collector-status findings and the data-freshness findings clearly separated, not one block of log lines. Ideally as separate Airflow tasks, or failing that, as separate sections inside the one task.
+
+**On the cost of separate tasks:** in this case it's small, so I'd go with separate tasks. Each task is its own worker process, so it adds a couple of seconds of startup and briefly takes one worker slot. Dev has 4 slots, and both checks finish in under a second every 15 minutes. "Needing more Airflow" really applies to long-running or many-task DAGs, not this one.
+
+**What separate tasks would give you:**
+- **The grid shows which check failed:** `check_collector_status` red with `check_source_data` green means "the collector is down or wrong", and the reverse means "the source has stopped". You can tell without opening a log.
+- **Each task's log contains only its own findings.**
+- **They're independent:** no dependency between them and they run in parallel, so one failing never skips the other. The data task reads `runtime.json` itself (it's one file, no need to pass data between tasks) to label streams as "not configured" versus "no data".
+- **Alerts are unchanged:** the alert callbacks are on the DAG, which fails if either task fails. You still get one alert per failed run and one recovery notice.
+
+**If you'd rather keep one task:** Airflow 3 shows `::group::Name` … `::endgroup::` lines as collapsible sections. The other session already uses this in the publisher (`b00ff2c`). It's cheaper, but the grid would still just show one red box.
+
+Shall I split it into the two tasks?
+
+## 11:46 user (smp-india)
+
+ah good point. yes pls!
+
+## 11:48 assistant (smp-india)
+
+That `failed = …` line is hard to read. Rewriting it as two plain lines:
+
+## 11:48 assistant (smp-india)
+
+Now the tests. Each existing test maps onto one of the two checks. I'll read the file and adapt it:
+
+## 11:48 assistant (smp-india)
+
+The two remaining `run_from_environment` references belong to the publisher and the POC, not this DAG. Updating the catalogue entry to describe the two tasks, then running the full checks:
+
+## 11:54 user (smp-india)
+
+Commit and push to smp-india dev, then confirm CI is green.
+
+## 11:55 assistant (smp-india)
+
+The pre-push pytest hook failed, so nothing was pushed. The suite passed locally a few minutes ago, so I'll run what the hook runs and look at the actual failure:
+
+## 11:55 assistant (smp-india)
+
+My repro wasn't what the hook runs: it collected the collector's own tests as well. The hook runs `.venv/bin/pytest dags/test/`. Running exactly that:
+
+## 11:56 assistant (smp-india)
+
+It failed again, and the working tree now shows 4 changed files that weren't there after my commit. Looking at both:
+
+## 12:00 assistant (smp-india)
+
+Pushed and green. The other session's 5 HPX files are still in the working tree, untouched. I'll note this push trick for future sessions:
+
+## 12:00 assistant (smp-india)
+
+Pushed to smp-india dev as `956d5c0`, and CI is green: lint, tests, docs and the collector image all passed.
+
+**A hiccup on the way:** the first two pushes were rejected by the pre-push hook even though all 1217 tests passed. Another session is editing HPX national files in this same working tree right now. Pre-commit stashes uncommitted changes before the hook and restores them after, and when files change in between it marks the hook as failed. Retrying could have clobbered that session's edits. So I pushed from a clean temporary worktree, where the hook passed first time, and saved this as a note for future sessions. The other session's 5 files are still uncommitted, untouched.
+
+**What you'll see in dev now:** the DAG has two boxes, `check_collector_status` and `check_source_data`. Until Michael deploys the new image:
+- **`check_collector_status`** fails with "collector status missing", since the running image predates `runtime.json`.
+- **`check_source_data`** also fails on Khaba's three "no source data" streams. Without a status file it can't tell "not configured" from "no data". Once the new image is running, Khaba moves to the status check and this box goes green.
+
+Michael should deploy `darwin-collector-fce554866e74`. I haven't seen the two-task DAG run in Airflow yet; the next scheduled run will show the grid.
+
+## 14:51 user
+
+<pasted_content id="f04e">
+[2026-10-19 14:31:02] INFO - DARWIN_COLLECTOR_STATUS={"problems": ["SOF_INNS7/ActivePower: not configured in the running collector (image darwin-collector-fce554866e74)", "SOF_INNS7/HorizontalIrradiance: not configured in the running collector (image darwin-collector-fce554866e74)", "SOF_INNS7/TiltedIrradiance: not configured in the running collector (image darwin-collector-fce554866e74)"], "collector": {"image_tag": "darwin-collector-fce554866e74", "environment": null, "started_at": "2026-10-19T04:28:38.672257+00:00", "last_poll": {"finished_at": "2026-10-19T06:30:47.071911+00:00", "observations": 0, "failed_entities": []}}}
+[2026-10-19 14:31:02] ERROR - Task failed with exception
+StaleDarwinDataError: Darwin collector unhealthy:
+SOF_INNS7/ActivePower: not configured in the running collector (image darwin-collector-fce554866e74)
+SOF_INNS7/HorizontalIrradiance: not configured in the running collector (image darwin-collector-fce554866e74)
+SOF_INNS7/TiltedIrradiance: not configured in the running collector (image darwin-collector-fce554866e74)
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 1576 in run
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 189 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py", line 2120 in _execute_task
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py", line 398 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py", line 445 in wrapper
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 231 in execute
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py", line 254 in execute_callable
+
+File "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py", line 97 in run
+
+File "/opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py", line 46 in check_collector_status
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 126 in run_collector_status
+
+File "/opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py", line 73 in check_collector_status
+</pasted_content id="f04e">
+
+-- but check_source_data task is successful! What the hell??
+
+## 14:52 assistant
+
+That's working as designed, and the status file just told you exactly what went wrong with Michael's deploy.
+
+**What the status says:**
+- `image_tag: darwin-collector-fce554866e74`: Michael **did** deploy the new image.
+- `environment: null`: the collector didn't receive `DARWIN_ENVIRONMENT`. The new smp-tool renderer always sets it, so **he deployed with an old smp-tool checkout**. The old renderer passed the site list in `DARWIN_ENTITY_TAGS_JSON` instead, and since Khaba is missing from that list, his checkout predates Thursday's Khaba commit (`9b9b914`). This is the stale-checkout case I mentioned on Friday: the new collector still accepts the old variable, so nothing errored.
+- `observations: 0` in the last poll is normal. The collector takes one sample per stream per minute and polls every 15 seconds, so most polls have nothing new.
+
+**Why `check_source_data` is green:** each task checks one thing now. The source-data task checks the streams the collector actually polls (all fresh) and leaves the unconfigured ones to the status task. So the grid reads "collector misconfigured, data fine", which is exactly right. Before the split, all of this was one red box with "no source data recorded yet", which pointed in the wrong direction.
+
+**The fix is on Michael's side, same image:**
+
+```
+Hi Michael, thanks for deploying darwin-collector-fce554866e74! It looks like it was rendered from an older smp-tool checkout, so Khaba is missing. Could you rerun it from the latest smp-tool dev?
+
+git checkout dev && git pull --ff-only
+scripts/deploy_darwin.sh --env dev --context <india-dev-context> --tag darwin-collector-fce554866e74
+
+The diff should show DARWIN_ENTITY_TAGS_JSON replaced by DARWIN_ENVIRONMENT=dev, and "Sites:" should mention the image's bundled sites.json. Thanks!
+```
+
+Once that's applied, the next run should show `environment: "dev"` and all 18 streams configured, and both tasks go green.
+
+One gap this exposed: the deploy script can't stop someone deploying the new image with an old smp-tool, because the guard only lives in the new smp-tool. The status check catches it within 15 minutes, which is how we found it.
+
+## 15:42 user
+
+everything green!!! So we good with this monitoring dag?
+
+## 15:43 assistant
+
+Yes for dev. Today's sequence covered more than planned:
+- **Failure alerts:** they fired all weekend on the Khaba gap.
+- **Diagnosis:** the status file pinned down the stale smp-tool deploy, no kubectl needed.
+- **Both tasks:** each gave the right answer for its half.
+
+**Before calling SCR-1268 done:**
+
+1. **Teams recovery notice:** the DAG just went from failing to green, so Scraper Notification should have received one recovery message. Can you check it arrived? That's the only alert path we haven't seen work for real.
+2. **The night question, already answerable:** dev ran all weekend with the solar sites collecting. Open any failed run during India night, say Sunday around 20:00 UTC (01:30 IST). If it lists only the `SOF_INNS7` lines and no `newest source minute is N min old` for `SOF_INKHA`/`SOF_INGU2`/`SOF_INRAG`, solar keeps advancing at night and the 10-minute threshold is fine.
+3. **Stopped-collector drill:** optional. "Last poll too old" is unit-tested, and the rest of the alert path has now worked for real. I'd skip it unless you want a full drill, which needs Michael to scale the collector to 0 for 15 minutes.
+4. **Promote to qa/prod:** smp-india and smp-tool merges, then Michael's first-time setup per namespace (Secret, PVC) and a deploy of `fce554866e74`. This time he needs an up-to-date smp-tool checkout.
+5. **Troubleshooting notes:** the remaining written criterion. They're short now, since the alert text says what's wrong. I can write them.
+6. **Jira:** update the acceptance criteria with the deployed tag and the new commits.
+
+If 1 and 2 check out, I'd do 5 and 6 now and treat 4 as the release step. Want me to start on the notes?
+
+## 15:43 user
+
+where will you write the notes?
+
+## 15:44 assistant (smp-india)
+
+I'd put them in **`smp-india/docs/runbooks/scr-1268-darwin-freshness.md`**, a new file next to the existing runbooks (`scr-1256`, `scr-1258`, `scr-1274`, `scr-1278`), with a link from the freshness DAG's entry in `DATA_CATALOGUE.md`, the same way the HPX and IEX cleanup entries link to theirs ("See the runbook").
+
+**Why there:** the people who see a freshness alert are reading Airflow logs from smp-india. The runbook belongs with the DAG's code and its catalogue entry, not in smp-tool (that runbook is for deploying) and not only in the collector README (which is for developers).
+
+**What it would cover, one short section per alert message:**
+- `collector status missing` → the image predates `runtime.json`, or the wrong spool is mounted
+- `collector not polling` → the collector is down or stuck
+- `not configured in the running collector (image …)` → wrong image or stale smp-tool checkout, including today's case and the fix
+- `no source data recorded yet` / `newest source minute is N min old` → a Darwin-side issue: the collector's `poll_entity_failed` / `missing_tags` logs, and the "last poll failed" hint
+- Changing the threshold (`DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES`), and what to expect after a fix: one recovery notice.
+
+About a page. Shall I write it?

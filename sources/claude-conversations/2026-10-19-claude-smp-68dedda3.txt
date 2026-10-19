@@ -1,0 +1,343 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 11:11 user
+
+So far so good with the darwin! When I checked the successful logs, I see 39-45 processing queue size. Is that normal though, for the number of files to vary?
+
+## 11:11 assistant
+
+Yes, that's normal. 39–45 per run means you're at **steady state**: the backlog has drained, and each run picks up only what arrived in the last ~5 minutes. Two things make the count wobble a little:
+
+1. **Files are per arrival, not per minute.** The collector writes a file whenever an entity has new readings. If an entity's tags show up at different seconds within a minute, that's two files instead of one (in your logs, Khavda's power and tilted irradiance sometimes come together, sometimes apart). Slow streams like Khavda's horizontal irradiance only add a file every few minutes. So the number of files per minute naturally floats a bit.
+2. **Runs aren't exactly 5 minutes apart.** Each run starts a few seconds to a minute after its scheduled time, so one run might cover 4.5 minutes and the next 5.5.
+
+With 6–7 entities that works out to roughly 8–9 files a minute, or 40–45 per 5-minute run, which matches what you're seeing.
+
+What would be worth a look:
+- **A steady climb in the "of N" number** (`Ingest 45 of 45` → `of 60` → `of 80`) means runs aren't keeping up.
+- **A sudden drop toward zero** while it's daytime means the collector may have stopped writing. The SCR-1268 freshness DAG is meant to catch that one.
+
+I'm going from the pattern in the logs you pasted earlier and your 39–45 range. I haven't looked at the current runs myself.
+
+## 15:44 user
+
+all good now!!! Are we finally ready for qa and production? Any final check? Maybe a quick readback in tsdb via an inline script?
+
+## 15:44 assistant
+
+Before the checklist, I'll find out which read function and mapping loader the current code uses. Other sessions have changed both since we last touched them:
+
+## 15:45 assistant (smp-india)
+
+QA is close. Prod still has a few open items, and the read-back is the right first check.
+
+**1. UAT read-back (paste on VPN).** It's read-only and takes about 4 minutes at most, using the publisher's own mapping loader and read function. It checks every series the dev collector feeds: 18 streams, 24 series, minute and quarter-hour.
+
+```bash
+cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback_uat.py
+```
+
+Each series prints `OK`, `STALE`, `EMPTY` or `ERR`, with its point count over the last 3 hours (about 180 for minute series, 12 for quarter-hour), the latest timestamp and the latest value. I can read your terminal. **All `OK`** means the whole chain works in UAT: collector → EFS → publisher → TSDB.
+
+**2. The checklist, as far as I can verify it:**
+
+| Item | Status |
+|---|---|
+| Site lists per environment | ✅ dev and qa: 6 entities. Prod: 7, Tithwa included. Checked from the catalogue just now. |
+| `darwin-api-credentials` in qa and prod | ✅ you confirmed |
+| UAT writes land | ⏳ step 1 |
+| **Prod TSDB write access** for `3-s-SMP-Service-Application` | ❓ granted, but never tested. Before the fix it couldn't even read. The first prod publish is the real test, so watch that run. |
+| **Prod cluster can reach Darwin** through the proxy | ❓ still open. That's Michael's one-liner from last week, run from a prod Airflow worker. |
+| Image in qa and prod ECR | ❓ depends on whether Michael fixed the AWS trust (CI pushes automatically if so) or the artifact gets pushed by hand. Either way, prod needs a **fresh** image built after the catalogue change. |
+| Code promoted to `smp-india` qa and prod branches | ⏳ the write-only publisher and the refactor are on `dev` only |
+| Prod Airflow: `DARWIN_PUBLISH_MAX_FILES`, unpause the publisher, SCR-1268 freshness DAG on | ⏳ deploy-day steps |
+
+**Two decisions for you:**
+- **QA collector on or off?** We said one UAT writer at a time, and dev already feeds UAT. I'd deploy QA to prove the deploy works, then scale it to 0 (or keep dev off instead).
+- **Go live in prod without the validator (SCR-1294)?** Prod writes would go unverified, with the 7-day raw-file copy as the only safety net. That's acceptable if SCR-1294 lands within the week.
+
+If the read-back is all green and Michael confirms prod egress and the image, I'd call QA ready now and prod ready after those two checks.
+
+I haven't checked whether Michael fixed the AWS trust or pushed images to the qa or prod ECR. I also assumed prod catches up from the moment its collector starts, with no backfill of earlier days.
+
+## 15:48 user (smp-india)
+
+1. good point. turn off dev and keep QA and Prod alive...at roughly the same time. So once we merge to qa and prod, we ask Michaael to deploy for us on both envs. 
+2. fuck good call. Having darwin available in both uat and prod tsdb is of the highest urgency and importance. Can we reasonably get there with confidence without the 1294 yet?
+
+## 15:48 assistant (smp-india)
+
+On 1: understood. Dev's collector goes to 0 replicas and its publisher DAG gets paused, while QA and prod come up together through Michael's deploy. Dev shouldn't go off until QA is confirmed writing, so UAT never has a gap.
+
+On 2: **yes, you can go live with reasonable confidence without SCR-1294**, if you swap the automatic validator for a few manual read-backs in the first week:
+
+- **What's already proven:** the full chain works in UAT (once today's read-back is green). The write path is identical in prod, only the endpoint and account differ.
+- **What already alerts automatically:**
+  - Any failed write fails the publisher run and alerts Teams, and the files are kept.
+  - The SCR-1268 freshness DAG alerts if the collector stops producing.
+- **The one blind spot:** TSDB *accepts* a write but never *stores* it. That's rare, and the 7-day raw-file copy covers it, as long as someone looks within the week.
+- **Covering it by hand:** run the read-back script once about an hour after go-live in each environment, then once a day until SCR-1294 lands. That's about 4 minutes on VPN each time.
+
+So the read-back script should cover prod as well as UAT. I'm making it take the environment as an argument:
+
+## 15:48 assistant (notes/scr-1273)
+
+The script is now `notes/scr-1273/readback.py` and takes the environment: `dev`/`qa` check UAT, `prod` checks prod.
+
+**Today** (dev is what's feeding UAT right now):
+
+```bash
+cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py dev
+```
+
+**About an hour after go-live, then daily until SCR-1294 lands:**
+
+```bash
+cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py qa
+```
+```bash
+cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py prod
+```
+
+**Go-live order:**
+1. **Today:** run the `dev` read-back. All `OK` proves the pipeline end to end.
+2. **Merge `smp-india` dev → qa and prod.** Prod then builds a fresh image with the site list, if Michael's AWS trust is fixed; otherwise the CI artifact gets pushed by hand.
+3. **Michael deploys QA and prod together,** after running his prod egress one-liner first.
+4. **In QA and prod Airflow:** set `DARWIN_PUBLISH_MAX_FILES` to 100, then unpause the publisher and the freshness DAG.
+5. **An hour later:** run the `qa` and `prod` read-backs. Prod's first run is also the real test of its write access.
+6. **Then dev off:** scale the collector to 0 and pause the dev publisher.
+
+The prod read-back also needs **read** access on the Darwin series for the prod account. Before the fix that read was refused, and the "access resolved" message hasn't been tested for reads either. If `readback.py prod` shows `ERR`, it's a permission gap, not a data problem.
+
+## 15:57 user (notes/scr-1273)
+
+there
+
+## 15:58 assistant (notes/scr-1273)
+
+**UAT is green: all 24 series came back `OK`.** The pipeline works end to end, and you're cleared for QA and prod.
+
+What the numbers show:
+- **Minute series** are at 176–180 of 180 points over 3 hours. Shapar and Khavda are missing 3–4 minutes, which are gaps in Darwin's own data. As agreed, we don't fill them.
+- **Quarter-hour series** are at 11 of 12. That's correct, not a gap: the newest quarter (07:45) isn't due until 08:05, after it closes plus the 5-minute grace. My "of 12" estimate in the script was just rough.
+- **Values look right for 13:20 IST:** Raganesda 395 MW, Shapar 157 MW, Khaba 275 MW, Tuticorin wind 0.9 and 13 MW, and daytime irradiance of 549–932 W/m².
+- **Khaba is in:** 21 minute points and 2 quarters, so the redeployed collector started collecting it about 25 minutes ago.
+- **The repeated "read_data_methods is set to 'api' only" warnings are harmless.** These series aren't served by TSDB's fast-read API, so every read falls back to Athena, which we already knew. It's just noise.
+
+**One real data problem: Khavda's horizontal irradiance is still 131.99 W/m², in the middle of the day.** It's the exact frozen value we saw on 30 Sep and 2 Oct, and at night, while Khavda's own tilted irradiance reads 549 and the other sites 167–842. So Khavda's GHI looks permanently stuck at Darwin's end, not only overnight. We publish it as-is. Mateo should hear about it before people use that series:
+
+```
+Hi Mateo, Darwin is now flowing into TSDB 🎉 One data issue: Khavda (SOF_INKHA) HorizontalIrradiance is stuck at 131.99 W/m² — same value on 30 Sep, 2 Oct and today at midday (its tilted irradiance reads ~549 and the other sites 167–842). Looks frozen at Darwin's end. We publish it as-is, so the Khavda GHI series in TSDB isn't usable until it's fixed. Can you check with Darwin?
+```
+
+**Next:** merge `smp-india` dev → qa and prod, then Michael deploys QA and prod together. The remaining unknowns are prod-only: prod egress and prod write and read access. The `readback.py prod` run about an hour after go-live settles both.
+
+The 131.99 conclusion rests on four matching snapshots across three weeks, not a continuous probe.
+
+## 16:02 user (notes/scr-1273)
+
+not our problem lol.
+
+So we ready for merging to both qa and prod? To clarify...
+
+* we need to turn off dev ASAP
+* since QA is pushing to UAT, we need to make sure dev and QA handoff is seamless so we don't lose data interim
+* We turn on prod alongside QA.
+
+
+To facilitate Michael's convenience, can he execute some script that effectively deploys to both qa and prod? Just a step more convenient for him.
+
+## 16:02 assistant (notes/scr-1273)
+
+Here's my understanding of the plan:
+- **Merge `smp-india` dev → qa and prod.** That also promotes everything else on `dev` (HPX/SCR-1274, SCR-1268 and others), not just Darwin.
+- **Bring up QA and prod together.** Both collectors are deployed and both publishers unpaused.
+- **Turn dev off as soon as QA is proven,** with no gap in UAT.
+- **Make it one convenient command for Michael.**
+
+**How to make the dev → QA handoff seamless:** each environment has its own spool on EFS, so the QA collector starts empty and only collects from the moment it starts. No data is lost if dev stays on until QA has published at least once:
+1. QA collector up, QA publisher unpaused (alongside prod).
+2. Wait for QA's first green publish run, about 10 minutes.
+3. Scale the **dev collector** to 0, but leave the **dev publisher** on so it publishes what dev already collected.
+4. Once dev's `pending/` is empty (one or two runs), pause the dev publisher.
+
+For those ~10–15 minutes, dev and QA both write to UAT. That's mostly harmless (same values, same timestamps). Very occasionally the two may pick a slightly different reading for the same minute, so UAT gets one extra point for that minute. I'd accept that over a gap.
+
+**The script for Michael:** a `go_live_darwin.sh` in `smp-tool` that wraps what already exists:
+- **QA and prod:** runs `deploy_darwin.sh` for each (with the diff shown and a confirmation for each), then, through the Airflow CLI in each environment's scheduler pod, sets `DARWIN_PUBLISH_MAX_FILES` and unpauses the publisher and freshness DAGs.
+- **Then waits for QA's first green publish run,** and only then scales the dev collector to 0.
+- **Prints the last step:** pause the dev publisher once dev's backlog has drained, since that's a "wait until empty" step. Or a second small `--dev-off` flag does it.
+
+Questions before I build it:
+1. **Can Michael run Airflow CLI commands in the scheduler pods** (`kubectl exec … airflow dags unpause`)? If not, the script only deploys, and the Airflow toggles stay as UI steps in a checklist.
+2. **Image tags:** do QA and prod already have the image in their ECR (CI push enabled after the AWS trust fix)? Or does Michael push the artifacts first? That decides whether the script takes a tag or a full image.
+3. **Merging:** promoting everything on `dev` is fine with you, including the other sessions' work? And should I do the dev → qa → prod merges in `smp-india` myself, using your usual promotion route, or is that yours?
+
+## 16:04 user (notes/scr-1273)
+
+1. I'd rather do anything airflow myself. 
+2. No, not yet. As far as QA and Prod go, we only have the images in the pipeline (confirm for me pls)
+3. Absolutely. CI/CD baby!! But last I checked we already promoted earlier, but worth double checking
+
+## 16:06 assistant (smp-tool)
+
+Red, as expected. Now the script:
+
+## 16:07 assistant (smp-tool)
+
+Fixed and verified under macOS's own bash 3.2: without `--yes` it now gets straight to the QA deploy, with no `unbound variable` crash. All `smp-tool` tests pass.
+
+The script is `smp-tool/scripts/go_live_darwin.sh`, and I haven't committed it yet (your rule). What it does for Michael, in one command:
+
+```bash
+scripts/go_live_darwin.sh --nonprod-context <nonprod-ctx> --prod-context <prod-ctx> --tag darwin-collector-fce554866e74
+```
+
+1. **Deploys QA** with that tag (diff shown, he confirms).
+2. **Deploys prod** with the same tag (diff shown, he confirms).
+3. **Waits up to 60 minutes for QA's first real publish,** checking every minute. While it waits, you unpause the QA and prod publisher DAGs. It looks for the first file in QA's `published/` folder, which only appears once a batch's minute points *and* its quarter-hour average have been written. If that never happens, it stops and leaves dev running, so there's no gap.
+4. **Scales the dev collector to 0** once QA is confirmed. Dev's spool stays on EFS.
+5. **Reminds you of the last Airflow step:** pause the dev publisher once its log shows `Ingest 0 of 0`.
+
+Before he runs it, he pushes the two images. The `qa` and `prod` CI runs each have a `darwin-collector-image` artifact, already named for the right ECR repo and account. They expire on 26 Oct.
+
+Message for Michael:
+
+```
+hi Michael! Darwin go-live for QA + prod 🎉
+
+1. push yung images galing sa CI artifacts (darwin-collector-image), parehong tag darwin-collector-fce554866e74:
+   - QA: https://github.com/qrm-dms/smp-india/actions → latest CI run sa qa branch
+   - prod: latest CI run sa prod branch (prod account ECR)
+2. pull smp-tool dev, then isang command lang:
+   scripts/go_live_darwin.sh --nonprod-context <nonprod-ctx> --prod-context <prod-ctx> --tag darwin-collector-fce554866e74
+   → magde-deploy sa QA tapos prod (may diff + confirm bawat isa)
+   → maghihintay hanggang mag-publish si QA, tapos auto-off si dev collector
+ako na bahala sa Airflow side. salamat!
+```
+
+Want me to commit and push it to `smp-tool` `dev` (script, test, and one line in the scripts README)?
+
+Not checked:
+- **The prod egress one-liner is still outstanding.** If prod can't reach Darwin, step 2 still deploys, but prod's logs will show `poll_entity_failed`. The wait only watches QA.
+- **The script's QA check runs a command inside the collector pod,** which needs `sh` in the image. `python:3.13-slim` has it, but that's never been exercised against the real pods.
+
+## 16:11 user (smp-tool)
+
+hmmm.. Only one way to find out
+
+## 16:11 assistant (smp-tool)
+
+Agreed. But Michael can only run the script once it's on `smp-tool` `dev`, and it's still uncommitted on your machine (your no-commit-unless-asked rule).
+
+Should I commit and push it? It would be one commit, `feat(scr-1283): one-command Darwin go-live for QA and prod`, containing the script, its 3 tests and a line in the scripts README, pushed from a clean worktree as your memory note says. After that, the message above is ready to send to Michael.
+
+## 16:11 user (smp-tool)
+
+yes pls.
+
+## 16:12 assistant (smp-tool)
+
+The push worked (`fc9cb98`, with the script and its tests), but my README edit didn't match the line, so the README line isn't in. Adding it now as a small follow-up:
+
+## 16:12 assistant (smp-tool)
+
+The go-live script is pushed to `smp-tool` `dev` as two commits:
+- `fc9cb98 feat(scr-1283): one-command Darwin go-live for QA and prod`: the script and its tests, pushed from a clean worktree. All tests passed there first.
+- `4a5d864 docs(scr-1283): document go_live_darwin.sh`: the scripts README line. My first edit attempt missed the line, so it went in as a separate commit.
+
+Your local `smp-tool` is synced with `dev`. The local copies were identical to what I pushed, so I replaced them with the pushed versions.
+
+The message to Michael from before is ready to send as-is. Once he runs it, the first prod publish run and `readback.py prod` will show whether prod's TSDB access and its connection to Darwin both work.
+
+## 16:15 user (smp-tool)
+
+can you get the direct link of both QA and Prod images?
+
+## 16:15 assistant (smp-tool)
+
+Here are the direct download links for both images. Each is the `darwin-collector-image` artifact, 41 MB, and expires on 26 Oct:
+
+- **QA:** https://github.com/qrm-dms/smp-india/actions/runs/39197926692/artifacts/12162672138
+- **Prod:** https://github.com/qrm-dms/smp-india/actions/runs/39197962264/artifacts/12163100615
+
+After `docker load`, each one is already named with its target, so Michael can push it as-is:
+- QA: `624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-qa-airflow:darwin-collector-fce554866e74`
+- Prod: `154989746575.dkr.ecr.eu-west-1.amazonaws.com/smp-india-prod-airflow:darwin-collector-fce554866e74`
+
+Downloading from the browser gives a zip, so he needs to `unzip` it before `docker load -i darwin-collector.tar`. The two names above are worked out from how CI names images; I didn't open the archives to check.
+
+## 16:16 user (smp-tool)
+
+sorry. Direct to the run page instead
+
+## 16:16 assistant (smp-tool)
+
+Here are the run pages. The artifact is listed at the bottom of each one:
+
+- **QA:** https://github.com/qrm-dms/smp-india/actions/runs/39197926692
+- **Prod:** https://github.com/qrm-dms/smp-india/actions/runs/39197962264
+
+## 16:19 user (smp-tool)
+
+thanks. For the "auto off of dev collector", did we also turn off the darwin-poc thing? Or no?
+
+## 16:19 assistant (smp-tool)
+
+No. The script only turns off the real collector (`darwin-collector` in `smp-india-dev`). **`darwin-poc` is a separate deployment and stays running.**
+
+It's harmless to Darwin and TSDB:
+- **No real API calls.** The POC's collector only talks to its own **mock API inside the same pod** (`127.0.0.1:8080`, fake `DEMO_FARM` data).
+- **No TSDB writes.** It only writes files to `/export/smp-india-dev/darwin-poc`.
+
+It is wasteful, though. It writes a mock file every minute to EFS, forever, and nothing needs it now that the real collector is proven. I'd retire it. It's a one-line command for Michael, and it's reversible because nothing is deleted:
+
+```bash
+kubectl --context <nonprod-ctx> -n smp-india-dev scale deployment/darwin-poc --replicas=0
+```
+
+Line for Michael's message:
+
+```
+also pa-off na rin si darwin-poc sa dev, hindi na kailangan: kubectl --context <nonprod-ctx> -n smp-india-dev scale deployment/darwin-poc --replicas=0
+```
+
+If the POC publisher DAG is still unpaused in dev Airflow, you can pause it too, since that's on your side. And if you'd rather delete the POC deployment outright, that's also Michael's call.
+
+## 16:20 user (smp-tool)
+
+what's the expected value in both <ctx>s?
+
+## 16:21 assistant (smp-tool)
+
+It depends on Michael's local kubeconfig, so I can't know the names for sure. But the team's setup tells us a lot. `smp-tool/scripts/eks_switch_context.sh` uses **one kubeconfig file per cluster**, downloaded from Rancher:
+- **non-prod (dev and QA):** `eks-qrm-dms-noprod-6196.yaml`
+- **prod:** `eks-qrm-dms-strategy-prod-bba1.yaml`
+
+Rancher usually names the context after the cluster, so the values are most likely:
+- `--nonprod-context eks-qrm-dms-noprod-6196`
+- `--prod-context eks-qrm-dms-strategy-prod-bba1`
+
+**One catch:** the script needs **both** clusters at once, but `eks_switch_context.sh` only loads one file at a time. Michael should load both, then check the real names:
+
+```bash
+export KUBECONFIG=<k8s-dir>/eks-qrm-dms-noprod-6196.yaml:<k8s-dir>/eks-qrm-dms-strategy-prod-bba1.yaml
+```
+```bash
+kubectl config get-contexts
+```
+
+He uses the two names from the `NAME` column as the two `<ctx>` values.
+
+Line for his message:
+
+```
+for the contexts: export KUBECONFIG=<k8s-dir>/eks-qrm-dms-noprod-6196.yaml:<k8s-dir>/eks-qrm-dms-strategy-prod-bba1.yaml, then kubectl config get-contexts — yung dalawang NAME yung --nonprod-context at --prod-context
+```
+
+The context names are a guess based on how Rancher usually names them; I haven't seen his kubeconfig files. `get-contexts` gives the real ones.

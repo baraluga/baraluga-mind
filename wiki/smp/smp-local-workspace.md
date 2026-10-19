@@ -2,14 +2,19 @@
 
 ## Current State
 
-As of 2026-10-11. `/Users/qn5792/repos/smp` is a parent workspace, not a git repository itself. The actual repos to keep are `apac-tsdb-scraper`, `smp-common`, `smp-dashboard`, `smp-india`, `smp-japan`, `smp-tool`, `smp-tsdb-explorer`, `sff-actions`, and `smp-standup-dashboard`, plus side clones or worktrees such as `smp-dashboard-grafana-alerts`, `smp-dashboard-scr1269`, and `copilot-worktrees`.
+As of 2026-10-20. `/Users/qn5792/repos/smp` is a parent workspace, not a git repository. Its retained repositories are `apac-tsdb-scraper`, `smp-common`, `smp-dashboard`, `smp-india`, `smp-japan`, and `smp-tool`; `sff-actions` moved to `~/repos/sff-actions` because it belongs to the SFF team. Root-level config includes `AGENTS.md`, `CLAUDE.md`, `Makefile`, `.envrc`, `.claude`, `.vscode`, and `.cursor`.
 
-Workspace-level config to keep includes `AGENTS.md`, `CLAUDE.md`, `Makefile`, `.envrc`, `.claude`, `.vscode`, and `.cursor`.
+`CLAUDE.md` now imports `AGENTS.md` in the five tracked SMP repositories so Claude Code loads the actual instructions. Root `.ignore` excludes archives, dependencies, caches, generated decks, and data from agent search. Loose evidence moved under `notes/<topic>/`; archival material and retired project sources are in `_archive/`. Copilot worktrees were moved to `~/repos/copilot-worktrees/` to retain their four unpushed commits.
 
-Loose root material is mostly scratch evidence grouped around OCCTO, JEPX day-ahead price, Khaba/CDH cross-account checks, SCR ticket assets, decks, and older docs. A reasonable cleanup path is to archive loose files by topic rather than deleting them. Obvious cache/build junk such as `.DS_Store`, `.coverage`, `__pycache__`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.playwright-mcp`, `.codex-build`, `.codex-tmp`, and `.codex-slides-work` was identified as safe to delete. Hold `scr1278-date-repair-backup/` until the date repair is confirmed finished.
+The Artifactory credential is now outside the workspace in a mode-600 config file loaded by `.envrc`; it should not return to the parent workspace. The remaining uncommitted repo-local work includes OCCTO probes in `smp-japan`, IEX probes in `apac-tsdb-scraper`, and `smp-tool/docs/spikes/`; it was intentionally not reorganized.
+
+## History
+
+- 2026-10-19: workspace cleaned and normalised for agent use; five `CLAUDE.md` import commits were pushed to their current branches.
 
 ## Sources
 
 - `sources/claude-conversations/2026-10-11-claude-smp-b6f4d55c.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-f61c600d.txt`
 
-Last Updated: 2026-10-12
+Last Updated: 2026-10-20

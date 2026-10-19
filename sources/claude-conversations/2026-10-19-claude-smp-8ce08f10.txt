@@ -1,0 +1,349 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/8ce08f10-6bc0-4bbc-9efe-04ea0036aaac.jsonl`
+Resume: `claude --resume 8ce08f10-6bc0-4bbc-9efe-04ea0036aaac`
+
+## 11:11 user
+
+So faar so good for both qa and prod but... I'm worried about the run duration. Hpx rtm takes around 4-8 minutes. While hpx dam_gdam takes 8-27 minutes!! In prod, I saw one run took 45 minutes! Given we scheduled it to run every 15 minutes, this shit is unnacceptable lol. 
+
+Here's screenshot of that 49 min (I stand corrected lol) run....
+
+## 11:11 assistant
+
+Your screenshot already shows where the time goes. Collection takes about 3 seconds. Publish and verify are the slow tasks, and three of them needed retries:
+
+| Task | Try | Duration |
+|---|---|---|
+| `verify_gdam_tomorrow` | **3** | 1m46 |
+| `verify_dam_today` | **2** | 44s |
+| `publish_gdam_tomorrow` | **2** | 2m07 |
+| `verify_hpdam_tomorrow` | 1 | **7m18** |
+
+Each retry adds a 5-minute delay, and the run also started 9 minutes late, queued behind the previous run because of `max_active_runs=1`. I'll read the publish and verify path to confirm where the minutes go.
+
+## 11:11 assistant
+
+The slowness comes from the TSDB round-trips, not from HPX. I'll check one more thing first: there's an existing bulk-read helper, and the IEX RTM realtime DAG may already use it for exactly this.
+
+## 11:12 assistant (smp-india)
+
+The 49 minutes is almost entirely TSDB overhead. It's three things, and the codebase already has the fix for all three.
+
+**Why it's slow**
+1. **Every 15-minute run republishes everything.** That's 6 chains, today and tomorrow for DAM, GDAM and HPDAM, even when HPX returned exactly the same bytes as last time. After the daily publication, almost every poll is like that.
+2. **Reads happen one series at a time.** Publish reads each series separately to find changed points, 14 serial reads for GDAM alone. Verify then reads them all again, even when nothing was written.
+3. **Verification waits are expensive.** The TSDB applies writes asynchronously. If a readback isn't visible within about 20 seconds, the task fails and Airflow waits **5 minutes** before retrying, up to 6 times. That's why `verify_gdam_tomorrow` was on try 3 and `publish_gdam_tomorrow` on try 2. Once a run passes 15 minutes, `max_active_runs=1` queues the next one, which explains the 9-minute late start.
+
+**The fix: reuse what the IEX RTM realtime DAG already does**
+- **Skip the TSDB when the source hasn't changed.** Save the source SHA per market and date once a publish is confirmed. If the next poll gets the same bytes, skip the TSDB entirely. IEX stores this in an Airflow Variable, and I'd do the same here.
+- **One bulk read instead of N serial reads.** Use `run_measured_batch(..., mode="bulk")` from `smp_common`. As a bonus, it logs `SMP_TSDB_TIMING` with per-run read and write seconds, so we'll finally see real numbers. Right now our own log suppression hides them.
+- **Verify only if something was written,** and do it with a short in-task poll of a couple of minutes instead of failing and waiting 5 minutes. If publish finds no changes, its own read already proves the TSDB holds the values.
+
+**Expected result:** most polls should take about a minute, since they only collect. A run that actually writes should take a few minutes, well under 15. RTM uses the same publication module, so it improves too. These figures are estimates and I haven't measured anything yet; the timing logs will show the real numbers after the change.
+
+This changes how prod verifies data, and the "no-change means verified" step rests on behaviour I haven't checked live. So I'd write a short plan and run one read-only review on it before coding, then tests first.
+
+Go ahead?
+
+## 11:15 user (smp-india)
+
+yes go ahead. tdd this carefully!
+
+Before that though, do you wanna confirm anything first?
+
+## 11:15 assistant (smp-india)
+
+Yes, two things, because the plan depends on both.
+
+1. **Does HPX return identical data on repeated polls?** The skip depends on it. If the response changes on every poll, for example through a timestamp in it, the skip would never fire. I can check this myself, since it's a public endpoint.
+2. **Are TSDB reads really the slow part, and does bulk actually help?** That needs the VPN, so it'll be a script for you.
+
+I'll do the first one now.
+
+## 11:16 assistant (smp-india)
+
+The installed `smp_common` is 0.9.0 and has the bulk reader. Now the timing script.
+
+## 11:17 assistant (smp-india)
+
+Good thing I tested it: the date helper broke on timezone-aware input. Fixing that and re-testing.
+
+## 11:17 assistant
+
+I've confirmed one thing and need you for the other.
+
+**Confirmed: HPX returns identical bytes on repeated polls.** I fetched each market twice, 25 seconds apart, and all four (DAM, GDAM, RTM, HPDAM) came back byte-identical. So skipping polls whose source hasn't changed is safe.
+
+That check also caught a trap. The artifact's `sha256` hashes the parquet, which includes `collected_at`, so it changes on every poll. The skip has to key on `raw_sha256` plus a hash of the market's mapping instead, so a mapping change still forces a republish.
+
+**Needs the VPN: do TSDB reads cost what I think, and does bulk help?** This script times today's and tomorrow's reads for GDAM (14 series) and DAM (5) in UAT, then prod. It compares the current one-series-at-a-time read with the proposed bulk read and counts fallbacks to the slower Athena path. It's read-only, and I tested it offline except for the TSDB calls themselves.
+
+```bash
+cat > /tmp/hpx_read_timing.py <<'PYEOF'
+"""Read-only: time today's/tomorrow's TSDB reads for HPX series, serial (current) vs bulk (proposed). UAT then prod."""
+import json, logging, os, subprocess, sys, time
+from pathlib import Path
+
+import pandas as pd
+
+MAPPING = Path("/Users/qn5792/repos/smp/smp-india/dags/src/scripts/india_hpx_national/catalog_mapping.json")
+
+
+def auth_for(endpoint):
+    prefixes = (["SMP_SERVICE_APP_OKTA_UAT_"] if endpoint == "uat" else []) + ["SMP_SERVICE_APP_OKTA_"]
+    for p in prefixes:
+        cid, sec = os.getenv(p + "CLIENT_ID"), os.getenv(p + "CLIENT_SECRET")
+        if cid and sec and cid.startswith("2-" if endpoint == "uat" else "3-"):
+            return dict(intact_client=cid, intact_secret=[REDACTED], f"service credentials ({p}*)"
+    return {}, "interactive Okta login"
+
+
+def payload(ids, day):
+    start = day.tz_convert("UTC")
+    stamps = pd.date_range(start, periods=96, freq="15min")
+    return pd.DataFrame([{"series_id": s, "application_date": t, "value": 0.0} for s in ids for t in stamps])
+
+
+class Count(logging.Handler):
+    def __init__(self):
+        super().__init__(); self.n = 0
+    def emit(self, record):
+        if "falling back" in record.getMessage() or "retrying raw-row budget" in record.getMessage():
+            self.n += 1
+
+
+def run(endpoint, dry):
+    rows = json.loads(MAPPING.read_text())["environments"][endpoint]
+    today = pd.Timestamp.now(tz="Asia/Kolkata").normalize()
+    print(f"\n=== {endpoint.upper()} ===", flush=True)
+    if dry:
+        print({m: len(r) for m, r in rows.items()}); return 0
+    from engie_tsdb.catalog import Config
+    from smp_common.tsdb import TsdbBatchIO
+    from smp_common.tsdb.transport import sdk_read_latest
+
+    auth, how = auth_for(endpoint)
+    print(f"auth: {how}", flush=True)
+    Config.set(catalog_endpoint=endpoint, client_name="scr_1274_readonly_timing", log_level="WARNING",
+               read_data_methods=["api", "athena"], **auth)
+    counter = Count(); logging.getLogger("smp_common").addHandler(counter); logging.getLogger("smp_common").setLevel(logging.WARNING)
+    results = []
+    for market in ("GDAM", "DAM"):
+        ids = [r["series_id"] for r in rows[market].values()]
+        for label, day in (("today", today), ("tomorrow", today + pd.Timedelta(days=1))):
+            frame = payload(ids, day)
+            start = frame.application_date.min(); end = frame.application_date.max() + pd.Timedelta(seconds=1)
+            counter.n = 0; t = time.perf_counter(); points = 0
+            for sid in ids:
+                points += len(sdk_read_latest(sid, start, end, 500))
+            serial = time.perf_counter() - t; serial_fallbacks = counter.n
+            io = TsdbBatchIO(frame, "bulk"); t = time.perf_counter(); bulk_points = 0
+            for sid in ids:
+                bulk_points += len(io.read(sid, start, end, 500))
+            bulk = time.perf_counter() - t
+            r = dict(endpoint=endpoint, market=market, day=label, series=len(ids), serial_seconds=round(serial, 1),
+                     serial_fallback_warnings=serial_fallbacks, serial_points=points, bulk_seconds=round(bulk, 1),
+                     bulk_sdk_calls=io.metrics["read_sdk_calls"], bulk_fallback_calls=io.metrics["fallback_calls"],
+                     bulk_points=bulk_points)
+            print(r, flush=True); results.append(r)
+    Path(f"/tmp/hpx_read_timing_{endpoint}.json").write_text(json.dumps(results, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    dry = "--dry-run" in sys.argv
+    if "--endpoint" in sys.argv:
+        sys.exit(run(sys.argv[sys.argv.index("--endpoint") + 1], dry))
+    for e in ("uat", "prod"):
+        try:
+            subprocess.run([sys.executable, __file__, "--endpoint", e] + (["--dry-run"] if dry else []), timeout=600)
+        except subprocess.TimeoutExpired:
+            print(f"{e}: TIMED OUT after 600s (that itself is the answer: reads are very slow)")
+    print("\nOUTPUT FILES: /tmp/hpx_read_timing_uat.json /tmp/hpx_read_timing_prod.json")
+PYEOF
+/Users/qn5792/repos/smp/smp-india/.venv/bin/python /tmp/hpx_read_timing.py
+```
+
+It should take a few minutes, with a hard cap of 10 minutes per environment; a timeout would itself mean the reads are very slow. Auth works as before: your shell's service credentials, or an interactive Okta login. Tell me when it's done and I'll read the results.
+
+If bulk turns out much faster, the plan stands as is. If both are fast, the 5-minute verification retries are the real cost, and the in-task poll plus the source skip become the core of the fix. Either way, I'll start the plan review and the tests once the numbers are in.
+
+## 11:47 user
+
+there
+
+## 11:47 assistant
+
+No result files were written, so the script probably failed before saving. I'll read your terminal to see what happened.
+
+## 11:48 assistant (smp-india)
+
+I've started the design review in the background. In short, the plan:
+- **Skip unchanged polls:** if HPX returned the same raw bytes for the same market, date and mapping, skip the TSDB entirely.
+- **Read in bulk:** use one bulk read for change detection instead of 14 serial reads, with timings logged.
+- **Verify only after a write:** run it as a 3-minute in-task poll instead of 5-minute retries.
+- **Keep the DAG shape:** collect → publish → verify stays, with shorter retries.
+
+I'll write the tests once the review's findings are in. I'm waiting on the review and haven't written any code or tests yet.
+
+## 11:53 assistant (smp-india)
+
+The review confirms the core assumption and finds real problems with my plan.
+
+- **The no-change check is verified safe.** When `publish_batch` reports no-change, every point was present and equal in a successful read, so it is equivalent to a readback. A brand-new empty series returns empty rather than raising.
+- **The skip-unchanged-source layer could skip a needed publish.** If a write fails partway and HPX later reverts to the earlier bytes, the stale slot state would skip the publish and leave mixed values in the TSDB, with nothing alerting. It also wouldn't republish after we deploy a fix to our own conversion code.
+
+Its suggestion is simpler and removes both risks, so I'm taking it. **Drop the Variable layer entirely.** A bulk read is a single SDK call per chain, so an unchanged poll stays cheap, and it compares against the TSDB on every poll. The source skip is not needed at a 15- or 30-minute cadence.
+
+I'm also taking two smaller fixes:
+- **Timing logs:** our `_call_tsdb` disables logging globally, so `SMP_TSDB_TIMING` would never show up. I'll log the returned metrics after the call instead.
+- **Verify budget:** your screenshot shows verify sometimes needed try 3, which means data took more than about 10 minutes to become visible. I'll use a 5-minute in-task poll plus one retry after 1 minute. If a tail case still fails, Teams alerts honestly and the next poll's bulk compare fixes the data. Your grid shows one retry and one failure across about 10 runs, so this should be rare.
+
+I'm skipping the read-mode rollback switch. A bulk read that hits the TSDB raw-row limit fails loudly, never silently wrong, and `git revert` is the rollback.
+
+Now the tests, written first. I'll look at the existing publication tests I'll be changing.
+
+## 11:54 assistant (smp-india)
+
+Nine tests fail, all on behavior that doesn't exist yet: the bulk measured calls, the skip, the in-task poll, and the new retry budget. Now the implementation.
+
+## 11:55 assistant (smp-india)
+
+Three failures remain. I'll look at them before touching anything.
+
+## 11:55 assistant (smp-india)
+
+The old test no longer exists, and the targeted re-run printed nothing, which suggests the full run saw a stale view. I'll re-run the suite cleanly.
+
+## 11:55 assistant (smp-india)
+
+Green: 1220 passed. Because you asked for careful TDD, I'll prove the key new tests actually bite by breaking each behavior in turn.
+
+## 11:56 assistant (smp-india)
+
+All five mutations are caught, and the file is restored afterwards. Last, the runbook still describes the old 5-minute retries.
+
+## 11:57 assistant (smp-india)
+
+The speed fix is built and tested, and it's uncommitted. The full suite passes: 1220 tests, including 262 HPX tests.
+
+**What changed** (5 files)
+- **One bulk read instead of one per series.** Change detection now uses `run_measured_batch(..., mode="bulk")`, so GDAM does 1 SDK read instead of 14.
+- **No readback when nothing was written.** If the publish read found every point already in the TSDB, verify returns `no-change` without touching the TSDB. The review confirmed this is equivalent to a readback, because every point must be present and equal in a successful read. This should be most polls.
+- **Verify polls inside the task after a write.** It does one bulk read every 15 seconds for up to 5 minutes, instead of failing and waiting 5 minutes for an Airflow retry.
+- **Shorter retries.** Publish retries once after 1 minute (5-minute timeout) and verify retries once after 1 minute (7-minute timeout), replacing 1×5 and 6×5 minutes.
+- **Timings are finally visible.** Every publish and verify logs `SMP_TSDB_TIMING` with read and write seconds and fallback counts. The old code silenced these.
+- **Runbook updated.**
+
+**Testing**
+- I wrote the tests first and watched them fail for the expected reasons.
+- I then broke each new behavior on purpose: removed the skip, switched to serial reads, removed the timing log, shortened the poll, and skipped when the write count was unknown. A test caught each one, and the file was restored afterwards.
+
+**Design review changes**
+I dropped my original skip based on unchanged source. The review found it could skip a needed publish and leave mixed values in the TSDB after a partial write, and that it wouldn't republish after a fix to our own conversion code. The bulk read gets almost the same speed with no stored state.
+
+**Not verified**
+- I couldn't measure real bulk-read times, because your Okta user can't read these series. The first QA run's `SMP_TSDB_TIMING` lines will show them.
+- If TSDB visibility sometimes takes more than about 7 minutes, a run that writes will fail and alert. The next poll then fixes the data.
+- Bulk reads lack the newer row-limit retry. If a series ever hits it, publishing fails loudly rather than writing anything wrong, and `git revert` is the rollback.
+
+Another session is committing SCR-1268 Darwin work in this same `smp-india` checkout right now. I'll commit only my 5 files, as two commits: code with tests, then the runbook.
+
+Want me to commit, push, and merge through qa to prod?
+
+## 12:01 user (smp-india)
+
+yes pls.
+
+## 12:08 assistant (smp-india)
+
+The HPX speed fix is pushed and promoted, so dev, qa and prod now hold the same code.
+
+**What shipped**
+- **HPX fix on dev:** `bff560c` (bulk reads, skip readback when unchanged, in-task polling, shorter retries) and `196b754` (runbook).
+- **qa:** `648dc44`, merged from dev.
+- **prod:** `41c5ae0`, merged from qa.
+- **Also promoted, as you chose:** the 5 commits from your other sessions. That's three SCR-1268 Darwin commits, plus the Khaba export no longer bundling forecasts and Khavda reading each series once per run. Anyone owning those should know they're live in prod now.
+
+I committed only the 4 HPX code and test files and the runbook. Your other session's uncommitted files weren't touched.
+
+**What to watch on the next QA/prod runs**
+- **Run duration:** most polls should take a few minutes at most. The new publish reads should finish in seconds; I haven't measured that yet.
+- **`SMP_TSDB_TIMING` lines** in the publish and verify logs: `read_seconds` should be small and `fallback_calls` should be 0.
+- **Verify results:** most should report `no-change`. Only runs that actually wrote data should do the readback poll.
+
+If a verify still fails after the 5-minute poll and one retry, TSDB visibility is slower than we assumed. The next poll will fix the data. Send me that run's timing line and I'll tune the budget.
+
+## 14:53 user
+
+can't say if it worked but last rtm run was <2 minutes only then the dam_gdam, I had to manually trigger, it went fast but skipped all "tomorrow", I think. 
+
+This got me wondering, what's the reason why we set the schedule this way? We have different windows, it seems.
+
+## 14:54 assistant (smp-india)
+
+Skipping "tomorrow" on a manual run is expected if you triggered it before HPX published the next day's data. That happens around 13:00 IST, which is 15:30 Manila. Each "tomorrow" collector found an empty table, logged `pending` and skipped its publish and verify. The next scheduled poll checks again.
+
+**Why the schedule has these windows**
+
+The ticket asks for DAM and GDAM "1 time a day (around 13h india time, retry every 15 minutes until we get it)", for today and next day. RTM has no time in the ticket, so I took every 30 minutes from the older SCR-1025 ticket, matching the existing IEX RTM DAGs.
+
+| Window (IST) | Purpose |
+|---|---|
+| Every 15 min, 13:00–17:45 | The "retry every 15 minutes until we get it" part. Tomorrow's data normally lands in the first poll or two. |
+| 18:00 | Deadline check. If tomorrow is still missing, the run **fails and alerts Teams** instead of skipping. Without it, a day HPX never publishes would just produce green, skipped runs forever. |
+| Every 15 min, 20:00–20:45 | Evening reconciliation. HPX has no "final" flag, so a complete response at 13:00 doesn't prove those values won't change. This re-reads both days and writes any corrections. |
+| 21:00 | Second deadline. Missing data fails here too. |
+| RTM every 30 min | Today's blocks fill in through the day, and yesterday is re-read until complete. |
+
+**What's ours, not the ticket's**
+
+The 18:00 cut-off and the whole evening window were my choices, not HPX guarantees. The POC notes say so: "The exact cutoff and reconciliation cadence remain engineering configuration choices." We've never seen HPX revise day-ahead values after first publication. If nobody needs late corrections, the evening window could go.
+
+**Gotcha for manual triggers between 18:00 and 20:00 IST**
+
+The deadline is still 18:00 then. If tomorrow's data is missing, the run **fails** instead of skipping, by design.
+
+I didn't check the time your manual run actually happened. If it was before 15:30 Manila, the skip is explained.
+
+## 14:57 user (smp-india)
+
+I see. So all good so far?
+
+## 14:57 assistant (smp-india)
+
+Mostly yes. The speed looks fixed, but the most important case hasn't run yet.
+
+**Confirmed so far**
+- RTM finished in under 2 minutes, down from 4–8.
+- Your manual DAM/GDAM run was fast, and "tomorrow" skipping before publication is expected behavior.
+
+**Not confirmed yet**
+- **A run that actually writes data.** That's today's first poll after HPX publishes tomorrow, around 13:00–13:30 IST (15:30–16:00 Manila). That run does the real write plus the in-task verify poll. It's the one that took 8–49 minutes before.
+- **The timing logs.** In that run's `publish_*` and `verify_*` logs, look for `SMP_TSDB_TIMING`: `read_seconds` should be small and `fallback_calls` should be 0. Paste one here and I'll read it.
+- **No verify failures.** A failure at that point would mean TSDB visibility takes longer than the 5-minute poll plus one retry.
+
+**Still open on our side**
+- The Jira description and last comment still say 33 series. It's 29 now, with GDAM at 14.
+- The Jira flag I set ("waiting for HPX Timeseries") is still on the ticket.
+- The one-liner to Lou about the three UAT price series still set to PT15M hasn't been sent.
+
+Want me to fix the two Jira items now?
+
+## 15:51 user (smp-india)
+
+yes pls
+
+## 15:52 assistant (smp-india)
+
+I fixed both on SCR-1274.
+- **Description:** it now says 29 series, with GDAM at 14 (no MCV, as agreed by Mateo and Lou). It also says Lou delivered the IDs on 15 Oct and that they're identical in UAT and prod.
+- **Flag:** cleared.
+- **Comment 134919:** I edited it instead of adding a new one. It drops the "waiting for 33" text and adds a 19 Oct update: 29 series confirmed in UAT and prod, publishing live, and runs sped up.
+
+I didn't re-read the ticket to confirm the flag shows as cleared.
+
+The ticket is now in **To be validated** and its priority is **High**. Someone changed both since my last update, so I left them alone.

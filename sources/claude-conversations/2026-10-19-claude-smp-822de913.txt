@@ -1,0 +1,152 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `822de913-6a35-4648-9e65-956b7e2d3853`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853.jsonl`
+Resume: `claude --resume 822de913-6a35-4648-9e65-956b7e2d3853`
+
+## 11:11 user
+
+weekend came along and I forgot about this. Where were we again?
+
+## 11:12 assistant (apac-tsdb-scraper)
+
+We left SCR-1289 one check away from validation, and that check never ran. My AWS login from last week has also expired, so I can't look myself.
+
+**Where things stand**
+- **Fixed and live:** `iex_api_rec` is back in the prod scraper list. The missing sessions up to 30 Sep are backfilled in TSDB and CDH (prod and QA). Airflow was green.
+- **Code:** both repos are pushed, and smp-india is promoted to QA and prod.
+- **Jira:** the summary comment is posted.
+- **Still open:** we wanted proof that the scraper runs on its own, using the 16 Oct scheduled task. Since the weekend passed, there should now be four automatic runs to check: 16, 17, 18 and 19 Oct.
+
+Same command as before, on the VPN, about a minute:
+
+```bash
+cd ~/repos/smp/apac-tsdb-scraper && source .venv/bin/activate && python scripts/prod_scraper_ops.py refresh-creds && { python scripts/prod_scraper_ops.py --skip-refresh check-active; python scripts/prod_scraper_ops.py --skip-refresh status iex_api_rec; } 2>&1 | grep -v -i warning | tee /private/tmp/claude-501/-Users-qn5792-repos-smp/822de913-6a35-4648-9e65-956b7e2d3853/scratchpad/scr1289_day2_check.txt
+```
+
+**Pass:** the 16, 17, 18 and 19 Oct tasks all show `Completed`, and `check-active` says the list matches. Then SCR-1289 is ready to send to Francois, and I'll unflag this chat. Say "done" and I'll read it.
+
+## 11:47 user (apac-tsdb-scraper)
+
+there
+
+## 11:47 assistant
+
+SCR-1289 is ready for Francois to validate. The REC scraper has run on its own all weekend, so the fix holds.
+
+- **16–18 Oct:** all three scheduled REC tasks completed with nobody touching them.
+- **19 Oct:** still `Waiting`, which is normal: its run window opens at 3 PM your time today.
+- **`check-active`:** clean.
+
+I've cleared the flag on this chat, removed the 🚩 from its title, and noted in memory that the fix is verified.
+
+All that's left is handing it over: move the ticket to validation and ping Francois. If you want a note to go with it:
+
+```
+Hi Francois, SCR-1289 is ready for validation. The REC dashboard (prod and QA) now shows data up to the 30 Sep session, and the scraper has been running daily on its own since the 15th. Details are in the ticket comment. Thanks!
+```
+
+Still open, if anyone cares: who removed REC from the scraper list in July. The CloudTrail logs that would show it age out around 21 Oct, two days from now.
+
+## 11:48 user
+
+wait, what did we do again as a fix?? Lol. Did we move the rec scraper to airflow or what
+
+## 11:48 assistant
+
+No, nothing moved. The REC scraper is still the same Lambda it always was, and the Airflow DAG is still the same DAG. We just turned the scraper back on and added alarms.
+
+**How it works**
+1. The **scraper** is a Lambda in apac-tsdb-scraper. It pulls REC from the IEX API every day and writes it to TSDB.
+2. The **Airflow DAG** (`india_iex_rec_tsdb_dag`) reads REC from TSDB and publishes it to CDH, which is where Grafana reads it from.
+
+**What broke**
+Around 23 July, `iex_api_rec` was removed from the Lambda's list of scrapers to run (`SCRAPER_NAMES`), so the scraper just stopped. The DAG kept running green because it re-published the old July data from TSDB every day.
+
+**What we did**
+1. **Turned it back on:** added `iex_api_rec` back to that list. That was one setting change in prod, with no code deploy.
+2. **Backfilled:** ran a one-off replay so TSDB got the 5 sessions it missed (29 Jul to 30 Sep). Then the DAG published them to CDH.
+3. **Added alarms so this can't go silent again:**
+   - The DAG now fails and alerts Teams if the newest REC data is over 25 days old, or missing. That would have flagged this in mid-August.
+   - The DAG only publishes to CDH after a successful read, so it can't push stale or partial data.
+   - A new command, `prod_scraper_ops.py check-active`, flags it when the Lambda's scraper list differs from the repo's config. You run it by hand after a deploy.
+
+Steps 1 and 2 fixed the data. Step 3 is the "detect similar issues" part Francois asked for.
+
+## 11:49 user
+
+right. write a very brief msg what happened, what fixed it, and what we placed to hopefully deter such situation
+
+## 11:49 assistant
+
+```
+Hi Francois, SCR-1289 is ready for validation.
+
+What happened: the REC scraper was dropped from the prod scraper Lambda's run list around 23 Jul, so it stopped collecting. The DAG stayed green because it kept republishing the old July data.
+
+Fix: re-enabled the scraper and backfilled the 5 missed sessions. The dashboard (prod and QA) now shows data up to the 30 Sep session, and the scraper has been running daily since.
+
+Prevention: the DAG now fails and alerts Teams if REC data is over 25 days old, and only publishes after a successful read. We also added a check that flags when the Lambda's scraper list drifts from the repo config.
+
+Thanks!
+```
+
+## 11:50 user
+
+Ah. Did we also push this in prod?
+
+## 11:50 assistant
+
+Quick check that `prod` still has our commits:
+
+## 11:50 assistant (smp-india)
+
+Yes, everything that needs to run in prod is there.
+
+| Part | In prod? |
+|---|---|
+| Scraper re-enabled and backfilled | Yes. Both were done directly on the prod Lambda and TSDB on 14 Oct, and it has run on its own since. |
+| DAG checks (the 25-day freshness alert, publish only after a successful read) | Yes. Both commits are on smp-india's `prod` branch, which prod Airflow pulls automatically. |
+| `check-active` and the replay tooling | Pushed to apac-tsdb-scraper `main`. They're commands you run from your laptop, so nothing needs deploying to the Lambda. |
+
+## 11:51 user (smp-india)
+
+okay what's unclear to me is, if the scraper stopped last July, it's been 3 month and no one raised it until now?
+
+## 11:52 assistant (smp-india)
+
+Pretty much, yes. Several things lined up to hide it:
+
+1. **Nothing was watching.** No alert existed for the scraper or the DAG. The Lambda didn't error, it just never got asked to run REC, so nothing failed anywhere. The DAG kept going green every day because it re-published the July data.
+2. **REC is sparse by nature.** It only trades about every two weeks, so a gap of a few weeks looks normal. The dashboard defaults to a 5-year window, where a handful of missing points at the end is easy to miss.
+3. **It's low traffic.** REC is a niche dashboard. Nothing we have shows how often anyone opens it, but Francois spotting it on 12 Oct was the first report.
+
+**It was actually noticed once, on 8 Sep, and not raised.** During the RTM recovery work, our own notes in `RTM_RECOVERY.md` (commit `9fbc719`) recorded that REC "was absent from the live production scraper list". Codex steered that deploy to avoid re-activating it, treating it as out of scope, and no ticket or message followed. So for about a month we knew, as a footnote, and didn't flag it.
+
+That's what the new checks are for. The 25-day freshness alert would have fired in mid-August, without anyone having to open the dashboard. And `check-active` would have flagged the missing scraper on 24 July, as long as someone runs it after deploys.
+
+Whether to mention the 8 Sep note to Francois is up to you. I left it out of the message draft.
+
+## 11:52 user (smp-india)
+
+....and we didn't work on anything about REC since then?
+
+## 11:52 assistant (smp-india)
+
+Checking git, Jira and the mind palace for any REC work between 23 Jul and 12 Oct:
+
+## 11:53 assistant
+
+Right, nothing. Between 23 July and Francois's ticket on 12 October, nobody worked on REC.
+
+- **Git:** no commits touching REC in apac-tsdb-scraper, smp-india, smp-dashboard or smp-tool in that window.
+- **Jira:** no REC tickets in that window. The last ones before SCR-1289 were the June build (SCR-1103/1108), the backfill (SCR-1165) and a proxy fix (SCR-1186, 1 Jul).
+- **Mind palace (Codex sessions):** REC only shows up in passing:
+  - 3 Aug: the REC dashboard was among your open browser tabs, captured in a session.
+  - 10 Sep: it appears in a Grafana dashboard listing.
+  - 8 Oct: it appears in a repo map.
+  
+  No session did any work on REC. The only real moment was the 8 Sep RTM note that REC was missing from the list, which was left alone.
+
+So once it shipped in early July, REC got no attention until Francois noticed the gap. That's another reason the freshness alert matters: it doesn't depend on anyone looking at REC.

@@ -1,0 +1,472 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `7de67109-1cef-41aa-b4ce-51bef7f2e635`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/7de67109-1cef-41aa-b4ce-51bef7f2e635.jsonl`
+Resume: `claude --resume 7de67109-1cef-41aa-b4ce-51bef7f2e635`
+
+## 18:16 user
+
+can you check https://tractebel-et.atlassian.net/browse/SCR-1296?
+
+although it's an extremely quick work (I already did it lol), it's just a bit troubling that these sort of things get through. I mainly blame the manual process of promoting dashboards from qa -> prod. 
+
+Any way we can automate this? Wdyt?
+
+## 18:16 assistant (smp-dashboard)
+
+I read the ticket: Francois found two India dashboards, the Cumulative Bid Stack and Bilateral Contracts, that were finished on QA but never pushed to prod. You've already fixed it.
+
+**Why it slipped:** the repo already stores the dashboards in a form that works in any environment. Every India dashboard in `smp-dashboard/dashboards/india/` points at a `${DS_SMP_CDH}` placeholder instead of a fixed datasource ID. The only manual part is the last step, importing into prod. Nothing tracks it and nothing flags when it's skipped, so a ticket counts as done once the dashboard is on QA.
+
+**What I'd do, smallest first:**
+
+1. **A promote script, run locally on the VPN.** I'd add `scripts/promote_grafana_dashboards.py --region india --env prod [--dry-run]`. It would:
+   - reuse the URL lookup and token handling already in `export_grafana_dashboard.py`;
+   - for each JSON in `dashboards/<region>/`, fetch the prod version by its ID and compare the two;
+   - list each dashboard as missing, outdated or the same, and stop there on `--dry-run`;
+   - otherwise import it through `POST /api/dashboards/import`, filling the placeholder with prod's Athena datasource.
+
+   The dry run is the useful part: it would have caught this ticket in one command. It's roughly one small file.
+2. **A rule that a ticket isn't done until it's on prod.** For dashboard tickets, the last step would be running that script with prod as the target. It's a process change rather than code, but it fixes the actual cause.
+3. **Later, a GitHub Actions trigger.** This would be a manual workflow like `cdh-register.yml`, or one that runs on merge to `main`. The catch is that Grafana is on `*.myengie.com`, which needs the VPN, so GitHub's own servers probably can't reach it. It only works if there's a runner inside the network. I don't know whether we have one.
+
+**What I'd avoid:** having Grafana load the dashboards from the repo at startup (the Helm "sidecar" option). Grafana makes those dashboards read-only in its editor, which breaks the "edit on QA, export, commit" workflow. It also won't fill in the `${DS_SMP_CDH}` placeholders, so every dashboard would need rewriting.
+
+I haven't checked that `/api/dashboards/import` works with prod's Grafana token permissions, or whether a runner inside the network exists. Nothing has been changed yet.
+
+## 18:20 user (smp-dashboard)
+
+to clarify, our gh actions DO have access to the vpn, as the runner itself is hosted within the network. So...
+
+## 18:20 assistant (smp-dashboard)
+
+So I understand you correctly: our GitHub Actions runners sit inside the corporate network, so a workflow can call `dms-smp-india-prd.gems.myengie.com` directly. That makes the GitHub Actions option possible now. The promotion doesn't need to depend on someone remembering a local script.
+
+**Revised proposal:**
+
+- **One script, `scripts/promote_grafana_dashboards.py`.** For each dashboard in `dashboards/<region>/`, it compares the repo JSON with what Grafana has. On `--dry-run` it only reports. Otherwise it imports through `/api/dashboards/import`, filling `${DS_SMP_CDH}` with that environment's Athena datasource. It runs the same way locally or in CI.
+- **A workflow, `.github/workflows/grafana-promote.yml`**, with two triggers:
+  - a manual run that takes a region, an environment and dry-run, following `cdh-register.yml` and limited to `main`;
+  - every merge to `main`, which promotes automatically.
+- **A daily drift check (optional).** It would run the dry run against prod and fail the job if the repo and prod differ. That catches the case where someone edits prod by hand, or where a merge happened but the promote step failed.
+
+Before I build anything, I need these answered:
+
+1. **Runner label.** Our workflows use `ubuntu-24.04`, `ubuntu-latest` and plain `ubuntu`. Which one is the runner inside the network? My guess is `ubuntu`, but I'd rather check than guess.
+2. **Tokens.** Is there a Grafana service-account token per region and environment that I can store as a repo secret, e.g. `GRAFANA_TOKEN_INDIA_PROD`? Does it need Editor rights, or are we using Admin?
+3. **Automatic or manual for prod.** Should a merge to `main` push straight to prod, or only to QA, with prod as a manual run (needing an approval)? My pick: merge goes to QA automatically and prod gets a manual run with approval, since Francois signs off on QA first.
+4. **Changes made directly in Grafana.** Importing from the repo overwrites prod edits made in the UI. Is the repo the only source of truth, so the import always wins? Or should the job stop with an error when prod has a newer version than the repo?
+5. **Scope.** India only for now, or Japan too? smp-japan is in maintenance mode, but its dashboards live in this same repo.
+
+## 18:24 user (smp-dashboard)
+
+1. guess is correct
+2. I can create, absolutely no prob
+3. I'd rather do something similar in smp-tool where, main is simply main for CI. CD is done when merged to japan-qa | india-qa, etc. 
+4. Okay so here's the thing. Both Japan and India likes to play and mess around the root "dashboards" folder, so I'm thinking, what if we create a dedicated folder for the repo and make this as the overwritten and sync'd source of truth, leaving the root dashboard folder as their playground?
+5. india only but it should be extremely painless to also prep for japan, no?
+
+## 18:24 assistant (smp-tool)
+
+Here's how I read your answers:
+
+1. The workflow runs on the `ubuntu` runner, which is inside the network.
+2. You'll create one Grafana token per region and environment and store it as a repo secret.
+3. `main` only runs CI checks. A push to a region/environment branch deploys that branch's dashboards to that Grafana, the way smp-tool's `deploy-infra.yml` does it.
+4. Each Grafana gets a dedicated folder that only the workflow writes to, and the workflow overwrites it on every deploy. The root folder stays a playground where people can edit whatever they like.
+5. India only for now. Japan should only need its secrets and a branch push. That holds: the workflow reads the region from the branch name, and Japan dashboards already live in `dashboards/japan/` with the same `${DS_...}` placeholders.
+
+A few things to pin down before I build:
+
+1. **Branch names.** smp-tool uses `qa-india` / `prod-india` (environment first). You wrote `india-qa`. I'd match smp-tool so both repos follow one pattern. Should dev get a `dev-india` branch too?
+2. **Dashboard IDs.** Grafana allows each dashboard ID only once per instance, so the managed copy and a playground copy can't share one. Option A: keep the current IDs. The existing dashboards move into the managed folder, Francois's bookmarked links keep working, and anyone experimenting uses "Save as" in the root folder. Option B: give the managed copies new IDs, which breaks every existing link. I'd go with A.
+3. **Removed dashboards.** If a JSON file is deleted from the repo, should the workflow also delete that dashboard from the managed folder? I'd say yes, since the folder belongs to the workflow. Otherwise it fills up with orphans.
+4. **Folder name.** Something like "SMP" (ID `smp-managed`), and I'd remove edit rights for everyone else so people can't edit there by mistake. Or do you want a different name?
+5. **Which dashboards go into the managed folder.** Is it everything in `dashboards/india/`, or do some of those count as playground too? `dashboards/spikes/` would stay out.
+
+## 18:28 user (smp-tool)
+
+1. nah. dev is purely for us devs. Hold on... I feel creating branches for each N env for each M region is a bit too much of an overhead... what if we keep a single branch, main, and just do manual workflow releases to grafana. Kind of like cdh registration. Wdyt? or do u have other ideas here
+2. yes, whichever is simpler and mkes sense
+3. yup. That actually also mean before we kick this up, we take a 2nd hard look at current dashboard jsons in the repo and check if they're even used now. I feel some are even pocs and shit
+4. yea, let's go with that first.... I honestly wanted more witty lol but can't think of any
+5. Ah. Partially addressed in my answer 3 so..
+
+## 18:29 assistant (smp-dashboard)
+
+Agreed on dropping the branches. A manual run from `main`, like `cdh-register.yml`, is simpler, and with only two regions and two environments a branch per combination isn't worth it. The shape I'd build:
+
+- **The release workflow (`grafana-release.yml`).** It's started by hand with these inputs:
+  - `region`: india or japan;
+  - `environment`: qa or prod;
+  - `dry_run`: on by default. It prints which dashboards would be added, updated or deleted and changes nothing.
+  
+  It only runs from `main` and uses the `ubuntu` runner. Adding Japan later means creating its two secrets and nothing else.
+- **A daily drift check.** It runs the same dry run against each region's prod Grafana and fails the job if prod doesn't match `main`. A manual release on its own still depends on someone remembering to run it, which is exactly how SCR-1296 happened. With the check, a forgotten release fails a job the next morning instead of Francois finding it.
+- **Prod approval (optional).** We can protect the `prod` GitHub environment so a prod run waits for someone to approve it. It's a free switch in repo settings, but probably overkill for a team our size.
+
+**Folder name.** "SMP" is fine. Some wittier ones if you want: "Canon", "Shipped", "Golden Copies" or "Don't Touch". "Canon" gets my vote: short, and it says what it is.
+
+**The audit.** The repo has 9 India dashboards. These look suspect to me:
+
+| Dashboard | Last changed | Why it's suspect |
+|---|---|---|
+| `iex_tsdb.json` / `iex_rec_tsdb.json` | Jun | They may have been replaced by `iex_tsdb_expanded*` |
+| `iex_tsdb_expanded_national.json` / `_regional.json` | Jun | They may duplicate `iex_tsdb_expanded.json` |
+| `iex_dam_gdam_rtm_mcp_volume_trends.json` (`ad6txb2`) | Oct | It has a Grafana-generated ID, which suggests it was made by clicking in the UI |
+| `rf_assets_forecasts_da_id_generation.json` (`ad8nwwj`) | Oct | Same as above |
+
+The free version of Grafana doesn't record how often a dashboard is viewed, so I can't prove from data what's still in use. What I can collect: whether each repo dashboard exists on India QA and prod, its version, when it was last edited and by whom, and which datasets it queries (so we can spot ones reading datasets that no longer exist). Grafana needs the VPN, so I'd give you one self-contained script to run, in read-only mode, taking about a minute. You'd then take the shortlist to Francois, Mateo and Adrien, since only they can say "yes, we look at this one".
+
+I haven't written any code yet.
+
+## 18:30 user (smp-dashboard)
+
+Yes, write the read-only India audit script (QA + prod) for me to run on VPN. Folder name: Canon.
+
+## 18:31 assistant (smp-dashboard/cdh_dataset_manager/definitions)
+
+The self-test caught a parsing bug with quoted table names like `"db".table`. Fixing it now.
+
+## 18:31 assistant
+
+Two false positives: `UNNEST` and the word "their" picked up from a SQL comment. I'll strip comments and skip `unnest`.
+
+## 18:32 assistant
+
+I've written the audit script: [notes/scr-1296/audit_grafana_dashboards.py](notes/scr-1296/audit_grafana_dashboards.py). It only reads from Grafana, needs no extra packages, and should finish in under a minute.
+
+Run it on the VPN from `~/repos/smp`. It prompts for each token if the variables aren't set. A Viewer service-account token per environment is enough (Grafana → Administration → Service accounts).
+
+```bash
+GRAFANA_TOKEN_INDIA_QA=<qa token> GRAFANA_TOKEN_INDIA_PROD=<prod token> python3 notes/scr-1296/audit_grafana_dashboards.py
+```
+
+It prints a report and saves it as `notes/scr-1296/audit-<date>.md`, with two tables:
+
+- **Dashboards in the repo:** for each one, whether it exists on QA and on prod, with version, last edit date and editor. It also says whether the live copy matches the repo (same panels and queries) or differs, and lists any table it queries that isn't in the CDH catalog.
+- **Dashboards that exist only in Grafana:** folder, title, version, editor, creation date and the tables each queries. Most of the playground experiments should show up here.
+
+The self-test passes. I also ran the repo-side checks without the VPN: every table the India dashboards in the repo query is in the CDH catalog, so none of them points at a dataset that no longer exists. That means the Grafana side will have to answer which dashboards are still in use.
+
+One thing to check: `iex_dam_gdam_rtm_mcp_volume_trends.json` reads both IEX tables and Khaba tables. If that's two sources combined in one dashboard, it's allowed under our one-source-per-DAG rule.
+
+I haven't run the Grafana part. The table detection is a rough text match on the SQL, so it can miss tables in unusual queries.
+
+Send me the report when you have it and I'll draft the keep-or-delete list for Francois, Mateo and Adrien.
+
+## 18:37 user
+
+there
+
+## 18:37 user (notes/scr-1296)
+
+[Request interrupted by user]
+
+## 18:38 user (notes/scr-1296)
+
+sorry! I mispressed. pls continue
+
+## 18:38 assistant (smp-dashboard)
+
+The report backs up what Francois found, and shows a bigger problem: **people edit prod directly**. Mateo has saved `ad8nwwj` (R&F Assets) on prod 38 times, and nobody exports those edits back into the repo. Our proposed design (the repo is the truth and the workflow overwrites prod) would wipe out work like that. So before the first release, prod changes have to be copied back into the repo, and from then on people's edits go in their own folders.
+
+**India dashboards in the repo**
+
+| Dashboard | What's going on | Proposal |
+|---|---|---|
+| Bid Stack | Same everywhere | Keep in Canon |
+| Bilateral Contracts | Adrien saved QA v4 on 6 Oct, after the last repo commit (2 Oct). Prod matches the repo | Ask Adrien what he changed, export it, then Canon |
+| R&F Assets (`ad8nwwj`) | Prod has Mateo's v38 from 30 Sep. The repo has my Khaba change from 17 Oct. Neither contains the other | Export prod, merge in the Khaba fix, then Canon |
+| MCP & Volume Trends (`ad6txb2`) | Prod copy dates from 8 Sep, from before the Khaba change; the repo is newer | Canon; the repo version wins |
+| IEX REC TSDB | Prod v5 (30 Jun) is newer than the repo (26 Jun) | Export prod and check which is right |
+| IEX TSDB — Expanded | Prod matches the repo. QA differs | Check QA. My fingerprint ignores drill-down links, so it could be just those |
+| Expanded National / Regional | Same everywhere, not touched since June | Ask Mateo and Adrien whether anyone uses them; probably retire |
+| IEX TSDB (`india-iex-tsdb`) | Only on QA, never released, replaced by Expanded | Delete from the repo and from QA |
+
+**Dashboards that exist only in Grafana**
+
+- **Mine, to delete:** the two `*-fixed` copies on prod (made today; the originals get them through Canon), `india-noc-tsdb-proof` on QA and prod, and `scr-1269-rtm-price-map-poc` on QA and prod.
+- **Leave alone:** the "Adrien - Views", "Lou - Views" and "Matéo - Views" folders. That's already the playground pattern you described; it just isn't official yet.
+- **To ask about:**
+  - `adhj947` "IEX Spot Trading – … REC MCP & Volume Trends" (Mateo, v10) looks like it has replaced `ad6txb2`. If so, it's the one to put in Canon, and `ad6txb2` gets retired.
+  - `corsica` "IEX Prices & Volumes" (Mateo, v7, edited 15 Oct) is actively used. Keep it in his folder or promote it?
+  - `_README` (Joyce, June) could move into the repo and Canon.
+
+**Effect on the workflow design**
+
+- Before each release, the workflow checks whether the live dashboard's version number is higher than the one recorded in the repo. If it is, someone edited it outside the repo since the last release, and the run fails instead of overwriting.
+- Lock Canon to read-only for everyone except the workflow's service account. Edits then have to happen in the personal folders, and the case above stops coming up.
+
+**Message for Francois, Mateo and Adrien:**
+
+```text
+Hi all, we're moving the India Grafana dashboards to an automated release from the repo into a "Canon" folder (read-only; your "<name> - Views" folders stay yours). Before that, quick check:
+1. Mateo: your R&F Assets edits on prod (v38, 30 Sep): I'll export them into the repo, please don't edit it until then.
+2. Adrien: Bilateral Contracts on QA (v4, 6 Oct): what changed? I'll pull it in.
+3. Is "IEX Spot Trading – DAM/GDAM/RTM/REC MCP & Volume Trends" the replacement for "IEX – DAM/GDAM/RTM MCP & Volume Trends"?
+4. Does anyone still use "IEX TSDB – National (Expanded)" / "Regional (Expanded)"? If not, we retire them.
+5. "IEX Prices & Volumes" (Mateo): keep it in your folder, or promote it to Canon?
+```
+
+I haven't deleted or exported anything. The "same as repo" check compares panel titles and queries only, so layout, links and colours can differ even where it says the copies match.
+
+## 18:41 user (smp-dashboard)
+
+wait wait.
+
+Let me clarify something first.
+
+We don't care (for now) what people do in Grafana, in general. They aare absolutely free to do what they want in qa and/or prod, the only thing we're missing is... a standardized release procedure for everything we create and push in the repo. For Mateo and Adrien, they like to build their own dashboards but with frankenstein pieces from the dashboard we create. 
+
+So in this whole introduction of workflow, I expect we simply release the official dashboards we are asked to do (checked in the repo) and make sure they are READONLY but still allow them to take parts from it, or even completely making a copy of it. Hence the NAME - Views setup lol
+
+## 18:42 assistant (smp-dashboard)
+
+Here's how I understand it now:
+
+- **Scope:** the workflow only releases the official dashboards, the ones checked into `dashboards/india/`, into a Canon folder. Anything else people do in Grafana, on QA or prod, isn't our concern.
+- **Canon:** read-only for everyone except the workflow. The repo is the only source, and each release simply overwrites Canon. So the version check I suggested earlier isn't needed: if nobody can edit Canon, there's nothing to protect.
+- **The Views folders:** Mateo and Adrien keep using their "<name> - Views" folders to build their own dashboards from copied panels or whole copies of Canon dashboards.
+- **The audit:** only matters for picking which repo dashboards are official. I'll drop the copy-prod-back idea.
+
+That shrinks the design to the release workflow, the folder permission, and optionally the daily drift check (Canon on prod still matches `main`). But I found a blocker in the Helm values:
+
+```yaml
+role_attribute_path: … 'smp-dashboard-editor' && 'Admin' || 'Viewer'
+```
+
+Members of the `smp-dashboard-editor` group become Grafana **organisation Admins**, and an Admin ignores folder permissions. As things stand, Canon can't be made read-only for Mateo or Adrien, or anyone else in that group.
+
+Questions before I go further:
+
+1. **Role change.** Should `smp-dashboard-editor` map to **Editor** instead of Admin? An Editor can be blocked from Canon but still edit their own Views folders. What they'd lose: managing users, datasources and org settings. Our `smp-dashboard-admin` group keeps full rights. This is an auth change in `configs/helm/india/*/grafana_values.yml`, so it needs a Helm redeploy of Grafana.
+2. **Copying from a read-only dashboard.** I'm not certain Grafana lets someone with view-only access to a dashboard "Save as" a copy or copy a single panel; the answer can depend on the Grafana version. I'd rather test it than guess: run a local Grafana container of the same version, create a view-only Canon folder and an Editor user, and try both. Can you tell me the version (it's at the bottom left of the Grafana help menu)? Or should I add a call to `/api/health` to the next VPN script?
+3. **The first release overwrites edits.** Mateo's R&F Assets v38 on prod, Adrien's Bilateral Contracts v4 on QA, and REC TSDB v5 on prod are all edits to official dashboards, and the release replaces them with the repo version. Should we tell them to "Save as" into their Views folders first, or are those edits ones they don't need?
+4. **Japan.** Is the Japan Helm config set up the same way (`smp-dashboard-editor` → Admin)? It probably is, and the same fix would apply when we add Japan.
+
+## 18:46 user (smp-dashboard)
+
+Hmm.. I feel we can work with this without changing anything in the role shit.
+
+What if we..
+
+1. change all agreed relevant dashboards' IDs to something different but still deterministic, to avoid conflict with existing
+2. put these in a dediated folder: "Golden Copies" (I like it lol)
+3. put a README inside with concise instructions and a big DO NOT TOUCH, ONLY COPY. Or something
+4. even if they do touch, it's fine as we're overwriting regularly....
+
+
+??
+
+## 18:46 assistant (smp-dashboard)
+
+Here's how I read the new plan:
+
+1. Each official dashboard gets a new ID, derived the same way every time. I'd use `gc-<current uid>`, e.g. `gc-india-iex-bid-stack`. The longest current ID is 26 characters, well under Grafana's 40 limit.
+2. The new copies live in a "Golden Copies" folder, and the existing dashboards stay where they are.
+3. The folder includes a README dashboard saying "DO NOT EDIT, COPY ONLY" and explaining how to copy into your own Views folder.
+4. Nothing gets locked. If someone edits a Golden Copy anyway, the next release overwrites it.
+
+I like it. It's smaller than my version and better:
+
+- **No auth change and no Helm redeploy.**
+- **Nobody loses work.** The old dashboards (Mateo's R&F v38, Adrien's Bilateral v4) stay as they are, so the edits I warned about earlier are no longer at risk.
+- **Changing the IDs is safe.** I checked the India dashboards: none link to another one (the only ID inside each file is its own), so nothing points at the old IDs.
+- **Deletes stay safe too.** The workflow only ever deletes dashboards inside Golden Copies.
+- One more soft guard costs nothing: setting `"editable": false` on the Golden Copies. Grafana then hides the edit button, though anyone can still switch it back in settings. All 9 are `true` today.
+
+Questions before I build:
+
+1. **How often to overwrite.** I'd keep the manual release from `main` (pick region and environment), plus a nightly job that re-applies what was last released. That way the nightly job reverts tampering without sending unreleased `main` changes to prod. To make that work, each release moves a git tag such as `golden/india-prod`, and the nightly job applies that tag. It also replaces the drift check. The simpler alternative is a nightly job that applies `main` to QA and prod, but then a merge reaches prod without a deliberate release. Which do you want?
+2. **The old dashboards.** Francois's bookmarks point at the old IDs, which will slowly go stale. Should we leave them for people to clean up, or delete our old official copies (e.g. `india-iex-bid-stack`) once Golden Copies is live? That second option would remove Mateo's v38 work, unless he copies it first.
+3. **The official list.** Going by the audit, the candidates are Bid Stack, Bilateral Contracts, R&F Assets, MCP & Volume Trends, REC TSDB and IEX TSDB Expanded. National/Regional Expanded are waiting on Mateo and Adrien's answer, and `iex_tsdb` gets deleted. Is that right, or does the team need to confirm it first?
+4. **The README.** Should it be a dashboard file in the repo (`dashboards/india/_readme.json`) released with the others? I'd say yes, so it gets restored like everything else.
+5. **Repo layout.** Keep `dashboards/india/` as the official set and rename the IDs in place? Or move the official ones into `dashboards/india/golden/` and leave the rest as unreleased work in progress? The second makes "what gets released" obvious from the folder alone.
+
+## 18:50 user (smp-dashboard)
+
+1. to keep it simple, we don't do anything automatic. As long as the golden copies get overwritten and maintained by the manual workflow, that's good enough for me. We'll introduce an automated "upkeep" if we notice it being an issue... which I think we won't lol
+2. leave them. I'll sort them out myself later
+3. yup, looks good. 
+4. yes. I'd even wager it should be up top as this'll be shared across diff regions no? Just a generic README for golden copies and shit. It doesn't have to be a catalogue or whatever.
+5. rename in place!
+
+## 18:50 assistant (smp-dashboard)
+
+Agreed. Building it now: rename the IDs in place, add the shared README, a release script, and a manual workflow.
+
+## 18:51 assistant (smp-dashboard)
+
+The uncommitted change to `india_bilateral_contracts.json` (columns reordered, taller text panels, version 4) looks like Adrien's QA v4 being exported. I'll keep it and apply the ID change on top.
+
+## 18:52 assistant (smp-dashboard)
+
+Script and workflow are written. Now updating the two tests that pin the old IDs and adding tests for the release logic.
+
+## 18:53 assistant (smp-dashboard)
+
+Now the docs: a section in `scripts/README.md` and a line in AGENTS.md.
+
+## 18:53 assistant (smp-dashboard)
+
+All 72 tests pass; the warnings come from existing tests. AGENTS.md says the India QA token is in the local `.envrc`, so I'll try a read-only dry run against QA if it's loaded.
+
+## 18:54 user (smp-dashboard)
+
+Commit to main as micro commits (scope scr-1296) and push.
+
+## 18:54 assistant (smp-dashboard)
+
+The pre-existing bilateral change (columns reordered, taller tables, version 4) matches Adrien's QA v4, so I'll commit it separately from the ID rename.
+
+## 18:55 assistant (smp-dashboard)
+
+I pushed 7 commits to `main`, rebased onto the latest `origin/main`, and the 72 tests pass. The release workflow hasn't run against a real Grafana yet; it needs the two token secrets first.
+
+1. `chore(scr-1296)`: deleted `iex_tsdb.json`, which was never released.
+2. `chore(scr-1296)`: committed the Bilateral Contracts change that was already sitting uncommitted in your working tree. It matches Adrien's QA v4, so I gave it its own commit, separate from the ID rename.
+3. `feat(scr-1296)`: India dashboards now have `gc-` IDs and `"editable": false`. The two tests that pinned the old IDs and the Khavda doc are updated.
+4. `feat(scr-1296)`: the shared README dashboard, `dashboards/golden_copies_readme.json`.
+5. `feat(scr-1296)`: the release script, `scripts/release_golden_copies.py`, with its tests.
+6. `ci(scr-1296)`: the manual workflow, `golden-copies-release.yml`.
+7. `docs(scr-1296)`: notes in `scripts/README.md` and AGENTS.md.
+
+**To release:**
+1. Create the repo secrets `GRAFANA_TOKEN_INDIA_QA` and `GRAFANA_TOKEN_INDIA_PROD`. Each needs a Grafana service-account token with the Editor role, because the workflow creates the folder and imports dashboards.
+2. Go to Actions → **Release Golden Copies**, choose india/qa, and run it with dry run ticked (the default). Read the plan it prints.
+3. Run it again with dry run unticked, then do the same for prod.
+
+**Things to know:**
+- **Datasource choice:** the script binds `${DS_SMP_CDH}` to the one Athena datasource it finds. If an environment has more than one, it stops and lists them, and we'll add a mapping then. The dry run shows which datasource it picked.
+- **What it deletes:** only dashboards inside Golden Copies whose ID starts with `gc-` and that are no longer in the repo. If someone saves a copy into Golden Copies by mistake, it gets a random ID, so it's never deleted.
+- **Old dashboards:** the old ones (`india-iex-bid-stack`, `ad8nwwj`, and so on) stay where they are, as agreed, for you to clean up. The SCR-1244 alert still points at the old QA `ad6txb2`, which still exists, so the alert keeps working.
+- **Unverified README instructions:** I haven't tested the copy steps in the README ("Make editable → Save as copy", and copying a single panel) on our Grafana version. A quick click-through on QA after the first release will confirm them.
+
+I didn't run a live dry run because the QA token isn't loaded in my shell. The two `.DS_Store` files are still untracked; I left them alone.
+
+## 18:56 user (smp-dashboard)
+
+can you set the tokens for me? Or maybe give me the commands -- 2 commands where each use the token assumed copied in clipboard
+
+## 18:56 assistant (smp-dashboard)
+
+I can't create the Grafana tokens for you: that needs your Grafana login on the VPN. Once you've copied a token, each of these stores it as a repo secret straight from your clipboard, so the token never appears in your shell history.
+
+Copy the **QA** token, then run:
+
+```bash
+pbpaste | GH_TOKEN=[REDACTED] auth token -u QN5792_engieco) gh secret set GRAFANA_TOKEN_INDIA_QA --repo qrm-dms/smp-dashboard
+```
+
+Copy the **prod** token, then run:
+
+```bash
+pbpaste | GH_TOKEN=[REDACTED] auth token -u QN5792_engieco) gh secret set GRAFANA_TOKEN_INDIA_PROD --repo qrm-dms/smp-dashboard
+```
+
+To create each token: [REDACTED] → Administration → Service accounts → Add service account, with the **Editor** role. Then Add service account token. Afterwards, copy something else to clear the token from your clipboard.
+
+## 18:57 user (smp-dashboard)
+
+done
+
+## 18:57 assistant (smp-dashboard)
+
+Both secrets are set. I've started a QA dry run; it only reads from Grafana. Waiting for it to finish.
+
+## 18:59 assistant (smp-dashboard)
+
+The fix is done and all 73 tests pass. The workflow runs from `main`, so I need to commit and push it before re-running the QA dry run.
+
+## 19:02 user (smp-dashboard)
+
+Right. Do what you have to pls. We wanna make sure both QA and Prod have the golden copies live!
+
+## 19:02 assistant (smp-dashboard)
+
+Pushed. Now running the QA dry run.
+
+## 19:03 assistant (smp-dashboard)
+
+The QA plan is clean and binds to `SMP_INDIA_CDH_QA`. Releasing to QA for real.
+
+## 19:04 assistant (smp-dashboard)
+
+QA is live with 9 dashboards. Releasing to prod.
+
+## 19:05 assistant (smp-dashboard)
+
+Prod is live too. To confirm, I'll run a dry run against each environment: all 9 should now show as "update" inside the folder, nothing as "create".
+
+## 19:06 assistant (smp-dashboard)
+
+Both environments have all 9 dashboards in Golden Copies. I'll try opening one in the browser to check that panels actually load data.
+
+## 19:07 assistant (smp-dashboard)
+
+Golden Copies is live on both India QA and prod. Each has the Golden Copies folder with 9 dashboards: the README plus the 8 official ones.
+
+- **QA:** all 8 dashboards use the `SMP_INDIA_CDH_QA` datasource ([run](https://github.com/qrm-dms/smp-dashboard/actions/runs/39241886463)).
+- **Prod:** all 8 use `SMP_INDIA_CDH_PROD` ([run](https://github.com/qrm-dms/smp-dashboard/actions/runs/39241980544)).
+- **Confirmed:** a dry run against each environment afterwards found all 9 already in the folder, with nothing to create or delete.
+
+Getting QA working took one more commit, `fix(scr-1296)`, now pushed to `main`. QA has an extra default `grafana-athena-datasource` next to `SMP_INDIA_CDH_QA`. When there's more than one Athena datasource, the script now picks the one named `SMP_<REGION>_CDH_<ENV>`.
+
+I couldn't check that the panels actually load data, because the browser pane couldn't reach Grafana. Two clicks on your side would cover it:
+- Open [Bid Stack in prod Golden Copies](https://dms-smp-india-prd.gems.myengie.com/dashboard/d/gc-india-iex-bid-stack) and check the panels show data.
+- On any Golden Copy, try the README's copy steps: "Make editable", then "Save as copy" into a Views folder.
+
+The old dashboards outside the folder are untouched, as agreed. You might also delete that stray `grafana-athena-datasource` on QA at some point.
+
+## 19:10 user (smp-dashboard)
+
+it worked! minor comments though:
+
+* I wanna make sure it's at the top.. <see screenshot>
+* And maybe... just maybe,... to make it more special, add some sort of emoji in the title? Lol. Anything to indicate this folder is special and shit
+
+## 19:13 assistant (smp-dashboard)
+
+The runs passed, but my log filter doesn't match `rename` lines. Checking the logs directly.
+
+## 19:13 assistant (smp-dashboard)
+
+The folder is now **`(⭐) Golden Copies`** on both India QA and prod, and both runs' logs show the rename. Refresh the Dashboards page and it should be at the top.
+
+- **Why the brackets:** your screenshot shows the folders in plain alphabetical order. An emoji sorts after every letter, so `⭐ Golden Copies` would have ended up last. `(` comes before every letter, so the folder goes first and the star still stands out.
+- **Script change:** the release script now renames the existing folder in place, keeping everything inside it. The README dashboard text uses the new name too.
+- **Commit:** pushed to `main` as `6dd2b83`, with a test for the rename. All 73 tests pass.
+
+I haven't seen the new order with my own eyes. If the folder doesn't show up first, Grafana is sorting differently than I expect; tell me and I'll pick another prefix.
+
+## 19:36 user (smp-dashboard)
+
+Gotcha. Worklow ran too?
+
+## 19:36 assistant (smp-dashboard)
+
+Yes. Both runs succeeded, on QA ([run 39242833002](https://github.com/qrm-dms/smp-dashboard/actions/runs/39242833002)) and prod ([run 39242917099](https://github.com/qrm-dms/smp-dashboard/actions/runs/39242917099)). Each log shows `rename folder 'Golden Copies' -> '(⭐) Golden Copies'` and `released 9 dashboards, deleted 0`.
+
+## 21:06 user (smp-dashboard)
+
+yey. thanks. Anything else, you reckon?
+
+## 21:07 assistant (smp-dashboard)
+
+A few small things left, most important first:
+
+1. **Tell the team.** Francois's bookmarks point at the old IDs, which will slowly go stale. A draft:
+   ```text
+   Official India dashboards now live in "(⭐) Golden Copies" (QA + prod), released straight from the repo. Read-only in spirit: copy whatever you want into your "<Name> - Views" folder, but edits inside Golden Copies get overwritten on the next release. Old copies outside the folder will be cleaned up, so please update bookmarks (e.g. /d/gc-india-iex-bid-stack).
+   ```
+2. **Check the README's copy steps once.** "Make editable → Save as copy" and copying a single panel are still untested on our Grafana version. Two minutes on QA would confirm them.
+3. **Questions still open from the audit:** whether anyone uses National/Regional Expanded, whether `adhj947` replaces `ad6txb2`, and where `corsica` belongs. If someone says retire, delete the JSON and release; the workflow removes it from the folder.
+4. **Close SCR-1296.** I can add a short comment to the Jira ticket with what changed and the run links, and move it to done, if you want.
+5. **Low priority:**
+   - delete the stray `grafana-athena-datasource` on QA;
+   - the SCR-1244 alert still points at the old QA `ad6txb2`, so move it to `gc-ad6txb2` before you clean up the old dashboards;
+   - onboard Japan whenever it's needed.
+
+I've also saved a memory note on how Golden Copies works so future sessions don't hand-import dashboards.

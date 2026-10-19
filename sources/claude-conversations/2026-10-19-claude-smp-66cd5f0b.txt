@@ -1,0 +1,204 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `66cd5f0b-b0d5-4efc-baa4-3a2fa069f44c`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/66cd5f0b-b0d5-4efc-baa4-3a2fa069f44c.jsonl`
+Resume: `claude --resume 66cd5f0b-b0d5-4efc-baa4-3a2fa069f44c`
+
+## 18:55 user
+
+Bong:
+
+"
+
+<pasted_content id="2604">
+Hi Brian,
+ 
+For our next 121, please prepare the gift of feedback for : 
+Michael, Francois.
+</pasted_content id="2604">
+
+"
+
+-- help haha. We should have enough data to give proper feedback no? Better if you can give as a "3rd party observer" of sorts
+
+## 18:56 assistant
+
+Let me pull context lines from the heaviest sources.
+
+## 18:57 assistant
+
+Yes, there's enough to go on. Below is feedback for each of them, written as a third party watching from the side. Each point has a dated example so it doesn't sound vague, and each "work on" point comes with a concrete ask. All of it comes from your own notes and sessions, so it only shows what *you* saw.
+
+---
+
+## Michael
+
+**What's working**
+- **He closes the loop and shows proof.** On 15 Oct he deployed the Darwin collector to india-dev. Before reporting back, he tested the Darwin API and Okta connections from inside the pod. He'd also already pinged Nilo about the pipeline. Nobody had to chase him.
+- **He takes on the escalations nobody wants.** The proxy 403s went to IT, then to Nilo, then straight to Frederik. He kept pushing instead of leaving the ticket parked as "blocked".
+- **He carries a lot of quiet platform work.** He's the execution lead for the Walnut migration and handles Artifactory and the GAMS installer. In July his smp-common publish to `qrm-dms-core-pypi-dev` was the working path everyone else copied.
+- **He goes beyond infra when needed.** He wrote the first Khaba parser fix for SCR-1288 on 13 Oct.
+
+**What to work on**
+- **Too much depends on him alone.** In September only he or Joyce could build Airflow images, and every Darwin deploy goes through him. The pipeline ticket (507) has been waiting on his role requirements since 5 Oct. *Ask:* treat 507 as his most valuable work, because it automates him out of the critical path.
+- **Shared CI runs on his personal token.** `GH_COM_TOKEN` is his PAT, and it didn't cover `smp-india`, so CI failed at checkout. I had to guess whose token it was. *Ask:* switch to a service account, or at least write down the owner and scope.
+- **Deploy messages leave out what was deployed.** On 15 Oct you had to ask him which image he'd deployed. That deploy also predated the Khaba commit, so it needed a second round. *Ask:* include the image tag or commit in each "deployed" message. It's a small habit that saves a round-trip.
+
+*Framing tip:* he's split 80/20 with Walnut, so present the first two as problems with the setup, not with him.
+
+---
+
+## Francois
+
+**What's working**
+- **His feedback is honest and balanced.** On 30 Jun he praised your delivery and client handling, raised his concern about you moving too fast, and admitted he could follow progress more closely himself. That built trust.
+- **He has a sharp eye for things that look off to users.** On 13 Oct he noticed the 6-hour bar on Khaba minute and Atlas DEV redirecting to the dashboards homepage. Both were real problems: a sensor hang that blocked every later run, and a missing DEV service.
+- **He's a hands-on PO.** He builds Atlas himself, supplies TSDB IDs, and cross-checks values against Grafana.
+- **He protects team allocation.** On 9 Oct he said not to start work without a framework.
+
+**What to work on**
+- **His validation step is becoming the bottleneck.** Tickets keep waiting on "ready for Francois's validation": 1171 (27 Jul), 1237/1238 (1 Sep, then he was on holiday), and 1253/1265 (28 Sep, even after Mateo had already validated 1253). He's at 40% and wants to drop to 20%. *Ask:* agree acceptance criteria at grooming, so either the user (e.g. Mateo) or a named delegate can sign off. Time-box what's left.
+- **Stakeholders send mixed priority signals.** On 1 Sep, Mateo's email said bilateral was low priority, while Matthew told Francois the opposite. *Ask:* settle it before the sprint and publish one ranked list.
+- **Some topics keep coming back without a decision.** On 8 Oct you were discussing Jupyter integration "YET AGAIN". *Ask:* write a one-page decision or a scoped spike with exit criteria, so it stops cycling.
+- **Optional, minor: jokes over text can land wrong.** On 9 Oct his "big no" joke about allocation was taken seriously by Fred. Mention it lightly or skip it.
+
+---
+
+**How to say each point:** use situation → behaviour → impact → ask. For example: *"On 15 Oct (situation) you deployed and tested from inside the pod (behaviour), so I could move on right away (impact). If the message also had the image tag, I wouldn't have needed to follow up (ask)."*
+
+What I didn't check: unprocessed notes from 17–19 Oct and anything outside Baraluga Mind (Teams, Jira history). There's nothing on how either of them comes across to people other than you.
+
+## 19:12 user
+
+shit. Francois on Atlas is Francois CAFFONT ha! Not the same Francois (DELCOURT) for SMP lol
+
+## 19:12 assistant
+
+Good catch. I went back to the sources and separated the two:
+
+- **Caffont (Atlas only):** the 8 Sep Atlas discussion, the 15–24 Sep pipeline and PROD work, and the 13 Oct Atlas DEV redirect.
+- **Delcourt (SMP PO):** the 30 Jun feedback, all the ticket validations, the 1 Sep priority mix-up, the 13 Oct Khaba 6-hour bar, the 8 Oct Jupyter push and Aurora/Gauthier ask, and the 9 Oct "big no" thread with Fred (a follow-up to the Aurora ask).
+
+So only two points were wrong: "he builds Atlas himself" and the Atlas DEV redirect example. Both were about Caffont. Corrected version:
+
+## Francois Delcourt
+
+**What's working**
+- **His feedback is honest and balanced.** On 30 Jun he praised your delivery and client handling, raised his concern about you moving too fast, and admitted he could follow progress more closely himself.
+- **He notices what looks wrong to users.** On 13 Oct he spotted the 6-hour bar on Khaba minute. Behind it was a real problem: a sensor hang that blocked every later run, documented in the wrong file.
+- **He's a hands-on PO.** He supplies TSDB IDs, including the broken IEX series in September, and checks values against Grafana before sign-off (28 Sep).
+- **He protects team scope.** On 8 Oct he passed Gauthier's Aurora request along with clear framing: "discussion phase", and don't start work without a framework.
+- **He gives quick appreciation.** On 16 Jul he thanked you for acting so fast and being so thorough.
+
+**What to work on**
+- **His validation step is becoming the bottleneck.** Tickets keep waiting on "ready for Francois's validation": 1171 (27 Jul), 1237/1238 (1 Sep, then he was on holiday), and 1253/1265 (28 Sep, even after Mateo had validated 1253). He's at 40% and wants 20%. *Ask:* agree acceptance criteria at grooming, so Mateo or a named delegate can sign off, and time-box what's left.
+- **Stakeholders send mixed priority signals.** On 1 Sep, Mateo's email said bilateral was low priority, while Matthew told him the opposite. *Ask:* settle it before the sprint and publish one ranked list.
+- **Some topics keep coming back without a decision.** On 8 Oct, Jupyter came up "YET AGAIN" as the front end for DAG contributors. It still isn't clear how that differs from writing the DAG normally. *Ask:* a one-page decision or a scoped spike with exit criteria, so it stops cycling.
+- **Optional, minor: jokes over text can land wrong.** On 9 Oct Fred took his "big no" about allocation seriously.
+
+The Michael section doesn't change.
+
+The wiki page `wiki/people/francois.md` mixes the two people, which is why I got this wrong. I haven't touched it. Should I split it into `francois-delcourt` and `francois-caffont` and add an aliases entry?
+
+## 19:13 user
+
+lol yes pls. commit and push immediately
+
+## 19:14 assistant
+
+Lint is clean. Now committing and pushing.
+
+## 19:14 assistant
+
+I split the page into two and pushed it to `baraluga-mind` `main` as commit `801b887`. The wiki check passes with no errors.
+
+- **`wiki/people/francois-delcourt.md`:** the SMP PO. It has the 30 Jun feedback and working model, the validation queue, Khaba, Jupyter, the Aurora/Gauthier request and the "big no" thread.
+- **`wiki/people/francois-caffont.md`:** Atlas. It has him as sole builder and admin, how deployment works, and the 13 Oct DEV redirect.
+- **`wiki/aliases.md`:** two entries now. Each says which Francois a plain "Francois" means depending on the source, SMP or Atlas.
+- **Links:** `index.md`, `atlas-dashboard`, `smp-india`, `smp-alerting-and-ops` and `brian-peralta` now point to the right person.
+
+- **Pages I left as they were:** `smp-platform`, `smp-dashboards` and `ai-assisted-engineering` mention "Francois" in plain text, mostly the 7 Jul "francois-help" meeting. I couldn't tell which Francois that was.
+- **Old links:** the `[[francois]]` links in the frozen `actions.md` and in the sources now point to a page that's gone. The wiki check doesn't scan those files, so nothing fails.
+
+## 19:43 user
+
+Thanks. This got me thinking lol… can I have a n artifact that serves as a master page of all the feedback we can give to every personality, identified. 
+
+Kind of how we did with smp sprint page, we have a “refresh” button where it gets all the identities + feedback we can get from baraluga-mind, so it’s laid out nicely in the page. So when the feedback season rolls around, I simply refresh the page and have everything there…. Wdyt??
+
+## 19:50 assistant
+
+Mining the per-person evidence now (done: Joyce, Alfred, Nilo, Fred). Next is the July 360-feedback pass you already did, then Mateo, Adrien, Hiromi, Carlos and Bong.
+
+## 19:51 assistant
+
+Now the wiki rule, then the Feedback Notes per person.
+
+## 19:53 assistant
+
+Writing the page template now. It's a card per person, with strengths, growth areas with their asks, sources, a copy button, and a "Copy refresh prompt" button.
+
+## 19:54 assistant
+
+I built it: **[Feedback Ledger](https://claude.ai/artifact/6Ymm9mQApWRbcvdU59nHf9)**. It's private, and since it's feedback about colleagues, keep it unshared. It has 14 people plus a card for you, with 62 dated notes. Each note shows its source path, and every growth item ends with a concrete ask. The wiki check passes, but nothing in `baraluga-mind` is committed yet.
+
+**How it works**
+- **Where the feedback lives:** a `## Feedback Notes` section on each person page in `baraluga-mind/wiki/people/`. The rule and line format are in `wiki/AGENTS.md`, so future ingests add to these sections as they go.
+- **Refresh:** the page's "Copy refresh prompt" button copies an instruction you paste into Claude Code. I then mine the newer sources, update the notes, run `scripts/build-feedback-ledger.py` and republish to the same link.
+- **On the page:** search, filters ("Has growth areas", "Thin evidence"), a sources toggle, and a Copy button on each card that gives plain text ready for a 1:1.
+
+**Who's on it**
+- **Existing pages:** Michael, Francois Delcourt, Francois Caffont, Joyce and Alfred now have Feedback Notes.
+- **New pages:** Mateo, Adrien, Carlos, Nilo Menezes, Frederic Degraeve, Bong, Charmaine Pabelico, Huk Lorenzo and Dale Anova.
+- **Left out:** Hiromi, Lou and Cresencio. There wasn't enough evidence.
+- **Your card** has what Francois Delcourt told you on 30 Jun and what Bong said in the 29 Jul review.
+
+**Things to check**
+- The Charmaine, Huk and Dale cards, and part of Alfred's, come only from your 9 Jul Copilot notes. Charmaine's growth item is flagged as secondhand.
+- Bong, Joyce, Huk and Francois Caffont are marked thin evidence.
+- I couldn't confirm that "Frederik" from the 21 Sep proxy escalation is Fred Degraeve. It's marked `UNCERTAIN`.
+- I didn't preview the page before publishing. The build script's own checks passed.
+- I saved a memory note with the link and the refresh steps.
+
+Should I commit and push the `baraluga-mind` changes now as micro commits (wiki rule, people pages, build script), or will you review the people pages first?
+
+## 20:10 user
+
+Clarification: Cresencio IS Bong. 
+
+Yes Frederik is indeed Fred D. 
+
+After all that, commit and push pls. I already saw the page, looks fine… very robotic looking though lol. Can we add more personality to it pls? After everything of course
+
+## 20:10 assistant
+
+Identities merged and the wiki check passes. Committing in logical groups and pushing.
+
+## 20:12 assistant
+
+Script parses and every person has a headline. Republishing, then committing the headline changes.
+
+## 20:12 assistant
+
+I merged both identities, pushed everything, and republished the [Feedback Ledger](https://claude.ai/artifact/6Ymm9mQApWRbcvdU59nHf9) with more personality. It's still the same link.
+
+**Identities**
+- **Bong:** the Bong page now gives his full name, Cresencio Valdoz Jr. Cresencio, Valdoz and VALDOZ Cresencio are listed as aliases for him.
+- **Fred:** Frederik is now an alias of Frederic Degraeve, and the old separate Frederik entry is gone. His card gained the 21 Sep proxy escalation as a strength. The Frederik links on Michael's page and on `smp-india-access` now point to Fred's page.
+
+**Commits on `baraluga-mind` `main`, all pushed**
+- `feac811` adds the Feedback Notes rule.
+- `2e9f161` adds Feedback Notes to the existing people pages.
+- `a208123` adds the new people pages, plus the alias and index changes.
+- `e99b47e` adds the page builder.
+- `1687a74` adds the headlines.
+- `daba27c` is the redesign.
+
+**What changed on the page**
+- **Headlines:** every card has a handwritten one-liner, like "Ships it, then proves it works from inside the pod." They're stored in the wiki as `- **Headline**:` lines, so a refresh keeps them. I'll write one for each new person.
+- **Look:** a dark header ("field notes from a quiet observer"), a coloured name tag per person, and a small bar showing strengths against growth areas.
+- **Wording:** the columns are now "Keep doing" and "The gift", with the ask set apart as "The ask →". Your own card sits under "Mirror, mirror". Copying a card says "Go be kind."
+- **Small touches:** a "Thin file" badge where evidence is light, caveats shown as "Observer's note", and the filters renamed to match.
+
+I checked that the page script runs and that everyone has a headline. I didn't look at the rendered result, so tell me if anything looks off. The headlines are my own wording, so edit any you'd phrase differently directly in the wiki.

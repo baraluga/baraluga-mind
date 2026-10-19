@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-18. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through [[francois-delcourt]].
+As of 2026-10-20. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through [[francois-delcourt]].
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)
@@ -17,15 +17,15 @@ As of 2026-10-18. These are the India data products built on [[smp-platform]]. S
 - The QA IEX RTM DAG polls once a minute and skips downstream work when nothing is new. First observed CDH delivery was 1 minute 2 seconds; the expected API-to-Grafana delay is up to about five minutes. The team will propose a five-to-ten-minute default interval with increased frequency during the critical trading window.
 - The GDAM Grafana panel queries the empty `india_iex_tsdb_dashboard_latest` table, while the data sits in `india_iex_tsdb_expanded_latest` (2026-10-09). This looks like a stale panel reference unless the live panel has already changed.
 - `SCR-1274`: HPX national scope is 29 PT15M series: five each for DAM, RTM, and HPDAM, plus 14 GDAM series. GDAM includes price, total purchase bid, sell bids, and cleared/scheduled volume by total, solar, non-solar, and hydro; it has no MCV series. Lou's IDs were mapped and catalog-checked in UAT and prod before promotion through dev, QA, and prod; publication enablement remains a separate rollout choice.
+- `SCR-1274` publication performance fix is now on dev, QA, and prod. It uses bulk TSDB reads, in-task verification only after writes, shorter retry budgets, and visible timing logs; the initial RTM/manual runs were fast, but the first scheduled write-path run still needs timing evidence.
 - Khaba `SCR-1288`: Michael's `index_col=False` fix handles the October 9 inverter expansion and trailing-delimiter parse shift from October 10 onward. Follow-up hardening added a regression test, clearer field-count errors, and a "last row wins" rule for rare conflicting duplicate minute readings after preserving the existing all-zero safeguard. Brian confirmed the October 9-12 backfills succeeded; October 8 remained a possible follow-up.
 - Khaba scheduling: deployed realtime and minute DAGs now explicitly skip a missing same-day CSV (with clear logs), while daily reconciliation stays fail-fast. This prevents hundreds of routine missing-file failures from obscuring real faults; an upstream outage can take until the next daily reconciliation to alert. The temporary `KHABA_GENERATION_SOURCE_TRANSITION_WINDOW_MINUTES=1440` stopgap should be removed once the deployed code is confirmed active.
-- `SCR-1289`: the REC Lambda omission was fixed and backfilled. TSDB and QA/prod CDH reached 30 September with all five missed sessions; the remaining proof is an unattended scheduled run and a Grafana visual check.
+- `SCR-1289`: the REC scraper remains a Lambda; it was re-enabled in its prod run list, backfilled, and monitored rather than moved to Airflow. The scheduled runs of 16–18 October completed autonomously and configuration-drift checking was clean. The remaining handover is validation by [[francois-delcourt]].
 - Darwin assets for Tuticorin and four Gujarat sites are moving from access-blocked design to rollout. See [[darwin-collector]].
 - Grid India (`SCR-1230`) and the national H. India site: blocked on access. See [[smp-india-access]].
 - Khaba QA pauses in early October were intentional operational choices, not a DAG pause-logic defect: QA was kept runnable for testing while avoiding unnecessary side-by-side production cost.
-- Khaba forecasts are now a separate CDH dataset/DAG (`india_khaba_forecasts`) rather than fields embedded in the actual-generation export. Phase 1 (the DAG, registration, and CDH dataset) is promoted through prod; the one-time prod backfill completed, but live-data and SQL-Lab visibility were not independently verified in the capture. Phase 2 dashboard JSON is on `smp-dashboard` main and the matching actual-only export is on `smp-india` dev, awaiting Grafana import before India promotion.
-- Khavda forecast reads were redesigned to bulk-read consecutive delivery dates in nine-day chunks, then split locally: three TSDB reads per run rather than 27. This is on `dev` only (`f9ec583`), tested offline, and still needs live TSDB observation before promotion.
-- Khaba actuals for 2026-10-13 and 2026-10-14 still need a reconciliation rerun.
+- Khaba forecasts are now a separate CDH dataset/DAG (`india_khaba_forecasts`) rather than fields embedded in the actual-generation export. Its dashboards were imported in QA and prod and the associated export change was promoted. The remaining 12–15 October actual-generation gaps derive from incomplete upstream CSVs; reconciliation should run again only after complete files are re-sent.
+- Khavda forecast reads now bulk-read consecutive delivery dates in nine-day chunks, then split locally: three TSDB reads per run rather than 27. This was promoted alongside the Khaba change; live timing evidence remains useful.
 - Not urgent: a KPI dashboard Mateo wants to pair on (TSDB → calculations → CDH → Grafana), and adapting the Aurora XLSX loader, which needs dataset, format, and ownership answers first.
 
 ## Background
@@ -71,6 +71,7 @@ As of 2026-10-18. These are the India data products built on [[smp-platform]]. S
 - 2026-10-15: HPX scope corrected from 33 to 29 series when Lou supplied the final IDs and confirmed GDAM excludes MCV; mappings were validated in UAT and prod.
 - 2026-10-15: Khaba missing-current-source handling promoted through QA and prod; REC TSDB/CDH recovery confirmed through 30 September.
 - 2026-10-17: Khaba forecast CDH dataset promoted through prod; dashboard/export separation is awaiting Grafana import and the associated India promotion.
+- 2026-10-19: Khaba dashboards and export separation reached QA/prod; HPX performance changes were promoted; REC ran autonomously over the weekend.
 
 ## Open Questions
 
@@ -81,9 +82,8 @@ As of 2026-10-18. These are the India data products built on [[smp-platform]]. S
 - UNCERTAIN: Whether October 8 Khaba needed the same backfill as October 9-12.
 - UNCERTAIN: What exact delay target Adrien will accept for `SCR-1284` RTM.
 - UNCERTAIN: Whether the deployed Khaba DAGs have been observed skipping a missing source in the live Airflow environments, and whether the temporary 1440-minute Variable has been removed.
-- UNCERTAIN: Whether the REC scraper completed unattended on 2026-10-16 and whether Grafana shows the five recovered sessions.
-- UNCERTAIN: Whether `india_khaba_forecasts_latest` is populated and queryable in CDH/Grafana after the first production run.
-- UNCERTAIN: Whether the two updated Khaba dashboards were imported before promoting `smp-india` dev, and whether the 13-14 October actuals were reconciled.
+- UNCERTAIN: Whether [[francois-delcourt]] has validated SCR-1289 and whether the 19 October REC run completed once its window opened.
+- UNCERTAIN: Whether the first scheduled HPX write-path run has the expected timing/verification behaviour.
 - UNCERTAIN: Whether Khavda's bulk-read change behaves correctly against live TSDB under shared Athena-slot contention.
 
 ## Sources
@@ -117,5 +117,8 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-16-claude-smp-4e922cd7.txt`
 - `sources/claude-conversations/2026-10-17-claude-smp-4e922cd7.txt`
 - `sources/claude-conversations/2026-10-17-claude-smp-e4dded4d.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-4e922cd7.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-822de913.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-8ce08f10.txt`
 
-Last Updated: 2026-10-18
+Last Updated: 2026-10-20

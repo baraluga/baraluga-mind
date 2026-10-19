@@ -1,0 +1,185 @@
+# Claude Conversation - 2026-10-19
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `f61c600d-7c33-4882-a7d3-50b5491a8e61`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/f61c600d-7c33-4882-a7d3-50b5491a8e61.jsonl`
+Resume: `claude --resume f61c600d-7c33-4882-a7d3-50b5491a8e61`
+
+## 12:03 user
+
+this workspace is starting to get messy. Can you take a look and tell me what u see? smp directory is supposed to be the centralized workspce for all smp-related repos. namely smp-* and apac-tsdb-scraper... everything else is supposed to be cleaned up or organized
+
+## 12:06 user
+
+propose layout with ai agentic development in mind. Prioritize what's best for you, claude, second is for Codex (or AI agents in general)
+
+## 12:07 assistant
+
+I'd keep the repos where they are and fix the three things that actually hurt agents. While checking, I found the biggest problem isn't the clutter.
+
+## Biggest problem: Claude isn't reading your AGENTS.md files
+
+The root `CLAUDE.md` and all five child-repo ones contain only `[AGENTS.md](AGENTS.md)`. To Claude Code that's just a markdown link, not an import, so the AGENTS.md content never loads automatically. At the start of this session I got the link text and had to open AGENTS.md by hand. Codex reads AGENTS.md natively, which is why this is easy to miss.
+
+- **Fix:** change each one to `@AGENTS.md` (6 one-line edits). AGENTS.md stays the single source for both tools.
+- `smp-common` and `sff-actions` have no CLAUDE.md, so they need one too.
+
+## Proposed layout
+
+```text
+smp/
+├── AGENTS.md              # canonical, read by Codex and every other agent
+├── CLAUDE.md              # @AGENTS.md
+├── .ignore                # search skips node_modules, caches, _archive
+├── apac-tsdb-scraper/     ┐
+├── smp-common/            │ repos stay flat at the root: AGENTS.md,
+├── smp-dashboard/         │ my memory links and cross-repo paths all
+├── smp-india/             │ assume smp/<repo>. Moving them buys nothing
+├── smp-japan/             │ and breaks those references.
+├── smp-tool/              │
+├── sff-actions/           ┘ keep: smp-common and smp-dashboard CI use it
+├── notes/                 # one folder per ticket or topic, found by searching the ticket ID
+│   ├── occto/             # ~25 occto-*.md files, probes, workbook, audit
+│   ├── jepx/
+│   ├── khaba-cdh/         # khaba_*, cdh-cross-account*, evidence/
+│   ├── scr-1206/ scr-1207/   # from implementation-plans/
+│   ├── scr-1267/ scr-1273/   # discovery/
+│   ├── scr-1278/          # date-repair backup
+│   ├── observability/     # synapse assessment
+│   └── decks/             # the 3 .pptx files
+└── _archive/              # anything you're unsure about; .ignore'd so searches skip it
+```
+
+Why this works for agents:
+1. **Searches stop returning duplicate results.** The root isn't a git repo, so ripgrep (which my search uses) ignores `.gitignore` there. A root `.ignore` file is always honoured. Right now the two smp-dashboard worktrees triple every dashboard result, and the root also holds about 2 GB of `node_modules`, the `.mypy_cache`/`.pytest_cache`/`.ruff_cache` folders and `__pycache__`.
+2. **Ticket folders.** When you mention "SCR-1273", I can find a folder with that name. Today the context is spread across about 50 loose files at the root.
+3. **Nested AGENTS.md is optional.** If a topic folder needs standing rules, it can have its own short AGENTS.md. Both Claude and Codex load these from the root down to the current folder.
+
+## What goes where
+
+| Item | Action |
+|---|---|
+| `smp-dashboard-grafana-alerts` (detached HEAD, 1 dirty file), `smp-dashboard-scr1269` (poc branch, 1 dirty file) | Out of smp/. Save or discard the change in each, then `git worktree remove`. Also `git worktree prune` for the stale `/tmp` and `~/Documents/Codex` entries |
+| `smp-standup-dashboard`, `smp-tsdb-explorer` | Git repos with zero commits and no remote; one is still the vinext starter README. Move them out (e.g. `~/repos/` siblings) or delete if the standup artifact replaced them |
+| `copilot-worktrees/` (ado-ios, plus 3 Copilot clones, 2 empty) | Out. ado-ios isn't SMP. The clone with content holds copies of smp-india/japan/tool |
+| `dags/src/scripts/occto_tsdb/` (empty) | Delete |
+| `_dump/` (parquet files, solaris/tsdb docs) | Docs go to `notes/reference/`, the parquet files to `_archive` |
+| `.codex-build`, `.codex-slides-work`, `.codex-tmp`, `.playwright-mcp`, `.coverage`, the caches, `__pycache__`, `.cursor` | Delete (tool leftovers) |
+| `Makefile` | Delete or rewrite: it still pulls `scraper-dags`/`scraper-tool` |
+| `.claude/settings.local.json` | Prune: many allow-rules point at `scraper-dags` and Azure DevOps |
+| `AGENTS.md` repo table | Lists `scraper-scripts`, which isn't on disk; missing `smp-common` and `sff-actions` |
+| Loose work in repos: `smp-japan` (7 `occto-probe-*` dirs plus the untracked geography change), `apac-tsdb-scraper` (17 changes, IEX GDAM/RTM probes), `smp-tool/docs/spikes/` | Not touched. You decide whether to commit or move each one into `notes/` |
+
+## Security: plaintext token
+`.envrc` holds an Artifactory token in plaintext, and every agent that lists or reads the root can see it. Move it out of the workspace, for example into `~/.config/smp/.envrc` sourced by direnv, or into the macOS Keychain.
+
+## Should smp/ itself become a git repo?
+I'd lean no. Adding `.ignore` gets most of the benefit, and a parent repo with nested repos confuses `git status`. The one thing it would add is history for AGENTS.md and the notes; I can set it up if you want that.
+
+If you approve, I'd go in this order: fix the CLAUDE.md imports and add `.ignore`, then move the notes, then the worktrees and dead folders, with no deletions until you've confirmed each one. I haven't moved or deleted anything; this is a proposal only. I didn't open the individual notes files to check whether they're still current, and moving them breaks any absolute paths written into older notes or memories.
+
+## 12:11 user
+
+yes pls. clean clean clean
+
+## 12:11 assistant (smp-dashboard)
+
+Removing a worktree keeps its branch (the `poc/scr-1269` commits stay in smp-dashboard), and the only uncommitted files are `.DS_Store`. So it's safe. Moving on.
+
+## 12:12 assistant
+
+Only two absolute paths will break, and I'll rewrite them. Moving the files now.
+
+## 12:12 assistant
+
+The Copilot clones have 4 commits that were never pushed (3 in smp-india, 1 in smp-japan), so I'm moving them rather than deleting them.
+
+## 12:13 assistant
+
+I've pruned 31 stale permission rules (none contained secrets). Next: the stale permitted directories, then AGENTS.md and the Makefile.
+
+## 12:14 assistant
+
+Now the AGENTS.md repo table and a workspace-layout section.
+
+## 12:14 assistant
+
+The root of `smp/` now holds only the 7 repos plus `notes/`, `_archive/` and a few config files. I checked for unpushed commits and uncommitted changes before removing anything, and the only uncommitted files I removed were `.DS_Store`.
+
+**Agent setup**
+- **CLAUDE.md:** all 8 files (the root and every repo) now say `@AGENTS.md`, so Claude actually loads AGENTS.md. `smp-common` and `sff-actions` got new ones.
+- **Search:** a root `.ignore` hides `_archive`, `node_modules`, `.venv`, caches, decks and data files from search. I tested it: a term that only appears in `_archive` gets 0 hits, and 5 when the ignore file is bypassed.
+- **[AGENTS.md](AGENTS.md):** the repo table now includes `smp-common` and `sff-actions`, and `scraper-scripts` is marked "not cloned". I also added a "Workspace Layout" section that says where notes, archives, worktrees and secrets go.
+
+**Moved**
+- About 50 loose files plus `evidence/`, `discovery/`, `implementation-plans/`, `scr1278-date-repair-backup/` and `_dump/` docs now live in `notes/<topic>/`: occto, jepx, khaba-cdh, scr-1273, scr-1278 and so on. I rewrote the two absolute `evidence/` paths in the khaba notes.
+- `copilot-worktrees/` went to `~/repos/copilot-worktrees/`. It has 4 commits that were never pushed (3 in smp-india, 1 in smp-japan), so I moved it rather than deleting it.
+- The Artifactory token now lives in `~/.config/smp/env` (mode 600), and `.envrc` loads it from there. I confirmed the token still loads through direnv.
+
+**Removed**
+- The `smp-dashboard-grafana-alerts` and `smp-dashboard-scr1269` worktrees, plus a stale one in `/tmp`. The `poc/scr-1269` branch still exists in `smp-dashboard`.
+- The empty `dags/` folder, the caches, `__pycache__`, `.playwright-mcp` and `.coverage`.
+- `smp-standup-dashboard` and `smp-tsdb-explorer` had zero commits, so I moved their source into `_archive/` and deleted only `node_modules`/`build`/`dist`/`.venv`. That freed about 2 GB.
+- The `.codex-*` deck build folders went to `_archive/deck-build/`.
+
+**Config and memory**
+- The `Makefile` now pulls the current repos.
+- I removed 31 stale `scraper-*`/Azure DevOps permission rules and 2 stale extra directories from `.claude/settings.local.json`; a backup is in `_archive/`.
+- Two memory notes pointed at the removed worktree; they now refer to the `smp-dashboard` branch.
+
+**Still to handle**
+- **Uncommitted CLAUDE.md edits** in all 7 repos.
+- **Leftover work in the repos, untouched:** the `occto-probe-*` folders in `smp-japan`, the IEX probe work in `apac-tsdb-scraper` and `smp-tool/docs/spikes/`.
+- **Another worktree outside smp/:** `~/Documents/Codex/.../smp-dashboard-scr-1247` is still registered to `smp-dashboard`. I left it alone.
+- **New shells:** run `direnv allow` once in any shell that was already open in smp/, so it picks up the new `.envrc`.
+- **`.DS_Store`:** Finder recreates it at the root. It's harmless.
+
+Should I commit the `@AGENTS.md` change in the 6 SMP repos, one small commit each following each repo's branch rules, and leave `sff-actions` uncommitted since it belongs to the SFF team?
+
+## 14:31 user
+
+sff actions is here in smp dir??
+
+## 14:32 assistant
+
+Nothing points to it by local path, and it has no unpushed work, so I'm moving it out.
+
+## 14:32 assistant
+
+Yes, it was. I left it there on purpose because SMP CI uses it (`smp-common` and `smp-dashboard` workflows call it), but that's not your rule: it belongs to the SFF team, not SMP. So I moved it to `~/repos/sff-actions`.
+
+- **Safe to move:** nothing on disk points to it by local path, because the CI workflows pull it from GitHub. It had no unpushed commits, and I deleted the CLAUDE.md I'd added there earlier.
+- **References updated:** I took it out of the `Makefile` pull list. Its row in [AGENTS.md](AGENTS.md) now says it lives outside the workspace, so agents still know the CI depends on it.
+
+The root now holds only `apac-tsdb-scraper`, the five `smp-*` repos, `notes/`, `_archive/` and a few config files.
+
+The `@AGENTS.md` change in those 6 repos is still uncommitted. Should I commit it, one small commit per repo?
+
+## 14:37 user
+
+yes pls.
+
+## 14:37 assistant
+
+`apac-tsdb-scraper` keeps CLAUDE.md in `.git/info/exclude` on purpose, so I'm leaving it untracked there and committing only in the other 5.
+
+## 14:38 user
+
+Push the 5 CLAUDE.md commits to their current branches.
+
+## 14:39 assistant
+
+All 5 commits are pushed, each as a plain fast-forward:
+
+| Repo | Branch | Commit |
+|---|---|---|
+| smp-common | dev | `bef5826` |
+| smp-dashboard | main | `0abcf59` |
+| smp-india | dev | `b59fdb5` |
+| smp-japan | dev | `ebcf83a` |
+| smp-tool | dev | `495d06d` |
+
+- **PR-only rule:** smp-india and smp-japan printed the usual "Changes must be made through a pull request" bypass notice for dev pushes with the work account. That's the known behaviour from your notes.
+- **Hooks:** all passed. No repo had uncommitted edits to tracked files that a hook could stash, except smp-dashboard, which has no hooks. Its local edit to `india_bilateral_contracts.json` wasn't part of the commit and is still uncommitted.
+
+I didn't check CI on any of the 5 pushes.

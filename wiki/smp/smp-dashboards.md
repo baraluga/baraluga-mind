@@ -2,11 +2,12 @@
 
 ## Current State
 
-As of 2026-10-18. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
+As of 2026-10-20. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
 
 - **India geomap:** delivered. It shows realtime market price and volume by region, with max/min/average and current-slot views and a freshness indicator. The Plotly prototype was replaced by native Grafana geomap, and colour settings live in the dashboard JSON, so the same JSON imports into production. Mateo expects three maps (price/volume sets joined by region codes such as `N1`–`N3`), using fixed scales: yellow to red, price 0–10,000, volume up to last year's maximum plus 10%.
 - **Bilateral contracts (`SCR-1275`):** a table of all contracts with a region legend, freshness, and anomaly indicators. Still needs validation. It consumes `SCR-1278`'s validated tables rather than fixing scraper behaviour in dashboard code, and it must show source differences explicitly (see [[smp-india]]).
-- **IEX `DAM/GDAM/RTM MCP & Volume Trends`:** the main India market dashboard. Its six Khaba panels and the R&F Assets & Forecasts dashboard now query the separate `india_khaba_forecasts_latest` dataset instead of forecasts embedded in actual-generation output. The JSON is committed on `smp-dashboard` main but must be imported in Grafana before the matching `smp-india` export change is promoted. It also includes the `SCR-1257` historical MCP heatmap and `SCR-1243` bid-stack curves; the bid-stack curves use separate buy/sell axes because the values are already cumulative, plus an estimated crossing marker.
+- **IEX `DAM/GDAM/RTM MCP & Volume Trends`:** the main India market dashboard. Its six Khaba panels and the R&F Assets & Forecasts dashboard now query the separate `india_khaba_forecasts_latest` dataset instead of forecasts embedded in actual-generation output. QA and prod imports plus the matching `smp-india` promotion were completed; the remaining actual-generation gaps for 12–15 October trace to incomplete upstream CSVs, not the forecast path. It also includes the `SCR-1257` historical MCP heatmap and `SCR-1243` bid-stack curves; the bid-stack curves use separate buy/sell axes because the values are already cumulative, plus an estimated crossing marker.
+- **India dashboard releases (`SCR-1296`):** official repo dashboards are released manually from `smp-dashboard` `main` to the read-only-in-practice `(⭐) Golden Copies` folder in QA and prod. The release workflow completed its first run (nine dashboards, no deletions) on 2026-10-19. Users may copy dashboards or panels to their personal Views folders; direct edits in Golden Copies are overwritten by the next release. The workflow should block a release on live-version drift rather than overwrite it blindly.
 - **Portable map panels:** Mateo's copied map panels failed because panel-only copies omit dashboard-level Grafana variables and shared-query panel references. The POC now makes map, freshness, zone-table, and price-stat panels self-contained with direct Athena queries and safe defaults. Treat independent panel pasting as the preferred pattern where it does not remove needed controls.
 - **Grafana usage (`SCR-1252`):** SMP runs Grafana OSS, so Enterprise Usage Insights isn't available. The cheapest first answer is active-user counts from the org-users API (`lastSeenAt`) or Okta logs, going deeper only if usage justifies it.
 - **Not urgent:** Matteo's KPI dashboard (end of year; flat CDH output if its shape is unknown) and the Grafana + JupyterLab integration, waiting on Nilo (see [[smp-jupyter-dag-authoring]]).
@@ -44,6 +45,7 @@ As of 2026-10-18. Grafana dashboard work across SMP Japan and India. India data 
 - 2026-10-07: India geomap and bilateral-contract dashboard delivered.
 - 2026-10-14: the IEX map POC was revised so every panel works when copied independently; the corrected import was tested in Mateo's dashboard.
 - 2026-10-17: Khaba forecast panels switched to the separate forecast dataset; Grafana import is pending.
+- 2026-10-19: Khaba forecast dashboards were imported and the export change promoted; the first managed release created `(⭐) Golden Copies` in India QA and prod.
 
 ## Open Questions
 
@@ -51,7 +53,8 @@ As of 2026-10-18. Grafana dashboard work across SMP Japan and India. India data 
 - UNCERTAIN: Who validates the bilateral-contract dashboard before it counts as done.
 - UNCERTAIN: Whether Grafana backup should be the full database (the July preference) or JSON in Git. No backup path was confirmed.
 - UNCERTAIN: Which Grafana deployments, if any, are being converted to Splunk.
-- UNCERTAIN: Whether the two Khaba dashboard JSON files have been imported and the new forecast table has been validated in Grafana.
+- UNCERTAIN: Whether anyone still needs the National/Regional Expanded dashboards, whether `adhj947` replaces `ad6txb2`, and whether `corsica` should remain personal or become official.
+- UNCERTAIN: Whether copying a dashboard or a single panel from Golden Copies works as documented in this Grafana version.
 
 ## Sources
 
@@ -78,6 +81,8 @@ As of 2026-10-18. Grafana dashboard work across SMP Japan and India. India data 
 - `sources/claude-conversations/2026-10-14-claude-smp-bde564a1.txt`
 - `sources/claude-conversations/2026-10-16-claude-smp-4e922cd7.txt`
 - `sources/claude-conversations/2026-10-17-claude-smp-4e922cd7.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-4e922cd7.txt`
+- `sources/claude-conversations/2026-10-19-claude-smp-7de67109.txt`
 - Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-18
+Last Updated: 2026-10-20
