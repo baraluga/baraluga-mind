@@ -8,7 +8,7 @@ As of 2026-10-07. Network and access blockers are the main drag on [[smp-india]]
 - **Darwin:** the proxy allowlist is missing, so the dev cluster gets 403s. The request is with IT. See [[darwin-collector]].
 - **H. India national website:** Zscaler returns 403, but the site works from the office and off-Zscaler. The fix is a security whitelist ticket with James Snow. The same blocker got an earlier HPX scraper ticket rejected.
 - **Cross-account CDH/S3:** Khaba QA could not read the production-owned source bucket because of an explicit AWS Organizations SCP deny. CDH support changed an SCP on 2026-09-30 to allow cross-region access; Airflow QA validation is still pending. See [[smp-india]].
-- **Escalation path:** [[michael]] is the point person. The India geo-restriction for cluster access went to Frederik on 2026-09-21, because France/Belgium IT had no India infrastructure or budget path and India VPCs were reportedly blocked in the current AWS account.
+- **Escalation path:** [[michael]] is the point person. The India geo-restriction for cluster access went to [[frederic-degraeve]] on 2026-09-21, because France/Belgium IT had no India infrastructure or budget path and India VPCs were reportedly blocked in the current AWS account.
 
 ## Background
 

@@ -45,6 +45,15 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 - [[francois-caffont]]: Atlas product owner and builder.
 - [[joyce]]
 - [[alfred-villalva]]
+- [[mateo]]: India stakeholder; owns India TSDB metadata.
+- [[adrien]]: India stakeholder and Mateo's backup.
+- [[carlos]]: Japan stakeholder; co-owns the OCCTO TSDB provider.
+- [[nilo-menezes]]: infra, proxy and cluster contact.
+- [[frederic-degraeve]]: ENGIE Belgium manager over SMP budget and escalations.
+- [[bong]]: Brian's manager; SMP Scrum Master.
+- [[charmaine-pabelico]]: project lead; July 360 notes only.
+- [[huk-lorenzo]]: developer; July 360 notes only.
+- [[dale-anova]]: covers as SMP Scrum Master.
 
 ## Personal
 

@@ -8,13 +8,13 @@ Add a variant only once it is confirmed, by Brian or by unambiguous repeated evi
 
 - **Mateo**: Matteo, Matéo, Matthew. India stakeholder for TSDB IDs, Khaba, and dashboards.
 - **Adrien**: Adrian. India escalation contact while Mateo is away.
-- **Bong**: Bang, Pong.
+- **Bong**: Bang, Pong, Cresencio, Cresencio Valdoz Jr., VALDOZ Cresencio. Same person: Bong is Cresencio's nickname.
 - **Nilo**: Milo, Nilor. Infra and proxy contact.
 - **Francois Delcourt**: François, Franco. SMP product owner; plain "Francois" in SMP sources means him.
 - **Francois Caffont**: François. Atlas product owner; plain "Francois" in Atlas sources means him.
 - **Lou Dubuisson**: Lou Buisson. Incoming India point of contact.
 - **Jeroen**: Jerome, but only as the 2026-08-19 SMP overview attendee. Not Jerome Blanc, who is a different person.
-- **Frederik**: Frédéric.
+- **Frederic Degraeve**: Fred, Frederik, Frédéric, DEGRAEVE Frederic.
 - **Hiromi**: IROMI. Japan interconnector stakeholder.
 
 ## Sites and Assets
