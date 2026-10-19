@@ -1,0 +1,175 @@
+<title>Feedback Ledger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: a ledger. Summary strip, then one card per person; strengths left, growth right, the ask set apart. */
+:root {
+  --bg: #f3f5f6; --surface: #ffffff; --ink: #18232b; --muted: #5b6b75; --line: #d9e0e4;
+  --accent: #0f6e78; --plus: #2f7a4b; --plus-soft: #e6f2ea; --delta: #a35d12; --delta-soft: #fbf0e2;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11181d; --surface: #182229; --ink: #e4ebef; --muted: #93a3ad; --line: #2a3740;
+  --accent: #5cc3cc; --plus: #7fcf99; --plus-soft: #1c2e24; --delta: #f0b267; --delta-soft: #33261a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11181d; --surface: #182229; --ink: #e4ebef; --muted: #93a3ad; --line: #2a3740;
+  --accent: #5cc3cc; --plus: #7fcf99; --plus-soft: #1c2e24; --delta: #f0b267; --delta-soft: #33261a; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 24px; }
+header { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; }
+h1 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.meta { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.meta b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+button { font: 600 14px var(--body); color: var(--accent); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bar input { flex: 1 1 220px; min-width: 0; font: 15px var(--body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.chip { color: var(--muted); font-weight: 400; }
+.chip[aria-pressed="true"] { color: var(--surface); background: var(--accent); border-color: var(--accent); }
+.index { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+.index a { color: var(--muted); text-decoration: none; }
+.index a:hover { color: var(--accent); }
+.index span { font-family: var(--mono); font-size: 12px; }
+h2 { font: 500 13px var(--body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 8px 0 0; }
+.cards { display: grid; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.head { display: flex; gap: 12px; justify-content: space-between; align-items: start; }
+.head h3 { font: 700 22px/1.2 var(--display); margin: 0; }
+.role { color: var(--muted); font-size: 14px; margin: 4px 0 0; max-width: 80ch; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+.col { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.col h4 { margin: 0; font: 600 13px var(--body); text-transform: uppercase; letter-spacing: 0.06em; }
+.plus h4 { color: var(--plus); } .delta h4 { color: var(--delta); }
+.note { display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--line); }
+.plus .note { border-left-color: var(--plus); } .delta .note { border-left-color: var(--delta); }
+.note p { margin: 0; }
+.ask { background: var(--delta-soft); border-radius: 6px; padding: 6px 10px; font-size: 15px; }
+.ask b { color: var(--delta); }
+.src { font: 12px/1.4 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.src .from { color: var(--accent); }
+.empty { color: var(--muted); font-size: 14px; font-style: italic; }
+.caveat { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.hide-src .src .path { display: none; }
+.toast { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+</style>
+
+<div class="wrap" id="app">
+  <header>
+    <div>
+      <h1>Feedback Ledger</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="bar">
+      <button type="button" id="copy-refresh" title="Paste this into Claude Code to rebuild the page from Baraluga Mind">Copy refresh prompt</button>
+    </div>
+  </header>
+  <div class="bar" role="toolbar" aria-label="Filters">
+    <input id="q" type="search" placeholder="Search people or notes" aria-label="Search people or notes">
+    <button type="button" class="chip" data-filter="all" aria-pressed="true">Everyone</button>
+    <button type="button" class="chip" data-filter="growth" aria-pressed="false">Has growth areas</button>
+    <button type="button" class="chip" data-filter="thin" aria-pressed="false">Thin evidence</button>
+    <button type="button" class="chip" id="toggle-src" aria-pressed="true">Sources</button>
+  </div>
+  <nav class="index" id="index" aria-label="People"></nav>
+  <h2>Feedback to give</h2>
+  <section class="cards" id="give"></section>
+  <h2 id="self-h">Feedback you've received</h2>
+  <section class="cards" id="self"></section>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const SELF = "brian-peralta";
+const REFRESH_PROMPT = "Refresh my Feedback Ledger: mine baraluga-mind sources newer than each person's last Feedback Notes date, update the Feedback Notes sections per wiki/AGENTS.md, run python3 -B scripts/build-feedback-ledger.py <scratch>/feedback-ledger.html, and republish it to the existing Feedback Ledger artifact URL.";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = (d) => new Date(d + "T00:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+let filter = "all";
+
+function isThin(p) { return p.items.length < 3 || p.caveats.some((c) => /thin|only from/i.test(c)); }
+function noteHtml(i) {
+  const ask = i.ask ? `<div class="ask"><b>Ask:</b> ${esc(i.ask)}</div>` : "";
+  const from = i.from ? `<span class="from">from ${esc(i.from)}</span> · ` : "";
+  return `<div class="note"><p>${esc(i.text)}</p>${ask}<div class="src">${from}${fmt(i.date)}<span class="path"> · ${esc(i.source)}</span></div></div>`;
+}
+function column(cls, title, items) {
+  const body = items.length ? items.map(noteHtml).join("") : `<p class="empty">Nothing captured yet.</p>`;
+  return `<div class="col ${cls}"><h4>${title} <span class="chip">${items.length}</span></h4>${body}</div>`;
+}
+function cardHtml(p) {
+  const self = p.slug === SELF;
+  const plus = p.items.filter((i) => i.kind.endsWith("strength"));
+  const delta = p.items.filter((i) => i.kind.endsWith("growth"));
+  const caveats = p.caveats.map((c) => `<div class="caveat">${esc(c)}</div>`).join("");
+  return `<article class="card" id="${p.slug}"><div class="head"><div><h3>${esc(p.name)}</h3><p class="role">${esc(p.role)}</p></div>
+    <button type="button" data-copy="${p.slug}">Copy</button></div>
+    <div class="cols">${column("plus", self ? "Strengths noted" : "Strengths", plus)}${column("delta", self ? "To work on" : "Growth areas", delta)}</div>${caveats}</article>`;
+}
+function asText(p) {
+  const line = (i) => `- ${i.text}${i.ask ? ` Ask: ${i.ask}` : ""} (${i.date})`;
+  const plus = p.items.filter((i) => i.kind.endsWith("strength")).map(line);
+  const delta = p.items.filter((i) => i.kind.endsWith("growth")).map(line);
+  return `${p.name}\n\nWhat's working\n${plus.join("\n") || "- (none captured)"}\n\nWhat to work on\n${delta.join("\n") || "- (none captured)"}`;
+}
+function matches(p, q) {
+  if (filter === "growth" && !p.items.some((i) => i.kind.endsWith("growth"))) return false;
+  if (filter === "thin" && !isThin(p)) return false;
+  if (!q) return true;
+  return JSON.stringify(p).toLowerCase().includes(q);
+}
+function render() {
+  if (!DATA) { $("#give").innerHTML = `<p class="empty">No data built into this page yet. Use "Copy refresh prompt" and paste it into Claude Code.</p>`; return; }
+  const q = $("#q").value.trim().toLowerCase();
+  const others = DATA.people.filter((p) => p.slug !== SELF);
+  const me = DATA.people.filter((p) => p.slug === SELF);
+  const shown = others.filter((p) => matches(p, q));
+  $("#give").innerHTML = shown.map(cardHtml).join("") || `<p class="empty">No one matches.</p>`;
+  const meShown = me.filter((p) => matches(p, q));
+  $("#self").innerHTML = meShown.map(cardHtml).join("");
+  $("#self-h").hidden = !meShown.length;
+  $("#index").innerHTML = shown.map((p) => `<a href="#${p.slug}">${esc(p.name)} <span>${p.items.length}</span></a>`).join("");
+}
+function toast(msg) {
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
+  document.body.append(t); setTimeout(() => t.remove(), 1800);
+}
+async function copy(text, label) {
+  try { await navigator.clipboard.writeText(text); toast(label); }
+  catch { const ta = document.createElement("textarea"); ta.value = text; document.body.append(ta); ta.select(); toast("Selected. Press Ctrl/Cmd+C to copy"); setTimeout(() => ta.remove(), 4000); }
+}
+
+if (DATA) {
+  const n = DATA.people.filter((p) => p.slug !== SELF).length;
+  const notes = DATA.people.reduce((s, p) => s + p.items.length, 0);
+  $("#meta").innerHTML = `<b>${n}</b> people · <b>${notes}</b> dated notes · built ${esc(DATA.built)} from Baraluga Mind`;
+}
+document.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => {
+  filter = b.dataset.filter;
+  document.querySelectorAll("[data-filter]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
+$("#toggle-src").addEventListener("click", (e) => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", String(on));
+  $("#app").classList.toggle("hide-src", !on);
+});
+$("#q").addEventListener("input", render);
+$("#copy-refresh").addEventListener("click", () => copy(REFRESH_PROMPT, "Refresh prompt copied"));
+document.addEventListener("click", (e) => {
+  const slug = e.target.closest("[data-copy]")?.dataset.copy;
+  const p = slug && DATA.people.find((x) => x.slug === slug);
+  if (p) copy(asText(p), `${p.name} copied`);
+});
+render();
+</script>
