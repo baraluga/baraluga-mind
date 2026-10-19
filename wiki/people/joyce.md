@@ -16,6 +16,15 @@ Joyce is one of the active SMP developers alongside [[brian-peralta]] and [[mich
 
 - UNCERTAIN: Joyce's exact role title and ongoing ownership areas are not captured in the notes.
 
+## Feedback Notes
+
+Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
+
+- **Strength** (2026-06-22): Validated India dev/QA Airflow login herself before endorsing the setup to Michael, and moved prod IAM roles onto the Japan pattern. `sources/meetings/2026-06-22-1415-granola-daily-standup.md`
+- **Strength** (2026-08-11): Led the team icebreaker ("happy places"). `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+- **Growth** (2026-09-18): One of only two people who could build Airflow images. Ask: help document or automate it so the knowledge spreads. `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
+- UNCERTAIN: thin evidence; she was at 0% SMP allocation from July.
+
 ## Sources
 
 - `sources/meetings/2026-06-22-1415-granola-daily-standup.md`

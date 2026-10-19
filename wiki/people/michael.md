@@ -7,7 +7,7 @@ As of 2026-10-14.
 - Back on SMP from 2026-10-01, split roughly 80% SMP and 20% Walnut migration. UNCERTAIN: the source says "SMB"; read as SMP from context.
 - Owns SMP infrastructure and deployment. As of 2026-09-18 only he or [[joyce]] could build and push Airflow Docker images, and it was still manual. He is requesting the roles needed for a GitHub pipeline that automates Airflow and Grafana image deployment; ticket 507 was waiting on his role requirements as of 2026-10-05.
 - Deployed the Darwin collector to India dev on 2026-10-01. It is blocked by proxy 403s, and he raised the proxy request with IT. Still waiting as of 2026-10-05.
-- Point person for India proxy escalation, first with Nilo and then directly with Frederik.
+- Point person for India proxy escalation, first with Nilo and then directly with [[frederic-degraeve]].
 - Core reviewer: SMP dev, QA, and prod merges require approval from [[brian-peralta]] or Michael.
 - Pending: a knowledge-transfer walkthrough of the India DAGs for Lou with Brian, a JupyterLab demo with Eric, and a Loki demo with Jeka.
 - Made the first Khaba CSV parsing fix for `SCR-1288` by forcing pandas not to treat the first data column as an index. Follow-up hardening added regression coverage and clearer errors around the same issue.
@@ -31,6 +31,18 @@ Role changes only. Detail stays in the sources.
 ## Open Questions
 
 - UNCERTAIN: surname and role title are not captured.
+
+## Feedback Notes
+
+Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
+
+- **Strength** (2026-10-15): Deployed the Darwin collector to india-dev, then tested the Darwin API and Okta connection from inside the pod before reporting back, and had already pinged Nilo about the pipeline. Nobody had to chase him. `sources/claude-conversations/2026-10-15-claude-smp-68dedda3.txt`
+- **Strength** (2026-09-21): Took the India proxy 403 escalation from IT to Nilo to Fred instead of leaving the ticket parked as blocked. `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
+- **Strength** (2026-07-24): Execution lead for the Walnut migration and Artifactory setup; his smp-common publish to `qrm-dms-core-pypi-dev` was the proven path others copied. `sources/codex-conversations/2026-07-24-codex-conversations.txt`
+- **Strength** (2026-10-13): Stepped outside infra to make the first Khaba CSV parser fix for `SCR-1288`. `sources/claude-conversations/2026-10-13-claude-smp-e3dc30e8.txt`
+- **Growth** (2026-09-18): Image builds and Darwin deploys depend on him (only he or Joyce could build Airflow images), and the pipeline ticket 507 waited on his role requirements from 2026-10-05. Ask: treat 507 as his highest-leverage work, since it removes him from the critical path. `sources/meetings/2026-09-18-1415-granola-smp-standup.md`
+- **Growth** (2026-10-13): Shared CI runs on his personal token (`GH_COM_TOKEN`); it lacked `smp-india` access, so checkout failed and ownership had to be inferred. Ask: move to a service account, or at least document owner and scope. `sources/claude-conversations/2026-10-13-claude-smp-68dedda3.txt`
+- **Growth** (2026-10-15): The "deployed" message did not say which image; Brian had to ask, and the deploy predated the Khaba commit. Ask: include the image tag or commit in every deploy message. `sources/claude-conversations/2026-10-15-claude-smp-68dedda3.txt`
 
 ## Sources
 
