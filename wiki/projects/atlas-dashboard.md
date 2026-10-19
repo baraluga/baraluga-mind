@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-14. Atlas is a Dash Framework front-end application for graphs, tables, and maps. Francois Caffont built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer.
+As of 2026-10-14. Atlas is a Dash Framework front-end application for graphs, tables, and maps. [[francois-caffont]] built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer.
 
 DEV is down outside Brian's control. On October 13, the read-only DAC connectivity workflow still had working credentials, but the DEV `dashboard-atlas` ECS service no longer existed in the expected cluster; on September 24 it still existed but was scaled to 0 tasks. The observed redirect to the dashboards homepage is therefore probably platform fallback rather than Atlas app behavior. The suggested path was for Francois to reach out to CDH/DAC about whether the DEV service was removed or switched off.
 

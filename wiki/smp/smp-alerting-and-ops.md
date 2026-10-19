@@ -5,7 +5,7 @@
 As of 2026-10-09.
 
 - **Grafana alerts to email and Teams.**
-  - Native Grafana alerts work in India QA (`SCR-1244`); the POC was an IEX RTM 10,000 threshold, and Francois created his own alert to confirm.
+  - Native Grafana alerts work in India QA (`SCR-1244`); the POC was an IEX RTM 10,000 threshold, and [[francois-delcourt]] created his own alert to confirm.
   - Teams delivery (`SCR-1267`/`1269`) was proven working by 2026-10-06. Users create a Teams channel, allow external senders, and add its email address as a Grafana Email contact point, with no IT request.
   - The Confluence guide is published under SMP India next to the `SCR-1244` email guide. Validation after review is the remaining step.
   - Business/data alert channels are user-owned and kept separate from SMP's operational alerting.

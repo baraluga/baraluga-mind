@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-18. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through Francois.
+As of 2026-10-18. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through [[francois-delcourt]].
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)

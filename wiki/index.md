@@ -31,7 +31,7 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 
 - [[team-operations]]: team routines, planning, allocations, and cross-team context.
 - [[technical-activities]]: last known state of non-SMP projects (Pyrene, GMR, Prosumer, and others).
-- [[atlas-dashboard]]: Francois's Dash front-end app and the engineering support around it.
+- [[atlas-dashboard]]: Francois Caffont's Dash front-end app and the engineering support around it.
 - [[recruitment-2026]]: Senior Software Engineer hiring process and candidates.
 - [[ai-assisted-engineering]]: practical AI tooling patterns at work.
 - [[zscaler-codex-access]]: what Codex can and can't reach behind Zscaler.
@@ -41,7 +41,8 @@ Every wiki page, grouped by area. Start here when you don't know which page hold
 
 - [[brian-peralta]]
 - [[michael]]
-- [[francois]]
+- [[francois-delcourt]]: SMP product owner.
+- [[francois-caffont]]: Atlas product owner and builder.
 - [[joyce]]
 - [[alfred-villalva]]
 

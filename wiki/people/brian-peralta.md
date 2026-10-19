@@ -9,7 +9,7 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 ## Details
 
 - SMP responsibilities in the notes include Japan demo preparation, Delphi/GitHub Actions coordination, proxy incident reporting, MS Teams alert fallback, Ruff secret detection research, TSDB interconnector pilot testing, README updates, and DAG agent prompt refinement.
-- Francois gave strong feedback on Brian's technical delivery, proposals, implementations, client relationship management, autonomy with users, and ability to translate feedback into action.
+- [[francois-delcourt]] gave strong feedback on Brian's technical delivery, proposals, implementations, client relationship management, autonomy with users, and ability to translate feedback into action.
 - Improvement area from Francois: tickets moving too fast without keeping Francois in the loop.
 - Agreed working model with Francois: Brian keeps freedom for user interactions and request response, while Francois adds explicit validation checkpoints and acts as safety net for production pushes and major deliverables.
 - Penbrothers interview notes say Brian has worked in a flat 15-17 engineer team without formal hierarchy or direct reports, while acting as a de facto standard-setter and mentor for the last 2 years.
