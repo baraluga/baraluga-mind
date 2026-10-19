@@ -8,6 +8,7 @@ As of 2026-10-19. India stakeholder on the trading side and SMP's main India use
 
 Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
 
+- **Headline**: Fixes things himself; the IDs are the bottleneck.
 - **Strength** (2026-07-23): Fixed the April RestKafka outage himself and explained it plainly when asked. `sources/codex-conversations/2026-07-23-codex-conversations.md`
 - **Strength** (2026-08-03): Granted all TSDB rights for the client IDs before leaving for France, and on 2026-08-27 announced his 10-day offline period in advance with Adrien as cover. `sources/meetings/2026-08-03-1415-granola-busy.md`
 - **Strength** (2026-07-22): Agreed to beta-test the DAG helper onboarding; his feedback surfaced the Artifactory access gap in the docs. `sources/codex-conversations/2026-07-29-codex-conversations.md`

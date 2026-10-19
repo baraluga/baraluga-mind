@@ -36,6 +36,7 @@ Role changes only. Detail stays in the sources.
 
 Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
 
+- **Headline**: Ships it, then proves it works from inside the pod.
 - **Strength** (2026-10-15): Deployed the Darwin collector to india-dev, then tested the Darwin API and Okta connection from inside the pod before reporting back, and had already pinged Nilo about the pipeline. Nobody had to chase him. `sources/claude-conversations/2026-10-15-claude-smp-68dedda3.txt`
 - **Strength** (2026-09-21): Took the India proxy 403 escalation from IT to Nilo to Fred instead of leaving the ticket parked as blocked. `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`
 - **Strength** (2026-07-24): Execution lead for the Walnut migration and Artifactory setup; his smp-common publish to `qrm-dms-core-pypi-dev` was the proven path others copied. `sources/codex-conversations/2026-07-24-codex-conversations.txt`

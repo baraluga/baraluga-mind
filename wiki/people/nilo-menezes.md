@@ -8,6 +8,7 @@ As of 2026-10-19. Infra, proxy, certificate and cluster contact (Synapse side). 
 
 Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
 
+- **Headline**: Knows the cluster; hard to pin down.
 - **Strength** (2026-07-12): Gave the right pointer on installing the GEMS TLS certificate for uv in pipelines. `sources/codex-conversations/2026-07-12-codex-conversations.md`
 - **Strength** (2026-07-15): Had already migrated his own repos before being asked. `sources/codex-conversations/2026-07-15-codex-conversations.md`
 - **Strength** (2026-09-21): Came to the Darwin consultation having already checked with Olivier and the network team. `sources/meetings/2026-09-21-1700-granola-smp-technical-consultation-on-darwin.md`

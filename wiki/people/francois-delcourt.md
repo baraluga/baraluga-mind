@@ -28,6 +28,7 @@ As of 2026-10-19. SMP product owner (ENGIE Belgium) and Brian's main SMP counter
 
 Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
 
+- **Headline**: The safety net who'd like to be a smaller one.
 - **Strength** (2026-06-30): Gave balanced, specific feedback and owned his half: praised delivery and client handling, raised the loop-in concern, and said he could follow progress more proactively himself. `sources/meetings/2026-06-30-1504-granola-feedback-from-francois.md`
 - **Strength** (2026-10-13): Spotted the 6-hour bar on Khaba minute; it exposed a sensor hang that blocked every later run. `sources/claude-conversations/2026-10-13-claude-smp-5c0b0e8d.txt`
 - **Strength** (2026-09-28): Hands-on validation: cross-checks TSDB values against Grafana and supplies TSDB IDs. `sources/meetings/2026-09-28-1415-granola-smp-standup.md`

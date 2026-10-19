@@ -60,6 +60,7 @@ Last Updated: YYYY-MM-DD
 
 People pages may carry a `## Feedback Notes` section: observed behaviour Brian could give as feedback, written as a neutral third-party observer. Add to it during ingest when a source shows a concrete behaviour (what they did, its effect), never personality labels or hearsay presented as fact.
 
+- Optional first line: `- **Headline**: one observer's line on the person, kind and specific.`
 - One line per observation: `- **Strength** (YYYY-MM-DD): what happened and its effect. \`sources/...\``
 - Growth items end with a concrete ask: `- **Growth** (YYYY-MM-DD): pattern with dated examples. Ask: one specific change. \`sources/...\``
 - On `brian-peralta.md`, feedback Brian received uses `**Received strength**` / `**Received growth**` and names who gave it.

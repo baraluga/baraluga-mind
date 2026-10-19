@@ -26,6 +26,7 @@ In the Penbrothers interview notes, Brian described 13 years in software enginee
 
 Observed behaviour for feedback season, as a third-party observer. Rendered by the Feedback Ledger artifact.
 
+- **Headline**: Fast and thorough, sometimes ahead of the loop.
 - **Received strength** (2026-06-30), from Francois Delcourt: technical delivery, proposals, client relationship management, autonomy with users, turning feedback into action, speaking up in grooming. `sources/meetings/2026-06-30-1504-granola-feedback-from-francois.md`
 - **Received growth** (2026-06-30), from Francois Delcourt: tickets and stakeholder messages moved too fast without looping him in; agreed validation checkpoints. `sources/meetings/2026-06-30-1504-granola-feedback-from-francois.md`
 - **Received strength** (2026-07-29), from Bong: rated beyond expectations; stakeholder responsiveness, technical leadership beyond SMP scope, end-to-end delivery, mentoring, growth from front-end into backend, CI/CD and infra. `sources/meetings/2026-07-29-1130-granola-1-1-bong.md`
