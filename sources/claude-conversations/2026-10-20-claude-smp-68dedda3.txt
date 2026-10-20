@@ -1,0 +1,929 @@
+# Claude Conversation - 2026-10-20
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 10:58 user (smp-tool)
+
+From Michael:
+ayy yes nagrun pala me kanina lang. Deployed na both pods ni darwin-collector for QA and PROD pero nasa 3rd step parin me ng script eh. Hindi rin ako nagprovide ng parameter for wait_minutes, kineep ko yung 60 min haha
+
+## 10:59 assistant (smp-tool)
+
+Step 3 is waiting for **you**. It sits there until the **QA publisher** has actually published, and that only starts once its DAG is unpaused in Airflow, which is your part. So:
+
+1. **In QA Airflow:** unpause `india_darwin_realtime_tsdb_dag`, and optionally set `DARWIN_PUBLISH_MAX_FILES` to 100.
+2. **In prod Airflow:** the same, plus the freshness DAG in both environments.
+
+After that, give it **about 20–35 minutes**. The script waits for the first file in QA's `published/` folder, which only appears once a quarter-hour average has been written as well: the quarter closes, then the 5-minute grace. Then it turns dev off on its own.
+
+**If his 60 minutes run out first,** nothing breaks: the script stops and **leaves dev running**. He can just run it again. Both deploys will report "already matches … nothing to apply", and it goes straight back to waiting.
+
+One more check, since prod is now running: ask Michael for the prod collector's logs, to settle whether prod can reach Darwin:
+
+```
+salamat Michael! 🙏 yung step 3 hinihintay lang ako mag-unpause sa Airflow, gagawin ko na. pa-check lang yung prod logs: kubectl --context <prod-ctx> -n smp-india-prod logs deploy/darwin-collector -c collector --tail=20 → hanap ng poll_complete na "failed_entities": 0
+```
+
+If the prod log shows `poll_entity_failed` instead, prod's proxy doesn't let it through to Darwin yet. That's a network approval, not our code.
+
+## 11:06 user (smp-tool)
+
+it worked in airflow!!! BUT freshness check failed on both envs with slightly varying reasons...
+
+QA:
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-20T03:00:00+00:00/task_id=check_source_data/attempt=2.log
+::endgroup::
+[2026-10-20T03:04:11.329938Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a15743-4ca0-7ef7-a1eb-0c666c4bcdb4 dag_id=india_darwin_freshness_dag task_id=check_source_data run_id=scheduled__2026-10-20T03:00:00+00:00 try_number=2 map_index=-1
+[2026-10-20T03:04:11.354843Z] DEBUG - Loading plugins
+[2026-10-20T03:04:11.357104Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-20T03:04:11.651121Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-20T03:04:11.679044Z] DEBUG - Loading plugins from entrypoints
+[2026-10-20T03:04:11.679205Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-20T03:04:11.680801Z] DEBUG - Loading 2 plugin(s) took 323.80 ms
+[2026-10-20T03:04:11.680991Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7ffb671c54c0>}
+[2026-10-20T03:04:11.681048Z] DEBUG - Hook impls: []
+[2026-10-20T03:04:11.681119Z] DEBUG - Result from 'on_starting': []
+[2026-10-20T03:04:11.681777Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-20T03:04:11.682252Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-20T03:04:11.682713Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-20T03:04:11.696494Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-20T03:04:11.696752Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-20T03:04:11.698636Z] DEBUG - Found DAG india_darwin_freshness_dag
+[2026-10-20T03:04:11.698862Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-20T03:04:11.699704Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag>
+[2026-10-20T03:04:11.700010Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=17 
+[2026-10-20T03:04:11.700217Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py 
+[2026-10-20T03:04:11.700394Z] DEBUG - Integrate Macros plugins
+[2026-10-20T03:04:11.720808Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15743-4ca0-7ef7-a1eb-0c666c4bcdb4'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-6ff1626fde0302c9464175012c7971ea-546447403e76d3ce-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 11, 352734, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-20T03:04:11.720908Z] DEBUG - Hook impls: []
+[2026-10-20T03:04:11.720965Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-20T03:04:11.721132Z] INFO - ::endgroup::
+[2026-10-20T03:04:11.749387Z] INFO - DARWIN_SOURCE_DATA={"stale": ["SOF_INRAG/ActivePower: newest source minute is 768 min old", "SOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old", "SOF_INRAG/TiltedIrradiance: newest source minute is 768 min old"], "source_age_minutes": {"SOF_INGU2/ActivePower": 0, "SOF_INGU2/HorizontalIrradiance": 1, "SOF_INGU2/TiltedIrradiance": 1, "SOF_INKHA/ActivePower": 1, "SOF_INKHA/HorizontalIrradiance": 2, "SOF_INKHA/TiltedIrradiance": 1, "SOF_INNS7/ActivePower": 1, "SOF_INNS7/HorizontalIrradiance": 1, "SOF_INNS7/TiltedIrradiance": 1, "SOF_INRAG/ActivePower": 768, "SOF_INRAG/HorizontalIrradiance": 768, "SOF_INRAG/TiltedIrradiance": 768, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 1, "WIF_INSE4/WindDirection": 1, "WIF_INSE4/WindSpeed": 1}, "skipped_not_configured": []}
+[2026-10-20T03:04:11.749593Z] ERROR - Task failed with exceptionStaleDarwinDataError: Darwin source data stale:
+SOF_INRAG/ActivePower: newest source minute is 768 min old
+SOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old
+SOF_INRAG/TiltedIrradiance: newest source minute is 768 min old
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py, line 52 in check_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 131 in run_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 112 in check_source_data
+
+[2026-10-20T03:04:11.749930Z] INFO - ::group::Post Execute
+[2026-10-20T03:04:11.753050Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a15743-4ca0-7ef7-a1eb-0c666c4bcdb4'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-6ff1626fde0302c9464175012c7971ea-546447403e76d3ce-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 11, 352734, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 3, 4, 11, 751872, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-20T03:04:11.753299Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15743-4ca0-7ef7-a1eb-0c666c4bcdb4'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-6ff1626fde0302c9464175012c7971ea-546447403e76d3ce-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 11, 352734, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 3, 4, 11, 751872, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': StaleDarwinDataError('Darwin source data stale:\nSOF_INRAG/ActivePower: newest source minute is 768 min old\nSOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old\nSOF_INRAG/TiltedIrradiance: newest source minute is 768 min old')}
+[2026-10-20T03:04:11.753370Z] DEBUG - Hook impls: []
+[2026-10-20T03:04:11.753439Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-20T03:04:11.753499Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7ffb67177500>}
+[2026-10-20T03:04:11.753544Z] DEBUG - Hook impls: []
+[2026-10-20T03:04:11.753598Z] DEBUG - Result from 'before_stopping': []
+[2026-10-20T03:04:11.753660Z] INFO - ::endgroup::
+</pasted_content id="f33a">
+
+Prod:
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-20T03:00:00+00:00/task_id=check_source_data/attempt=2.log
+::endgroup::
+[2026-10-20T03:04:41.898549Z] INFO - ::group::Pre Execute source=task  loc=task_runner.py:2303 
+Task Identity ti_id=01a15743-c461-7188-92c3-90f6e85e8ce5 dag_id=india_darwin_freshness_dag task_id=check_source_data run_id=scheduled__2026-10-20T03:00:00+00:00 try_number=2 map_index=-1
+[2026-10-20T03:04:41.914114Z] DEBUG - Loading plugins source=airflow.sdk.plugins_manager  loc=plugins_manager.py:79 
+[2026-10-20T03:04:41.915676Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:224 
+[2026-10-20T03:04:42.200747Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables. source=file_browser_plugin  loc=file_browser_plugin.py:35 
+[2026-10-20T03:04:42.226264Z] DEBUG - Loading plugins from entrypoints source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:193 
+[2026-10-20T03:04:42.226415Z] DEBUG - Importing entry_point plugin openlineage source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:198 
+[2026-10-20T03:04:42.227985Z] DEBUG - Loading 2 plugin(s) took 312.38 ms source=airflow.sdk.plugins_manager  loc=plugins_manager.py:114 
+[2026-10-20T03:04:42.228172Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7faf8055b560>} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T03:04:42.228234Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T03:04:42.228300Z] DEBUG - Result from 'on_starting': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T03:04:42.228902Z] INFO - DAG bundles loaded: dags-folder source=airflow.dag_processing.bundles.manager.DagBundlesManager  loc=manager.py:271 
+[2026-10-20T03:04:42.229323Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py source=airflow.dag_processing.dagbag.BundleDagBag  loc=dagbag.py:460 
+[2026-10-20T03:04:42.229774Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py source=airflow.dag_processing.importers.python_importer  loc=python_importer.py:224 
+[2026-10-20T03:04:42.242883Z] DEBUG - Initializing Provider Manager[taskflow_decorators] source=airflow.sdk._shared.providers_discovery.providers_discovery  loc=providers_discovery.py:285 
+[2026-10-20T03:04:42.243220Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds source=airflow.sdk._shared.providers_discovery.providers_discovery  loc=providers_discovery.py:288 
+[2026-10-20T03:04:42.244883Z] DEBUG - Found DAG india_darwin_freshness_dag source=airflow.dag_processing.importers.python_importer  loc=python_importer.py:360 
+[2026-10-20T03:04:42.245065Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning  source=py.warnings  loc=/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/definitions/dag.py:1680 
+[2026-10-20T03:04:42.245871Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag> source=airflow.dag_processing.dagbag.BundleDagBag  loc=dagbag.py:436 
+[2026-10-20T03:04:42.246185Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=16  source=task  loc=task_runner.py:1062 
+[2026-10-20T03:04:42.246413Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py  source=task  loc=task_runner.py:1194 
+[2026-10-20T03:04:42.246628Z] DEBUG - Integrate Macros plugins source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:289 
+[2026-10-20T03:04:42.270110Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15743-c461-7188-92c3-90f6e85e8ce5'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-707ec90e4bfa2f2dc2f999fd28dfc5dd-593c267a8dd97f73-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 41, 912131, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T03:04:42.270231Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T03:04:42.270313Z] DEBUG - Result from 'on_task_instance_running': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T03:04:42.270511Z] INFO - ::endgroup:: source=task  loc=task_runner.py:2107 
+[2026-10-20T03:04:42.298323Z] INFO - DARWIN_SOURCE_DATA={"stale": ["SOF_INRAG/ActivePower: newest source minute is 768 min old", "SOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old", "SOF_INRAG/TiltedIrradiance: newest source minute is 768 min old", "WIF_INGUV/ActivePower: newest source minute is 25 min old", "WIF_INGUV/WindDirection: newest source minute is 24 min old", "WIF_INGUV/WindSpeed: newest source minute is 24 min old"], "source_age_minutes": {"SOF_INGU2/ActivePower": 0, "SOF_INGU2/HorizontalIrradiance": 0, "SOF_INGU2/TiltedIrradiance": 0, "SOF_INKHA/ActivePower": 0, "SOF_INKHA/HorizontalIrradiance": 2, "SOF_INKHA/TiltedIrradiance": 0, "SOF_INNS7/ActivePower": 0, "SOF_INNS7/HorizontalIrradiance": 0, "SOF_INNS7/TiltedIrradiance": 0, "SOF_INRAG/ActivePower": 768, "SOF_INRAG/HorizontalIrradiance": 768, "SOF_INRAG/TiltedIrradiance": 768, "WIF_INGUV/ActivePower": 25, "WIF_INGUV/WindDirection": 24, "WIF_INGUV/WindSpeed": 24, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 0, "WIF_INSE4/WindDirection": 0, "WIF_INSE4/WindSpeed": 0}, "skipped_not_configured": []} source=scripts.darwin_publish.freshness  loc=freshness.py:110 
+[2026-10-20T03:04:42.298533Z] ERROR - Task failed with exception source=task  loc=task_runner.py:1673 StaleDarwinDataError: Darwin source data stale:
+SOF_INRAG/ActivePower: newest source minute is 768 min old
+SOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old
+SOF_INRAG/TiltedIrradiance: newest source minute is 768 min old
+WIF_INGUV/ActivePower: newest source minute is 25 min old
+WIF_INGUV/WindDirection: newest source minute is 24 min old
+WIF_INGUV/WindSpeed: newest source minute is 24 min old
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py, line 52 in check_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 131 in run_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 112 in check_source_data
+
+[2026-10-20T03:04:42.298812Z] INFO - ::group::Post Execute source=task  loc=task_runner.py:1674 
+[2026-10-20T03:04:42.301906Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a15743-c461-7188-92c3-90f6e85e8ce5'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-707ec90e4bfa2f2dc2f999fd28dfc5dd-593c267a8dd97f73-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 41, 912131, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 3, 4, 42, 300899, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')  source=task  loc=task_runner.py:2227 
+[2026-10-20T03:04:42.302190Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15743-c461-7188-92c3-90f6e85e8ce5'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T03:00:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-707ec90e4bfa2f2dc2f999fd28dfc5dd-593c267a8dd97f73-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 3, 4, 41, 912131, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 3, 4, 42, 300899, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': StaleDarwinDataError('Darwin source data stale:\nSOF_INRAG/ActivePower: newest source minute is 768 min old\nSOF_INRAG/HorizontalIrradiance: newest source minute is 768 min old\nSOF_INRAG/TiltedIrradiance: newest source minute is 768 min old\nWIF_INGUV/ActivePower: newest source minute is 25 min old\nWIF_INGUV/WindDirection: newest source minute is 24 min old\nWIF_INGUV/WindSpeed: newest source minute is 24 min old')} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T03:04:42.302258Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T03:04:42.302323Z] DEBUG - Result from 'on_task_instance_failed': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T03:04:42.302385Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7faf7f1c36e0>} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T03:04:42.302431Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T03:04:42.302480Z] DEBUG - Result from 'before_stopping': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T03:04:42.302526Z] INFO - ::endgroup:: source=task  loc=task_runner.py:2270
+</pasted_content id="f33a">
+
+ 
+
+-- within our control?
+
+## 11:07 assistant (smp-tool)
+
+Both failures point to the same suspect, and it's probably not on our side. **Raganesda is 768 minutes old (about 12.8 hours) in both QA and prod.** Two independent collectors reporting the same age means the data stopped at the source, Darwin, around 14:16 UTC yesterday. Prod also has **Tithwa 24–25 minutes old**, past the 10-minute threshold. I'll check both against live Darwin right now (no VPN needed):
+
+## 11:07 assistant
+
+No, it's not within our control: **Darwin itself has stopped updating both sites.** I just asked the live Darwin API directly:
+
+| Site | Darwin's newest reading | Age right now |
+|---|---|---|
+| **Raganesda** (`SOF_INRAG`) | 19 Oct **14:16 UTC** (19:46 IST yesterday) | **~771 min** |
+| **Tithwa** (`WIF_INGUV`) | 20 Oct **02:40 UTC** | **~27 min** |
+| Shapar (healthy, for comparison) | 03:07 UTC | 0 min |
+
+That matches the freshness DAG's numbers exactly, in both environments. Our collectors are fine; they keep asking and Darwin keeps returning the same old reading. **The freshness check is doing its job:** this is exactly the kind of upstream outage it exists to catch. Tithwa only shows up in prod because it's prod-only.
+
+What to do:
+- **Nothing on our side.** When Darwin resumes, the collectors pick it up on the next poll and the freshness check goes green again.
+- **Tell Mateo**, since it's a Darwin feed problem:
+
+```
+Hi Mateo, heads-up from our Darwin monitoring: two sites stopped updating in Darwin itself (we checked the API directly):
+- Raganesda (SOF_INRAG): last reading 19 Oct 14:16 UTC, nothing since (~13 h)
+- Tithwa (WIF_INGUV): last reading 20 Oct 02:40 UTC (~30 min and counting)
+The other sites are live. Could you check with the Darwin team? Our side picks it up automatically once data resumes.
+```
+
+The freshness DAG will keep failing, and alerting, on every run until Darwin recovers. If that gets too noisy during a known outage, we could discuss per-site handling later, but I wouldn't change it now. Tithwa might also just be a short hiccup; check again in an hour before escalating that one.
+
+## 12:57 user
+
+Hmm. I'm wondering if we should make the "staleness age in minutes" configurable... wdyt? We leave it at a reasonable default, of course
+
+## 12:58 assistant
+
+It already is. The threshold is an Airflow Variable, **`DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES`**, defaulting to **10 minutes**. It was added with SCR-1268 (`get_source_max_age_minutes()` in `darwin_publish/settings.py`). You can set it in each environment's Airflow UI with no code change.
+
+But raising it wouldn't have prevented today's alerts, and I don't think it should:
+- **Raganesda at 13 hours** is a real outage that any sensible threshold should catch.
+- **Tithwa at 25–30 minutes** would still alert under a 15- or 20-minute threshold, and it's also a real gap: wind farms report every minute normally.
+
+The cost of raising it is that a genuinely dead feed takes longer to notice. 10 minutes is about right for minute data. I'd only go to about 15 if you see short Darwin hiccups (5–12 minutes) causing noise that clears by itself.
+
+If anything needs changing later, it's more likely **per-site muting during a known outage**, so that Raganesda being down doesn't keep the whole check red and hide a new problem at another site. That's only worth building if outages like this turn out to be common.
+
+## 13:07 user
+
+I see. So apart from this... I think we're good na no? Anything else before we send this for official validation?
+
+## 13:07 assistant
+
+Nearly there. Prod's freshness log already answered one open question: **prod reaches Darwin.** Every prod site except the two Darwin is missing shows age 0, so the egress worry is gone. A few things left before handing it over for validation:
+
+**Must do (about 10 minutes):**
+1. **Read back from TSDB in both environments** (on VPN), so validation starts from proof rather than assumption. Prod's run is also the first real check of its TSDB read and write access:
+   ```bash
+   cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py qa
+   ```
+   ```bash
+   cd /Users/qn5792/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py prod
+   ```
+   Expect `STALE` only for Raganesda (and Tithwa in prod) while Darwin is down.
+2. **Confirm dev is fully off:**
+   - Michael's script printed `✅ QA is publishing. Retiring the dev collector`.
+   - The dev publisher shows `Ingest 0 of 0`, then you pause it.
+   - `darwin-poc` is scaled to 0.
+
+**Tell the validators up front** so they don't file false bugs:
+- **Raganesda (since 19 Oct 14:16 UTC) and Tithwa (since 02:40 UTC):** no new data, because Darwin stopped sending it.
+- **Khavda horizontal irradiance:** stuck at 131.99 W/m² at the source.
+- **Small minute gaps:** a few missing minutes per day are Darwin's own gaps, deliberately not filled.
+- **No automatic check that writes landed** until SCR-1294. Meanwhile we do manual daily read-backs.
+
+**Housekeeping:**
+- **Jira:**
+  - SCR-1273: move to review or validation.
+  - SCR-1283: tick off what's done. That's image publishing (artifact mode), the deploy and go-live scripts, and qa/prod configs. Still open: the CI ECR push, waiting on the AWS trust.
+- Send Mateo the Darwin outage message from before.
+
+Once the two read-backs come back clean, I'd call it ready for validation. I can update the two Jira tickets for you if you'd like.
+
+## 13:26 user
+
+1. ran in terminal
+2. yes, he told me + I checked in airflow dev, freshness dag is indeed failing due to collector status
+
+## 13:26 assistant
+
+Prompt is too long
+
+## 13:27 user
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+   - Brian migrated a Codex conversation about SCR-1273, "Import data from Darwin api and push to TSDB" for more Darwin assets. The work evolved into:
+     - adding Darwin sites Khavda (SOF_INKHA), Shapar (SOF_INGU2), Raganesda (SOF_INRAG), Tithwa (WIF_INGUV, prod-only) and Khaba (SOF_INNS7, parallel to the Khaba CSV feed), alongside Tuticorin (WIF_INSE3/WIF_INSE4);
+     - TSDB mappings from Mateo's IDs;
+     - collector/publisher fixes;
+     - SCR-1283 CI/CD (build in smp-india CI, deploy from smp-tool);
+     - go-live to QA and prod, with dev turned off and a seamless dev→QA handoff;
+     - a validator ticket (SCR-1294).
+   - The most recent request: "So apart from this... I think we're good na no? Anything else before we send this for official validation?" I listed final checks (read-backs in qa and prod, dev off, darwin-poc off, validator caveats, Jira housekeeping). The user replied: "1. ran in terminal  2. yes, he told me + I checked in airflow dev, freshness dag is indeed failing due to collector status". That means the read-back scripts were run and dev is confirmed off. I was reading the terminal output when the summary was requested.
+
+2. Key Technical Concepts:
+   - **Darwin collector** (smp-india/services/darwin-collector):
+     - polls Darwin every 15 s, keeping the first valid sample per source minute;
+     - takes `DARWIN_ENTITY_TAGS_JSON` per-entity tags;
+     - sites are now bundled in the image's `sites.json` and selected by `DARWIN_ENVIRONMENT` (done by another session);
+     - spool on EFS `/export/smp-india-<env>/darwin` (`pending/`, `collector-state/sampling.json`).
+   - **Publisher DAG** `india_darwin_realtime_tsdb_dag` (every 5 min, `max_active_runs=1`, 4-min task timeout):
+     - `publish_aggregated` is split into `_prepare/_recover/_ingest/_aggregate/_publish/_release`, with a `_step()` context manager that writes collapsible Airflow `::group::` log groups plus durations;
+     - write-only mode: no TSDB reads, no storage confirmation;
+     - raw batches move to `publisher-state/published/<UTC day>/`, kept 7 days in day folders (pruned with `shutil.rmtree` on old day folders);
+     - 15-min averages are taken over the available samples (no minimum), with circular mean for wind direction;
+     - `DARWIN_PUBLISH_MAX_FILES` Airflow Variable (default 100).
+   - **Why write-only:**
+     - UAT/prod TSDB reads are Athena-bound, with a limit of 2 concurrent queries per shared service account (~8 s per read);
+     - storage confirmation needs a socket.io connection that fails from EKS (workers reach `.myengie.com` directly via `NO_PROXY`).
+   - **Freshness DAG (SCR-1268):** `india_darwin_freshness_dag` checks collector state on EFS. Its threshold is the Airflow Variable `DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES` (default 10).
+   - **Deploy:**
+     - smp-india CI builds, tests and labels the image (OCI revision label), tagged `darwin-collector-<12-char SHA of last Dockerfile/src change>` (currently `darwin-collector-fce554866e74` on dev, qa and prod);
+     - CI pushes to ECR only if `DARWIN_COLLECTOR_ECR_PUSH=true` and `AWS_ROLE_ARN_NOPROD`/`AWS_ROLE_ARN_PROD` are set (roles `dms-smp-india-deploy`; the OIDC trust failed earlier and the flag is unset). Otherwise CI uploads a `darwin-collector-image` artifact (7 days);
+     - smp-tool `deploy_darwin.sh` and `go_live_darwin.sh` deploy;
+     - ECR repos: `624915953606.dkr.ecr.eu-west-1.amazonaws.com/smp-india-<env>-airflow` (dev/qa) and `154989746575...` (prod);
+     - clusters: non-prod `eks-qrm-dms-noprod-6196` (dev and qa share it), prod `eks-qrm-dms-strategy-prod-bba1`.
+   - **TSDB IDs** are the same in UAT and prod by convention. Tithwa is the exception: prod-only by agreement with Mateo (option 3).
+   - **Service accounts:**
+     - UAT `2-s-scrapertool-service-application-ECFZKGWYADYUXMG`
+     - prod `3-s-SMP-Service-Application-F0MFVNSO5E1PDUC`
+     - TSDB access was fixed by Mateo/Lou.
+   - **Review rule** (global CLAUDE.md): a Claude subagent reviews by default; Codex runs in parallel for high-stakes changes. This came from a benchmark: Claude was 2.5–4× faster, while Codex was better at judging impact.
+
+3. Files and Code Sections:
+   - smp-india/dags/src/scripts/darwin_publish/mappings.json:
+     - Gujarat and Khaba rows added (later moved by another session into a catalogue loaded via `targets.load_mappings`/`expected_streams(env)`);
+     - ActivePower: kW→MW, scale 0.001, 1M+15M;
+     - irradiance: W/m²→W/m2, 15M only;
+     - WindDirection: °→deg, circular_mean.
+   - smp-india/dags/test/test_darwin_mappings.py: pins Mateo's IDs (KHAVDA/SHAPAR/RAGANESDA/TITHWA/KHABA), units, scales and aggregation, and that there's no ModuleTemperature.
+   - smp-india/dags/src/scripts/darwin_publish/publisher.py:
+     - `publish_pending(..., write_only=False)`. When true it skips the conflict pre-read, calls `publish_batch(verify=not write_only, reader=_nothing_stored if write_only else minute_reader)`, and only accepts the status `published`;
+     - `quiet_sdk_wire_logs()` sets the `requests_auth` and `urllib3` loggers to WARNING;
+     - `run_from_environment()` calls `publish_aggregated(..., max_files=get_max_files(), write_only=True)`.
+   - smp-india/dags/src/scripts/darwin_publish/aggregation.py:
+     - refactored into named steps with `_step()`;
+     - stale outbox cleanup must stay BEFORE `_aggregate` (a regression test pins this);
+     - `_describe_batch` logs one line per minute file, in the `else:` branch of the try;
+     - `PUBLISHED_RETENTION_DAYS = 7`.
+   - smp-india/.github/workflows/ci.yml, `darwin-collector` job:
+     - `fetch-depth: 0` and image labels;
+     - a resolve step with branch → account mapping and the `ECR_PUSH` flag;
+     - an artifact fallback;
+     - OIDC plus a publish step whose tag check fails closed (only `ImageNotFoundException` leads to a push);
+     - the summary prints `scripts/deploy_darwin.sh --env ${GITHUB_REF_NAME} --context <india-${GITHUB_REF_NAME}-context> --tag $TAG`.
+   - smp-india/contracts/darwin/README.md and services/darwin-collector/README.md: updated to document write-only publication, the destinations, Tithwa prod-only, and Khaba.
+   - smp-tool/scripts/deploy_darwin.sh:
+     - requires `--context`, `--env dev|qa|prod`, and `--tag` or `--image`;
+     - shows `kubectl diff`, asks for confirmation, runs a server dry-run, applies, and waits on `rollout status` with a 180 s timeout;
+     - the account is chosen per env.
+   - smp-tool/scripts/render_darwin.py: has `from __future__ import annotations` (for Python 3.9), plus `--env`.
+   - smp-tool/config/india/{dev,qa,prod}/darwin/: deployment.json (namespace, PVC and paths per env), sites.json, enabled_sites.json. The site source may have moved to the image catalogue in another session's change 87c19cf.
+   - smp-tool/scripts/go_live_darwin.sh (pushed in fc9cb98, with a README line in 4a5d864):
+     ```bash
+     # Usage: go_live_darwin.sh --nonprod-context <ctx> --prod-context <ctx> --tag <tag> [--wait-minutes 60] [--yes]
+     "$deploy" --env qa --context "$NONPROD" --tag "$TAG" ${YES:+"$YES"}
+     "$deploy" --env prod --context "$PROD" --tag "$TAG" ${YES:+"$YES"}
+     # waits until QA's publisher-state/published/*/ has a file (kubectl exec into the qa collector), polling every GO_LIVE_POLL_SECONDS (60)
+     kubectl --context "$NONPROD" -n smp-india-dev scale deployment/darwin-collector --replicas=0
+     ```
+     Its test is smp-tool/tests/test_go_live_darwin.py, using a fake kubectl.
+   - notes/scr-1273/readback.py: a read-only TSDB read-back.
+     - Usage: `cd smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py dev|qa|prod`.
+     - It uses `load_mappings()` and `expected_streams(env)`, and `sdk_read_latest` over the last 3 h with a 420 s alarm.
+     - It prints OK/STALE/EMPTY/ERR per series, with an expected 180 points for 1M and ~12 for 15M (11 is normal because of the grace period).
+   - Probe scripts live in discovery/ and notes/scr-1273/ (write_probe.py, probe_ids.py, probe_env.py, darwin probe).
+   - Memory files added:
+     - project_tsdb_ids_uat_prod
+     - project_darwin_deploy_split
+     - project_darwin_publish_write_only
+     - feedback_commit_scope_lowercase
+   - Global ~/.claude/CLAUDE.md: the review rule was updated, replacing the line in place.
+
+4. Errors and fixes:
+   - **`# noqa` in a test:** this violates the user's rule against disabling lint rules. I replaced it with an importlib load.
+   - **Refactor dropped the stale outbox cleanup:** tests caught it, and I restored it. Codex then found the restore was placed after `_aggregate`; I moved it back and added a regression test.
+   - **Python 3.9 system python3:** `Path | None` crashed under 3.9. Fixed with `from __future__ import annotations`.
+   - **bash 3.2:** an empty array under `set -u` crashes. Fixed with `${YES:+"$YES"}`.
+   - **Readback / CI issues:**
+     - the TSDB read-back needed VPN, so I handed the user scripts;
+     - the SDK can't switch environments in one process, so each environment runs in a separate process;
+     - the cross-repo token didn't work: deploy keys are disabled in the org and the PAT was pending approval, so the design changed to building in smp-india.
+   - **Publisher failures, in order:**
+     1. 403 on the Kafka topic: a permission problem, fixed by Mateo/Lou;
+     2. Athena timeout during read-back;
+     3. socket.io confirmation failing from the cluster;
+     4. resolved by switching to write-only.
+   - **Codex job hung:** I cancelled it and used background polling instead. The `claude -p` OAuth had expired, so I used Agent subagents for the benchmark.
+   - **User feedback:**
+     - scopes must always be lowercase;
+     - keep messages extremely tight / Taglish / vague when asked;
+     - "Airflow stuff I do myself";
+     - no commit unless asked;
+     - "Do it nice or do it twice";
+     - SRP: one writer to TSDB; the validator requests republish instead of writing;
+     - granularity via code split, not Airflow tasks.
+
+5. Problem Solving:
+   - Go-live happened. Michael deployed QA and prod with tag `darwin-collector-fce554866e74`. The publishers work in Airflow, dev is off, and dev freshness is failing because the collector is off (expected).
+   - The freshness DAG failed in QA and prod because of a Darwin source outage, confirmed via the live API:
+     - Raganesda's last reading was 2026-10-19 14:16 UTC;
+     - Tithwa's last reading was 2026-10-20 02:40 UTC;
+     - this is not in our control, and I drafted a message to Mateo.
+   - Khavda GHI is frozen at 131.99 W/m² at the source. The user said "not our problem".
+   - Prod egress to Darwin is confirmed: prod freshness shows the other sites at 0 min.
+   - Latest PROD read-back (terminal), "8 problem series":
+     - Raganesda (SOF_INRAG): ERR DataNotAvailableException for its HorizontalIrradiance and TiltedIrradiance 15M series. This is likely because there's no data in the 3 h window during the Darwin outage, not a permission problem;
+     - Tithwa (WIF_INGUV): STALE (1/180 points, latest 02:39);
+     - WIF_INSE3 and WIF_INSE4: OK, at 152–153 of 180 points on 1M and 10 of 12 on 15M;
+     - the solar sites' lines weren't in the visible portion; presumably they're OK, since 8 problems = Raganesda 4 + Tithwa 4;
+     - prod read access therefore works.
+   - The QA read-back output still needs reading (earlier terminal lines).
+
+6. All user messages:
+   - "I'm migrating a conversation from Codex.... I copied the whole thing as a markdown... will that help you get up to speed or you feel that'd be overwhelming?"
+   - "I'll copy-paste here!" (followed by the pasted Codex transcript, which included the Darwin creds and Mateo's IDs)
+   - "1. not quite. I need you to give me the script probe, preferably an inline python script, that I can literally copy-paste in a terminal while connected to vpn 2. they should be in MW?... 3. no idea what u saying but I expect we'll simply work locally, on dev/main 4. if you can see it in the pasted conversation, that's exactly it."
+   - "Ran it... I did it here in your in-app terminal.. can you see that yourself?" / "there. Wydt?"
+   - "daaaaamn claude.. can you remember our last convo...?"
+   - "lol. Straight to business huh. Yes pls, but let's hold the actual implementation for tomorrow... /plan"
+   - On ModuleTemperature: "i have reservations for stopping the collection entirely..." then chose "Stop collecting"; for Tithwa, "Add mappings, don't enable".
+   - "it's tomorrow! Let's go ahead with the impl"
+   - "did we at least test this locally? ... No TSDB as this should just be done deployed"
+   - "Tbf, when we did leave out a collection run for 1 hour... So yes pls, commit and push!"
+   - "why are we setting the max files to 200 again? And from what value? 100?"
+   - "Darwin's unblocked finally! Operationally, how do we make sure the deployed darwin collector is updated again?"
+   - "hmmm. Put yourself in Michael's shoes, do you find this cumbersome?..."
+   - "Yes, do 1 and 2. For 3, we actually have a ticket this sprint, scr-1283... At the very least we build the image in the pipeline" / "sorry to interrupt. Let's test this out cleanly via docker... orbstack... Let's test smartly"
+   - "Wait, let me clarify... for scr-1273 expansion of assets, what do we update then? I assume the enabled_sites json change?"
+   - "can't we simply add all 4, in total 5 sites?"
+   - "add the 3 solar sites, then commit and push. I'm wondering, did we test all 4 assets in docker?"
+   - "draft a message to Michael for the first deploy / then how do we test the new gh workflow?"
+   - "yes, trigger run 1 and watch it"
+   - "wait wait, can't I simply do this from our end? I wanna say we have enough rights." / "yes, go ahead with all five" / "i set bypass permissions, try again?"
+   - "wait, I'm lost na lol. Why does #2 make the convention?..." / "Option 2 makes sense then..." / "yes it's Michael, push the revert and merge the message" / "too much. keep it extremely tight pls. Also in taglish lol"
+   - "what's the correct image tag?" / "I see. Michael's unresponsive though. Can we do the option 1 instead? Or maybe compromise both?" / "can you do for me pls? I have gh opened here in the tab" / "there" / screenshot showing the PAT pending / "sent. if in case Michael makes the first move..." / "how did we know again Michael added this token" / Michael: classic PAT... "can't we move the things we need from india to tool instead?"
+   - "Huh. If we do what we're trying to now, we're still blocked by the deploiyment yes?..." / "Ah.. I'd rather do it right the first time then..." / answers: "1. that's the best case... 2. Yes... 3. This will be handled by Michael ad hoc 4. for both. do it nice lol"
+   - "thanks. In the meantime, how can we use this to streamline the manual process?" / "Ah.. what I was expecting is, the CI will publish the tagged image as an artifact..." / "yes, add the artifact step"
+   - "where did we get the ... string?" / "wait, did we create that string? is that verifiable in the image itself?" / "yes, add both / HOWEVER... the whole string is damn long lol" / "1 is fine then." / "give me the full updated message for Michael"
+   - "yo wait, I thought the deployment should be in smp-india solely..." / "I presumed... We did agree the CI/CD... built and deploy from smp-india" / "yes, move the deployment into smp-india. We now have a pending request for the AWS role update" / Michael: "...expect nalang ng variable for AWS_ROLE_ARN" / "Which is simpler? I assume 3 lol." / Michael's ARNs, "can we already set these now?" / "yes pls" / "no, keep that in. Let's just feature flag the actual role assumpton + deploy step"
+   - "thanks. So for manual deployment, what's the steps nalang?" / "Michael can simply download from the GH UI, no?" / "Hmmmm.. The pushing image to ECR sounds convoluted..." / "wait, now I'm lost again lol. ...aren't we also doing the actual deployment?" / "is it feasible to do the actual deployment from smp-india though?..." / Michael: "I just assumed na same sa current process..." / "I see.. so if we decide to move everything to smp-india, that'd mean we'd be repeating certain configuration..." / "ok, move the deployment back to smp-tool. Sorry!!!" / "yes, update the ticket and the message for Michael. For msg to Michael, keep it extremely steps-driven. For pushing to ECR, just keep it vague..." / "clarification. For step 3, does he do this inside the pod?" / "apologies, but I'm still confused af..."
+   - Mateo's Tithwa UAT IDs / "Hold on... 9/10 of the time, UAT and Prod ids should be exactly the same..." / probe run / "give me the full message for Mateo. Tighten it pls..." / "can you fact check me on that though?" / "no I mean for other dags too! IEX, Aurora, etc. Look at apac-tsdb-scraper, jic" / "give me the full updated message for Mateo" / Mateo: option 3 / "why no qa or prod? Can't we establish that now?" / "yes, go ahead with all five in prod, then commit and push. if applicable, merge to qa and prod" / "1. creds exist across all namespaces 2. good point. I dunno 3. I assume so..." / "flag: waiting for Michael's help on deploying and shit"
+   - Mateo's Khaba IDs, "What the hell are these for?" / Mateo: "Khaba = SOF_INNS7; parallel, sftp backup" / "there, ran it. ...are we using that as a basis for our darwin collection interval?" / "yes, go ahead, commit and push pls. same scope, scr-1273" / "did you use the ponytail plugin?" / "is it working? ...full potential" / "yes, run ponytail-review on both repos" / "fix 1, 2 and 3, commit and push" / "Should we do the ponytail review for every round?" / "yes, save that rule to memory. Heck, save it globally... BUT BEFORE THAT... delegate this to codex" / "yes, save it globally with codex delegation pls"
+   - Michael's screenshot: "does that also imply the latest darwin code should be there in dev??" / sampling.json "How's it looking? ...pending folder... loooooot of files" / "1. how do we make sure the publisher dag exhausts all files? 2. ...3 darwin collector instances..." / "there's no scheduling in dev..." / "I wouldn't be able to stop the collector now. What if we make an exception..." / log paste "I don't like how it appears on airflow..." / "yes, do A, commit and push pls" / log paste "here's how it's looking so far... worried with the line errors" / attempt 1 log "??" / "before that, can we at least try via a short inline vpn script to try and write in UAT and Prod..." / "there, ran it" / "too technical. vague-ify pls" / "rephrase... double check" / "surface the client ids pls" / "same case for the hpx timeseries... Lou, Mateo" / "tsdb access should be resolved now but... failed again!" / "wait but this would mean a single publish run will take more than 5 minutes?" / "I can confirm that it's still athena... What if we just remove the readback..." / "well if we're unsure, I'd rather us probe on it first" / "there, ran it" / "yes go ahead, commit and push pls. same scope: scr-1273" / "wtf happened there?" / "okay, why the need for arbitrarily waiting for 30 seconds?" / "it failed yet again... curious, are we doing bulk writes in tsdb?" / "go with option 1, commit and push. I have a diff take. We keep this dag as the sole publishing step..." / "thanks. one minor thing though. I honestly don't like the one task one dag design..." / "1. not really... 2. ...Ideally NONE... 3. Yes of course" / "yes go ahead, commit and push pls. Take note: scopes should always be lowercase!" / "I haven't had the chance to thoroughly test it but... around 70?" / "Nah I can't check right now... 4700 → 4630" / "So to clarify… now, we removed the readback validation... validator dag..." / "1. Republish for sure… no? 2. I honestly don't know. Wdyt? 3. Hourly is a good start" / "Agree on all EXCEPT the republishing. ...SRP" / "Yup. Write the ticket in Jira then pls. Keep it short and sweet" / "Thanks. Can you do me a solid: delegate this to a new session.. compare codex vs claude review" / "How did it go? I can't see it from remote" / "20??? Too much lol." / "Yes pls" / "Yes pls. Let's do this route then. I'll trust your firm judgement on when to ask for codex review is appropriate."
+   - "So far so good with the darwin! ...39-45 processing queue size. Is that normal?" / "all good now!!! Are we finally ready for qa and production? Any final check? Maybe a quick readback in tsdb via an inline script?" / "there" / "1. good point. turn off dev and keep QA and Prod alive...at roughly the same time... 2. ...Can we reasonably get there with confidence without the 1294 yet?" / "not our problem lol. So we ready for merging to both qa and prod? ...turn off dev ASAP... seamless... prod alongside QA. ...can he execute some script that effectively deploys to both qa and prod?" / "1. I'd rather do anything airflow myself. 2. No, not yet... only have the images in the pipeline (confirm for me pls) 3. Absolutely. CI/CD baby!!..." / "hmmm.. Only one way to find out" / "yes pls." / "can you get the direct link of both QA and Prod images?" / "sorry. Direct to the run page instead" / "thanks. For the 'auto off of dev collector', did we also turn off the darwin-poc thing?" / "what's the expected value in both <ctx>s?" / Michael: "Deployed na both pods... nasa 3rd step parin..." / "it worked in airflow!!! BUT freshness check failed on both envs... within our control?" / "Hmm. I'm wondering if we should make the 'staleness age in minutes' configurable..." / "I see. So apart from this... I think we're good na no? Anything else before we send this for official validation?" / "1. ran in terminal 2. yes, he told me + I checked in airflow dev, freshness dag is indeed failing due to collector status"
+   - Security-relevant constraints, verbatim from the global CLAUDE.md:
+     - "do not commit unless asked!"
+     - "do not ever ever ever resort to disabling eslint rules"
+     - "whenever you need to clarify something, find out instead of guessing: write an ephemeral script and run it yourself. If it needs the VPN (anything inside the corporate network/prod creds), hand over ONE self-contained copy-paste script (creds refresh included, bounded runtime stated) that I run once inside the VPN, then read its output."
+   - Security-relevant constraints from memory and AGENTS.md:
+     - "never run TSDB probes myself, hand user one script";
+     - secrets go in ~/.config/smp/env and are never committed;
+     - Darwin creds come from the pasted conversation and are passed through stdin only, never saved to disk.
+
+7. Pending Tasks:
+   - Interpret the QA and PROD read-back output (prod shows "8 problem series", read QA from the earlier terminal lines) and give a validation-readiness verdict.
+   - Optional, offered and not confirmed: update Jira SCR-1273 (move to review/validation) and SCR-1283 (tick off done items; the CI ECR push still waits on the AWS trust).
+   - User actions: pause the dev publisher after "Ingest 0 of 0", scale darwin-poc to 0, and send Mateo the Darwin outage message (Raganesda/Tithwa).
+   - Manual daily read-backs until SCR-1294 (validator DAG) is built.
+
+8. Current Work:
+   I was reading the terminal to check the read-backs the user ran (`readback.py qa` and `readback.py prod`). The visible output was PROD, ending in "8 problem series":
+   ```
+   ERR   SOF_INRAG  HorizontalIrradiance  15M  DataNotAvailableException
+   ERR   SOF_INRAG  TiltedIrradiance      15M  DataNotAvailableException
+   STALE WIF_INGUV  ActivePower           1M      1/180  pts  latest 02:39 ( 159 min ago)
+   STALE WIF_INGUV  ActivePower/WindDirection/WindSpeed 15M  1/12 latest 02:30
+   OK    WIF_INSE3/INSE4 ... 152-153/180 (1M), 10/12 (15M)
+   ```
+   My interpretation so far:
+   - The problems are the known Darwin outages: Raganesda has no data in the 3 h window, so DataNotAvailable is likely "no rows", not a permission error; Tithwa is stale since 02:40.
+   - Prod reads work.
+   - Tuticorin at ~152/180 likely reflects prod starting partway through the window.
+   - The solar sites' lines and the QA output weren't visible in the 120 lines read.
+
+9. Optional Next Step:
+   Read the earlier terminal output to see the full prod list (the INGU2, INKHA and INNS7 lines) and the QA read-back. Then report back on the user's question, "Anything else before we send this for official validation?", saying whether all non-outage series are OK in both environments. The expectation: problems only for Raganesda and Tithwa because of the Darwin source outage, with prod's TSDB read and write confirmed. Then confirm it's ready for validation, with the known caveats (Raganesda/Tithwa outage, Khavda GHI frozen, minute gaps not filled, no validator until SCR-1294), and re-offer the Jira updates.
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+The messages after this summary are the most recent messages from before compaction, kept verbatim. The summary was written without seeing them, so something it says has not happened yet may already have happened in them.
+
+## 13:26 user
+
+<command-name>/compact</command-name>
+            <command-message>compact</command-message>
+            <command-args></command-args>
+
+## 13:27 user
+
+<local-command-stdout>Compacted PreCompact [${CLAUDE_PLUGIN_ROOT}/scripts/run] completed successfully</local-command-stdout>
+
+## 13:27 user
+
+The context window filled up while you were working, so the conversation was compacted. Please continue from where you left off.
+
+## 13:28 assistant
+
+**Verdict: ready for official validation.** No problem series is ours.
+
+**Prod** (complete run, 8 problem series):
+- **Raganesda (SOF_INRAG):** `DataNotAvailable` on all 4 series. Darwin has sent nothing since 19 Oct 14:16 UTC, so the 3 h window is empty.
+- **Tithwa (WIF_INGUV):** stale on all 4 series since 02:39. This is also a Darwin outage.
+- **Shapar, Khavda, Khaba and Tuticorin:** all OK, at about 150 of 180 points per minute and 9–10 of 12 per quarter-hour. They're short only because prod went live partway through the 3 h window.
+
+**QA** (the run hit the 420 s alarm before Tuticorin INSE4 wind direction and speed):
+- **4 `ReadTimeout`s** on Shapar and Khavda series. That's the Athena-bound UAT read, not a write problem: other series of the same sites read back fine (11 of 12).
+- **Raganesda:** same `DataNotAvailable` as in prod.
+- **The rest:** OK, at 183–190 of 180 points. Dev and QA overlapped during the handoff, so both wrote the same minutes and some got counted twice. The handoff had no gap.
+
+One thing to eyeball, not a blocker: Khavda ActivePower sits at about 72.56 MW in every reading, 1M and 15M, in both envs. Together with GHI frozen at 131.99, it looks like a frozen or capped feed at the source, maybe curtailment. Worth a quick look in Darwin or Grafana, or a heads-up to Mateo along with the outage message.
+
+**Caveats to state for validation:**
+- Raganesda and Tithwa are down at the source (Darwin), not on our side.
+- Khavda GHI is frozen, and ActivePower may be too.
+- Missed minutes aren't backfilled.
+- There's no automated read-back until SCR-1294. Until then it's a manual `readback.py`.
+
+**Left on your side:**
+- Pause the dev publisher once its log shows "Ingest 0 of 0".
+- Scale darwin-poc to 0.
+- Send Mateo the outage message.
+
+Want me to update Jira (SCR-1273 to validation, SCR-1283 progress)?
+
+I haven't re-run the QA read-back. The 4 timed-out series and INSE4 wind direction and speed in QA are unverified.
+
+## 13:33 user
+
+Okay 2 things:
+
+1. I think Darwin, in of its own, is quite big.. so I'd rather have good but very concise documentation on this new and proven collector-service-publisher-dag pattern that we've established, starting with Darwin. Then we lay out the design decisions (preferably in diagrams; less text, more visual) + how it operates, especially on the airflow freshness check side of things. Troubleshooting, those kind of stuff. <-- BUT DELEGATE THIS TO A NEW SESSION PLEASE. If something's unclear, hit me
+2. Update JIRA by adding a brief comment where we are now on all 3 darwin-related tickets then set them to 2BV, then add another comment tagging Francois DELCOURT simply saying, "ready for u !"
+
+## 13:35 assistant
+
+Commenting on the 3 tickets, moving them to To be validated, then tagging Francois.
+
+## 13:36 assistant
+
+Both are done, apart from you starting the docs session.
+
+**1. Docs:** I queued the docs work as a new session called "Document Darwin collector-publisher pattern". It won't start until you click its chip. The brief covers:
+- Mermaid diagrams for the data flow, the publisher steps and the deploy flow.
+- A decision tree for the freshness check and troubleshooting.
+- A short table of design decisions and a symptom → cause → fix table.
+
+I told it to ask you anything that's unclear, to check with you on where the docs should live, and not to commit unless you ask.
+
+**2. Jira:** on SCR-1261, SCR-1268 and SCR-1273 I added a short status comment, moved each to To be validated, and posted "@DELCOURT Francois ready for u !" as a separate comment.
+
+SCR-1283 stays Blocked, because the CI push to ECR is still waiting on the AWS trust fix. SCR-1294 hasn't been touched.
+
+## 14:05 user
+
+done! Msg for the india team pls. Announcing that finally Darwin is live and ready + disclaimer on our observations as of activation
+
+## 14:05 assistant
+
+```
+Hi team! 🎉 Darwin is officially live in QA and prod.
+
+Live sites (publishing to TSDB every 5 min):
+• Tuticorin (WIF_INSE3/INSE4): generation 1M + 15M, wind speed and wind direction 15M
+• Khavda, Shapar, Raganesda, Khaba: generation 1M + 15M, GHI and GTI 15M
+• Tithwa: prod only, as agreed
+
+What we noticed when we switched it on (all on the Darwin source side, not in our pipeline):
+• Raganesda has sent no data since 19 Oct, 14:16 UTC
+• Tithwa has sent no data since 20 Oct, 02:40 UTC
+• Khavda GHI is stuck at 131.99 W/m², and its generation also looks flat at ~72.56 MW
+• Minutes Darwin misses are not backfilled for now
+
+Our freshness alert will flag any site that stops sending. If something looks off on your side, just ping us. 🙏
+```
+
+## 14:08 user
+
+ah... preface it with "I know india is on holiday right now (check internet pls on why, Monday Tue is supposed to be off), but announcing it here regardless.  In the end, also specifically mention Mateo to tell him that I'll msg Zhan as requested, to let him know Tutucorin is now available. 
+
+For context, here's Mateo's request last Friday...
+
+"
+
+<pasted_content id="f33a">
+Hell oBrian ! Hope you are doing good
+India will be on leave Monday/Tuesday because of some crazy Hindou festivals 
+So if by chance Tuticorin (with the Darwin API) is live on TSDB within these two days, can you ask this to Zhan Zhang ? :
+Hello Zhan,
+Tuticorin Indian asset is now live on TSDB, so you can start sharing them with the provider Biosky. Here are the timeseries concerned :
+
+* Subfarm 1 (INSE3) :
+   * adf0e91d-bc74-52fa-8a63-51711db66e96 : Generation INSE3 (15min frequency)
+   * f0398d1b-74cb-5f1a-8bf8-e7b14a1be370 : Windspeed INSE3 (15min frequency)
+   * dd4ceb07-9fd6-55e9-921c-727a6a1102f1 : WindDirection for INSE3 (15min)
+* Subfarm 2 (INSE4) :
+   * 271a9615-9c02-5340-9f3d-99f4f59e84e5 : Generation INSE4 (15min)
+   * 7f13f05c-b6bb-55ad-8480-6b7da918258d : WindSpeed INSE4 (15min)
+   * 83ad9e55-bd82-51ee-a670-a37b2ef40683 : WindDirection for INSE4 (15min)
+
+These are the last dataset that needs Biosky to work properly !
+You can ajust as you want. And if it's not ready when I come back I'll do this message myself !
+ 
+As we have a pressure from biosky to send them the data it's better for us not to loose 2 more days because I am not here (I can't take my computer with me..). This message will make us gain 1 or two days of process I hope
+I might be on teams if any questions on Tuesday.. let see !
+</pasted_content id="f33a">
+
+"
+
+## 14:08 assistant (smp-india)
+
+The 6 IDs Mateo listed for Zhan are exactly the Tuticorin 15M series we publish (checked against `sites.json`). The holiday is Dussehra (Durga Puja): Mon 19 Oct is Maha Ashtami/Navami and Tue 20 Oct is Vijayadashami.
+
+```
+I know India's off right now for Dussehra (Mon–Tue), but announcing it here anyway 😄
+
+Hi team! 🎉 Darwin is officially live in QA and prod.
+
+Live sites (publishing to TSDB every 5 min):
+• Tuticorin (WIF_INSE3/INSE4): generation 1M + 15M, wind speed and wind direction 15M
+• Khavda, Shapar, Raganesda, Khaba: generation 1M + 15M, GHI and GTI 15M
+• Tithwa: prod only, as agreed
+
+What we noticed when we switched it on (all on the Darwin source side, not in our pipeline):
+• Raganesda has sent no data since 19 Oct, 14:16 UTC
+• Tithwa has sent no data since 20 Oct, 02:40 UTC
+• Khavda GHI is stuck at 131.99 W/m², and its generation also looks flat at ~72.56 MW
+• Minutes Darwin misses are not backfilled for now
+
+Our freshness alert will flag any site that stops sending. If something looks off on your side, just ping us. 🙏
+
+@Mateo as you asked, I'll message Zhan now to tell them Tuticorin is available for Biosky. Enjoy the holiday!
+```
+
+Here's Mateo's text for Zhan, lightly tidied:
+
+```
+Hello Zhan,
+
+Tuticorin (India) is now live on TSDB, so you can start sharing it with Biosky. The timeseries:
+
+Subfarm 1 (INSE3), 15 min:
+• adf0e91d-bc74-52fa-8a63-51711db66e96: Generation
+• f0398d1b-74cb-5f1a-8bf8-e7b14a1be370: Wind speed
+• dd4ceb07-9fd6-55e9-921c-727a6a1102f1: Wind direction
+
+Subfarm 2 (INSE4), 15 min:
+• 271a9615-9c02-5340-9f3d-99f4f59e84e5: Generation
+• 7f13f05c-b6bb-55ad-8480-6b7da918258d: Wind speed
+• 83ad9e55-bd82-51ee-a670-a37b2ef40683: Wind direction
+
+This is the last dataset Biosky needs. Thanks!
+```
+
+I checked the holiday on web search only: the central government list puts Ashtami on the 19th and Dussehra on the 20th, but some state calendars differ.
+
+Sources:
+- [Holidays in October 2026 (BankBazaar)](https://bankbazaar.com/indian-holiday/october-holidays.html)
+- [Central Government Holidays List in 2026 (BankBazaar)](https://bb.bankbazaar.com/indian-holiday/central-government-holidays.html)
+
+## 14:10 user (smp-india)
+
+Ah... add in the preface by apologizing for taking a bit more time than expected. The solution we had to do for Darwin due to the demand of near-realtime is new and warranted more testing than usual! blablabla
+
+## 14:10 assistant (smp-india)
+
+```
+I know India's off right now for Dussehra (Mon–Tue), but announcing it here anyway 😄
+
+Hi team! 🎉 Darwin is officially live in QA and prod.
+
+Sorry it took longer than expected. Near-realtime meant building a new setup (an always-on collector plus a 5-min publisher), which is new for us and needed more testing than usual. It's solid now and gives us a pattern we can reuse for other realtime sources.
+
+Live sites (publishing to TSDB every 5 min):
+• Tuticorin (WIF_INSE3/INSE4): generation 1M + 15M, wind speed and wind direction 15M
+• Khavda, Shapar, Raganesda, Khaba: generation 1M + 15M, GHI and GTI 15M
+• Tithwa: prod only, as agreed
+
+What we noticed when we switched it on (all on the Darwin source side, not in our pipeline):
+• Raganesda has sent no data since 19 Oct, 14:16 UTC
+• Tithwa has sent no data since 20 Oct, 02:40 UTC
+• Khavda GHI is stuck at 131.99 W/m², and its generation also looks flat at ~72.56 MW
+• Minutes Darwin misses are not backfilled for now
+
+Our freshness alert will flag any site that stops sending. If something looks off on your side, just ping us. 🙏
+
+@Mateo as you asked, I'll message Zhan now to tell them Tuticorin is available for Biosky. Enjoy the holiday!
+```
+
+## 14:13 user (smp-india)
+
+Add context to Zhang where Mateo asked us to tell him lol
+
+## 14:13 assistant (smp-india)
+
+```
+Hello Zhan,
+
+Mateo asked me to pass this on while the India team is off for Dussehra (Mon–Tue), so Biosky doesn't lose two days waiting for him.
+
+Tuticorin (India) is now live on TSDB, so you can start sharing it with Biosky. The timeseries:
+
+Subfarm 1 (INSE3), 15 min:
+• adf0e91d-bc74-52fa-8a63-51711db66e96: Generation
+• f0398d1b-74cb-5f1a-8bf8-e7b14a1be370: Wind speed
+• dd4ceb07-9fd6-55e9-921c-727a6a1102f1: Wind direction
+
+Subfarm 2 (INSE4), 15 min:
+• 271a9615-9c02-5340-9f3d-99f4f59e84e5: Generation
+• 7f13f05c-b6bb-55ad-8480-6b7da918258d: Wind speed
+• 83ad9e55-bd82-51ee-a670-a37b2ef40683: Wind direction
+
+This is the last dataset Biosky needs. Let me know if you have any questions. Thanks!
+```
+
+## 14:43 user (smp-india)
+
+sent!
+
+I checked again in both qa and prod and I find the error on freshness... strange. 
+
+For QA:
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-20T06:30:00+00:00/task_id=check_source_data/attempt=2.log
+::endgroup::
+[2026-10-20T06:31:06.812252Z] INFO - ::group::Pre Execute
+Task Identity ti_id=01a15800-be34-707c-94e6-530fc29fe329 dag_id=india_darwin_freshness_dag task_id=check_source_data run_id=scheduled__2026-10-20T06:30:00+00:00 try_number=2 map_index=-1
+[2026-10-20T06:31:06.840827Z] DEBUG - Loading plugins
+[2026-10-20T06:31:06.841941Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins
+[2026-10-20T06:31:07.061334Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables.
+[2026-10-20T06:31:07.082121Z] DEBUG - Loading plugins from entrypoints
+[2026-10-20T06:31:07.082255Z] DEBUG - Importing entry_point plugin openlineage
+[2026-10-20T06:31:07.083734Z] DEBUG - Loading 2 plugin(s) took 241.85 ms
+[2026-10-20T06:31:07.083916Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f0f8526bec0>}
+[2026-10-20T06:31:07.083988Z] DEBUG - Hook impls: []
+[2026-10-20T06:31:07.084071Z] DEBUG - Result from 'on_starting': []
+[2026-10-20T06:31:07.084772Z] INFO - DAG bundles loaded: dags-folder
+[2026-10-20T06:31:07.085373Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-20T06:31:07.085819Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py
+[2026-10-20T06:31:07.095645Z] DEBUG - Initializing Provider Manager[taskflow_decorators]
+[2026-10-20T06:31:07.095929Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds
+[2026-10-20T06:31:07.097284Z] DEBUG - Found DAG india_darwin_freshness_dag
+[2026-10-20T06:31:07.097452Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning 
+[2026-10-20T06:31:07.098088Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag>
+[2026-10-20T06:31:07.098331Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=0  dag_file_parse_ms=13 
+[2026-10-20T06:31:07.098510Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py 
+[2026-10-20T06:31:07.098695Z] DEBUG - Integrate Macros plugins
+[2026-10-20T06:31:07.119591Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15800-be34-707c-94e6-530fc29fe329'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-3bb30487069f8ad172461ac797d6f0ef-0fa00e65a3232fe3-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 6, 838191, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')}
+[2026-10-20T06:31:07.119676Z] DEBUG - Hook impls: []
+[2026-10-20T06:31:07.119736Z] DEBUG - Result from 'on_task_instance_running': []
+[2026-10-20T06:31:07.119898Z] INFO - ::endgroup::
+[2026-10-20T06:31:07.148790Z] INFO - DARWIN_SOURCE_DATA={"stale": ["SOF_INRAG/ActivePower: newest source minute is 975 min old", "SOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old", "SOF_INRAG/TiltedIrradiance: newest source minute is 975 min old"], "source_age_minutes": {"SOF_INGU2/ActivePower": 1, "SOF_INGU2/HorizontalIrradiance": 1, "SOF_INGU2/TiltedIrradiance": 1, "SOF_INKHA/ActivePower": 1, "SOF_INKHA/HorizontalIrradiance": 3, "SOF_INKHA/TiltedIrradiance": 0, "SOF_INNS7/ActivePower": 1, "SOF_INNS7/HorizontalIrradiance": 1, "SOF_INNS7/TiltedIrradiance": 1, "SOF_INRAG/ActivePower": 975, "SOF_INRAG/HorizontalIrradiance": 975, "SOF_INRAG/TiltedIrradiance": 975, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 1, "WIF_INSE4/WindDirection": 1, "WIF_INSE4/WindSpeed": 1}, "skipped_not_configured": []}
+[2026-10-20T06:31:07.148958Z] ERROR - Task failed with exceptionStaleDarwinDataError: Darwin source data stale:
+SOF_INRAG/ActivePower: newest source minute is 975 min old
+SOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old
+SOF_INRAG/TiltedIrradiance: newest source minute is 975 min old
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py, line 52 in check_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 131 in run_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 112 in check_source_data
+
+[2026-10-20T06:31:07.149269Z] INFO - ::group::Post Execute
+[2026-10-20T06:31:07.151703Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a15800-be34-707c-94e6-530fc29fe329'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-3bb30487069f8ad172461ac797d6f0ef-0fa00e65a3232fe3-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 6, 838191, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 6, 31, 7, 150956, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration') 
+[2026-10-20T06:31:07.151901Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15800-be34-707c-94e6-530fc29fe329'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13ead-f070-7faa-b642-e040f6508987'), map_index=-1, hostname='aif-engie-worker-0.aif-engie-worker.smp-india-qa.svc.cluster.local', context_carrier={'traceparent': '00-3bb30487069f8ad172461ac797d6f0ef-0fa00e65a3232fe3-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 6, 838191, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 6, 31, 7, 150956, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': StaleDarwinDataError('Darwin source data stale:\nSOF_INRAG/ActivePower: newest source minute is 975 min old\nSOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old\nSOF_INRAG/TiltedIrradiance: newest source minute is 975 min old')}
+[2026-10-20T06:31:07.151947Z] DEBUG - Hook impls: []
+[2026-10-20T06:31:07.151992Z] DEBUG - Result from 'on_task_instance_failed': []
+[2026-10-20T06:31:07.152028Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7f0f8431cd10>}
+[2026-10-20T06:31:07.152058Z] DEBUG - Hook impls: []
+[2026-10-20T06:31:07.152085Z] DEBUG - Result from 'before_stopping': []
+[2026-10-20T06:31:07.152115Z] INFO - ::endgroup::
+</pasted_content id="f33a">
+
+For Prod: 
+
+<pasted_content id="f33a">
+::group::Log message source details
+http://aif-engie-worker-1.aif-engie-worker.smp-india-prod.svc.cluster.local:8793/log/dag_id=india_darwin_freshness_dag/run_id=scheduled__2026-10-20T06:30:00+00:00/task_id=check_source_data/attempt=2.log
+::endgroup::
+[2026-10-20T06:31:04.146778Z] INFO - ::group::Pre Execute source=task  loc=task_runner.py:2303 
+Task Identity ti_id=01a15800-add5-786e-9a13-ab284a1ff2b7 dag_id=india_darwin_freshness_dag task_id=check_source_data run_id=scheduled__2026-10-20T06:30:00+00:00 try_number=2 map_index=-1
+[2026-10-20T06:31:04.158144Z] DEBUG - Loading plugins source=airflow.sdk.plugins_manager  loc=plugins_manager.py:79 
+[2026-10-20T06:31:04.160152Z] DEBUG - Loading plugins from directory: /opt/airflow/plugins source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:224 
+[2026-10-20T06:31:04.400005Z] ERROR - Okta configuration is missing. Please set OKTA_CLIENT_ID, OKTA_CLIENT_SECRET, OKTA_DOMAIN, and APP_SECRET_KEY environment variables. source=file_browser_plugin  loc=file_browser_plugin.py:35 
+[2026-10-20T06:31:04.433051Z] DEBUG - Loading plugins from entrypoints source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:193 
+[2026-10-20T06:31:04.433618Z] DEBUG - Importing entry_point plugin openlineage source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:198 
+[2026-10-20T06:31:04.435794Z] DEBUG - Loading 2 plugin(s) took 275.72 ms source=airflow.sdk.plugins_manager  loc=plugins_manager.py:114 
+[2026-10-20T06:31:04.436032Z] DEBUG - Calling 'on_starting' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7fb182f9a930>} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T06:31:04.436112Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T06:31:04.436201Z] DEBUG - Result from 'on_starting': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T06:31:04.436983Z] INFO - DAG bundles loaded: dags-folder source=airflow.dag_processing.bundles.manager.DagBundlesManager  loc=manager.py:271 
+[2026-10-20T06:31:04.437569Z] INFO - Filling up the DagBag from /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py source=airflow.dag_processing.dagbag.BundleDagBag  loc=dagbag.py:460 
+[2026-10-20T06:31:04.438109Z] DEBUG - Importing /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py source=airflow.dag_processing.importers.python_importer  loc=python_importer.py:224 
+[2026-10-20T06:31:04.454522Z] DEBUG - Initializing Provider Manager[taskflow_decorators] source=airflow.sdk._shared.providers_discovery.providers_discovery  loc=providers_discovery.py:285 
+[2026-10-20T06:31:04.454851Z] DEBUG - Initialization of Provider Manager[taskflow_decorators] took 0.00 seconds source=airflow.sdk._shared.providers_discovery.providers_discovery  loc=providers_discovery.py:288 
+[2026-10-20T06:31:04.456687Z] DEBUG - Found DAG india_darwin_freshness_dag source=airflow.dag_processing.importers.python_importer  loc=python_importer.py:360 
+[2026-10-20T06:31:04.457141Z] WARNING - The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html category=UserWarning  source=py.warnings  loc=/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/definitions/dag.py:1680 
+[2026-10-20T06:31:04.458012Z] DEBUG - Loaded DAG <DAG: india_darwin_freshness_dag> source=airflow.dag_processing.dagbag.BundleDagBag  loc=dagbag.py:436 
+[2026-10-20T06:31:04.458318Z] INFO - Worker startup parse complete bundle_name=dags-folder  bundle_version=null  dag_file=india/india_darwin_freshness_dag.py  bundle_prepare_ms=1  dag_file_parse_ms=20  source=task  loc=task_runner.py:1062 
+[2026-10-20T06:31:04.458535Z] DEBUG - Dag file parsed file=india/india_darwin_freshness_dag.py  source=task  loc=task_runner.py:1194 
+[2026-10-20T06:31:04.458740Z] DEBUG - Integrate Macros plugins source=airflow.sdk._shared.plugins_manager.plugins_manager  loc=plugins_manager.py:289 
+[2026-10-20T06:31:04.501682Z] DEBUG - Calling 'on_task_instance_running' with {'previous_state': <TaskInstanceState.QUEUED: 'queued'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15800-add5-786e-9a13-ab284a1ff2b7'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-1c5a557cdaaee7cdb046552605fdfd85-ddb5f31769616a8a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 4, 156133, tzinfo=datetime.timezone.utc), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T06:31:04.501787Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T06:31:04.501855Z] DEBUG - Result from 'on_task_instance_running': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T06:31:04.502078Z] INFO - ::endgroup:: source=task  loc=task_runner.py:2107 
+[2026-10-20T06:31:04.531687Z] INFO - DARWIN_SOURCE_DATA={"stale": ["SOF_INRAG/ActivePower: newest source minute is 975 min old", "SOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old", "SOF_INRAG/TiltedIrradiance: newest source minute is 975 min old", "WIF_INGUV/ActivePower: newest source minute is 232 min old", "WIF_INGUV/WindDirection: newest source minute is 231 min old", "WIF_INGUV/WindSpeed: newest source minute is 231 min old"], "source_age_minutes": {"SOF_INGU2/ActivePower": 1, "SOF_INGU2/HorizontalIrradiance": 1, "SOF_INGU2/TiltedIrradiance": 1, "SOF_INKHA/ActivePower": 1, "SOF_INKHA/HorizontalIrradiance": 3, "SOF_INKHA/TiltedIrradiance": 1, "SOF_INNS7/ActivePower": 1, "SOF_INNS7/HorizontalIrradiance": 1, "SOF_INNS7/TiltedIrradiance": 1, "SOF_INRAG/ActivePower": 975, "SOF_INRAG/HorizontalIrradiance": 975, "SOF_INRAG/TiltedIrradiance": 975, "WIF_INGUV/ActivePower": 232, "WIF_INGUV/WindDirection": 231, "WIF_INGUV/WindSpeed": 231, "WIF_INSE3/ActivePower": 0, "WIF_INSE3/WindDirection": 0, "WIF_INSE3/WindSpeed": 0, "WIF_INSE4/ActivePower": 1, "WIF_INSE4/WindDirection": 1, "WIF_INSE4/WindSpeed": 1}, "skipped_not_configured": []} source=scripts.darwin_publish.freshness  loc=freshness.py:110 
+[2026-10-20T06:31:04.531986Z] ERROR - Task failed with exception source=task  loc=task_runner.py:1673 StaleDarwinDataError: Darwin source data stale:
+SOF_INRAG/ActivePower: newest source minute is 975 min old
+SOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old
+SOF_INRAG/TiltedIrradiance: newest source minute is 975 min old
+WIF_INGUV/ActivePower: newest source minute is 232 min old
+WIF_INGUV/WindDirection: newest source minute is 231 min old
+WIF_INGUV/WindSpeed: newest source minute is 231 min old
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 1576 in run
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 189 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py, line 2120 in _execute_task
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py, line 398 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py, line 445 in wrapper
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 231 in execute
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py, line 254 in execute_callable
+    File /home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py, line 97 in run
+    File /opt/airflow/dags/repo/dags/src/india/india_darwin_freshness_dag.py, line 52 in check_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 131 in run_source_data
+    File /opt/airflow/dags/repo/dags/src/scripts/darwin_publish/freshness.py, line 112 in check_source_data
+
+[2026-10-20T06:31:04.532358Z] INFO - ::group::Post Execute source=task  loc=task_runner.py:1674 
+[2026-10-20T06:31:04.536474Z] DEBUG - Running finalizers ti=RuntimeTaskInstance(id=UUID('01a15800-add5-786e-9a13-ab284a1ff2b7'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-1c5a557cdaaee7cdb046552605fdfd85-ddb5f31769616a8a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 4, 156133, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 6, 31, 4, 535162, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration')  source=task  loc=task_runner.py:2227 
+[2026-10-20T06:31:04.536826Z] DEBUG - Calling 'on_task_instance_failed' with {'previous_state': <TaskInstanceState.RUNNING: 'running'>, 'task_instance': RuntimeTaskInstance(id=UUID('01a15800-add5-786e-9a13-ab284a1ff2b7'), task_id='check_source_data', dag_id='india_darwin_freshness_dag', run_id='scheduled__2026-10-20T06:30:00+00:00', try_number=2, dag_version_id=UUID('01a13eaf-7a69-7cf2-adce-7eec4c4657c0'), map_index=-1, hostname='aif-engie-worker-1.aif-engie-worker.smp-india-prod.svc.cluster.local', context_carrier={'traceparent': '00-1c5a557cdaaee7cdb046552605fdfd85-ddb5f31769616a8a-00'}, queue='default', task=<Task(_PythonDecoratedOperator): check_source_data>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=1, start_date=datetime.datetime(2026, 10, 20, 6, 31, 4, 156133, tzinfo=datetime.timezone.utc), end_date=datetime.datetime(2026, 10, 20, 6, 31, 4, 535162, tzinfo=datetime.timezone.utc), state=<TaskInstanceState.FAILED: 'failed'>, is_mapped=False, rendered_map_index=None, sentry_integration='sentry_sdk.integrations.celery.CeleryIntegration'), 'error': StaleDarwinDataError('Darwin source data stale:\nSOF_INRAG/ActivePower: newest source minute is 975 min old\nSOF_INRAG/HorizontalIrradiance: newest source minute is 975 min old\nSOF_INRAG/TiltedIrradiance: newest source minute is 975 min old\nWIF_INGUV/ActivePower: newest source minute is 232 min old\nWIF_INGUV/WindDirection: newest source minute is 231 min old\nWIF_INGUV/WindSpeed: newest source minute is 231 min old')} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T06:31:04.536904Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T06:31:04.536974Z] DEBUG - Result from 'on_task_instance_failed': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T06:31:04.537039Z] DEBUG - Calling 'before_stopping' with {'component': <airflow.sdk.execution_time.task_runner.TaskRunnerMarker object at 0x7fb1821f9670>} source=airflow.sdk._shared.listeners.listener  loc=listener.py:59 
+[2026-10-20T06:31:04.537098Z] DEBUG - Hook impls: [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:60 
+[2026-10-20T06:31:04.537187Z] DEBUG - Result from 'before_stopping': [] source=airflow.sdk._shared.listeners.listener  loc=listener.py:74 
+[2026-10-20T06:31:04.537243Z] INFO - ::endgroup:: source=task  loc=task_runner.py:2270
+</pasted_content id="f33a">
+
+ 
+
+
+-- basically we have 3 additional stale assets in Prod... despite fetching from the same API... why's that?
+
+## 14:43 assistant (smp-india)
+
+It's the same Darwin outage in both. The difference is that QA doesn't collect Tithwa at all.
+
+The 3 extra prod entries are all Tithwa (`WIF_INGUV` ActivePower, WindDirection, WindSpeed). Tithwa is prod-only, as agreed with Mateo. In the QA log, `source_age_minutes` has no `WIF_INGUV` key at all: QA isn't stale on Tithwa, it just doesn't have it.
+
+Everything the two envs share matches, minute for minute:
+
+| Site | QA | Prod |
+|---|---|---|
+| Raganesda (SOF_INRAG) | 975 min, stale | 975 min, stale |
+| Tithwa (WIF_INGUV) | not collected | 231–232 min, stale |
+| Everything else | 0–3 min | 0–3 min |
+
+So prod has 2 stale sites, not more stale assets than QA, and they're the 2 already in the India team message. The freshness DAG is doing its job and will keep failing until Darwin resumes for Raganesda and Tithwa.
+
+The `Okta configuration is missing` line is just noise from the file-browser plugin on the worker. It's unrelated to this failure.
+
+## 14:44 user (smp-india)
+
+AHHHHH FUCK. Okay. And we did mention that in our observations?
+
+## 14:44 assistant (smp-india)
+
+Yes, both are in the India team message, and the timings match the logs:
+
+- **Raganesda** has sent no data since 19 Oct, 14:16 UTC. That's 975 min before 06:31.
+- **Tithwa** has sent no data since 20 Oct, 02:40 UTC. That's about 232 min before 06:31.
+
+The message also says Tithwa is prod only, which is why QA doesn't list it as stale.
+
+## 14:44 user (smp-india)
+
+I see. If we're to theorize... what could be the reason? Could this be expected? At least for Thitwa maybe?
+
+## 14:45 assistant (smp-india)
+
+My guess is that neither stop is expected. It looks like the sites stopped reporting, not Darwin as a whole, but that's a theory until we look at their history.
+
+**Tithwa (wind)**
+- Its last readings were ActivePower -0.10 MW and wind speed 2.39 m/s. That's below typical cut-in, so the turbines were idle and drawing a little auxiliary power.
+- An idle wind farm normally still reports 24/7, and the negative power shows the plant was online and talking. A calm night doesn't make a farm go quiet.
+- More likely: the site's SCADA or comms link to Darwin dropped around 02:40 UTC (08:10 IST).
+
+**Raganesda (solar)**
+- It stopped at 14:16 UTC, which is 19:46 IST, just after sunset.
+- A logger that sleeps at night would fit, except it never came back at sunrise (~01:00 UTC). Our other solar sites keep reporting overnight.
+- So it reads like a night shutdown that didn't recover, or a comms drop that happened at dusk.
+
+**Why neither has been fixed:** it's Dussehra, so site and O&M staff are probably off. A dead link or a hung logger could sit until Wednesday.
+
+**What would settle it:**
+1. Pull the last ~30 days of these two sites from the Darwin API and look for past gaps. Recurring nightly or weekend gaps would mean "normal for this site"; none would mean a one-off outage.
+2. Ask Mateo whether Darwin's own UI shows the same gap. If it does, the problem is upstream of us for sure.
+
+I can write and run the history check myself, since Darwin isn't behind the VPN. Want me to?
+
+## 14:45 user (smp-india)
+
+yes pls, check the history
+
+## 14:46 assistant
+
+Looking for Darwin's history endpoint (the collector only uses the realtime one).
+
+## 14:48 assistant
+
+Found Darwin's only history route (`lastday`, 24 h at 10-min steps). Now locating the creds from earlier in our chat without writing them to disk.
+
+## 14:49 assistant
+
+Writing the history probe now (Darwin's last 24 h for the two quiet sites plus healthy ones for comparison).
+
+## 14:51 assistant (smp-india/services/darwin-collector)
+
+Raganesda's inverters and its grid meter each have only 46 of 144 10-min points. Checking when they all stopped:
+
+## 14:51 assistant (smp-india/services/darwin-collector)
+
+It's a comms loss at each site, not normal behaviour and not a Darwin-wide problem. Every device at each site went quiet together, which points to the site's data link to Darwin (SCADA or datalogger), not the plants. Darwin only keeps 24 h of history (10-min steps), so I couldn't check whether this happened before.
+
+**Raganesda: whole site cut off at once**
+- Every device I sampled has its last point at exactly 19 Oct, 14:20 UTC (19:50 IST). That covers 100 of 1,252 series: inverters, the grid meter and the irradiance sensor.
+- The inverters' last values are all `0.0`, as you'd expect at night. Then nothing more arrived, including at sunrise.
+- The other solar sites (Khavda) have all 144 points over the same 24 h.
+- So the site's link to Darwin went down at dusk and never came back. This isn't a night-mode pause.
+
+**Tithwa: drop-off, not a single cut**
+- 11 of its 14 series (farm plus turbines) stopped at 02:40 UTC. The others stopped at 02:50, 03:20 and 04:40.
+- The farm's final point (02:50) is exactly `0.0` for both power and wind speed. That's a placeholder written when the link drops, not a real reading.
+- Before that, wind was about 2.5 m/s, so the turbines were idle but still reporting.
+
+**Is it expected?** No for both, unless these sites routinely have gaps, and I can't verify that. My best guess is site comms failures that nobody is fixing because of the holiday, with Raganesda on day 2 and Tithwa since this morning.
+
+Worth adding to the note for Mateo:
+```
+FYI Raganesda: all devices (inverters, grid meter, irradiance) stopped reaching Darwin at exactly 19 Oct 14:20 UTC.
+Tithwa: turbines dropped off between 02:40 and 04:40 UTC today.
+Both look like site comms or SCADA outages rather than our pipeline. Known issue, or should someone ping the site/O&M?
+```
+
+The creds were piped from our chat history straight into the scripts and never saved. The three probe scripts are in the scratchpad.

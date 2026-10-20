@@ -1,0 +1,132 @@
+# Claude Conversation - 2026-10-20
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `1aff4345-967d-433f-a70b-7d441ec6a2b6`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/1aff4345-967d-433f-a70b-7d441ec6a2b6.jsonl`
+Resume: `claude --resume 1aff4345-967d-433f-a70b-7d441ec6a2b6`
+
+## 13:35 user
+
+Write good but VERY concise documentation for the realtime "collector service → EFS spool → Airflow publisher DAG" pattern in smp-india, using Darwin as the first (proven, live in QA+prod since 2026-10-20) instance. User (Brian) wants: less text, more visuals (Mermaid diagrams, which GitHub renders), covering (1) the pattern itself, (2) design decisions with the why, (3) how it operates day to day, especially the Airflow freshness-check side, (4) troubleshooting. If anything is unclear, ASK Brian rather than guessing. Do not commit unless Brian asks; commit scopes are always lowercase (e.g. docs(scr-1273)). Read /Users/qn5792/repos/smp/AGENTS.md and smp-india/AGENTS.md first. smp-india is a shared working tree: push from a temp worktree (see memory feedback_push_from_clean_worktree).
+
+Where things live (verify, they are the source of truth):
+- Collector: smp-india/services/darwin-collector/ (README.md, src, sites.json catalogue bundled in image, selected by DARWIN_ENVIRONMENT; DARWIN_ENTITY_TAGS_JSON per-entity tags). Polls Darwin every 15s, keeps first valid sample per source minute, writes minute batches to EFS spool /export/smp-india-<env>/darwin (pending/, collector-state/sampling.json).
+- Publisher DAG: india_darwin_realtime_tsdb_dag, code in smp-india/dags/src/scripts/darwin_publish/ (aggregation.py steps _prepare/_recover/_ingest/_aggregate/_publish/_release logged as collapsible Airflow ::group:: sections; publisher.py; targets.py; mappings catalogue). Every 5 min, max_active_runs=1, 4-min timeout. WRITE-ONLY to TSDB: no read-back/storage confirmation because UAT/prod TSDB reads are Athena-bound (2 concurrent queries per service account, ~8s/read) and socket.io storage confirmation fails from EKS. Published raw batches move to publisher-state/published/<UTC day>/, kept 7 days. 15-min averages over available samples (no minimum), circular mean for wind direction. kW→MW scale. Airflow Variable DARWIN_PUBLISH_MAX_FILES (default 100). One writer to TSDB (SRP); a future validator DAG (SCR-1294) verifies hourly and requests republish rather than writing.
+- Freshness DAG (SCR-1268): india_darwin_freshness_dag reads collector state on EFS (not TSDB); threshold Airflow Variable DARWIN_FRESHNESS_SOURCE_MAX_AGE_MINUTES (default 10). It fails when the collector is stopped (e.g. dev, intentionally off) or when Darwin itself stops sending for a site (2026-10-20: Raganesda SOF_INRAG since 19 Oct 14:16 UTC, Tithwa WIF_INGUV since 20 Oct 02:40 UTC — source outage, not ours).
+- Contracts: smp-india/contracts/darwin/README.md. Sites: Tuticorin WIF_INSE3/INSE4, Khavda SOF_INKHA, Shapar SOF_INGU2, Raganesda SOF_INRAG, Khaba SOF_INNS7 (parallel to the Khaba CSV/SFTP feed), Tithwa WIF_INGUV (prod-only by agreement with Mateo). TSDB IDs identical in UAT and prod.
+- Build/deploy split (SCR-1283): smp-india CI (.github/workflows/ci.yml darwin-collector job) builds/tests/labels the image, tag darwin-collector-<12-char SHA of last Dockerfile/src change>; ECR push is feature-flagged (DARWIN_COLLECTOR_ECR_PUSH + AWS_ROLE_ARN_NOPROD/PROD, currently blocked on AWS OIDC trust) else uploads an image artifact. smp-tool deploys: scripts/deploy_darwin.sh (--env dev|qa|prod --context --tag; diff, confirm, dry-run, apply, rollout status), scripts/go_live_darwin.sh (QA+prod then retire dev after QA's first publish), config/india/<env>/darwin/. Clusters: non-prod eks-qrm-dms-noprod-6196 (dev+qa), prod eks-qrm-dms-strategy-prod-bba1.
+- Manual read-back until SCR-1294 exists: notes/scr-1273/readback.py (cd smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py dev|qa|prod; needs VPN). Expected ~180 pts/3h on 1M, ~11-12 on 15M; ReadTimeouts in UAT are Athena slowness, DataNotAvailable usually means no data in window.
+- Known source quirks: Khavda GHI frozen at 131.99 W/m2 at source; Khavda ActivePower looked flat ~72.56 MW (maybe capped/frozen). Missed minutes are not backfilled.
+- Background notes: /Users/qn5792/repos/smp/notes/scr-1273/, notes/scr-1268/ if present, and the memory files project_darwin_publish_write_only, project_darwin_deploy_split, project_scr1268_darwin_monitoring under /Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/memory/.
+
+Decide placement (e.g. one pattern doc in smp-india docs plus short links from the existing READMEs, avoiding duplicated content) and propose it to Brian briefly before writing if unsure. Keep it tight: diagrams for the architecture/data flow, the publisher step sequence, the deploy flow, and a freshness/troubleshooting decision tree; a short decisions table; a symptom → cause → fix troubleshooting table. Run smp-india's docs check (python .github/scripts/check_docs.py) if it exists.
+
+## 13:35 assistant (smp-india)
+
+Still reading the source: freshness checker, publisher steps, and the smp-tool deploy scripts. Placement proposal comes next.
+
+## 13:40 assistant (smp-india/docs)
+
+Doc drafted. Now tidying a diagram label, then the stale README lines and links.
+
+## 13:41 assistant
+
+All four diagrams render. Quick visual check of the first and last:
+
+## 13:43 user
+
+Commit as docs(scr-1273) (micro commits by scope) and push to dev from a temp worktree.
+
+## 13:43 assistant (smp-india)
+
+Up to date with origin/dev. Creating the worktree and committing:
+
+## 13:44 assistant (smp-india)
+
+I pushed the docs to smp-india `dev` (b59fdb5..7ef93a4) from a temp worktree, in three commits:
+
+- `docs(scr-1273): add realtime collector pattern doc for Darwin`: the new [docs/realtime-collector-pattern.md](smp-india/docs/realtime-collector-pattern.md).
+- `docs(scr-1273): link the pattern doc and drop stale Darwin claims`: the root README, the collector README and `contracts/darwin/README.md` now link to the new doc. I removed the old lines saying the publisher runs on mocks, that deployment is deferred and that read-back is required.
+- `docs(scr-1273): describe the Darwin publisher DAG as write-only`: only the DAG's description string changed.
+
+The pre-push pytest hook passed, and so did both doc checks (`check_docs.py` and `check_data_catalogue.py`). All four Mermaid diagrams render; I checked them with the Mermaid command-line tool, not on GitHub itself. The shared checkout is clean and at 7ef93a4. I haven't promoted anything to qa or prod.
+
+Points to know:
+- **No republish procedure exists yet.** Raw batches are kept for 7 days, but the doc says there's no way yet to send them again. Copying files back into `pending/` is untested, and the publisher has probably already marked those minutes as done, so it would likely not resend them.
+- **Solar at night is still an open question.** The doc flags that if Darwin stops sending solar data at night, the freshness DAG will fail every night.
+
+## 13:47 user (smp-india)
+
+thanks. Can we maybe mention this in a comment in jira for all relevant darwin tickets pls?
+
+## 13:48 assistant (smp-india)
+
+I'll take that as approval to post, with the ticket names spelled out wherever a ticket is mentioned.
+
+## 13:48 assistant (smp-india)
+
+I added a comment to these 5 Darwin tickets, each with the docs link and a line on what's relevant to that ticket:
+
+- **SCR-1261** (Ingest Tuticorin live wind and generation data through Darwin API): the publisher design and known data problems at the source.
+- **SCR-1273** (Import data from Darwin api and push to TSDB): the same points as SCR-1261.
+- **SCR-1268** (Alert when Darwin collection stalls): where to look day to day and how to triage, plus the open question on whether solar sites keep sending at night.
+- **SCR-1283** (CI/CD for smp-india realtime services): the deploy flow, and that pushing the image to ECR is still blocked on AWS OIDC trust.
+- **SCR-1294** (Darwin TSDB validator DAG): no republish procedure exists yet, so this ticket needs to define one.
+
+Each comment ends with a "Related:" line that lists the other four tickets by key and name.
+
+I didn't comment on SCR-1276 (CDH/Grafana), because the doc doesn't cover it. SCR-1265, SCR-1260 and SCR-1027 also mention Darwin but aren't about this pipeline, so they got nothing.
+
+## 14:09 user (smp-india)
+
+Just to confirm, are we indeed pushing tot he correct tsdb as Mateo iss expecting? Here's his msg last Friday:
+
+"
+
+<pasted_content id="42ff">
+Hell oBrian ! Hope you are doing good
+India will be on leave Monday/Tuesday because of some crazy Hindou festivals 
+So if by chance Tuticorin (with the Darwin API) is live on TSDB within these two days, can you ask this to Zhan Zhang ? :
+Hello Zhan,
+Tuticorin Indian asset is now live on TSDB, so you can start sharing them with the provider Biosky. Here are the timeseries concerned :
+
+* Subfarm 1 (INSE3) :
+   * adf0e91d-bc74-52fa-8a63-51711db66e96 : Generation INSE3 (15min frequency)
+   * f0398d1b-74cb-5f1a-8bf8-e7b14a1be370 : Windspeed INSE3 (15min frequency)
+   * dd4ceb07-9fd6-55e9-921c-727a6a1102f1 : WindDirection for INSE3 (15min)
+* Subfarm 2 (INSE4) :
+   * 271a9615-9c02-5340-9f3d-99f4f59e84e5 : Generation INSE4 (15min)
+   * 7f13f05c-b6bb-55ad-8480-6b7da918258d : WindSpeed INSE4 (15min)
+   * 83ad9e55-bd82-51ee-a670-a37b2ef40683 : WindDirection for INSE4 (15min)
+
+These are the last dataset that needs Biosky to work properly !
+You can ajust as you want. And if it's not ready when I come back I'll do this message myself !
+ 
+As we have a pressure from biosky to send them the data it's better for us not to loose 2 more days because I am not here (I can't take my computer with me..). This message will make us gain 1 or two days of process I hope
+I might be on teams if any questions on Tuesday.. let see !
+</pasted_content id="42ff">
+
+"
+
+## 14:09 assistant (smp-india)
+
+All six IDs match. Next, checking which TSDB endpoint prod writes to:
+
+## 14:09 assistant (smp-india)
+
+Yes, the config points to the right series. I haven't checked that the data actually landed in prod TSDB.
+
+**What I checked**
+- **The IDs match.** All 6 IDs from Mateo's message are the 15-min targets in [sites.json](smp-india/services/darwin-collector/src/darwin_collector/sites.json): generation, wind speed and wind direction for INSE3 and INSE4. Tuticorin is enabled in dev, qa and prod.
+- **Prod writes to prod TSDB.** In [publisher.py:248](smp-india/dags/src/scripts/darwin_publish/publisher.py:248), the prod deployment sends data to the prod TSDB and dev/qa send it to UAT. The code also refuses to run if the credentials belong to the other environment, so prod can't write to UAT by mistake.
+- **Units:** generation is converted from kW to MW, wind speed stays in m/s, and wind direction is in degrees using an average suited to angles.
+
+**Not checked:** whether points are actually arriving in prod for those 6 series. To confirm before you message Zhan, run this on VPN (it stops on its own after at most 7 minutes):
+
+```bash
+cd ~/repos/smp/smp-india && source .envrc && .venv/bin/python ../notes/scr-1273/readback.py prod
+```
+
+Each 15-min series should show about 11–12 points for the last 3 hours. A "DataNotAvailable" result usually just means no data in that window.
+
+If that looks good, you can forward Mateo's message to Zhan as he wrote it. I haven't sent anything.

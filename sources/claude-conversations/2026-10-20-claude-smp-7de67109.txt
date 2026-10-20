@@ -1,0 +1,29 @@
+# Claude Conversation - 2026-10-20
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `7de67109-1cef-41aa-b4ce-51bef7f2e635`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/7de67109-1cef-41aa-b4ce-51bef7f2e635.jsonl`
+Resume: `claude --resume 7de67109-1cef-41aa-b4ce-51bef7f2e635`
+
+## 13:52 user (smp-dashboard)
+
+how to delete the stray thing. Can we do that via api?
+
+## 13:52 assistant
+
+Yes, the API can do it: `DELETE /api/datasources/uid/<uid>`. Two catches:
+
+- **The workflow's token can't.** Deleting a datasource requires Grafana's Admin role, and the QA release token is only Editor. You'd need a temporary Admin token, or just delete it in the UI as a Grafana admin: Connections → Data sources → open `grafana-athena-datasource` → **Delete** at the bottom.
+- **Check nothing uses it first.** Any panel bound to it breaks after the delete. If it's QA's *default* datasource, panels without an explicit datasource quietly fall back to it, so they'd break too.
+
+I wrote a script for that: [notes/scr-1296/delete_stray_athena_ds.py](notes/scr-1296/delete_stray_athena_ds.py). It's QA only and runs on the VPN in about a minute:
+
+1. It lists the Athena datasources and flags whether the stray one is the default.
+2. It scans every dashboard and alert rule on QA and lists any that reference the stray datasource.
+3. It deletes only if you type `DELETE`; any other answer stops with nothing changed.
+
+```bash
+GRAFANA_ADMIN_TOKEN=[REDACTED] token> python3 notes/scr-1296/delete_stray_athena_ds.py
+```
+
+If step 2 lists anything, stop there and send me the output; those dashboards would need moving to `SMP_INDIA_CDH_QA` first. I've only checked that the script's syntax is valid; it hasn't run against Grafana. The Golden Copies are already bound to `SMP_INDIA_CDH_QA`, so they won't be affected either way.

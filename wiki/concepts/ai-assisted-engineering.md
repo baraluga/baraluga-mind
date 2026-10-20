@@ -2,13 +2,15 @@
 
 ## Current State
 
-As of 2026-10-18, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
+As of 2026-10-21, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
 
 Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 work also showed a practical personal-tooling pattern: Claude mods can expose usage and work-time signals in the prompt/footer UI, while Codex can be used as an adversarial reviewer when Brian or Claude remains the main driver.
 
 As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configured for marketplace auto-update; this remains a personal-tooling convenience rather than a controlled team dependency.
 
 Brian's current review rule is proportional: default to a read-only Claude subagent when a review is warranted; additionally run Codex in parallel for data integrity, deletions, crash recovery, money, or production-data changes. A small controlled comparison found Claude faster while Codex better demonstrated impact for an ordering defect; this is a local working preference, not a general model-quality claim.
+
+The October QRM presentation reinforced that spec-driven development remains a supervised, stack-specific workflow: specifications precede implementation, organization-level GitHub standards are shared in Markdown, and pull-request review remains human-owned. Reported credit use for a complex task (~10,000 credits over two days) exceeded a standard 5,000-credit period cap, so output size and test volume need active cost control. The reported OmniRun result is a meeting claim, not independently validated here.
 
 ## Background
 
@@ -118,5 +120,6 @@ Brian's current review rule is proportional: default to a read-only Claude subag
 - `sources/claude-conversations/2026-10-13-claude-scratch-75ac0d14.txt`
 - `sources/codex-conversations/2026-10-13-codex-conversations.txt`
 - `sources/claude-conversations/2026-10-16-claude-smp-68dedda3.txt`
+- `sources/meetings/2026-10-20-1500-granola-qrm-all.md`
 
-Last Updated: 2026-10-18
+Last Updated: 2026-10-21

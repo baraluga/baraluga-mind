@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is run, logged, and coordinated. SMP specifics are on [[smp-platform]], non-SMP projects on [[technical-activities]], and the GitHub migration on [[sff-walnut-migration]].
+As of 2026-10-21. Team-wide context for the QRM Philippines team: how work is run, logged, and coordinated. SMP specifics are on [[smp-platform]], non-SMP projects on [[technical-activities]], and the GitHub migration on [[sff-walnut-migration]].
 
 - **SMP process:** moving off strict sprints. On 2026-09-02, Brian recommended Scrumban: continuous pull, WIP limits, a visible `Waiting` state, and cycle-time metrics instead of velocity, while keeping a two-week demo and budget cadence. On 2026-10-09 the team favoured Kanban because mid-sprint pulls distort burn-down and India users already validate in near real time. This still needs discussion with Fred and Bong.
 - **Time tracking:** the Philippines team left Tempo on 2026-09-01. Prométhée (also spelled Promethe) is filled every Friday. UNCERTAIN: the name of the new tracker.
@@ -12,6 +12,7 @@ As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is ru
   - A three-week November Philippines trip with training: Kubernetes, possibly Copilot Studio, and Explorer sessions.
   - Dinner and Dance, tentatively 2026-11-12.
 - **Recent changes:** Jerome Blanc was expected to leave at the end of September, with handover to UK contacts. Development reviews were due in Sesame by 2026-09-15.
+- **QRM All (2026-10-20):** the leadership roadmap is due for validation by 2026-11-09 and manager performance scores are due in Sesame by 2026-11-13. Chronio migration/dashboard rollout was reported on track for leadership rollout in November, but the source does not establish its wider rollout status. Commercial reporting was EUR 1.45M billed against a EUR 9.17M objective, with EUR 2.85M pipeline.
 
 ## Background
 
@@ -46,6 +47,7 @@ As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is ru
 
 - UNCERTAIN: What the new time-tracking app is called.
 - UNCERTAIN: Whether SMP formally adopts Kanban or Scrumban.
+- UNCERTAIN: Whether `Chronio`, `Carrier Pass`, and `Communication Plan Strategy` are the exact names and what scope they cover.
 
 ## Sources
 
@@ -64,6 +66,7 @@ As of 2026-10-09. Team-wide context for the QRM Philippines team: how work is ru
 - `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
 - `sources/meetings/2026-10-07-granola-morning-standup.md`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+- `sources/meetings/2026-10-20-1500-granola-qrm-all.md`
 - Migration evidence moved with the playbook to [[sff-walnut-migration]]. Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-21

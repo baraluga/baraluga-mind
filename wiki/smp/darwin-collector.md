@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-20.
+As of 2026-10-21.
 
 - The network blocker appears to have cleared enough to resume rollout work. Earlier, the collector was deployed to India dev on 2026-10-01 with [[michael]]'s help but Okta auth and the Darwin base API returned proxy 403s; by October 13 Brian treated Darwin as unblocked and moved to deployment/config questions.
 - The collector catalogue is now the single source of truth in `smp-india`: it supplies collector entity/tag selection, publisher destinations, and freshness expectations. It has 18 expected streams in dev/QA and 21 in prod; Tithwa is prod-only. The duplicate `smp-tool` site configuration and publisher `mappings.json` were removed.
@@ -11,7 +11,9 @@ As of 2026-10-20.
 - TSDB probing found 12 Gujarat IDs in UAT and all 16 in prod. The four Tithwa series existed in prod but initially 404ed in UAT; Mateo said he would create them in UAT too. Generation destinations are MW, so Darwin kW values still need the existing 0.001 conversion.
 - India dev is now proven end to end: a read-back returned `OK` for all 24 mapped series over three hours, including Khaba after its redeploy. Its 39–45 files per five-minute run indicate a drained, steady-state backlog. Darwin-source gaps are deliberately not filled.
 - Khaba is confirmed as Darwin entity `SOF_INNS7`; its Darwin series remain parallel backup to the CSV/SFTP feed. Khavda horizontal irradiance appeared frozen at 131.99 W/m² across several snapshots, so it is published as received but should not be used until Darwin corrects it.
-- QA and prod rollout is approved in principle but not complete. The hand-off keeps dev live until QA has made its first real publication, then drains dev's EFS spool before pausing its publisher. `smp-tool` `dev` now has `go_live_darwin.sh` to deploy QA and prod, wait for QA publication, and scale down the dev collector; Brian retains the Airflow unpause/pause steps. Production egress and prod TSDB read/write access remain unproven.
+- Darwin is live in QA and prod as of 2026-10-20. QA published before the go-live hand-off retired dev; Brian separately confirmed the dev publisher was paused and its freshness DAG then failed because the collector was intentionally off. The QA and prod freshness checks show all configured sites except the known upstream outages receiving current source data, which proves production egress to Darwin; a completed TSDB read-back was reported but its output was not captured here.
+- The operating pattern is documented in `smp-india/docs/realtime-collector-pattern.md`; it describes the collector-to-EFS-to-Airflow publisher flow, write-only TSDB publishing, freshness triage, and deployment. Related Jira tickets `SCR-1261`, `SCR-1268`, `SCR-1273`, `SCR-1283`, and `SCR-1294` received links to that documentation.
+- As of 2026-10-20, Raganesda (`SOF_INRAG`) and production-only Tithwa (`WIF_INGUV`) are stale because their source data stopped upstream, not because of the pipeline. A direct 24-hour Darwin-history probe found all sampled Raganesda devices stopped together at 19 Oct 14:20 UTC; Tithwa series dropped between 02:40 and 04:40 UTC on 20 Oct. This suggests site communications/SCADA failures, but historical recurrence cannot be checked from Darwin's 24-hour history window. The freshness DAG correctly remains failed while either site is stale.
 - **Tickets:**
   - `SCR-1261`: Tuticorin wind speed, wind direction, and generation.
   - `SCR-1273`: four more assets. All 15 requested measurements parse from saved responses.
@@ -37,6 +39,7 @@ As of 2026-10-20.
 - 2026-10-15: first UAT Darwin publication attempt reached TSDB but failed with a 403 write-permission error; no data was lost.
 - 2026-10-16: catalogue ownership moved into `smp-india`; live publisher reads were removed after EKS could not use TSDB storage-confirmation sockets.
 - 2026-10-19: dev read-back proved all mapped series through collector, EFS, publisher, and UAT TSDB; QA/prod go-live script was pushed to `smp-tool` dev.
+- 2026-10-20: QA and prod went live; the dev collector was retired after QA's first publication.
 
 ## Open Questions
 
@@ -46,8 +49,7 @@ As of 2026-10-20.
 - UNCERTAIN: Whether Khavda's sparse irradiance (6–7 values per 15 minutes) is expected Darwin behaviour. Asset spellings are settled in [[aliases]].
 - UNCERTAIN: Whether Gregory is still relevant now that Brian treated Darwin as unblocked.
 - UNCERTAIN: Whether the four Tithwa UAT series were created after Mateo's October 13 reply.
-- UNCERTAIN: Whether prod egress to Darwin and prod TSDB read/write access pass after deployment.
-- UNCERTAIN: Whether QA/prod have been deployed and the dev-to-QA hand-off has completed without a gap.
+- UNCERTAIN: The captured evidence proves production egress to Darwin but does not retain the result of the reported QA/prod TSDB read-backs.
 - UNCERTAIN: Whether CI can be authorized to push Darwin images directly to ECR through GitHub OIDC.
 - UNCERTAIN: Whether the planned bulk validator will prove published files in TSDB before their seven-day retention ends.
 
@@ -78,5 +80,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-16-claude-smp-c410edb9.txt`
 - `sources/claude-conversations/2026-10-19-claude-smp-36b94912.txt`
 - `sources/claude-conversations/2026-10-19-claude-smp-68dedda3.txt`
+- `sources/claude-conversations/2026-10-20-claude-smp-1aff4345.txt`
+- `sources/claude-conversations/2026-10-20-claude-smp-68dedda3.txt`
 
-Last Updated: 2026-10-20
+Last Updated: 2026-10-21
