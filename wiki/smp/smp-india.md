@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-20. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through [[francois-delcourt]].
+As of 2026-10-21. These are the India data products built on [[smp-platform]]. Stakeholders are Mateo, Adrien/Adrian, and Lou Dubuisson. Validation runs through [[francois-delcourt]].
 
 **Delivered by the 2026-10-07 sprint review:**
 - Legacy Green DAM scraper fix (`SCR-1264`)
@@ -10,6 +10,7 @@ As of 2026-10-20. These are the India data products built on [[smp-platform]]. S
 - India geomap in Grafana
 - Bilateral-contract dashboard (`SCR-1275`)
 - Grafana alerting docs
+- The bilateral-contract table and bid-stack report were promoted from QA to production by 2026-10-21 and reported available to end users.
 
 **In flight or pending:**
 - `SCR-1286`: October IEX Green DAM/GDAM gap fix, pushed to [[apac-tsdb-scraper]]. Lou confirmed it works; closure still pending.
@@ -22,6 +23,7 @@ As of 2026-10-20. These are the India data products built on [[smp-platform]]. S
 - Khaba scheduling: deployed realtime and minute DAGs now explicitly skip a missing same-day CSV (with clear logs), while daily reconciliation stays fail-fast. This prevents hundreds of routine missing-file failures from obscuring real faults; an upstream outage can take until the next daily reconciliation to alert. The temporary `KHABA_GENERATION_SOURCE_TRANSITION_WINDOW_MINUTES=1440` stopgap should be removed once the deployed code is confirmed active.
 - `SCR-1289`: the REC scraper remains a Lambda; it was re-enabled in its prod run list, backfilled, and monitored rather than moved to Airflow. The scheduled runs of 16–18 October completed autonomously and configuration-drift checking was clean. The remaining handover is validation by [[francois-delcourt]].
 - Darwin assets for Tuticorin and four Gujarat sites are moving from access-blocked design to rollout. See [[darwin-collector]].
+- `SCR-1294` is ready to implement as a missing-point detector/alerter: the publisher retains raw published batches for seven days and [[smp-platform]] already supports a 28-series bulk read in one query. Start with an hourly check over a window ending 15–20 minutes in the past; defer state-mutating republish until missing stored points are actually observed. UNCERTAIN: Airflow-on-EKS read-path behaviour for this service account still needs one UAT DAG test.
 - Grid India (`SCR-1230`) and the national H. India site: blocked on access. See [[smp-india-access]].
 - Khaba QA pauses in early October were intentional operational choices, not a DAG pause-logic defect: QA was kept runnable for testing while avoiding unnecessary side-by-side production cost.
 - Khaba forecasts are now a separate CDH dataset/DAG (`india_khaba_forecasts`) rather than fields embedded in the actual-generation export. Its dashboards were imported in QA and prod and the associated export change was promoted. The remaining 12–15 October actual-generation gaps derive from incomplete upstream CSVs; reconciliation should run again only after complete files are re-sent.
@@ -120,5 +122,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-19-claude-smp-4e922cd7.txt`
 - `sources/claude-conversations/2026-10-19-claude-smp-822de913.txt`
 - `sources/claude-conversations/2026-10-19-claude-smp-8ce08f10.txt`
+- `sources/meetings/2026-10-21-1630-granola-smp-review.md`
+- `sources/claude-conversations/2026-10-21-claude-smp-de004df5.txt`
 
-Last Updated: 2026-10-20
+Last Updated: 2026-10-22

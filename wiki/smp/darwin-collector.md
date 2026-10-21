@@ -7,6 +7,7 @@ As of 2026-10-21.
 - The network blocker appears to have cleared enough to resume rollout work. Earlier, the collector was deployed to India dev on 2026-10-01 with [[michael]]'s help but Okta auth and the Darwin base API returned proxy 403s; by October 13 Brian treated Darwin as unblocked and moved to deployment/config questions.
 - The collector catalogue is now the single source of truth in `smp-india`: it supplies collector entity/tag selection, publisher destinations, and freshness expectations. It has 18 expected streams in dev/QA and 21 in prod; Tithwa is prod-only. The duplicate `smp-tool` site configuration and publisher `mappings.json` were removed.
 - Collector deployments now require an explicit image tag. The new catalogue is bundled into the image, so enabling a site is an `smp-india` change and deployment of that image; the old-image/new-manifest pairing is refused before it can replace a running pod. CI currently publishes an image artifact rather than directly to ECR, so the manual image-transfer/deploy path remains until the CI ECR setting and AWS OIDC trust are resolved.
+- On 2026-10-21, a documentation-only change under the collector `src/` directory was committed to `dev` as `b89c82d` to force a fresh content-derived image tag (`darwin-collector-b89c82dddddb`). The captured CI run was only queued; image build and ECR publication are not yet evidenced. The run still depends on an environment-level `DARWIN_COLLECTOR_ECR_PUSH=true` setting because it is absent from repository-level variables.
 - For `SCR-1273`, Mateo clarified ModuleTemperature is not needed. The rollout removed ModuleTemperature from collection instead of collecting and dropping it later.
 - TSDB probing found 12 Gujarat IDs in UAT and all 16 in prod. The four Tithwa series existed in prod but initially 404ed in UAT; Mateo said he would create them in UAT too. Generation destinations are MW, so Darwin kW values still need the existing 0.001 conversion.
 - India dev is now proven end to end: a read-back returned `OK` for all 24 mapped series over three hours, including Khaba after its redeploy. Its 39–45 files per five-minute run indicate a drained, steady-state backlog. Darwin-source gaps are deliberately not filled.
@@ -20,6 +21,7 @@ As of 2026-10-21.
   - `SCR-1268`: collector health and freshness monitoring, starting with Prometheus discovery.
 - Freshness monitoring (`SCR-1268`) now compares EFS collector state with the catalogue's expected streams, so a site that has never produced data is stale rather than invisible. Khaba's three dev streams will remain correctly stale until the new collector image is deployed and begins polling them.
 - The publisher no longer performs Athena read-before-write or read-back on live runs: TSDB storage-confirmation sockets cannot connect from EKS. It writes each series and moves fully written raw files to `published/` for seven days; a bulk validator design is pending before that retention can become verified cleanup. The manual aggregation Airflow test and its CI coverage were repaired after the catalogue migration.
+- A 2026-10-21 probe reconfirmed that the machine account can only access `/production/data/lastday`: 24 hours at 10-minute or hourly resolution. Network failure then prevented more probing. Mateo must supply the exact historical endpoint and access path before a longer or exact one-minute backfill can be designed.
 
 ## Background
 
@@ -52,6 +54,7 @@ As of 2026-10-21.
 - UNCERTAIN: The captured evidence proves production egress to Darwin but does not retain the result of the reported QA/prod TSDB read-backs.
 - UNCERTAIN: Whether CI can be authorized to push Darwin images directly to ECR through GitHub OIDC.
 - UNCERTAIN: Whether the planned bulk validator will prove published files in TSDB before their seven-day retention ends.
+- UNCERTAIN: Whether Mateo's historical API is a distinct Darwin endpoint, UI access, or a permission unavailable to the machine account; `/lastday` cannot provide exact one-minute backfill.
 
 ## Sources
 
@@ -82,5 +85,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/claude-conversations/2026-10-19-claude-smp-68dedda3.txt`
 - `sources/claude-conversations/2026-10-20-claude-smp-1aff4345.txt`
 - `sources/claude-conversations/2026-10-20-claude-smp-68dedda3.txt`
+- `sources/claude-conversations/2026-10-21-claude-smp-45346bf9.txt`
+- `sources/claude-conversations/2026-10-21-claude-smp-68dedda3.txt`
 
-Last Updated: 2026-10-21
+Last Updated: 2026-10-22

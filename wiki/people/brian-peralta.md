@@ -1,12 +1,12 @@
 # Brian Peralta
 
-## Summary
+## Current State
 
-Brian appears in the captured notes as the main SMP engineer handling Japan/India platform work, dashboard delivery, alerting fixes, Copilot DAG agent follow-up, recruitment assessment, and stakeholder coordination.
+As of 2026-10-21. Brian is coordinating the primary SMP Jupyter/Synapse delivery, including requirement discovery with [[nilo-menezes]] and the Synapse team. He will lead the 2026-10-26 Scrapper clarification session with [[adrien]] and [[mateo]]. His DashC/AWS account was decommissioned for inactivity and must be re-requested through the Singapore help desk only if the Jupyter work needs AWS CLI or infrastructure access.
+
+## Background
 
 In the Penbrothers interview notes, Brian described 13 years in software engineering, including 8 years at NGP, and emphasized quality, coding standards, CI/CD, developer experience, team standards, and de facto technical leadership.
-
-## Details
 
 - SMP responsibilities in the notes include Japan demo preparation, Delphi/GitHub Actions coordination, proxy incident reporting, MS Teams alert fallback, Ruff secret detection research, TSDB interconnector pilot testing, README updates, and DAG agent prompt refinement.
 - [[francois-delcourt]] gave strong feedback on Brian's technical delivery, proposals, implementations, client relationship management, autonomy with users, and ability to translate feedback into action.
@@ -43,5 +43,7 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 - `sources/meetings/2026-08-06-1000-granola-1-1-with-bong.md`
 - `sources/codex-conversations/2026-08-06-codex-conversations.txt`
 - `sources/meetings/2026-08-11-0945-granola-weekly-team-meeting.md`
+- `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
+- `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 
-Last Updated: 2026-08-11
+Last Updated: 2026-10-22

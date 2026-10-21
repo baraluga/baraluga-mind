@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-19. India stakeholder (trading side) and Mateo's backup. Sets acceptance targets such as the 5-minute RTM delay for `SCR-1284` and validates India tickets with traders.
+As of 2026-10-21. India stakeholder (trading side) and Mateo's backup. Sets acceptance targets such as the 5-minute RTM delay for `SCR-1284` and validates India tickets with traders. Brian is to lead a 2026-10-26 clarification session with Adrien and Mateo for the “Scrapper” task; UNCERTAIN: whether that is the exact task/system name.
 
 ## Feedback Notes
 
@@ -17,5 +17,6 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-08-1533-granola-sprint-planning.md`
+- `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
 
-Last Updated: 2026-10-19
+Last Updated: 2026-10-22

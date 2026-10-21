@@ -1,0 +1,31 @@
+# Claude Conversation - 2026-10-21
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `de004df5-d51b-492d-8494-7d3fcda621b5`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/de004df5-d51b-492d-8494-7d3fcda621b5.jsonl`
+Resume: `claude --resume de004df5-d51b-492d-8494-7d3fcda621b5`
+
+## 13:44 user
+
+thoughts on scr-1294? We finally ready to do this?
+
+## 13:45 assistant (smp-india)
+
+Read the ticket and the publisher's state code. One last check: does smp-common already have a multi-series TSDB read?
+
+## 13:45 assistant
+
+Yes, it's ready to build. The things it depends on are done, and the hardest part is already there.
+
+**What's in place (smp-india dev, latest commit 20 Oct):**
+- The publisher only writes now (`10e72fa`), and the raw batches it publishes are kept for 7 days under `published/<day>/` (`71ba682`). The validator reads those files.
+- The 15-min averages are frozen in `aggregate_intent` before anything is written to TSDB, so a republish can resend exactly the same value. The publisher's state already has the flag that marks a point as sent (`points[ts][1]` for minute points, `finalized` for averages). "Mark unsent" just resets that flag, so it doesn't need a new state model.
+- **One read per run is enough:** smp-common already has a reader that fetches many series in one query (`batch_io.py`, up to 50 series per read). Darwin has 28 series, so each run makes one Athena query, which is under the ≤2 limit in the ticket.
+
+**Where I'd change the ticket:**
+1. **Build detection and the alert first, and republish later.** We haven't actually seen a write that TSDB accepted but didn't store. Republishing is the only part that changes publisher state, and the doc says those receipts must never be broken. An hourly check that alerts on missing points meets most of the goal with no risk to the publisher. If points really do go missing, add the republish request then, using the reset described above.
+2. **Don't delete the raw files once they're verified.** The 7-day cleanup already removes them, and keeping them means a human can still republish by hand. It's one acceptance criterion less and nothing is lost.
+3. **Check a window that ends 15–20 min in the past, not the last hour up to now.** Points written in the last few minutes may not be readable yet, which would cause false "missing" alerts. Averages also only go out 20 min after their window ends.
+4. **The "~3 failed checks" counter needs a small state file owned by the validator,** in its own folder rather than `publisher-state/`.
+
+I didn't check whether bulk reads through `batch_io` (Athena plus the API) work from Airflow on EKS for this service account, or how stable the publisher is in prod. That read path is the one real unknown, so I'd test it first with a single `airflow dags test` run in UAT.

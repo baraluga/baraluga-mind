@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-19. India stakeholder on the trading side and SMP's main India user: owns TSDB metadata and time series creation for India data, validates India tickets, and beta-tests DAG authoring. Wants to own more himself (KPI dashboard pairing, 2026-10-01). Adrien covers when he is away.
+As of 2026-10-21. India stakeholder on the trading side and SMP's main India user: owns TSDB metadata and time series creation for India data, validates India tickets, and beta-tests DAG authoring. Wants to own more himself (KPI dashboard pairing, 2026-10-01). Adrien covers when he is away. He needs to identify the exact Darwin historical API endpoint/access path that showed Tithwa data, because the machine account only confirms a 24-hour `/lastday` route.
 
 ## Feedback Notes
 
@@ -22,5 +22,6 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 - `sources/meetings/2026-07-27-1415-granola-daily-standup.md`
 - `sources/meetings/2026-07-30-1232-granola-generation-data-scraper.md`
 - `sources/meetings/2026-08-27-granola-mateo-call.md`
+- `sources/claude-conversations/2026-10-21-claude-smp-68dedda3.txt`
 
-Last Updated: 2026-10-19
+Last Updated: 2026-10-22

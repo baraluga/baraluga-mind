@@ -1,0 +1,63 @@
+# Claude Conversation - 2026-10-21
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/68dedda3-87ea-4b1f-a14f-9806c4412b0e.jsonl`
+Resume: `claude --resume 68dedda3-87ea-4b1f-a14f-9806c4412b0e`
+
+## 14:08 user
+
+Mateo: 
+
+"Yes he contacted me for this topic it's done !
+For "Tithwa has sent no data since 20 Oct, 02:40 UTC" we checked and it looks like data is available in the historical API. I guess that the Realtime API wasn't working properly yesterday..!
+ "
+
+-- how much do we know about the historical api? What can we do with it and will it help us in backfilling? You should have everything you need to probe yourself
+
+## 14:08 assistant
+
+Starting with Darwin's Swagger spec to find the historical route and its parameters.
+
+## 14:08 assistant
+
+Swagger is blocked (403). Searching our earlier Darwin notes for any historical route names before guessing.
+
+## 14:09 assistant
+
+Earlier probes guessed 4 `/historical` URLs and all 404'd. Trying a wider set of route and parameter candidates now; a 400 instead of a 404 means a route exists.
+
+## 14:09 assistant
+
+`/data/historical` returned 403, not 404. Checking whether that's a real route we lack permission for, or just a generic answer for anything outside `/production`:
+
+## 14:11 assistant
+
+One request hit a TLS timeout. Rerunning with that error caught:
+
+## 14:12 assistant
+
+Now the token endpoint is failing too, so this looks like my network rather than Darwin. Quick connectivity check:
+
+## 14:12 assistant
+
+I couldn't finish the probe: my Mac can't reach Darwin's login server right now. Every connection to `engiedigital.okta-emea.com` fails locally with "Can't assign requested address", even outside the sandbox. Without a token I can't call Darwin at all. Most likely a VPN or network change on your side. Can you check, or toggle the VPN, and tell me when to rerun?
+
+**What we know about Darwin history so far**
+- **Only one history route works:** `/production/data/lastday`. It covers the last 24 h, in 10-min or 1-hour steps; 1-min is rejected (HTTP 400).
+- **It returns every device under the site** (inverters, turbines, meters), one series per device and tag.
+- **I found no other history route.** About 25 candidates (`/historical`, `/history`, `/period`, `/range`, `/production/data` with start and end dates, and so on) all return 404.
+- **Swagger is 403 for our client**, so I can't read the API spec.
+- **Mateo's "historical API" is probably something our machine account can't see.** It could be the Darwin UI, his personal access, or a route our account isn't permitted to use. We need the exact URL from him or Darwin.
+
+**Will it help with backfill?**
+- **15-min series: partly, and only within 24 h.** We could rebuild them from `lastday`'s 10-min points. But 10-min blocks don't line up with quarter-hours, so each :15 and :45 average would only be approximate.
+- **1-min series: no.** Only a proper history endpoint with 1-min data would let us backfill those exactly.
+- **Raganesda and Tithwa:** if Mateo is right that history has Tithwa's data, `lastday` may now show it too, since they likely read the same store. Checking that is the first thing I'll run when the network is back. If the data is there, we can backfill Tithwa's 15-min series today, before the 24 h window passes.
+
+Question for Mateo:
+```
+Which URL/endpoint do you use for the historical API (exact path + params)? Our machine account only sees /production/data/realtime and /lastday (24h, 10-min). If there's a history route with 1-min data, we can use it to backfill gaps.
+```
+
+The probe scripts are in the scratchpad, ready to rerun.

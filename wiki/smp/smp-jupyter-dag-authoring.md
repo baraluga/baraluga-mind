@@ -2,9 +2,10 @@
 
 ## Current State
 
-As of 2026-10-08.
+As of 2026-10-21.
 
-- **Timeline:** planned for next period, roughly late October to late November or early December. The goal is for India stakeholders (Mateo, Adrien, Lou) to create DAGs with minimal developer help.
+- **Committed delivery direction:** Jupyter integration with Synapse is the primary SMP deliverable. The first deliverable is a working development-environment version to test behaviour, then rollout and end-user training. An India geography task with Mateo is the suggested first example.
+- **Planning:** Francois has not yet created the story and may need to make `SCR-1210` an epic. Brian is coordinating requirements with [[nilo-menezes]] (recorded as “Milo” in one meeting) and Synapse. Brian's decommissioned DashC/AWS account is not an immediate blocker, but must be re-requested through the Singapore help desk if AWS CLI or infrastructure work is required.
 - **Preferred architecture (2026-10-08):**
   - A persistent DevX namespace with paired Jupyter and Airflow instances.
   - A shared volume, so DAG changes show up in about 30–45 seconds.
@@ -28,12 +29,14 @@ As of 2026-10-08.
 - 2026-08-24: `SCR-1210` rated conditionally feasible but too broad for one story.
 - 2026-10-07: simplified to JupyterHub in SMP dev only, without the Synapse machinery.
 - 2026-10-08: DevX namespace with paired Jupyter and Airflow preferred.
+- 2026-10-21: Synapse Jupyter integration made the primary committed deliverable, with a dev-environment-first rollout.
 
 ## Open Questions
 
 - UNCERTAIN: Whether `DevX` is the chosen name.
 - UNCERTAIN: Whether Eric is confirmed as demo owner.
 - UNCERTAIN: Why `SCR-992` was rejected and what `SCR-1011` concluded.
+- UNCERTAIN: Whether “Scrapper” is the exact task/system name and how it relates to the Jupyter work.
 
 ## Sources
 
@@ -45,5 +48,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/meetings/2026-10-05-granola-trading-data-platform-presentation-and-jupyterlab-roadmap-with-bong.md`
 - `sources/meetings/2026-10-07-granola-integration-of-jupyterlab-to-airflow.md`
 - `sources/meetings/2026-10-08-1431-granola-another-attempt-at-jupyter-discussion.md`
+- `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
+- `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-22

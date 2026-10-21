@@ -13,6 +13,7 @@ As of 2026-10-21. Team-wide context for the QRM Philippines team: how work is ru
   - Dinner and Dance, tentatively 2026-11-12.
 - **Recent changes:** Jerome Blanc was expected to leave at the end of September, with handover to UK contacts. Development reviews were due in Sesame by 2026-09-15.
 - **QRM All (2026-10-20):** the leadership roadmap is due for validation by 2026-11-09 and manager performance scores are due in Sesame by 2026-11-13. Chronio migration/dashboard rollout was reported on track for leadership rollout in November, but the source does not establish its wider rollout status. Commercial reporting was EUR 1.45M billed against a EUR 9.17M objective, with EUR 2.85M pipeline.
+- **SMP capacity (2026-10-21):** 10 completed versus 14 new tickets over 14 days, with six open WIP items and two blockers. The reported working ideal is one to two open items per person; the team proposed a separate validation stage to expose that bottleneck.
 
 ## Background
 
@@ -67,6 +68,7 @@ As of 2026-10-21. Team-wide context for the QRM Philippines team: how work is ru
 - `sources/meetings/2026-10-07-granola-morning-standup.md`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 - `sources/meetings/2026-10-20-1500-granola-qrm-all.md`
+- `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
 - Migration evidence moved with the playbook to [[sff-walnut-migration]]. Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-21
+Last Updated: 2026-10-22

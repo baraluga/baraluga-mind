@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-09.
+As of 2026-10-21.
 
 - **Grafana alerts to email and Teams.**
   - Native Grafana alerts work in India QA (`SCR-1244`); the POC was an IEX RTM 10,000 threshold, and [[francois-delcourt]] created his own alert to confirm.
@@ -13,6 +13,7 @@ As of 2026-10-09.
   - `SCR-1254` covers resource monitoring, starting from real pain points: Airflow CPU pressure, Airflow memory pressure, and Grafana dashboard access errors. Grafana usage tracking starts from cheap Okta or user-activity evidence.
   - `SCR-1268` covers Darwin collector monitoring: about 1 point if Jeka's existing observability stack covers it, about 3 if SMP must build a small health monitor. See [[darwin-collector]].
 - **`SCR-1284` dashboard delay:** before proposing the Airflow dual-write bypass described in [[smp-india]], the team needs timing evidence across scrape → TSDB → CDH, with mean and standard deviation for one IEX series and one non-IEX source.
+- **Next India operational change:** create a dedicated Teams channel for DAG-failure notifications. This is separate from user-owned business/data alert channels; the captured review does not state its owner, routing, or implementation date.
 
 ## Background
 
@@ -67,6 +68,7 @@ As of 2026-10-09.
 - `sources/meetings/2026-10-06-1415-granola-smp-standup.md`
 - `sources/meetings/2026-10-08-1131-granola-sprint-planning.md`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
+- `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 - Older sources (June–July Teams/APM threads) are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-22

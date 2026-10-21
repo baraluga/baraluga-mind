@@ -2,12 +2,12 @@
 
 ## Current State
 
-As of 2026-10-09.
+As of 2026-10-21.
 
 - **Focus:** India delivery dominates. The 2026-09-23 sprint had no active Japan ticket. Japan next-period work is bug fixes and robustness; Common work is platform capabilities. India data products are on [[smp-india]].
 - **Team:** [[brian-peralta]] runs delivery on India time-and-materials work from September. [[michael]] is back on SMP from 2026-10-01 at about 80%, owning infrastructure and deploys. Francois validates tickets and leads demos. Lou Dubuisson is taking over Mateo's India point-of-contact role and still needs a knowledge-transfer walkthrough of the India DAGs.
-- **Process:** sprints run at about 12–15 points. On 2026-10-09 the team favoured moving SMP to Kanban, because sprint reviews add little beyond budget tracking; this still needs discussion with Fred and Bong. Since the 2026-09-09 retro, India POC attempts are capped at five before pivoting, and the team talks to India directly with no PO intermediary.
-- **Budget:** about EUR 45,000 for the current period, roughly 60% spent at the 2026-10-07 review, projected to close near 80%. Steering committee is the week of 2026-10-12 to 10-18, with the topic list due Monday 2026-10-12. Jayant and Lou are to join prep.
+- **Process:** Japan is now in Kanban support mode with no active development; new requests enter a backlog for stakeholder prioritisation against available capacity. Bi-weekly meetings continue for delivery and budget visibility. India POC attempts remain capped at five before pivoting, and the team talks to India directly with no PO intermediary.
+- **Budget:** the 2026-10-21 review reported 84% consumed for the current period, with most cost still supported by the India team. The source does not state the final budget or forecast.
 - **Next-period priorities (2026-10-07/08):**
   - Darwin data fetch once access is fixed: [[darwin-collector]].
   - Jupyter DAG authoring: [[smp-jupyter-dag-authoring]].
@@ -210,5 +210,7 @@ This page was split on 2026-10-11 into [[smp-india]], [[darwin-collector]], [[sm
 - `sources/codex-conversations/2026-10-08-codex-conversations.txt`
 - `sources/meetings/2026-10-09-1415-granola-daily-standup.md`
 - `sources/codex-conversations/2026-10-09-codex-conversations.txt`
+- `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
+- `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-22
