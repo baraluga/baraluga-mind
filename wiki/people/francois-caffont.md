@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-19. Product owner who built [[atlas-dashboard]], a Dash app, with Copilot, and remains its primary builder. Brian consults on engineering foundations and deployment, not feature ownership. Not the same person as [[francois-delcourt]], the SMP product owner.
+As of 2026-10-22. Product owner who built [[atlas-dashboard]], a Dash app, with Copilot, and remains its primary builder. Brian consults on engineering foundations and deployment, not feature ownership. Not the same person as [[francois-delcourt]], the SMP product owner. He asked about Intact-group feature permissions; Atlas cannot rely on groups until its Okta authorisation-server claim is configured.
 
 - 2026-10-13: reported Atlas DEV redirecting to the dashboards homepage; evidence pointed to a missing DEV ECS service outside Brian's control, with PROD healthy.
 
@@ -32,5 +32,6 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 - `sources/codex-conversations/2026-09-17-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 - `sources/claude-conversations/2026-10-13-claude-atlas-dash-frontend-b943dd75.txt`
+- `sources/claude-conversations/2026-10-22-claude-atlas-dash-frontend-a93f38c8.txt`
 
-Last Updated: 2026-10-19
+Last Updated: 2026-10-23

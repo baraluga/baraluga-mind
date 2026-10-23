@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-21. Infra, proxy, certificate and cluster contact (Synapse side). Built the Singapore proxy workaround; key dependency for India proxy access and the Grafana/JupyterLab integration. Brian is coordinating the now-primary Jupyter/Synapse delivery with him; the meeting source recorded his name as “Milo,” resolved through [[aliases]].
+As of 2026-10-22. Infra, proxy, certificate and cluster contact (Synapse side). Built the Singapore proxy workaround; key dependency for India proxy access and the Grafana/JupyterLab integration. Brian is coordinating the browser DAG-authoring decision with him; `SCR-1298` requires his agreement with [[francois-delcourt]] on per-region versus per-branch isolation. The meeting source recorded his name as “Milo,” resolved through [[aliases]].
 
 ## Feedback Notes
 
@@ -17,5 +17,6 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 
 - `sources/meetings/2026-10-01-1433-granola-backlog-grooming-again.md`
 - `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
+- `sources/claude-conversations/2026-10-22-claude-smp-d2cd8178.txt`
 
-Last Updated: 2026-10-22
+Last Updated: 2026-10-23

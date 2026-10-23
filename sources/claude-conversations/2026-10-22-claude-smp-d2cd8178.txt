@@ -1,0 +1,834 @@
+# Claude Conversation - 2026-10-22
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `d2cd8178-d406-49af-a7c8-16a8afc5aefa`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/d2cd8178-d406-49af-a7c8-16a8afc5aefa.jsonl`
+Resume: `claude --resume d2cd8178-d406-49af-a7c8-16a8afc5aefa`
+
+## 13:53 user
+
+Remember the plan on doing jupyter notebook integration in smp?
+
+## 13:53 assistant
+
+Yes. It's written up in your mind palace at `~/baraluga-mind/wiki/smp/smp-jupyter-dag-authoring.md`, last updated today.
+
+**Where it stands (as of 21 Oct)**
+- Jupyter integration with Synapse is now SMP's main committed deliverable. The plan is to get a working dev-environment version first, then roll it out and train end users. The suggested first example is an India task with Mateo.
+- Francois hasn't created the story yet. `SCR-1210` will probably become an epic, split into four stories: hosting/security, authoring/export, Git/CI and test support.
+
+**Preferred architecture (from 8 Oct)**
+- A persistent "DevX" namespace that pairs a Jupyter instance with an Airflow instance.
+- A shared volume, so DAG edits show up in Airflow in about 30–45 seconds.
+- Strict CPU and memory limits per pod.
+- Git PR review stays the merge gate. No per-session spin-up or teardown.
+- How it's meant to work: you iterate in the notebook, copy the validated logic into the DAG `.py` file, then commit and open a PR. Notebooks are for debugging CDH, API and transform logic, not for replacing DAG files.
+
+**What was rejected**
+- Writing straight from Jupyter into the live DAG path, because a duplicate DAG ID could trigger real external calls.
+- Copying Synapse's save-to-DB audit trail, per-save commits or per-developer Airflow.
+- The fallback, if nobody needs notebook visuals, is a VS Code remote session into a cluster container.
+
+**Risks and prerequisites**
+- Capacity is the main risk: the shared non-prod EKS cluster was about 90% used (10 nodes, 78.2 cores).
+- The repos use Python 3.13 but the Airflow image uses 3.12, so the versions need to line up.
+- Before the period starts, you need:
+  - a JupyterLab demo, probably from Eric, with Michael;
+  - an explicit tradeoff between this work and regular delivery, agreed with Bong and Fred;
+  - an S&P/Synapse estimate with Eric Martin for the steering committee.
+- Your AWS account was decommissioned. That only matters if you need AWS CLI or infra access, in which case you'd re-request it through the Singapore help desk.
+
+**Still open:** whether "DevX" is the final name, whether Eric owns the demo, and why `SCR-992` was rejected and what `SCR-1011` concluded.
+
+I only read the wiki summary, not the meeting sources behind it. I can dig into any of these points if you want.
+
+## 13:59 user
+
+Right. In broad strokes, do we have a vague idea on how the steps/tasks will be drafted? I'm doing a kanban planning now on this ticket and I have no idea how to size it lol. 
+
+when I asked Mae and Eric yesterday via chat,
+
+"
+
+<pasted_content id="1fa9">
+PABELICO Mae (ENGIE Services Philippines) and DAVID Eric Martin (ENGIE Services Philippines), kung kunyare i-e-enable na tomorrow ang jupyter notebook thing sa SMP, kaya matapos within the day? Lol.
+ 
+In broad strokes, ano ang steps na need gawin, bukod sa humingi ng tulong from you both? 
+ 
+If may confluence shit, point me pls
+</pasted_content id="1fa9">
+
+"
+
+and then Mae simply replied..
+
+"
+
+<pasted_content id="1fa9">
+to lang how to namin to install jupyter:
+ 
+Shell
+
+```
+Then deploy JupyterHub:
+
+```bash
+helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
+helm repo update
+
+envsubst < config/minikube/jupyter/jupyterhub-values.yaml | \
+  helm upgrade --install jupyter jupyterhub/jupyterhub \
+  --version 4.3.4 \
+  -n synapse \
+  -f -
+```
+
+> The chart version is `4.3.4` (see `config/env.sh` → `jupyterhub_chart_version`).
+> `5.4.5` is the JupyterHub **application** version shipped inside that chart.
+
+Port-forward the `proxy-public` service to port 8888 after the pod is running.
+```
+
+ 
+ 
+Di ko sure anong specs ng jupyterhub niyo, pero if yung basic lang, helm install lang talaga.
+ 
+
+Shell
+
+```
+helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
+helm repo update
+helm upgrade --install jupyter jupyterhub/jupyterhub \  --version 4.3.4 \  -n <namespace>
+```
+</pasted_content id="1fa9">
+
+-- is it really that simple?? Run this script and call it a day? Lol
+
+## 13:59 assistant (smp-tool)
+
+For a demo, yes, it's that simple. For something your team actually uses, no. Mae's commands install the stock chart into the `synapse` namespace on minikube, and you reach it with a port-forward. That gives you a JupyterHub on your laptop with default settings: dummy login, a generic image, and no access to any SMP data. Call it about 10% of the work.
+
+The real work is in the values file she pipes through `envsubst`: `config/minikube/jupyter/jupyterhub-values.yaml`. Ask her for it. It shows how Synapse handled auth, images and storage, and could cut the rest of the work roughly in half.
+
+**Rough task breakdown for the board** (one person's working days; check these with Eric and Mae):
+
+| # | Card | What's in it | Size |
+|---|---|---|---|
+| 0 | Spike: local demo | Run Mae's helm on minikube, get the Synapse values file, show it to Michael and Bong | S (½ day) |
+| 1 | Deploy hub to SMP dev EKS | Helm values in `smp-tool/config/<region>/dev/`, like `airflow_values.yaml`; CPU/memory limits; storage for user volumes; capacity check (cluster about 90% used) | M (1–2 days) |
+| 2 | Access and auth | Ingress or hostname and Okta login. The default chart lets anyone log in. An Okta app registration usually means waiting on another team | M–L (2–4 days + waiting) |
+| 3 | Notebook image | Python 3.12 to match the Airflow image, `smp-common` and deps, Artifactory credentials at build time. Probably base it on the Airflow image | M (1–2 days) |
+| 4 | Runtime access to data | Service account and IAM for S3/CDH, Airflow variables and connections, network reach to TSDB and APIs. Security-sensitive | M–L (2–3 days) |
+| 5 | Notebook-to-DAG loop | Shared volume with Airflow dev (`smp-*-dev-efs-pvc` already exists) vs. "commit, push to dev, git-sync"; guard against duplicate DAG IDs | M (2–3 days + a decision) |
+| 6 | Pilot and training | India example with Mateo, short how-to, walkthrough | S–M (1–2 days) |
+
+**Total:** roughly 2–3 weeks of focused work for one person. Waiting on Okta registration and cluster capacity can stretch that. "Done within a day" is only true for card 0.
+
+**Kanban tip:** don't size the whole epic now. Put cards 0 and 1 in "ready" and leave the rest as rough placeholders. The spike will show how much of cards 2–4 Synapse has already solved.
+
+These estimates are mine, not from Eric or Mae. I only skimmed the `smp-tool` layout, and I haven't checked how Airflow does Okta auth today. Card 4 (credentials and network access) carries the most security risk, so plan a review there.
+
+## 14:02 user (smp-tool)
+
+this shit is too much for my pea-brain. 
+
+The overall pain point described by Francois was to, streamline the development environment setup of key users who'd like to do their own dags. So instead of cloning the repo, asking for artifactory permissions and shit, install deps... they simply log in to a web IDE that already has all smp airflow deps, and then write the dag... can also commit and push to a dedicated branch per user, and that's it. 
+
+Writing it in jupyter notebook is a plus but I think the core friction is the setup. Wdyt?
+
+## 14:02 assistant (smp-tool)
+
+I agree. Francois's pain point is setup friction, not notebooks: cloning the repo, getting Artifactory access, installing deps. Fix that and the notebook becomes a nice-to-have.
+
+That makes the job much smaller: **"open a browser, get a ready-made SMP dev environment, write a DAG, push to your own branch."**
+
+**Simplest option: GitHub Codespaces with a devcontainer.** The SMP repos are already on GitHub. You'd add one `.devcontainer/devcontainer.json` to `smp-india`, pointing at the Airflow image or a Python 3.12 image with deps preinstalled. Artifactory credentials go in a Codespaces org secret. A key user clicks "Open in Codespace" and gets VS Code in the browser with everything installed. Commit and push work out of the box, notebooks run in it too, and there's nothing for you to host.
+
+- **What it could take:** about 1–3 days, versus 2–3 weeks for self-hosted JupyterHub.
+- **What could block it:** ENGIE's GitHub org has to allow Codespaces, and someone has to pay for it. That's an admin or policy question, not engineering work.
+- **If it's blocked:** run a prebuilt image on EKS, with JupyterHub or code-server. That brings back cards 1–3 from before (deploy, auth, image). It still drops the shared volume and the notebook-to-DAG loop.
+
+**One gap: feedback.** Pushing to a personal branch doesn't make the DAG run anywhere, because Airflow dev git-syncs only one branch. Two ways to handle it:
+1. Users run `airflow dags test` inside the IDE. Since the deps are installed, this works for most DAGs; your memory notes say about 86% can be tested from the CLI. It needs network access to the data sources, which a codespace may not have, e.g. TSDB is behind the VPN.
+2. A PR to `dev` is the gate, and they watch the run in Airflow dev.
+
+To confirm I've understood: you want to size and pitch this as "a zero-setup web dev environment for key users", with notebooks optional. Before I draft cards, three questions:
+
+1. Does ENGIE's GitHub org allow Codespaces? Is that something you'd check with GitHub admins, or do you already know?
+2. Do key users need to test against real sources from the IDE, or is "PR to dev, then watch Airflow" enough feedback?
+3. Is it only `smp-india` for the Mateo pilot, or `smp-japan` as well?
+
+I haven't checked the Codespaces policy, and I haven't checked whether a codespace can reach Artifactory or TSDB from GitHub's network. Both could decide which option wins.
+
+## 14:03 user (smp-tool)
+
+AHHH I forgot something.
+
+It's also preferable to have a dedicated airflow instance in the same environment... so when they push, airflow auto syncs against that specific branch.
+
+## 14:04 assistant (smp-tool)
+
+Got it. This changes the shape, but it can still be simple.
+
+**The catch with "Airflow syncs each user's branch":** Airflow's git-sync follows only one branch. Giving every user's branch its own sync means either one Airflow per user on EKS, which is what was rejected for Synapse and the cluster is already about 90% full, or hacks that load every DAG once per user and clash on DAG IDs.
+
+**Simpler idea:** run Airflow inside each user's workspace, next to the IDE. The devcontainer starts `airflow standalone` with its DAG folder pointing at the user's checkout. Save a file and it shows up in their own Airflow UI within seconds, with no push and no sync. Pushing to their branch is only for review: PR to `dev`, then the real dev Airflow picks it up.
+
+So the full flow is:
+1. Log in and open the workspace. Deps are installed and Airflow is already running.
+2. Write the DAG, see it in their own Airflow, and trigger it there.
+3. When it works, push to their branch and open a PR.
+
+On Codespaces this is mostly one devcontainer config plus a startup command, so maybe 2–4 days including getting it right. Each person's Airflow runs in their own codespace, so it costs nothing on the cluster. If Codespaces isn't allowed, the same container runs as a pod per user on EKS, but then capacity becomes the real cost again.
+
+To check I've understood: what matters is that users see their DAG run in a real Airflow right after writing it, not specifically that push triggers a sync. If so, the per-user Airflow inside the workspace covers it.
+
+Questions before I draft cards:
+1. Is "see it in your own Airflow without pushing" acceptable, or does Francois specifically want push → sync, for example so others can see it too?
+2. Do users' test runs need real credentials (TSDB, CDH, S3), or are dry runs and dev creds enough for the first version?
+
+I haven't checked whether the SMP Airflow image runs `airflow standalone` cleanly, or whether a codespace can reach VPN-only sources like TSDB. That network access is still the biggest unknown.
+
+## 14:06 user (smp-tool)
+
+1. I'd imagine it to be shared to other users too. So let me clarify... to simplify the flow, one "dev india" environment for all india users.. so it's going to be one sandbox per region. Mateo can push Dag 1 today, and Lou logging in tomorrow we'll see it and can play around OR add her own dag. 
+2. real nonProd creds
+
+## 14:06 assistant (smp-tool)
+
+You might already have most of this. `smp-tool/config/india/dev/airflow_values.yaml` sets India dev Airflow to git-sync `qrm-dms/smp-india`, branch `dev`. It already has Okta login and non-prod credentials. So "one dev India environment for all India users" is basically `smp-india-dev` as it exists today. Mateo pushes DAG 1 to `dev`, and Lou sees it in the same Airflow tomorrow.
+
+That leaves one real gap: **the web IDE with deps preinstalled.**
+
+**The cards:**
+
+| Card | What | Size |
+|---|---|---|
+| 1. Decide the sandbox | Reuse `smp-india-dev` (default) or stand up a separate sandbox Airflow syncing a `sandbox` branch, copied from `config/india/dev` | ½ day (decide with Francois) |
+| 2. Web IDE | Codespaces devcontainer with the SMP Airflow image (1–2 days), or JupyterHub/code-server on EKS if Codespaces isn't allowed (1–2 weeks) | S or L |
+| 3. User access | GitHub org membership with push to `dev`, Okta access to Airflow dev. No Artifactory needed if the image already has the deps | ½ day + waiting |
+| 4. Guardrails | New DAGs start paused (Airflow's default; I didn't see it overridden in the India values), DAG ID naming convention, how-to doc | ½–1 day |
+| 5. Pilot | Mateo pushes, Lou picks it up, collect feedback | 1 day |
+
+That's about one week with Codespaces, or two to three without. Japan follows the same pattern later on its own dev Airflow.
+
+**Why a separate sandbox might be worth it anyway:**
+- Key users' experiments would share the team's dev Airflow and its worker slots. Your notes say the dev Airflow has one worker pod with 4 slots, though that note may be about Japan.
+- Their test runs would write to the same non-prod TSDB and CDH datasets the team uses.
+
+If either bothers you, card 1 becomes "copy the dev config to a new namespace", which costs about 2–3 days plus cluster capacity.
+
+To check I've understood: one shared Airflow per region, every user pushes to the same branch, everyone sees everyone's DAGs, test runs use real non-prod credentials, and the main thing to build is a zero-setup web IDE.
+
+Questions:
+1. Are you OK with key users pushing straight to `dev`, the same branch the team uses? Or should they get their own `sandbox` branch and Airflow?
+2. Do you know if ENGIE's GitHub org allows Codespaces? That one answer decides whether card 2 is S or L.
+
+I haven't checked whether the 1-worker/4-slot limit applies to India dev, or how Okta access is granted to new users.
+
+## 14:11 user (smp-tool)
+
+pros and cons on codespaces vs jupyter?
+
+## 14:11 assistant (smp-tool)
+
+Here, "Jupyter" means self-hosted JupyterHub on your EKS cluster, i.e. Mae's helm chart.
+
+| | **Codespaces** | **JupyterHub on EKS** |
+|---|---|---|
+| **Effort** | 1–2 days: a devcontainer file in the repo | 1–2+ weeks: deploy, Okta, ingress, image, storage |
+| **Maintenance** | GitHub runs it | You run it: upgrades, broken pods, user volumes |
+| **Cluster capacity** | None used | Uses some of the ~90%-full non-prod cluster |
+| **Editor** | Full VS Code: terminal, git panel, linting. Notebooks work too | JupyterLab. Fine for notebooks, clunky for editing `.py` DAG files |
+| **Git push** | Built in, logged in as the user's GitHub account | Each user sets up a token or the jupyterlab-git extension. Most users will trip on this |
+| **Network** | GitHub's cloud. It can't reach VPN-only things like TSDB from the IDE | Inside the cluster, so it can reach TSDB/CDH with non-prod credentials for exploring |
+| **Data exploration** | Possible, but data access is limited by the network row | The main strength: poke at data and plot it interactively |
+| **Cost / approval** | Needs org policy and billing approval, charged per core-hour | No new approval. It's your cluster, but it costs capacity |
+| **Help available** | None in-house, but it's well documented | Mae and Eric already have a Synapse recipe |
+| **Fit for "write DAG → push → sandbox Airflow runs it"** | Very good: runs happen in Airflow, so the IDE only edits and pushes | OK. The notebook is an extra step before the real `.py` file |
+
+**My take:** Francois's main pain is setup, and the shared sandbox Airflow does the real runs. So the IDE only needs to edit and push, which favours **Codespaces**.
+
+**Pick JupyterHub if:**
+- Codespaces isn't approved, or
+- key users mainly want to explore data interactively, with real non-prod credentials, before writing a DAG.
+
+**Middle ground if Codespaces is blocked:** code-server (VS Code in the browser) on EKS. You'd host it the way you'd host JupyterHub, but users get the better git and `.py` editing.
+
+The deciding question goes to GitHub admins: can the `qrm-dms` org use Codespaces? I haven't checked ENGIE's Codespaces policy, or whether a codespace can reach ENGIE Artifactory to build the image.
+
+## 14:12 user (smp-tool)
+
+I dunno how to check lol. Or do we simply ask?
+
+## 14:13 assistant (smp-tool)
+
+I checked with your work GitHub account using read-only calls, and **Codespaces looks switched off for you on `qrm-dms/smp-india`**:
+
+- `qrm-dms` is on the **GitHub Enterprise** plan (about 5,000 seats), so Codespaces is possible in principle.
+- But GitHub returned **zero machine types** you could launch for `smp-india` (`total_count: 0`). When Codespaces is enabled for a user, that list contains the machine sizes they can pick. Empty usually means an admin hasn't turned it on for you or hasn't set up billing.
+
+So yes, now you ask, and you can ask precisely. The org admins are `AJC531_engieco`, `BJM501_engieco`, `FR6034_engieco`, `JGAI11_engieco`, `LQ5839_engieco`, `NP6766_engieco`, `SD5895_engieco` and `SVIJ09_engieco`. Whoever runs the ENGIE GitHub enterprise will know which of them to contact.
+
+Draft:
+
+```
+Hi! Is GitHub Codespaces available for the qrm-dms org? For SMP we'd like to give a few key users (India first, ~3–5 people) a browser dev environment for smp-india instead of local setup. Currently no machine types show up for me on qrm-dms/smp-india. If it's possible, what's the process to enable it, and who covers the billing?
+```
+
+If the answer is no, or it takes forever, the fallback is JupyterHub or code-server on EKS, so card 2 becomes the L-sized version.
+
+The empty machine list strongly suggests Codespaces is off, but it doesn't prove it. A full check needs the `codespace` token scope, and I didn't change your token.
+
+## 14:15 user (smp-tool)
+
+hmmm. can we include in the msg on why we think this is better than doing the jupyterhub approach? The strongest argument for JHub, I'm seeing is.. Synapse already done it so why reinvent the wheel.
+
+## 14:16 assistant (smp-tool)
+
+I'd mention the Synapse argument head-on rather than dodge it. It's fair, and naming it shows you've weighed it.
+
+```
+Hi! Is GitHub Codespaces available for the qrm-dms org? For SMP we'd like to give a few key users (India first, ~3–5 people) a browser dev environment for smp-india instead of local setup. Currently no machine types show up for me on qrm-dms/smp-india.
+
+Why Codespaces over JupyterHub (which Synapse already runs):
+- Our users write .py DAG files and push to a shared dev Airflow, which does the actual runs. VS Code + built-in git fits that better than notebooks.
+- Nothing for us to host: no auth/ingress/storage to maintain, and no extra load on the non-prod EKS cluster (already ~90% used).
+- Setup is a config file in the repo, so roughly days instead of weeks.
+
+If Codespaces isn't an option, we'll fall back to JupyterHub using Synapse's setup. If it is: what's the process to enable it, and who covers the billing?
+```
+
+The point that "Synapse already did it" saves less than it seems: Mae's script installs a bare hub on minikube. Okta login, the SMP image, credentials and git push would still be ours to build. Leave that out of the message unless they push back, so it doesn't sound like a dig at their work.
+
+## 14:16 user (smp-tool)
+
+where did we get the 90% used?
+
+## 14:16 assistant
+
+The 90% comes from your own meeting: the Granola notes from **8 Oct 2026, "Another Attempt at Jupyter Discussion"** (`baraluga-mind/sources/meetings/2026-10-08-1431-granola-another-attempt-at-jupyter-discussion.md:56`). It says SMP runs on a shared EKS cluster at about 90% utilization, across 10 nodes and 78.2 cores. The same section notes that adding Airflow deployments is expensive and needs coordinating with Milo, the cluster admin.
+
+Two caveats before you put it in a message:
+- **It's two weeks old** and was said in a meeting. Nobody measured it for this purpose.
+- **It's unclear what kind of 90% it is:** CPU *requested* by pods (which limits what can be scheduled) or CPU *actually used*. Those numbers can be very different.
+
+You have two options:
+- Soften the line to "the shared non-prod EKS cluster is already heavily used (~90% as of early Oct)".
+- Get a current number. I can give you one copy-paste script to run on the VPN: refresh EKS credentials, print requested vs. used CPU and memory per node, about 30 seconds to run.
+
+## 14:39 user
+
+I see. In terms of cost, IF it's included in our org and it's just a matter of activation, how do both options look in terms of cost?
+
+## 14:40 assistant
+
+**Short version:** at your scale, both are cheap in cash. The real cost difference is your team's time.
+
+**Codespaces (pay-as-you-go; GitHub orgs get no free hours)**
+- Rates: a 2-core machine is $0.18/hour, a 4-core is $0.36/hour, and storage is $0.07 per GB per month. You only pay compute while a codespace is running, and it stops itself after 30 idle minutes by default.
+- 2-core is enough here, because the shared Airflow does the real runs. The IDE only edits and pushes.
+
+| Scenario | Per user per month | 5 users per month |
+|---|---|---|
+| Light: 2-core, ~2 h/day | ~$7 compute + ~$1 storage ≈ **$8** | **~$40** |
+| Heavy: 4-core, ~6 h/day | ~$43 + ~$1 ≈ **$45** | **~$225** |
+
+You can set an org spending limit, so costs can't run away.
+
+**JupyterHub on EKS (no new invoice, but not free)**
+- **Compute:** the hub plus one pod per active user, at maybe 1 core and 2 GB each. If the cluster really is about 90% used, you'd probably need one more node. An AWS 4-vCPU/16 GB node running all the time is roughly **$150–180/month** (my estimate; I didn't look up current AWS prices for your region).
+- **Storage:** user volumes on EFS cost a few dollars a month at this size.
+- **People time:** 1–2 weeks to build, plus ongoing upkeep (upgrades, Okta, broken pods). That's far more than either cash figure.
+
+| | Codespaces | JupyterHub on EKS |
+|---|---|---|
+| Cash per month (5 users) | ~$40–225, scales with use | ~$0 if there's spare capacity, otherwise ~$150–180 for a node, flat |
+| Build time | 1–2 days | 1–2+ weeks |
+| Upkeep | ~none | Yours |
+| Who pays | GitHub org billing (needs approval) | Existing AWS budget |
+
+**For the pitch:** "Codespaces costs roughly $40/month for five light users and needs no hosting, versus 1–2 weeks of build time plus upkeep for a self-hosted JupyterHub."
+
+The Codespaces rates come from GitHub's docs. The usage hours are my guesses, so treat the totals as rough. The ENGIE Enterprise agreement might have negotiated rates; ask about that in the same message.
+
+Sources:
+- [GitHub Codespaces billing – GitHub Docs](https://docs.github.com/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces)
+- [Product usage included with each plan – GitHub Docs](https://docs.github.com/en/billing/reference/product-usage-included)
+
+## 14:46 user
+
+Hmmm. Let's rephrase the msg pls to be more:
+
+* careful, considering this can be construed as reinventing the wheel
+* inquisitive while affirmative with the pros: full-fledged IDE + copilot + less maintenance (if any) vs hosting our own jupyter thing but still accepting the cons
+
+
+Very brief pls! As this msg is only to answer: "hey is codespaces available to us? (and the why the sudden interest)"
+
+## 14:46 assistant
+
+```
+Hi! Quick question: is GitHub Codespaces available to qrm-dms, or could it be enabled? No machine types show up for me on qrm-dms/smp-india.
+
+Context: we want key SMP users to write DAGs without the local setup (repo, Artifactory, deps). Synapse's JupyterHub is the obvious route and we may still go that way. Codespaces just caught our eye because it's a full IDE with Copilot and git built in, and there'd be little or nothing for us to host. The trade-offs are per-use billing and no in-network data access from the IDE.
+
+If it's available, what's the process and who covers the billing?
+```
+
+## 14:48 user
+
+what's "no in-network data access"? within the intranet, you mean?
+
+## 14:49 assistant
+
+Yes, close. A codespace runs on GitHub's cloud machines on the public internet, outside ENGIE's network and VPN. From inside the IDE, users couldn't reach VPN-only systems like TSDB (`*.myengie.com`) or anything that lives only inside the EKS cluster.
+
+That matters less for you than it sounds. The DAGs actually run in the shared dev Airflow on EKS, which already has network access and non-prod credentials. The IDE just edits and pushes. You'd only notice it if users wanted to poke at TSDB data interactively from the IDE, which is where JupyterHub in the cluster would win.
+
+To make the message clearer, swap the last part of that sentence:
+
+```
+The trade-offs are per-use billing and no access to VPN-only systems (e.g. TSDB) from the IDE itself.
+```
+
+## 14:49 user
+
+how will github reconcile that if smp-india has vpn-only dependencies?
+
+## 14:50 assistant
+
+Good catch. **GitHub won't reconcile it for you.** The repo already shows the problem: [smp-india/AGENTS.md:54](smp-india/AGENTS.md:54) says tests run on the **Walnut runner** "with private dependency access". GitHub's own runners can't install smp-india's private deps; the lint job there gets around it with `uv sync --no-config`, which skips the private indexes. The lockfile pulls from `artifactory.gem.myengie.com` (about 1,400 references), and `*.myengie.com` is VPN-only. A codespace runs on GitHub's cloud too, so a plain `uv sync` inside it would most likely fail the same way.
+
+**How to work around it:**
+1. **Bake the deps into the image.** The Walnut runner, which can reach Artifactory, builds the devcontainer image with all deps installed and pushes it to a registry the codespace can pull from (e.g. GitHub's container registry, `ghcr.io/qrm-dms/...`). The codespace then needs no Artifactory access at startup. Editing, linting and pytest all work. Adding a new dependency means an image rebuild through CI, which is rare and fine.
+2. **Runtime doesn't need it.** DAGs run in the dev Airflow on EKS, which already sits inside the network.
+3. **Private networking for Codespaces.** GitHub Enterprise has options to connect codespaces to a company network (Azure VNet). That's heavy admin work; only worth asking about.
+
+**Honest impact:** this narrows Codespaces' lead. Option 1 adds about 1–2 days (an image build workflow on Walnut), and a self-hosted JupyterHub or code-server inside the cluster wouldn't have this problem at all. Codespaces still wins on maintenance and the IDE, but the gap is smaller.
+
+Worth adding one line to your message:
+
+```
+Also: smp-india's deps come from Walnut Artifactory (gem.myengie.com). Can codespaces reach it, or would we need a prebuilt image?
+```
+
+I haven't checked whether `artifactory.tools.digital.engie.com`, the other index, is reachable from the internet with credentials. If it is and only `gem.myengie.com` is VPN-only, there might be a simpler route.
+
+## 14:55 user
+
+Hmmm. Let's post this to the "Builder Community" channel instead. I don't think no one knows codespaces in the team. 
+
+So let's rephrase the question to a more generic pls.
+
+## 14:55 assistant
+
+```
+Hi all! Has anyone here used GitHub Codespaces at ENGIE?
+
+We're looking at giving a few key users a browser-based dev environment so they can skip the local setup (repo, Artifactory access, deps). Codespaces looks appealing (full IDE, Copilot, nothing to host), but we're also weighing self-hosting something like JupyterHub.
+
+A few things we're unsure about:
+- Is Codespaces available on our GitHub Enterprise, and how do you get it enabled and billed?
+- How did you handle private deps from Walnut Artifactory or other VPN-only systems? Prebuilt image, private networking, something else?
+
+Any experience or pointers welcome, thanks!
+```
+
+## 14:56 user
+
+Disclaimer on, I hope I'm posting at the right channel
+
+## 14:56 assistant
+
+```
+Hi all! (Hope this is the right channel, feel free to redirect me.) Has anyone here used GitHub Codespaces at ENGIE?
+
+We're looking at giving a few key users a browser-based dev environment so they can skip the local setup (repo, Artifactory access, deps). Codespaces looks appealing (full IDE, Copilot, nothing to host), but we're also weighing self-hosting something like JupyterHub.
+
+A few things we're unsure about:
+- Is Codespaces available on our GitHub Enterprise, and how do you get it enabled and billed?
+- How did you handle private deps from Walnut Artifactory or other VPN-only systems? Prebuilt image, private networking, something else?
+
+Any experience or pointers welcome, thanks!
+```
+
+## 17:01 user
+
+Sent. We'll wait for the response. 
+
+Worst case, we stick with Jupyter. Here are more details from Eric:
+
+"
+
+<pasted_content id="1fa9">
+helm repo add jupyter to get the chart, install as-is if you want
+
+1. some admin things
+   1. add ingress to expose as subpage ng domain nyo
+   2. add oauth sa template for okta/intact support (kita nmn sa config nmn), same sa custom auth ng smp airflow
+2. to customize ung python interpreter inside, we suggest magbuild ng image so you provide the harbor image sa values.yaml
+</pasted_content id="1fa9">
+
+"
+
+
+-- does it make sense? I asked kasi..
+
+"
+
+<pasted_content id="1fa9">
+DAVID Eric Martin (ENGIE Services Philippines), high-level, ano ang steps for the jupyter thingy (assume barest of the bare bones)? Yung sagot ni Mae eh...
+
+1. Install JupyterHub
+
+....tapos na hahaha.
+</pasted_content id="1fa9">
+
+ "
+
+## 17:02 assistant (smp-tool)
+
+Yes, it makes sense. Eric gave the real steps, and they match the cards from earlier: deploy the hub, ingress plus Okta login, and a custom image. Here's how his list maps to SMP:
+
+| Eric's step | What it means for SMP | Notes |
+|---|---|---|
+| Install the chart | Same helm command, values kept in `smp-tool/config/india/dev/` next to `airflow_values.yaml` | Easy |
+| 1a. Ingress | Expose it at a subpath of your domain, e.g. `<smp-india-dev-domain>/jupyter`, the same way Airflow dev is exposed | Easy, follow the Airflow pattern |
+| 1b. OAuth for Okta/Intact | Hook JupyterHub's OAuth login to the same Okta setup as SMP Airflow's custom auth (`smp_airflow/auth/`). Their config is a template | The fiddliest part. Ask what "Intact" is; I don't know it |
+| 2. Custom image | Build an image with the SMP Python deps | **Small difference:** Synapse uses Harbor, but SMP's Airflow image lives in **AWS ECR** (`…ecr.eu-west-1…/smp-india-dev-airflow`). Simplest path: use the Airflow image as the base, add `jupyterlab` + `jupyterhub`, and push to ECR. The Python version and deps then match Airflow automatically |
+
+**What Eric's list doesn't cover, and you'll still need:**
+- **Git push from the hub.** Each user needs a GitHub token, or the hub needs a git extension. Without this, "push to the dev branch" doesn't happen.
+- **CPU/memory limits and persistent user storage.** A few lines in the values file, but don't skip them given the capacity concern.
+- **Non-prod credentials inside notebooks.** Running in the cluster helps, but the user pods still need a service account with the same access Airflow dev has.
+
+**Updated size:** about 1 week of focused work with Eric and Mae's templates, maybe less if they share their values file. Okta is the most likely place it slips.
+
+I haven't checked how the Airflow image is built or pushed to ECR, or whether Eric's Okta template carries over to SMP's Okta app as-is.
+
+## 17:12 user (smp-tool)
+
+here's their repo: https://github.com/QRM-APO-STT/synapse-infra.git 
+
+should we clone this locally or you can read from here?
+
+## 17:13 assistant (smp-tool)
+
+No need to clone. Your work GitHub account can read it directly; I've already listed its files. It's private, its default branch is `dev`, and it was updated today.
+
+The parts that matter for SMP:
+
+- **Values files:** `config/jupyter/jupyterhub-values.yaml`, plus `-staging` and `-prod` versions. These cover the ingress and the Okta login setup Eric mentioned.
+- **Docs:** `docs/jupyterhub.md`, and `docs/jupyter-image-amd64-build-issue.md`, which looks like a known problem worth reading first.
+- **Image:** `images/jupyter-image/Dockerfile`, and a CI workflow that builds it (`build-jupyter-image.yaml`).
+- **Git workflow:** `images/jupyter-image/bin/quiver-jupyter-clone.sh` and `quiver-jupyter-sync.sh`. These probably answer the "how do users push from the hub" gap.
+- **Deploy:** `scripts/k8s/deploy-jupyter.sh` and a deploy workflow.
+- **What to skip:** the audit database pieces (`jupyter-audit-*`, `00-cell-audit.py`). That's the Synapse save-to-database audit trail you already ruled out. There are also `azure_config` and `bicep/`, so their setup leans on Azure, unlike SMP's AWS.
+
+Next I can read these and write a short "reuse as-is / adapt / skip" map for SMP. That would replace the guesswork in the card sizes.
+
+## 17:15 user (smp-tool)
+
+how much we can reuse as is from here?
+
+## 17:16 assistant (smp-tool)
+
+**Short answer: about two-thirds, and the hardest third is already solved.** Their setup matches what you described more closely than I expected. In `synapse-infra`'s `dev` branch, when a user saves a file, it's committed and pushed to a shared branch, and every user's checkout pulls every 10 seconds. That is the "Mateo pushes today, Lou sees it tomorrow" flow.
+
+**Reuse almost as-is (rename variables, point at `smp-india`)**
+- **Values file skeleton** (`config/jupyter/jupyterhub-values.yaml`): chart `4.3.4`, CPU/memory limits on every pod, readiness probe, shutting down idle servers after 6 hours, proxy env vars, and file-permission tweaks for shared EFS volumes.
+- **Okta login:** it reuses the *Airflow's* Okta app and secret. SMP Airflow already has `smp-okta-client-secret`, so the same pattern applies. The one external ask is adding the hub's callback URL to the Okta app's allowed redirect URIs.
+- **Git flow:**
+  - an init container that clones the branch when a user's server starts;
+  - `jupyter_server_config.py`, which commits each saved file as the user and pushes it with a shared bot token;
+  - `quiver-jupyter-sync.sh`, which runs `git pull --rebase` every 10 seconds.
+- **Dockerfile pattern:** ENGIE CA certs plus deps installed with `uv`.
+
+**Adapt (their managed environments run on Azure; SMP is on AWS)**
+- Azure Workload Identity becomes an **IRSA service account**. `smp-tool` already has `config/india/dev/service_account`.
+- Their Harbor image registry becomes **ECR**, where the SMP Airflow image lives.
+- Their Traefik ingress route becomes whatever SMP Airflow dev uses. I didn't find that in the values I checked.
+- **Image deps:** swap their `pyproject.toml` for SMP's. Simplest is to start from the SMP Airflow image so Python and deps match. Their image is Python 3.11.
+
+**Skip**
+- The audit database (PostgreSQL, Alembic, `00-cell-audit.py`, migration jobs), `azure_config`, `fetch_from_azure`, `bicep/` and the logger shim. That's the Synapse audit machinery you already ruled out.
+
+**Decisions they made that you'd inherit**
+1. **Every save is pushed immediately.** If the branch is `dev`, every half-written save lands in the shared dev Airflow within seconds. A broken DAG only shows an import error and doesn't take down others, but this is a good argument for a dedicated `sandbox` branch.
+2. **Terminal and the git UI are turned off.** Users can't run `airflow dags test` or git by hand, so the push-and-pull is automatic. Simpler, but less control.
+3. **Notebooks don't survive a restart.** Pod storage is temporary (`emptyDir`); only what's been pushed survives.
+
+**Updated size:** about 3–5 days instead of a week or more, mostly the AWS adaptation and getting the Okta redirect URI registered.
+
+I read the values file, Dockerfile, docs and parts of the scripts. I didn't read `deploy-jupyter.sh`, `quiver-jupyter-clone.sh`, `quiver-jupyter-bootstrap.sh`, or the staging and prod values. Their values comment says "EKS" but the docs say AKS, so confirm with Eric which cluster dev actually runs on.
+
+## 17:18 user (smp-tool)
+
+oh shit so they commit every save? Isn't that too much? Imagine typing "lord help us" in a comment, SAVE, and we have that as a small commit in git history.....???
+
+## 17:18 assistant (smp-tool)
+
+Yes, and it's worse than "every Save". The hook runs on **every save, including JupyterLab's autosave**, which by default fires every 2 minutes while a file has unsaved changes. Their config doesn't turn autosave off. So your "lord help us" comment gets committed even if you never press Save, as `jupyter: <user> edited <file>`, and pushed straight to the shared branch. The only filter is "skip if the file didn't change".
+
+The hook (`images/jupyter-image/jupyter_server_config.py`) has two more problems:
+- **Failures are silent.** If the push fails, it just logs a warning and the user never finds out.
+- **Half-finished work goes live.** With autosave on a branch that Airflow syncs, half-typed DAGs land in the shared Airflow every couple of minutes.
+
+**Why Synapse did it:** this is their audit trail, where every edit is recorded. It's the same machinery you already ruled out for SMP.
+
+**What I'd do instead (less code than theirs):**
+- **Drop the save hook.**
+- **Turn the git UI back on** (`jupyterlab-git`, which they deliberately disabled). Users click commit, type a message and push when the DAG is ready. Pushes still go through the shared bot token in the hub, so nobody sets up credentials, and you can keep the commit author set to the logged-in user, as they do now.
+- **Keep their 10-second pull sync,** so Lou still sees Mateo's pushed DAGs without doing anything.
+
+You get one commit per intentional change and nothing half-baked reaching Airflow. Users learn exactly one thing: the commit and push button.
+
+I haven't checked whether their staging or prod values turn autosave off. The 2-minute default is standard JupyterLab behaviour, and the dev values don't override it.
+
+## 17:21 user (smp-tool)
+
+yea.. tbh, I'd cut all of the custom fluff synapse configured, focus on the default setup of jups, and then dial down or up from there. 
+
+Clear enough to create the tickets? How should we organize? 1 huge ticket and subtasks each or 1 epic with multiple ticktes?
+
+## 17:21 assistant (smp-tool)
+
+Yes, it's clear enough. **Use one epic with several tickets, not one ticket with subtasks**, for three reasons:
+- On a kanban board each ticket is its own card that moves through the columns. Subtasks are usually hidden inside their parent or squeezed into swimlanes.
+- The pieces block on different people: Okta is an external wait, Eric and Mae help with some cards, Mateo pilots. Separate cards show what's stuck where.
+- `SCR-1210` was already meant to become an epic.
+
+**Epic: SCR-1210 – Browser dev environment for key DAG users (India first)**
+
+| # | Ticket | Done when | Size | Blocked by |
+|---|---|---|---|---|
+| 1 | Spike: default JupyterHub locally + Codespaces answer | Default chart running on minikube; Builder Community replied; JupyterHub vs Codespaces decided | S | — |
+| 2 | Deploy default JupyterHub to `smp-india-dev` | Values file in `smp-tool/config/india/dev/` with CPU/memory limits; reachable only by port-forward | S | 1 |
+| 3 | Okta login + ingress | Hub reachable at a subpath of the dev domain, login through the Airflow Okta app, redirect URI registered | M (external wait) | 2 |
+| 4 | SMP notebook image | Airflow image + `jupyterlab`/`jupyterhub`, pushed to ECR, SMP imports work in a notebook | M | 2 |
+| 5 | Git workflow | `smp-india` cloned at startup, git UI with shared bot token, pull sync; **includes deciding `dev` vs a `sandbox` branch** | M | 4 |
+| 6 | Non-prod credentials | User pods use the same service account access as Airflow dev; a notebook can read CDH/S3 | S–M | 4 |
+| 7 | Pilot + how-to | Mateo pushes a DAG, a second user sees and runs it in dev Airflow, short guide written | S | 3, 5, 6 |
+
+**Notes:**
+- "Default first, dial up later" fits this: ticket 2 is the plain chart, and each later ticket adds exactly one thing.
+- Keep ticket 2 on port-forward only until ticket 3 is done. The default login accepts anyone, so it shouldn't get a public URL before Okta is in place.
+- If Codespaces wins in ticket 1, cut tickets 2, 3 and 6 and rewrite 4–5 as "devcontainer + prebuilt image".
+
+Shall I create these in Jira under `SCR-1210`? I'd show you the exact fields first.
+
+## 17:27 user (smp-tool)
+
+I feel it's too granular. I struggle to justify 7 tickets for "2-3 days" of work
+
+## 17:27 assistant (smp-tool)
+
+Fair. Group the work by what a user can do at the end of each step, not by technical task. That gives **3 tickets under `SCR-1210`**:
+
+| # | Ticket | Includes | Done when | Size |
+|---|---|---|---|---|
+| 1 | **Decide: Codespaces vs JupyterHub** | Builder Community answer, try the default chart on minikube | Decision noted on the epic | ½ day |
+| 2 | **JupyterHub on India dev with Okta login** | Default chart in `smp-tool`, resource limits, ingress, Okta (Airflow app) | A key user logs in at the dev URL and gets a notebook | 1–2 days (+ Okta wait) |
+| 3 | **SMP-ready notebooks** | SMP image on ECR, non-prod creds, `smp-india` clone + git push, `dev`/`sandbox` decision, pilot with Mateo | Mateo pushes a DAG, a second user sees it run in dev Airflow | 1–2 days |
+
+Each ticket is a clear demo, which is easy to justify in a review. The details from the 7-ticket list go into each ticket as a checklist, so nothing gets lost.
+
+If even 3 feels like too many, fold ticket 1 into ticket 2 as its first checklist item.
+
+## 17:28 user (smp-tool)
+
+any external deps for each?
+
+## 17:28 assistant (smp-tool)
+
+**Ticket 1: decide Codespaces vs JupyterHub**
+- **Builder Community reply.** Nothing you can do to speed it up. Set a timebox, e.g. no answer by Friday means JupyterHub.
+- If Codespaces looks possible, the **GitHub Enterprise admins** have to enable it and agree on billing.
+- No external deps for the minikube part.
+
+**Ticket 2: JupyterHub on India dev with Okta login**
+- **Your AWS access.** Your wiki notes say your AWS account was decommissioned. Deploying to EKS needs kubectl and helm access, so re-request it through the **Singapore help desk** now. This is the most likely blocker, because it gates everything else.
+- **Cluster capacity: Milo**, the cluster admin. The 8 Oct meeting said new deployments need his OK, and the cluster was about 90% full.
+- **Okta app admin:** whoever owns the SMP Airflow Okta app has to add the hub's callback URL to its allowed redirect URIs. Find out who that is early; it's usually a ticket and a wait.
+- **Eric and Mae:** optional help with the Okta config and ingress.
+
+**Ticket 3: SMP-ready notebooks**
+- **GitHub bot token** that can push to `qrm-dms/smp-india`. Check whether there's an existing service account or bot, or ask a `qrm-dms` org admin.
+- **Branch decision (`dev` vs `sandbox`):** Francois, and maybe the India team.
+- **Non-prod credentials:** probably none if you reuse the service account Airflow dev already uses. If a new IAM role is needed, that's the AWS/infra team.
+- **Pilot:** Mateo's time, plus a second user.
+
+**Start now, before the sprint:** the AWS access request and finding the Okta app owner. Both are waits you can run in parallel with ticket 1.
+
+I haven't checked whether Airflow dev's service account can be shared with user pods as-is, or who owns the SMP Okta app.
+
+## 17:29 user (smp-tool)
+
+For ticket 1 outcome, if codespaces is green, is ticket 2 irrelevant or ticket 3 too?
+
+## 17:29 assistant (smp-tool)
+
+**Ticket 2 goes away. Ticket 3 stays, but gets rewritten.**
+
+**Ticket 2 isn't needed.** GitHub hosts the IDE, and users log in with their GitHub account, so there's no deployment, no Okta and no cluster capacity to worry about.
+
+**Ticket 3 becomes "SMP-ready Codespace":**
+
+| Item | JupyterHub version | Codespaces version |
+|---|---|---|
+| Image | SMP image on ECR | Prebuilt devcontainer image, built on the **Walnut runner** (it can reach Artifactory), pushed to GHCR |
+| Git push | Shared bot token in the hub | Built in, under each user's own GitHub account. **No bot token needed** |
+| Non-prod creds | Service account on user pods | **Dropped.** The codespace sits outside the network; real runs happen in dev Airflow |
+| `dev` vs `sandbox` decision | Needed | Still needed |
+| Pilot with Mateo | Needed | Still needed |
+
+**External deps change too:**
+- **Gone:** your AWS access (for this work), Milo/capacity, the Okta app owner, the bot token.
+- **New:** GitHub admins enable Codespaces and billing, and each key user needs a `qrm-dms` GitHub account with push access to `smp-india`.
+
+So the Codespaces path is 2 tickets (decide, then build the codespace), about 2–3 days in total.
+
+## 17:31 user (smp-tool)
+
+I see. So fair to say to create 4 tickets then? Something like...
+
+1. spike to decide jupy vs codespaces
+2. IF jupy 
+3. IF codespaces
+4. SMP-readiness -- I wonder if we can write it, agnostically?
+
+## 17:31 assistant (smp-tool)
+
+Almost. Two tweaks:
+
+1. **Don't create both "IF" tickets now.** One of them will be closed as won't-do, and a card that's dead on arrival is just clutter. Create tickets 1 and 4 now, and add whichever of 2 or 3 wins once the spike is done. If you want the board to show the full picture today, create both and close the loser right after the spike. That works too, it's just noisier.
+
+2. **Yes, ticket 4 can be written agnostically** if you describe outcomes, not tools. Something like:
+
+> **SMP-ready browser dev environment (India pilot)**
+>
+> Key users can write a DAG in the browser environment chosen in [spike], with SMP deps preinstalled, push it to a shared branch, and see it run in India dev Airflow. No local setup.
+>
+> **Acceptance:**
+> - SMP Python deps (incl. Artifactory packages) are available without users installing anything
+> - Users can push to a shared `smp-india` branch from the environment
+> - Shared branch decided (`dev` or `sandbox`) and synced by dev Airflow
+> - Pilot: Mateo pushes a DAG; a second user sees it and runs it in dev Airflow
+> - Short how-to for key users
+>
+> **Depends on:** [hosting ticket from spike]
+
+The how goes into the checklist after the spike, e.g. "image on ECR + bot token" or "devcontainer + GHCR". The acceptance criteria stay the same either way.
+
+Final shape: **spike → (JupyterHub hosting | Codespaces enablement) → SMP-ready environment**, which is 3 live tickets at any time.
+
+## 18:19 user (smp-tool)
+
+tbh, at this point, we don't mind deleting a ticket. Easier to do that than going back here to properly write the 2nd ticket. Wdyt?
+
+## 18:19 assistant (smp-tool)
+
+Agreed. Writing it now while everything's fresh is worth more than a tidy board, and deleting a card takes a few seconds. Go with 4 tickets under `SCR-1210`:
+
+1. **Spike:** JupyterHub vs Codespaces (timeboxed)
+2. **JupyterHub hosting on India dev:** deploy, Okta, ingress, non-prod creds. Delete if Codespaces wins.
+3. **Codespaces enablement:** admin/billing, user access, devcontainer + prebuilt image. Delete if JupyterHub wins.
+4. **SMP-ready browser dev environment (India pilot):** the agnostic outcome ticket from before.
+
+Each one would include its external deps and acceptance criteria from this conversation.
+
+Want me to draft all four here first, or create them straight in Jira under `SCR-1210` once you've checked the drafts?
+
+## 18:19 user (smp-tool)
+
+create straight to jira pls. Account => Common, Label => Common.
+
+## 18:19 assistant (smp-tool)
+
+Jira site from earlier notes: tractebel-et.atlassian.net.
+
+## 18:20 assistant (smp-tool)
+
+I haven't created any tickets yet. While checking `SCR-1210` (already an Epic, with the Common account and the `SMP-COMMON` label), I found **[SCR-1297 "Jupyter Intergration: Implementation"](https://tractebel-et.atlassian.net/browse/SCR-1297)**. Francois created it yesterday under the same epic, and its design is different from what we just planned.
+
+| | Francois's SCR-1297 | Our plan |
+|---|---|---|
+| Environment | One namespace per **user branch**, each with its own Airflow + JupyterLab ("DEVX") | One shared sandbox per region, using the existing India dev Airflow |
+| Sharing | Users work in isolation; a PR to `dev` is the merge point | Everyone pushes to one shared branch and sees each other's DAGs |
+| Limits | Max 2 DEVX branches at once, smaller resources, cost/activity monitoring | Resource limits only |
+| Secrets | Same as the Airflow instance, minus SMP's own infra | Real non-prod credentials |
+| Codespaces | Doesn't fit: it needs a running Airflow per branch | An option |
+| Next step | "Contact the Synapse team for grooming, and have Nilo take a last look before starting" | — |
+
+Where we agree: get rid of local setup, keep the PR review gate, keep resources under control, and do something lighter than Synapse.
+
+Where we really differ:
+- **Per-branch Airflow vs. one shared Airflow.** This is the big one, and it brings back the capacity question.
+- **Isolation vs. sharing:** Francois has users working on separate branches, while you described Mateo pushing and Lou seeing it the next day.
+
+Creating four tickets that contradict his story the day after he wrote it would look odd. If you go with his design, the "Codespaces vs. JupyterHub" spike changes too.
+
+For when we do create them, I'd use Account `O.QR26055.003 SMP_CAPEX_COMMON_2026` and label `SMP-COMMON`, matching the epic and SCR-1297. There's also an OPEX Common account; tell me if this work belongs there.
+
+## 19:23 user (smp-tool)
+
+scr-1297 is the whole epic so let's repurpose that then create sibling tickets the rest of sibling tickets. 
+
+1. to me, it makes more sense to have per region no? It'd be a waste of resources and unnecessary complexity if we do per user. Wdyt? Objectively speaking. No bias and whatsoever
+2. Ah. Same as above
+
+## 19:23 assistant (smp-tool)
+
+Here's my honest comparison. For your current scale, **per-region is the better call**, but Francois's design solves real problems, and you should be ready to name them.
+
+**What per-branch (Francois) gets right**
+1. **Isolation.** One user's broken or heavy DAG can't slow down or confuse others. India dev might have only one worker with 4 slots.
+2. **Clean PRs.** One branch per feature means each PR to `dev` holds one person's change. With a shared branch, everyone's work-in-progress ends up in the same history, and a PR to `dev` drags in other people's half-finished work. **This is the strongest argument against per-region**, and the one he'll probably raise.
+3. **The team's dev stays clean.** User experiments don't land in the Airflow the SMP team itself uses.
+
+**What it costs**
+- **Up to 2 extra full Airflows** (scheduler, API server, triggerer, database, worker) on a cluster that was about 90% full.
+- **Automation to create and tear down** branch, namespace, Airflow and JupyterLab on demand. This is the expensive part, and it's essentially what you rejected from Synapse.
+- **A cap of 2** means users wait for each other.
+- **Two DEVX instances running the same DAG** write twice to the same non-prod CDH/TSDB.
+
+**Per-region costs and gains**
+- **Costs:** none of the isolation above. A shared branch also needs a rule for getting work into `dev`, e.g. each user's DAG lives in its own files and gets cherry-picked or copied into a PR.
+- **Gains:** one Airflow (zero extra if you reuse India dev), no lifecycle automation, and users see each other's work, which is what you described.
+
+**Verdict:** the 8 Oct estimate was **1–2 active DAG developers**. At that scale, isolation and clean PRs barely matter, and per-region saves a lot of build and running cost. Per-branch starts to pay off at roughly 3+ concurrent developers, or if users keep tripping over each other.
+
+**A middle ground worth offering Francois:** one sandbox per region, *separate from the team's dev Airflow*, syncing a `sandbox` branch, with DAGs paused at creation. That's one extra Airflow instead of N. It fixes point 3, partly fixes point 1, and handles point 2 with the "one DAG, own files, PR from sandbox to dev" rule.
+
+**On the tickets:** to confirm I've understood, you want to turn SCR-1297 into one of the four (the outcome ticket, "SMP-ready browser dev environment") and create the spike, JupyterHub hosting and Codespaces enablement as siblings under SCR-1210.
+
+Before I touch his ticket:
+1. Should I **keep Francois's original text** at the bottom of SCR-1297 (e.g. "Original scope" section), or replace it completely?
+2. Is the design question settled, or do you want the spike to **include "per-region vs per-branch, agreed with Francois and Nilo"**? His ticket explicitly asks for Nilo's review before starting.
+
+## 19:25 user (smp-tool)
+
+1. keep
+2. Yea. Let's bake it in the spike
+
+## 19:26 assistant (smp-tool)
+
+Now repurposing SCR-1297, keeping Francois's original text below.
+
+## 19:27 assistant (smp-tool)
+
+The four tickets are set up under `SCR-1210`, using Account `O.QR26055.003 SMP_CAPEX_COMMON_2026` and label `SMP-COMMON`:
+
+| Ticket | Role |
+|---|---|
+| [SCR-1298](https://tractebel-et.atlassian.net/browse/SCR-1298) **Spike: decide environment model and tooling** | Per-region vs per-branch, agreed with Francois and Nilo; JupyterHub vs Codespaces; `dev` vs `sandbox` branch |
+| [SCR-1299](https://tractebel-et.atlassian.net/browse/SCR-1299) **JupyterHub on India dev with Okta login** | Delete if Codespaces wins |
+| [SCR-1300](https://tractebel-et.atlassian.net/browse/SCR-1300) **GitHub Codespaces for smp-india** | Delete if JupyterHub wins |
+| [SCR-1297](https://tractebel-et.atlassian.net/browse/SCR-1297) **SMP-ready browser dev environment (India pilot)** | Repurposed as the outcome ticket, written to work for either option. Francois's original text is kept under "Original scope (Francois, 2026-10-21)" |
+
+Each ticket has a checklist, a done-when, its external dependencies and a size.
+
+- **Your name on SCR-1297:** I changed the title and description of Francois's ticket, so the history will show your account as the editor. Worth a quick heads-up to him.
+- **Dependencies are text only:** they're written in each description, not as Jira links. Nobody is assigned and there are no story points yet.

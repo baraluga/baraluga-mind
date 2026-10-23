@@ -1,0 +1,151 @@
+# Claude Conversation - 2026-10-22
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `1439c39e-9822-4480-8637-68a03262e85c`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/1439c39e-9822-4480-8637-68a03262e85c.jsonl`
+Resume: `claude --resume 1439c39e-9822-4480-8637-68a03262e85c`
+
+## 11:44 user
+
+Help me help Lou!
+
+"Hello Team, I hope everything is going well for you. 
+I would like to set up alerts in Grafana to be notified in case of missing data. I have read the documentation and would like to run a test in the QA environment but I do not have the necessary permission to create a Contact Point (even though I am able to do so in prod environment). Could you help me get the permission to carry the test in QA? 
+Thank you "
+
+-- I'm stupid in Grafana UI lol
+
+## 11:44 assistant
+
+It's almost certainly an Okta group membership issue, not something you fix by clicking around in Grafana.
+
+**Why prod works but QA doesn't**
+
+Every Grafana (dev, qa and prod, for both India and Japan) sets the user's role from their Okta groups each time they sign in ([india/qa/grafana_values.yml:75](smp-dashboard/configs/helm/india/qa/grafana_values.yml:75)):
+
+- `smp-dashboard-admin` → GrafanaAdmin
+- `smp-dashboard-editor` → Admin, which is the role that can create contact points
+- anything else → Viewer
+
+The catch is that **QA and dev sign in through a different Okta tenant**:
+- Prod uses `gem.okta-emea.com`.
+- QA uses `gem-beta.oktapreview.com`, the preview tenant.
+
+The group lists in the two tenants are separate. Lou is probably in `smp-dashboard-editor` in prod Okta but not in the preview tenant, so QA gives them Viewer.
+
+**The fix:** add Lou to `smp-dashboard-editor` in the **preview** Okta tenant. Lou then needs to sign out of QA Grafana and sign back in, because the role is only re-read at login.
+
+Two things to avoid:
+- **Don't change Lou's role in Grafana's user admin.** The setting `skip_org_role_sync: false` means Okta overwrites it at Lou's next login.
+- **Add them to `-editor`, not `-admin`.** `-admin` makes them a server-wide Grafana admin, which is more than they need.
+
+**How to check this yourself:** in QA Grafana, go to Administration → Users, find Lou and look at their role. If it says Viewer, this is the cause.
+
+Draft reply:
+
+```
+Hi Lou! QA Grafana gets roles from a separate Okta tenant (the preview one), so having editor access in prod doesn't carry over. I'll get you added to smp-dashboard-editor on the QA side. Once that's done, sign out of QA Grafana and back in, and "Create contact point" should show up. I'll ping you when it's ready.
+```
+
+I didn't check Lou's actual group membership or who manages groups in the preview Okta tenant, so I'm not sure whether you can add them yourself or need to raise an IAM request. Which QA (India or Japan) also doesn't matter, since both use the same mapping and the same preview tenant.
+
+## 11:47 user
+
+QA and Prod screenshots
+
+## 11:47 assistant
+
+Your screenshots confirm it. Lou is **Viewer in QA** and **Admin in prod**, and both roles say "Synced via Okta". QA reads the group list from the preview Okta tenant (`gem-beta.oktapreview.com`), and Lou isn't in `smp-dashboard-editor` there.
+
+**What to do:**
+1. Get Lou added to `smp-dashboard-editor` in the **preview** Okta tenant. Do it the same way you got them into the group in prod Okta, or through an IAM request.
+2. Lou signs out of QA Grafana and back in. You can also click "Force logout from all devices" on that QA page. Lou has two QA sessions open today (Chrome and Edge), and the role is only refreshed when they sign in again.
+3. Check this page again. It should show **Admin**.
+
+Don't try to change the role on this Grafana page. Because the role is synced from Okta, Grafana either won't let you edit it or will reset it at Lou's next login.
+
+You can still send the draft reply from before as it is.
+
+## 11:50 user
+
+wait I think I can do this myself. By any chance, is this the "intact" thing?
+
+## 11:51 assistant
+
+Yes. Your own notes back this up:
+
+- Intact is ENGIE's portal for managing Okta apps and groups, and there's a separate **Intact Beta** for the preview tenant. Francois is recorded as a project admin of `portfolio-atlas` in Intact Beta, apart from the prod admins.
+- `wiki/smp/smp-dashboards.md` says group-based edit rights like Intact `editor` "can show as `Viewer` until the user logs out and back in". That's the same situation Lou is in.
+
+So:
+1. Open **Intact Beta**, not prod Intact, since QA signs in through the preview tenant.
+2. Find the SMP dashboard project/app and add `lou.buisson@engie.com` to the **editor** group. That's the one that comes through to Grafana as `smp-dashboard-editor`. Don't use the admin group.
+3. Ask Lou to sign out of QA Grafana and back in, or click "Force logout from all devices" on that page. Their role should then show **Admin**.
+
+I don't know the exact menu names in Intact. If you can see the prod project in Intact, you can compare Lou's groups there with Beta to find the right one.
+
+## 11:54 user
+
+She's here though.....
+
+## 11:54 assistant
+
+Then the group membership is fine, and the problem is between Intact and Grafana. Grafana only re-reads groups at sign-in, and both of Lou's QA sessions are from today (3 and 16 minutes before your screenshot). So the first thing to rule out is timing.
+
+Check this in QA Grafana under **Administration → Users**: look at the role of another person in that group, like Mateo, Eric or Francois.
+
+- **They show Admin.** The setup works and only Lou is stale. Either Lou was added recently, or Intact Beta hadn't pushed the change to Okta yet when they signed in. Click **"Force logout from all devices"** on Lou's page, ask them to sign in again, and check that it now says Admin. If it still says Viewer, wait a bit (Intact Beta can be slow to sync to Okta) and try again.
+- **They also show Viewer.** Then nobody in that group is getting editor access in QA, which means `smp-dashboard-editor` isn't being sent to QA Grafana at sign-in. In Intact Beta, check that Grafana's application or scope includes this group in its `groups` claim; the **Applications** and **Scopes** entries in the left menu are where that's set up. That would be a wider QA problem, not just Lou.
+
+The first case is far more likely.
+
+## 11:58 user
+
+They show Admin... weirdly enough, Francois shows as Viewer lol.
+
+## 11:58 assistant
+
+That narrows it down: the setup works, and Lou's role is just out of date.
+
+**Francois** is probably the same thing. His role was saved the last time he signed in to QA, which could have been before he joined the group. Check "Last seen" on his user page. If it's old, he'll get Admin the next time he signs in. Nothing to do there.
+
+**Lou:** click **"Force logout from all devices"** on their QA user page, have them sign in again, and refresh the page. It should say **Admin**.
+
+If it still says Viewer after a fresh sign-in, Lou was probably added recently and Intact Beta hasn't synced to Okta yet. Wait a little and try again. If it's still wrong after that, the next step is to look at the groups in the token Lou actually receives, but that's unlikely to be needed.
+
+## 11:59 user
+
+Right. I clicked. Short msg for Lou pls what we found, what we did, and what's next for her. Concise!
+
+## 11:59 assistant
+
+```
+Hi Lou! Your QA access was fine in Okta (you're in smp-dashboard-editor), but Grafana only refreshes your role when you sign in, so QA still had you as Viewer. I've signed you out of QA Grafana. Just sign back in and you should be able to create contact points. Let me know if not!
+```
+
+## 11:59 user
+
+too confident lol. Add a bit of uncertainty pls
+
+## 11:59 assistant
+
+```
+Hi Lou! Looks like your Okta access for QA is fine (you're in smp-dashboard-editor), but Grafana only picks up your role when you sign in, so QA probably still had you as Viewer. I've signed you out of QA Grafana. Could you sign back in and see if you can create contact points now? If not, let me know and I'll dig further 🙂
+```
+
+## 17:58 user
+
+From Lou: 
+
+"Hello Brian, I have seen your message for the QA access, I have signed in back but unfortunately I cannot create contact points, can you help me when you are available ? Thank you for your help "
+
+-- likely reason??
+
+## 17:59 assistant
+
+QA and prod have the same alerting and role settings (I compared the Helm values for India and Japan), so the Grafana config isn't the problem. The first step is to **open Lou's QA user page again and look at the role**.
+
+- **Still Viewer (most likely).** Grafana still isn't receiving `smp-dashboard-editor` in Lou's login. Probably Intact Beta hasn't pushed Lou's group membership to Okta preview yet, especially if they were added recently. Mateo and the others are Admin because they were added long ago. The fix is to wait and have Lou sign in again. If it's still Viewer after a few hours, remove Lou from the group in Intact Beta, add them back to force a fresh sync, then do another logout and sign-in.
+- **Now Admin.** Then the role is fine. Lou may be on a different QA (India and Japan are separate Grafanas), or looking in the wrong place. Ask for a screenshot of Alerting → Contact points.
+
+Either way, the user page shows you which case it is in a few seconds.

@@ -2,14 +2,14 @@
 
 ## Current State
 
-As of 2026-10-21. SMP product owner (ENGIE Belgium) and Brian's main SMP counterpart for validation, planning, sprint scope, and stakeholder safety. Not the same person as [[francois-caffont]], who owns [[atlas-dashboard]].
+As of 2026-10-22. SMP product owner (ENGIE Belgium) and Brian's main SMP counterpart for validation, planning, sprint scope, and stakeholder safety. Not the same person as [[francois-caffont]], who owns [[atlas-dashboard]].
 
 - Validates India tickets before they close, often cross-checking TSDB values against Grafana. Validation queues on him: tickets waited on his sign-off on 2026-07-27 (1171), 2026-09-01 (1237, 1238), and 2026-09-28 (1253, 1265).
 - 2026-10-13: asked about Khaba QA failures and the minute feed's ~6h "weird state". The QA pause was intentional; the 6h bar was the file sensor timing out while blocking later runs.
 - 2026-10-08: keen on Jupyter as the "frontend" for DAG contributors such as Mateo; Brian is skeptical it differs from normal DAG development unless it abstracts Airflow away. Recurring, undecided topic.
 - 2026-10-08: relayed Gauthier de Maere's request for help loading Aurora data into TSDB, framed as a discussion phase: share the Mateo Aurora script, but do not start work without a framework. The script lives in [[apac-tsdb-scraper]].
 - 2026-10-09: his "big no" about working for free on Aurora was read seriously by Fred; Brian read it as a joke.
-- 2026-10-21: has not yet created the Jupyter integration story/epic; he also has potential validation work on tickets 1291 and Tutti Colori after the demo. Ticket 1285 needs more time.
+- 2026-10-21/22: created the original `SCR-1297` Jupyter implementation ticket. It is now the preserved-scope outcome ticket in `SCR-1210`; `SCR-1298` requires his agreement with [[nilo-menezes]] on per-region versus per-branch authoring.
 
 ## Background
 
@@ -56,5 +56,6 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 - `sources/claude-conversations/2026-10-13-claude-smp-31a97f39.txt`
 - `sources/claude-conversations/2026-10-13-claude-smp-5c0b0e8d.txt`
 - `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
+- `sources/claude-conversations/2026-10-22-claude-smp-d2cd8178.txt`
 
-Last Updated: 2026-10-22
+Last Updated: 2026-10-23

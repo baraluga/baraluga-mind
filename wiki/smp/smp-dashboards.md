@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-21. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
+As of 2026-10-22. Grafana dashboard work across SMP Japan and India. India data behind the dashboards is on [[smp-india]]; Japan interconnector dashboards are on [[japan-interconnector-dashboard]]; alerting is on [[smp-alerting-and-ops]].
 
 - **India geomap:** delivered. It shows realtime market price and volume by region, with max/min/average and current-slot views and a freshness indicator. The Plotly prototype was replaced by native Grafana geomap, and colour settings live in the dashboard JSON, so the same JSON imports into production. Mateo expects three maps (price/volume sets joined by region codes such as `N1`–`N3`), using fixed scales: yellow to red, price 0–10,000, volume up to last year's maximum plus 10%.
 - **Bilateral contracts (`SCR-1275`):** a table of all contracts with a region legend, freshness, and anomaly indicators. Still needs validation. It consumes `SCR-1278`'s validated tables rather than fixing scraper behaviour in dashboard code, and it must show source differences explicitly (see [[smp-india]]).
@@ -27,7 +27,7 @@ As of 2026-10-21. Grafana dashboard work across SMP Japan and India. India data 
   - Portable dashboard sources live under `dashboards/<region>/`, and post-promotion snapshots under `dashboards/backups/<region>/`.
   - Keep the dashboard UID when the source is meant to overwrite a live dashboard, but parameterise datasource UIDs (e.g. `${DS_SMP_CDH}`) so dev, QA, and prod bind correctly.
   - Git as the single source of truth, with no drift from live Grafana, remains the goal.
-- **Permissions:** group-based edit rights (e.g. Intact `editor`) can show as `Viewer` until the user logs out and back in.
+- **Permissions:** group-based edit rights (e.g. Intact `editor`) can show as `Viewer` until the user logs out and back in. On 2026-10-22, Lou remained `Viewer` in QA after a forced logout/re-login despite being in `smp-dashboard-editor`, while other group members showed `Admin`; the general mapping therefore works, but Lou's group/token sync remains unresolved.
 
 ### Patterns and Preferences
 
@@ -85,6 +85,7 @@ As of 2026-10-21. Grafana dashboard work across SMP Japan and India. India data 
 - `sources/claude-conversations/2026-10-19-claude-smp-4e922cd7.txt`
 - `sources/claude-conversations/2026-10-19-claude-smp-7de67109.txt`
 - `sources/claude-conversations/2026-10-20-claude-smp-7de67109.txt`
+- `sources/claude-conversations/2026-10-22-claude-smp-1439c39e.txt`
 - Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-21
+Last Updated: 2026-10-23

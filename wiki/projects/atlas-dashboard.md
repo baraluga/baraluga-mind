@@ -2,7 +2,9 @@
 
 ## Current State
 
-As of 2026-10-14. Atlas is a Dash Framework front-end application for graphs, tables, and maps. [[francois-caffont]] built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer.
+As of 2026-10-22. Atlas is a Dash Framework front-end application for graphs, tables, and maps. [[francois-caffont]] built the first version with AI assistance and wants enough engineering confidence for continued internal development without turning the consulting engineer into the primary maintainer.
+
+Atlas has the beginnings of group-aware feature gating (`User.groups` reads a `groups` value from Okta user info), but its custom Okta authorisation servers currently request only `openid email profile`. Public discovery does not expose a `groups` scope or claim, so group-based UI or server-side permission checks cannot be relied on until IAM configures an Atlas-scoped groups claim, ideally on beta first. UNCERTAIN: public discovery can omit custom claims, so this needs confirmation in the Okta/Intact configuration.
 
 DEV is down outside Brian's control. On October 13, the read-only DAC connectivity workflow still had working credentials, but the DEV `dashboard-atlas` ECS service no longer existed in the expected cluster; on September 24 it still existed but was scaled to 0 tasks. The observed redirect to the dashboards homepage is therefore probably platform fallback rather than Atlas app behavior. The suggested path was for Francois to reach out to CDH/DAC about whether the DEV service was removed or switched off.
 
@@ -52,6 +54,7 @@ PROD looked healthy in the October 13 probe: credentials worked, the PROD servic
 - UNCERTAIN: Whether the actual Atlas PROD rollout and browser acceptance checks have been completed after the successful September 24 dry run.
 - UNCERTAIN: Whether CDH/DAC intentionally removed, renamed, or switched off the Atlas DEV service.
 - UNCERTAIN: Whether Atlas PROD charts and data load correctly after Okta login; the October 13 PROD probe checked hosting health only.
+- UNCERTAIN: Whether the Atlas beta and production authorisation servers already have a hidden groups claim, and who owns its Intact/Okta change.
 
 ## Sources
 
@@ -68,5 +71,6 @@ PROD looked healthy in the October 13 probe: credentials worked, the PROD servic
 - `sources/codex-conversations/2026-09-22-codex-conversations.txt`
 - `sources/codex-conversations/2026-09-24-codex-conversations.txt`
 - `sources/claude-conversations/2026-10-13-claude-atlas-dash-frontend-b943dd75.txt`
+- `sources/claude-conversations/2026-10-22-claude-atlas-dash-frontend-a93f38c8.txt`
 
-Last Updated: 2026-10-14
+Last Updated: 2026-10-23

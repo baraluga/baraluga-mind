@@ -1,0 +1,61 @@
+# Claude Conversation - 2026-10-22
+
+Project: atlas-dash-frontend (/Users/qn5792/repos/atlas-dash-frontend)
+Session: `a93f38c8-3143-4f64-bd8a-5d11da45c13a`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-atlas-dash-frontend/a93f38c8-3143-4f64-bd8a-5d11da45c13a.jsonl`
+Resume: `claude --resume a93f38c8-3143-4f64-bd8a-5d11da45c13a`
+
+## 17:04 user
+
+From Francois:
+
+"Hi Brian how are you? Quick question : I want to implement user permissions based on Intact groups in Atlas (i.e. make certain features visible only to certain users). For that, I understand I need to make sure Intact exposes the User groups to the app. Do you by any chance know if it is set by default in Intact? My guess is that I need to add the groups as part of the Scopes/APIs but not sure about it. 
+Can you maybe help? "
+
+## 17:05 assistant
+
+No, groups aren't sent by default. He's right that the fix is on the Okta side, but it's a claim on the authorization server, not just an extra scope in the app.
+
+**What I found:**
+- Atlas logs in against the custom Okta authorization servers in [_authentication.py](deployment/runtime/dash_okta/_authentication.py): `gem.okta-emea.com/.../aus2jp8vmz3yYrDnc0i7` for PROD and `gem-beta.oktapreview.com/.../aus3v6rg3e9zNHMxe0x6` for beta. It asks only for `scope: "openid email profile"`.
+- I pulled the public discovery documents for both servers. Neither lists a `groups` scope or a `groups` claim.
+  - One caveat: custom claims can be hidden from that public list. So this strongly suggests groups aren't configured, but it doesn't prove it.
+- The app already reads groups. `User.groups` reads `id_token["userinfo"]["groups"]`, but nothing calls it yet. Today it would raise a `KeyError` because the claim isn't there.
+
+**Draft reply:**
+
+> Hi Francois, all good, you? Short answer: no, groups aren't exposed by default. I checked our Okta auth servers (PROD and beta) and neither publishes a `groups` scope or claim today. We only request `openid email profile`.
+>
+> You're half right on scopes. On a custom Okta authorization server, the Okta admins have to add a **`groups` claim** to the auth server:
+> - included in the **ID token**
+> - value type "Groups"
+> - with a filter, e.g. "starts with ATLAS_", so we don't get every group the user is in
+> - set to "always include" (or tied to a `groups` scope)
+>
+> If they tie it to a scope, we just add `groups` to the requested scopes in the app.
+>
+> Code-wise it's mostly ready: there's already a `User().groups` helper in our Okta module that reads that claim. Once the claim is live, gating a feature is just checking membership in a callback/layout. One thing to keep in mind is that we'd check it on the server side too, not just hide things in the UI.
+>
+> These auth servers look shared, so the change probably has to go through the Okta/IAM team. I'd ask them to do it on beta first so we can test it. Happy to help wire it up once they have.
+
+Two things I didn't check: the Okta admin console itself (I can't see it, so "no groups claim" rests on the public discovery documents), and whether those auth servers are shared with other apps (I'm inferring that from the URLs).
+
+## 17:07 user
+
+too verbose. Francois is tech dumb lol.
+
+## 17:07 assistant
+
+Shorter version:
+
+> Hi Francois, all good! No, groups aren't shared with Atlas by default. You're on the right track, though: the Okta/IAM team needs to add a "groups" claim to Atlas's Okta setup, ideally only for Atlas-related groups. Once they've done it, I can handle the app side, which is mostly built already. Best to ask them to try it on beta first.
+
+## 17:08 user
+
+oh wait, remove the "ownership", as we're not supposed to be a support for Francios lol.
+
+## 17:08 assistant
+
+Here it is without the offer to help:
+
+> Hi Francois, all good! No, groups aren't shared with Atlas by default. You're on the right track, though: the Okta/IAM team needs to add a "groups" claim to Atlas's Okta setup, ideally only for Atlas-related groups. The app code can already read groups once the claim is there. Best to ask them to try it on beta first.
