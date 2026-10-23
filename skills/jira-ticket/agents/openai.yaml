@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira Ticket"
+  short_description: "Write concise, AI-first stories, tech tasks, and bug reports"
+  default_prompt: "Use $jira-ticket to write this ticket."
