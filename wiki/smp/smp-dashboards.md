@@ -11,7 +11,7 @@ As of 2026-10-22. Grafana dashboard work across SMP Japan and India. India data 
 - **Portable map panels:** Mateo's copied map panels failed because panel-only copies omit dashboard-level Grafana variables and shared-query panel references. The POC now makes map, freshness, zone-table, and price-stat panels self-contained with direct Athena queries and safe defaults. Treat independent panel pasting as the preferred pattern where it does not remove needed controls.
 - **Grafana usage (`SCR-1252`):** SMP runs Grafana OSS, so Enterprise Usage Insights isn't available. The cheapest first answer is active-user counts from the org-users API (`lastSeenAt`) or Okta logs, going deeper only if usage justifies it.
 - **QA datasource cleanup (`SCR-1296`):** a stray Athena datasource should only be removed after checking whether it is the default and whether dashboards or alert rules reference it. A QA-only, unexecuted script was prepared to perform that inventory and require typed confirmation before deletion; deletion itself needs a Grafana Admin token, not the Editor-scoped release token.
-- **Not urgent:** Matteo's KPI dashboard (end of year; flat CDH output if its shape is unknown) and the Grafana + JupyterLab integration, waiting on Nilo (see [[smp-jupyter-dag-authoring]]).
+- **Not urgent:** Matteo's KPI dashboard (end of year; flat CDH output if its shape is unknown) and the Grafana + JupyterLab integration, waiting on Nilo (see [[smp-jupyter-dag-authoring]]). A fourth forecast-versus-actual dashboard exercise is deferred until Jupyter/Dolphin integration; it would move Matteo's local error calculation into a DAG and use the result to train him on the DAG tooling.
 
 ## Background
 
@@ -86,6 +86,7 @@ As of 2026-10-22. Grafana dashboard work across SMP Japan and India. India data 
 - `sources/claude-conversations/2026-10-19-claude-smp-7de67109.txt`
 - `sources/claude-conversations/2026-10-20-claude-smp-7de67109.txt`
 - `sources/claude-conversations/2026-10-22-claude-smp-1439c39e.txt`
+- `sources/meetings/2026-10-22-0930-granola-busy.md`
 - Older sources are in this page's git history before 2026-10-11.
 
-Last Updated: 2026-10-23
+Last Updated: 2026-10-24

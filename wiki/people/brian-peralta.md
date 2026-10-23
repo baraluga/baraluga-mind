@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-22. Brian is coordinating the India-first browser DAG-authoring initiative. He created the `SCR-1210` decision spike and mutually exclusive JupyterHub/Codespaces paths around the repurposed `SCR-1297` outcome ticket; the spike must align the environment model with [[francois-delcourt]] and [[nilo-menezes]]. He will lead the 2026-10-26 Scrapper clarification session with [[adrien]] and [[mateo]]. His DashC/AWS account was decommissioned for inactivity and must be re-requested through the Singapore help desk only if the Jupyter work needs AWS CLI or infrastructure access.
+As of 2026-10-23. Brian is coordinating the India-first browser DAG-authoring initiative. He created the `SCR-1210` decision spike and mutually exclusive JupyterHub/Codespaces paths around the repurposed `SCR-1297` outcome ticket; the spike must align the environment model with [[francois-delcourt]] and [[nilo-menezes]]. A stock JupyterHub local spike worked but was torn down; Brian asked Pierre about Codespaces licensing after finding no clear Walnut support route. He will lead the 2026-10-26 Scrapper clarification session with [[adrien]] and [[mateo]]. His DashC/AWS account was decommissioned for inactivity and he does not intend to seek infrastructure access unless the Jupyter work makes it unavoidable; a deployment owner is still needed.
 
 ## Background
 
@@ -46,5 +46,7 @@ Observed behaviour for feedback season, as a third-party observer. Rendered by t
 - `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
 - `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 - `sources/claude-conversations/2026-10-22-claude-smp-d2cd8178.txt`
+- `sources/claude-conversations/2026-10-23-claude-smp-d2cd8178.txt`
+- `sources/codex-conversations/2026-10-23-codex-conversations.txt`
 
-Last Updated: 2026-10-23
+Last Updated: 2026-10-24

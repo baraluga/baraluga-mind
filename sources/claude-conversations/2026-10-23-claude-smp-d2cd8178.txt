@@ -1,0 +1,118 @@
+# Claude Conversation - 2026-10-23
+
+Project: smp (/Users/qn5792/repos/smp)
+Session: `d2cd8178-d406-49af-a7c8-16a8afc5aefa`
+Transcript: `/Users/qn5792/.claude/projects/-Users-qn5792-repos-smp/d2cd8178-d406-49af-a7c8-16a8afc5aefa.jsonl`
+Resume: `claude --resume d2cd8178-d406-49af-a7c8-16a8afc5aefa`
+
+## 13:11 user
+
+I'm not seeing any traction in our builder community post. Only reactions but no proper replies. I also took a look at confluence to find any mention of codespaces or the process of asking for it, nada!!! Unlike gh actions runner before.
+
+So... I'm not feeling confident with Codespaces in our org lol. Bong told me to ask Pierre, nevertheless, as he's the one who manages qrm-dms license for GH... so Bong reckons he might now. Write simple msg pls. Remember, Pierre is not privy with all the GH inner workings and just so happen that he's the guy who holds our license.
+
+## 13:11 assistant
+
+```
+Hi Pierre! Bong mentioned you manage our GitHub license for qrm-dms, so hopefully you can point me in the right direction.
+
+We'd like to try GitHub Codespaces. It lets a few of our users code from their browser without installing anything on their laptops. Is it included in our GitHub license, or is it something that has to be enabled or paid for separately? If you're not sure, who should I ask?
+
+Thanks!
+```
+
+## 13:13 user
+
+sent. Eric earlier raised a good point on the (in)feasibility of Codespaces -- Codespaces are only GH-hosted and doesn't allow self-hosting, which is not likely for Engie as they did with GH custom runner, no? Or you feel this is a non-issue
+
+## 13:13 assistant
+
+Eric's right that Codespaces only runs on GitHub's machines; you can't host it yourself the way ENGIE hosts the Walnut runner for Actions. It's a real issue, though not an automatic deal-breaker.
+
+**Why it matters**
+- **ENGIE's own track record:** Walnut set up self-hosted runners because GitHub's machines couldn't reach internal systems like Artifactory and VPN-only services. Codespaces has exactly that problem, and there's no self-hosted way around it.
+- **Our workaround is only partial:** a prebuilt image fixes dependency installs. But users still couldn't reach TSDB or other VPN-only systems from the IDE, so testing would only happen through the dev Airflow.
+- **Security approval:** it's a new cloud environment where users run code and possibly handle credentials. Security may need to sign off.
+
+**What softens it**
+- The code is already on GitHub's cloud (`qrm-dms` is on GitHub Enterprise Cloud), so data location isn't a new concern.
+- In the shared-sandbox model, real runs happen in the dev Airflow anyway. The IDE only edits and pushes.
+
+**My read:** add this to the earlier signals (no Confluence page, no process, no replies in Builder Community), and Codespaces looks **unlikely to be approved in practice**, even if it might work technically. I'd treat JupyterHub as the plan and Pierre's answer as a cheap last check. If he says it's included and allowed, look again. If not, delete SCR-1300 and move on.
+
+GitHub may offer some private-network option for Codespaces on Enterprise; I haven't checked and wouldn't count on it.
+
+## 14:08 user
+
+Yea. Accurate read. In the meantime, anything we can from this point?
+
+## 14:08 assistant
+
+Yes. The Codespaces question only blocks one small part of the spike. Here's what can move now:
+
+**1. Start the slow external requests today.** These take the longest and don't depend on any decision.
+- **AWS/EKS access.** Your machine has no EKS contexts and no AWS profiles, so you can't deploy to India dev right now. Raise the Singapore help-desk request now. Every SCR-1299 deploy step needs it.
+- **Okta app owner.** Find out who can add a redirect URI to the SMP Airflow Okta app. A one-line ask to Francois or whoever set up the Airflow Okta login.
+
+**2. Book the real decision: per-region vs per-branch with Francois and Nilo.** This, not Codespaces, is what really blocks SCR-1297/1299. Francois's ticket asks for Nilo's review anyway. 30 minutes, using the comparison table in SCR-1298.
+
+**3. Try the default JupyterHub locally (spike item).** You already have `helm`, `kubectl`, Docker and a `kind` cluster. Docker isn't running, though, so the cluster is down. Once you start Docker Desktop, I can run the plain chart (`jupyterhub/jupyterhub` 4.3.4) on `kind` and port-forward it. It takes about 15 minutes and gives you something concrete to show Francois and Nilo in that meeting.
+
+**4. Answer one of Francois's "is it possible?" questions.** "Every DAG turned off by default" works out of the box: Airflow's default pauses new DAGs, and nothing in `smp-tool` overrides it. I can add that to SCR-1297 as a comment.
+
+Do you want 3? If so, start Docker Desktop and say go.
+
+## 14:37 user
+
+1. Okay I have to confess.. I honestly don't like anything to do with AWS or anything infra that would require me to use a different account (dash C).. So I'd only dignify the idea of asking for access if there's a gun pointing at me lol. For anything okta, I think I can do that. I assume it's via Intact, yes? Intact beta and Intact (prod).
+2. good point. Will it make any difference in terms of things we'd be doing though? I feel it's only a matter of scale. Either N or MxN..?
+3. Good call. You have full control. No docker but I have orbstack
+4. Let's take care of this too
+
+## 14:40 assistant
+
+Default JupyterHub installed on OrbStack. Checking it spawns a notebook.
+
+## 14:41 assistant
+
+JupyterLab is loading for the test user. Meanwhile, posting the comment on SCR-1297.
+
+## 14:41 assistant
+
+**1. Okta: yes, through Intact.** India dev Airflow logs in through `gem-beta.oktapreview.com` (`smp-tool/config/india/dev/airflow_values.yaml:1511`), so dev means **Intact beta** and prod means Intact prod. The JupyterHub ask is to add its callback URL to that same app's allowed redirect URIs.
+
+On AWS: fine, but someone still has to run `helm` against EKS for SCR-1299. If it isn't you, put a name on it. Eric or Nilo are likely candidates, since the Synapse docs already hand deploy commands to someone to run by hand.
+
+**2. It's not just a matter of scale.** Per-branch adds a whole other kind of work:
+- **Per region:** "deploy JupyterHub once next to an Airflow". Static config, done.
+- **Per branch:** an *on-demand system* that creates a branch, namespace, Airflow (with its own database), JupyterLab and storage when someone starts, and tears it all down afterwards. It also has to enforce the max-of-2 cap and track cost. That's an automation project with its own failure modes, like orphaned namespaces or a stuck teardown. It's closer to what Synapse built than the "lighter" version Francois asked for.
+
+So the meeting matters: per-branch could add 1–2 weeks, not just more of the same.
+
+**3. Local JupyterHub works.** On your OrbStack Kubernetes (I switched it on), the plain chart `jupyterhub/jupyterhub` 4.3.4 is running in namespace `jupyter-spike` at **http://localhost:8080** (port-forward). It accepts any username, and a test user `spike-user` got a working JupyterLab. Install and first login took about 2 minutes total, so "install the chart" really is the easy part, just as Mae said.
+
+**4. Posted on [SCR-1297](https://tractebel-et.atlassian.net/browse/SCR-1297)** as a comment answering both of Francois's "is it possible?" questions:
+- **DAGs off by default:** yes. Airflow's default pauses new DAGs, `smp-tool` doesn't override that, and several smp-india DAGs set it explicitly too.
+- **Same active DAGs after the merge:** yes. Whether a DAG is on or off is stored in each Airflow's database, not in git. Merging into `dev` doesn't change what's already running; new DAGs arrive paused.
+
+The local hub has no Okta, no SMP image and no git, so it shows the starting point only.
+
+## 17:16 user
+
+Tear down the local JupyterHub and turn OrbStack Kubernetes back off.
+
+## 17:16 assistant
+
+The local JupyterHub is gone: I uninstalled the Helm release, deleted the `jupyter-spike` namespace and stopped the port-forward.
+
+OrbStack's Kubernetes is set to off, but it's still running until OrbStack restarts. A restart briefly stops your other containers: `scr-1248-metrics-drilldown-grafana-1`, `scr-1248-metrics-drilldown-telemetry-1`, `devcontainer-db-1` and `kind-control-plane`. Any of them without a restart policy won't come back on their own. So I didn't restart it without asking.
+
+## 17:24 user
+
+Restart OrbStack now; the containers can come back up.
+
+## 17:24 assistant
+
+OrbStack has restarted and its Kubernetes is off; connecting to that cluster now gets refused. All four containers came back up on their own: `scr-1248-metrics-drilldown-grafana-1`, `scr-1248-metrics-drilldown-telemetry-1`, `devcontainer-db-1` and `kind-control-plane`. My own command to restart them failed, but they didn't need it.
+
+Your kube config still lists an `orbstack` cluster entry, but it points at nothing now.

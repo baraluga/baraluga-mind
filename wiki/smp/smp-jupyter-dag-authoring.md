@@ -2,12 +2,13 @@
 
 ## Current State
 
-As of 2026-10-22.
+As of 2026-10-23.
 
 - **Delivery shape:** `SCR-1210` is now the epic for an India-first browser development environment. `SCR-1297` is the outcome ticket, *SMP-ready browser dev environment (India pilot)*; it preserves [[francois-delcourt]]'s original scope. Its acceptance target is a no-local-setup environment where a key user can develop a DAG, push it, and have another user see it in India dev Airflow.
-- **Current planning:** `SCR-1298` is the spike that must settle per-region versus per-branch isolation with [[francois-delcourt]] and [[nilo-menezes]], JupyterHub versus Codespaces, and the `dev` versus `sandbox` branch. `SCR-1299` (JupyterHub on India dev with Okta) and `SCR-1300` (Codespaces for `smp-india`) are mutually exclusive implementation paths; delete the losing path after the spike.
+- **Current planning:** `SCR-1298` is the spike that must settle per-region versus per-branch isolation with [[francois-delcourt]] and [[nilo-menezes]], JupyterHub versus Codespaces, and the `dev` versus `sandbox` branch. `SCR-1299` (JupyterHub on India dev with Okta) and `SCR-1300` (Codespaces for `smp-india`) are mutually exclusive implementation paths; delete the losing path after the spike. Per-branch is a materially different on-demand platform (branch, namespace, Airflow/database, JupyterLab, storage, cost cap, and teardown), not simply a scaled per-region deployment.
 - **Direction, not yet a final architecture:** Brian prefers one sandbox per region over an Airflow/Jupyter instance per user branch, because the estimate is only one to two active authors and per-user instances add lifecycle and capacity cost. The spike remains the decision gate; it must account for the isolation and clean-PR benefits of per-branch work.
-- **Operational constraints:** JupyterHub needs EKS capacity, an Okta callback/ingress configuration, and an SMP-ready image. Codespaces needs organisation availability/billing and a way to use private Artifactory dependencies without public-network access. The shared non-prod EKS cluster was reported at about 90% utilized on 2026-10-08 (10 nodes, 78.2 cores), but that is not a current capacity measurement.
+- **Operational constraints:** JupyterHub needs EKS capacity, an Okta callback/ingress configuration, and an SMP-ready image. A 2026-10-23 local OrbStack spike installed the stock `jupyterhub/jupyterhub` 4.3.4 chart and opened JupyterLab for a test user; it was then fully removed and OrbStack Kubernetes was disabled. This proves only the baseline chart, not Okta, Git, SMP-image, ingress, or India deployment readiness. Codespaces remains practically doubtful: searches found no Walnut onboarding/support process, it runs only on GitHub-hosted infrastructure, and its private-network/Artifactory fit is unresolved. Brian asked Pierre about license availability; no response is captured.
+- **Airflow behaviour:** a comment was posted to `SCR-1297` that new DAGs default paused and existing active/inactive state lives in each Airflow database, so merging to `dev` does not switch already-running DAGs. This is implementation guidance, not a production verification.
 - **Workflow preference:** retain Git/PR review as the merge gate and avoid Synapse-style automatic commits on every Jupyter save/autosave. The desired user flow is intentional commit/push from the browser environment; notebooks remain optional to the core setup-friction problem.
 
 ## Background
@@ -31,8 +32,8 @@ As of 2026-10-22.
 ## Open Questions
 
 - UNCERTAIN: Which environment model wins: per-region or per-branch.
-- UNCERTAIN: Whether Codespaces is available to the organisation, how it is billed, and how it can safely consume private Artifactory dependencies.
-- UNCERTAIN: Whether EKS has capacity for JupyterHub and who owns the Okta callback configuration.
+- UNCERTAIN: Whether Codespaces is available to the organisation, how it is billed, and whether GitHub Enterprise private networking can satisfy SMP's Artifactory and service-access needs.
+- UNCERTAIN: Whether EKS has capacity for JupyterHub, who owns the Okta callback configuration, and who will deploy `SCR-1299` if Brian does not use DashC/AWS infrastructure access.
 
 ## Sources
 
@@ -47,5 +48,7 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/meetings/2026-10-21-1415-granola-smp-retro.md`
 - `sources/meetings/2026-10-21-1630-granola-smp-review.md`
 - `sources/claude-conversations/2026-10-22-claude-smp-d2cd8178.txt`
+- `sources/claude-conversations/2026-10-23-claude-smp-d2cd8178.txt`
+- `sources/codex-conversations/2026-10-23-codex-conversations.txt`
 
-Last Updated: 2026-10-23
+Last Updated: 2026-10-24

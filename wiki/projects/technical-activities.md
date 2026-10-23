@@ -12,7 +12,7 @@ Non-SMP projects that came up in technical-activities standups, the tech-lead ro
 - **Lambda VPC binding** (2026-09-17): several no-prod Lambdas, including Extruder and The Click, are deployed without VPC binding. Not urgent; a report is wanted.
 - **DayClick** (2026-09-17): production domain `declick.myengi.com`, pending NGIT DNS and DigiCert. UNCERTAIN: exact names.
 - **Omniland** (2026-09-17): moving to ECR publication via an ADO-to-GitHub pipeline, EventBridge, and Step Functions. Moving to a backend-for-frontend auth pattern after a pentest.
-- **Onset Energy** (2026-09-17): green-lit. Angular, FastAPI, CDK, serverless, with a DNV integration.
+- **Onset Energy** (as of 2026-10-22): green-lit. Angular, FastAPI, CDK, serverless, with a DNV integration. The reported Phase 1 needs multi-tenancy before further build: only super-admin would remain in Okta, while per-client roles live in internal tables and the UI selects the active client role. Continuing without it was said to risk a later breaking change. UNCERTAIN: the proposed model and project naming are based on one meeting summary.
 - **Kiba MCP and MCP servers** (2026-09-17/22): Kiba MCP stores no data; users supply keys at runtime. 2 of 5 MCP servers were deployed by 2026-09-15, with governance unsettled.
 - **Consumer backend** (2026-09-22): migrated to GitHub; integration testing blocked on front-end/back-end integration. [[michael]] was waiting on Artifactory and the Sabina team.
 - **ABS-CBS TSDB** (2026-09-22): production approval blocked until TSDB metadata is pre-created.
@@ -35,5 +35,6 @@ Main sources are below. The full trail from before the 2026-10-11 split is on [[
 - `sources/meetings/2026-09-15-weekly-team-meeting.md`
 - `sources/meetings/2026-09-17-1700-granola-tech-lead-roundtable.md`
 - `sources/meetings/2026-09-22-0945-granola-weekly-team-meeting.md`
+- `sources/meetings/2026-10-22-1702-granola-tech-lead-roundtable.md`
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-24

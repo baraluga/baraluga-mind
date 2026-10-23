@@ -2,7 +2,7 @@
 
 ## Current State
 
-As of 2026-10-21, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
+As of 2026-10-23, AI-assisted engineering in these notes is a practical workflow theme rather than a single governed program. The durable patterns are repo-grounded Copilot/Codex work, custom skills and mods for repeated workflows, MCP/browser validation, reverse-engineering tools, and lightweight agent orchestration when the coordination cost is justified.
 
 Human review and workflow controls remain part of the operating model. The current constraints are still network access, authentication, billing/credit ambiguity, model quality, context size, and evidence quality. October 2026 work also showed a practical personal-tooling pattern: Claude mods can expose usage and work-time signals in the prompt/footer UI, while Codex can be used as an adversarial reviewer when Brian or Claude remains the main driver.
 
@@ -11,6 +11,8 @@ As of 2026-10-15, Brian's local Ponytail plugin is updated to 5.2.0 and configur
 Brian's current review rule is proportional: default to a read-only Claude subagent when a review is warranted; additionally run Codex in parallel for data integrity, deletions, crash recovery, money, or production-data changes. A small controlled comparison found Claude faster while Codex better demonstrated impact for an ordering defect; this is a local working preference, not a general model-quality claim.
 
 The October QRM presentation reinforced that spec-driven development remains a supervised, stack-specific workflow: specifications precede implementation, organization-level GitHub standards are shared in Markdown, and pull-request review remains human-owned. Reported credit use for a complex task (~10,000 credits over two days) exceeded a standard 5,000-credit period cap, so output size and test volume need active cost control. The reported OmniRun result is a meeting claim, not independently validated here.
+
+The 2026-10-22 tech-lead roundtable sharpened the control model: align process deviations with the group before work starts; groom work in human-led epics or batches before agents; keep one developer responsible for SDD on a story at a time; and retain PO review of specifications plus tech-lead review of architecture. ARC001's dependency-tree parallelization was timeboxed for assessment, not adopted as a default. Kiva-to-SDD conversion is blocked by non-standard MCP requirements and a repository-creation constraint; the exact tooling and owner path remain uncertain.
 
 ## Background
 
@@ -121,5 +123,6 @@ The October QRM presentation reinforced that spec-driven development remains a s
 - `sources/codex-conversations/2026-10-13-codex-conversations.txt`
 - `sources/claude-conversations/2026-10-16-claude-smp-68dedda3.txt`
 - `sources/meetings/2026-10-20-1500-granola-qrm-all.md`
+- `sources/meetings/2026-10-22-1702-granola-tech-lead-roundtable.md`
 
-Last Updated: 2026-10-21
+Last Updated: 2026-10-24
